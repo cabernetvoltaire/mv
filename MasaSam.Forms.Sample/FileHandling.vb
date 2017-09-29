@@ -21,6 +21,16 @@ Module FileHandling
                         frmMain.Update()
                         frmMain.tsslblFiles.Text = list.Count & " FILES LOADED"
                     End If
+                Else
+                    If extensions = "" Then
+                        If blnRemove Then
+                            list.Remove(file.FullName)
+                        Else
+                            list.Add(file.FullName)
+
+                            DontInclude.Add(False)
+                        End If
+                    End If
                 End If
 
             Catch ex As PathTooLongException
@@ -41,6 +51,7 @@ Module FileHandling
     End Sub
 
     Public Sub FillListbox(lbx As ListBox, e As IO.DirectoryInfo, Currentfilterstate As Integer, ByVal flist As List(Of String))
+        If IsNothing(e) Then Exit Sub
         If e.Name = "My Computer" Then Exit Sub
 
         Try
@@ -93,6 +104,7 @@ Module FileHandling
             lbx.Tag = e
             If lbx.Items.Count <> 0 Then
                 lbx.SelectedIndex = 0
+                'lbx.TabStop = True
 
             End If
             'flist.Clear()
@@ -147,6 +159,7 @@ Module FileHandling
             frmMain.tsslblLastfile.Text = s & "(" & list.Count & ")"
             frmMain.Update()
         Loop
+        If lbx.Items.Count <> 0 Then lbx.TabStop = True
         fs.Close()
         If notlist.Count = 0 Then Exit Sub
         If MsgBox(notlist.Count & " files were not found. Remove from list?", vbYesNo, "Metavisua") = MsgBoxResult.Yes Then
@@ -154,6 +167,5 @@ Module FileHandling
                 list.Remove(s)
             Next
         End If
-
     End Sub
 End Module

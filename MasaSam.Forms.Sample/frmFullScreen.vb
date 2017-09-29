@@ -4,8 +4,9 @@ Public Class FullScreen
 
 
     Private Sub FullScreen_Shown(sender As Object, e As EventArgs) Handles Me.Shown
-        FSWMP.stretchToFit = True 'TODo improve this
+        'FSWMP.stretchToFit = True 'TODo improve this
         FSWMP.uiMode = "None"
+        FSWMP.Location = Me.Location
         Timer1.Interval = 25
         Timer1.Enabled = True
 
@@ -75,4 +76,7 @@ Public Class FullScreen
         End If
     End Sub
 
+    Private Sub FSBlanker_Click(sender As Object, e As EventArgs) Handles FSBlanker.Click
+
+    End Sub
 End Class

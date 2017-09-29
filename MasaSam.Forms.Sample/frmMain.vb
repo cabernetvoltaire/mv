@@ -5,6 +5,7 @@ Imports AxWMPLib
 Imports MasaSam.Forms.Controls
 
 
+
 Public Class frmMain
     Public Enum ExifOrientations As Byte
         Unknown = 0
@@ -24,10 +25,9 @@ Public Class frmMain
     Public currentWMP As New AxWMPLib.AxWindowsMediaPlayer
     Public LastPlayed As New Stack(Of String)
     Public blnAutoAdvanceFolder As Boolean = True
-
-
-
-
+    Public Property blnRestartSlideShowFlag As Boolean = False
+    Public strOldPath As String = "C:\"
+    Public ChosenPlayOrder As Byte = 0
     Public Function ImageOrientation(ByVal img As Image) As ExifOrientations
         ' Get the index of the orientation property.
         Dim orientation_index As Integer = Array.IndexOf(img.PropertyIdList, OrientationId)
@@ -47,6 +47,8 @@ Public Class frmMain
         Length
         Type
     End Enum
+    Dim strPlayOrder() As String = {"Original", "Random", "Name", "Path Name", "Date/Time", "Size", "Type"}
+
     Private Sub SaveShowlist()
         Dim path As String
         If SaveFileDialog1.ShowDialog() = System.Windows.Forms.DialogResult.OK Then
@@ -63,13 +65,18 @@ Public Class frmMain
                 tmrSlideShow.Enabled = False
 
             Case KeyRandomize
-                blnRandom = Not blnRandom
-                If blnRandom Then
-                    tsslblRandom.Text = "RANDOM"
-                Else
-                    tsslblRandom.Text = "ORDERED"
+                'Cycle through play orders
+                ChosenPlayOrder = (ChosenPlayOrder + 1) Mod (PlayOrder.Type - 1)
+                tsslblRandom.Text = UCase(strPlayOrder(ChosenPlayOrder))
+                Showlist = SetPlayOrder(ChosenPlayOrder, Showlist)
+                FillShowbox(lbxShowList, FilterState.All, Showlist)
+                'blnRandom = Not blnRandom
+                'If blnRandom Then
+                '    tsslblRandom.Text = "RANDOM"
+                'Else
+                '    tsslblRandom.Text = "ORDERED"
 
-                End If
+                'End If
 
 
             Case KeyNextFile, KeyPreviousFile
@@ -81,7 +88,7 @@ Public Class frmMain
                 MediaSmallJump(e)
                 e.Handled = True
 
-                Case KeyBigJumpOn, KeyBigJumpBack
+            Case KeyBigJumpOn, KeyBigJumpBack
                 MediaLargeJump(e)
                 e.Handled = True
             Case KeyMuteToggle
@@ -101,8 +108,8 @@ Public Class frmMain
                 JumpRandom(e.Shift)
 
             Case KeyTraverseTree, KeyTraverseTreeBack
-                'tvwMain2_KeyDown(sender, e)
-                'TraverseTree(tvwMain2.tvFiles, e.KeyCode = KeyTraverseTree)
+                'tvMain_KeyDown(sender, e)
+                'TraverseTree(tvMain.tvFiles, e.KeyCode = KeyTraverseTree)
             Case KeyToggleSpeed
                 With currentWMP
                     If .playState = WMPLib.WMPPlayState.wmppsPaused Or PlaybackSpeed <> 1 Then
@@ -117,7 +124,7 @@ Public Class frmMain
                 tsslblSPEED.Text = "SPEED (" & PlaybackSpeed * 100 & "%)"
             Case KeySpeed1, KeySpeed2, KeySpeed3
                 If e.KeyCode = KeySpeed1 Then
-                    If e.Control Then 'increase the extremes if Control held
+                    If e.Control Then 'increase the extremes if Control held TODO Don't know if this works. 
                         If e.Shift Then 'decrease if Shift
                             iSSpeeds(0) = iSSpeeds(0) * 0.9
                         Else
@@ -138,8 +145,13 @@ Public Class frmMain
                 End If
 
                 Dim Choice As Byte = e.KeyCode - KeySpeed1
-                PlaybackSpeed = iPlaybackSpeed(Choice) 'TODO Options
-                If tmrSlideShow.Enabled Then tmrSlideShow.Interval = iSSpeeds(Choice)
+                If tmrSlideShow.Enabled Then
+                    tmrSlideShow.Interval = iSSpeeds(Choice)
+                Else
+                    PlaybackSpeed = iPlaybackSpeed(Choice) 'TODO Options
+                    'TODO This means you can't change Slideshow speed while watching a movie, which makes sense. 
+
+                End If
                 If Choice = KeyToggleSpeed - KeySpeed1 Then PlaybackSpeed = 1
 
                 currentWMP.settings.rate = PlaybackSpeed
@@ -149,7 +161,7 @@ Public Class frmMain
             Case KeyFilter 'Cycle through listbox filters
                 CurrentFilterState = (CurrentFilterState + 1) Mod (GetMaxValue(Of FilterState)() + 1)
                 'MsgBox(CurrentFilterState.ToString)
-                FillListbox(lbxFiles, lbxFiles.Tag, CurrentFilterState, Showlist)
+                FillListbox(lbxFiles, New DirectoryInfo(CurrentFolderPath), CurrentFilterState, Showlist)
                 tsslblFilter.Text = UCase(Filterstates(CurrentFilterState))
                 e.Handled = True
 
@@ -322,6 +334,8 @@ Public Class frmMain
         For Each s In showlist
             lbxShowList.Items.Add(s)
         Next
+        lbxShowList.TabStop = True
+
     End Sub
     Private Sub SetWMP(tWMP As AxWindowsMediaPlayer)
         With currentWMP
@@ -332,9 +346,10 @@ Public Class frmMain
 
             '   .Visible = False
             currentWMP = tWMP
-            .uiMode = "FULL"
+            '.uiMode = "FULL"
             .stretchToFit = True
             .Visible = True
+            .BringToFront()
         End With
 
     End Sub
@@ -375,8 +390,12 @@ Public Class frmMain
         Dim finfo As New IO.FileInfo(strPath)
         Dim dr As New DriveInfo(strPath)
         Dim fldr As New DirectoryInfo(strPath)
-        'tvwMain2.Collapse()
-        tvwMain.Expand(strPath)
+        'tvMain.Collapse()
+        'tvMain2.Validate()
+        '        tvMain2.Collapse(strOldPath)
+        tvMain2.CreateControl()
+        tvMain2.Expand(strPath)
+
         'Tvw.SelectNode(strPath, 0, False)
         ' FillListbox(lbxFiles, fldr, CurrentFilterState, LboxFiles) 'TODO
         'Highlight the file in lbxFiles
@@ -396,7 +415,7 @@ Public Class frmMain
 
     End Sub
     Private Sub LoadShowList()
-        Dim path As String
+        Dim path As String = ""
         tsslblLastfile.Text = TimeOperation(True).TotalMilliseconds
         If OpenFileDialog1.ShowDialog() = System.Windows.Forms.DialogResult.OK Then
             path = OpenFileDialog1.FileName
@@ -416,8 +435,12 @@ Public Class frmMain
     End Sub
 
     Private Sub AddMovies(blnRecurse As Boolean)
-        AddFilesToCollection(Showlist, FBCShown, strVideoExtensions, True)
+        AddFilesToCollection(Showlist, FBCShown, strVideoExtensions, blnRecurse)
         FillShowbox(lbxShowList, FilterState.All, Showlist)
+    End Sub
+    Private Sub AddFiles(blnRecurse As Boolean)
+        AddFilesToCollection(Showlist, FBCShown, "", blnRecurse)
+        FillShowbox(lbxFiles, FilterState.All, Showlist)
     End Sub
     Private Sub SelectRandomToPlay(flist As List(Of String))
         If flist.Count = 0 Then Exit Sub
@@ -537,7 +560,7 @@ Public Class frmMain
         Dim s As String
 
         s = InputBox("Search for?")
-        Dim d As New System.IO.DirectoryInfo(CurrentFolderPath)
+        Dim d As New DirectoryInfo(CurrentFolderPath)
 
         FindAllFilesBelow(d, list, dontinclude, extensions, False, s, blnRecurse)
 
@@ -559,7 +582,8 @@ Public Class frmMain
     'Form Controls
     Private Sub Form1_Shown(sender As Object, e As EventArgs) Handles Me.Shown
         PreferencesGet()
-        'HighlightCurrent(strCurrentFolderPath)
+        tmrLoadLastFolder.Enabled = True
+        ' HighlightCurrent(strCurrentFilePath)
         tmrPicLoad.Interval = lngInterval
         tmrJumpVideo.Interval = lngInterval / 50
         currentWMP = MainWMP
@@ -584,23 +608,7 @@ Public Class frmMain
         Settings.PreferencesSave()
     End Sub
 
-    Private Sub tvwMain2_DirectorySelected(sender As Object, e As DirectoryInfoEventArgs)
-        PreferencesSave()
-        CurrentFolderPath = e.Directory.FullName
-        FillListbox(lbxFiles, e.Directory, CurrentFilterState, Showlist)
-        '  ControlSetFocus(lbxFiles)
-    End Sub
-    Private Sub tvwMain2_NodeSelected(sender As Object, e As TreeViewEventArgs)
-        If e.Node.ToolTipText = "My Computer" Then Exit Sub
-
-        If e.Node.ToolTipText = "" Then Exit Sub
-        ' MsgBox(e.Node.ToolTipText)
-        Dim di = New IO.DirectoryInfo(e.Node.ToolTipText)
-        CurrentFolderPath = di.FullName
-        FillListbox(lbxFiles, di, CurrentFilterState, Showlist)
-
-    End Sub
-    Private Sub tvwMain2_DriveSelected(sender As Object, e As DriveInfoEventArgs)
+    Private Sub tvMain2_DriveSelected(sender As Object, e As DriveInfoEventArgs)
         If e.Drive.Name = "" Then Exit Sub
         Try
             If e.Drive.DriveFormat = "" Then Exit Sub
@@ -647,7 +655,12 @@ Public Class frmMain
                 currentWMP.URL = strCurrentFilePath
                 If PlaybackSpeed <> 1 Then currentWMP.settings.rate = PlaybackSpeed
                 currentWMP.Visible = True
-                tmrSlideShow.Enabled = False 'Slideshow stops if movie. Create separate timer for movie slideshows. 
+                currentWMP.BringToFront()
+
+                If tmrSlideShow.Enabled Then
+                    blnRestartSlideShowFlag = True
+                    tmrSlideShow.Enabled = False 'Slideshow stops if movie. Create separate timer for movie slideshows. 
+                End If
 
             Case Filetype.Pic
                 Dim img As Image
@@ -671,11 +684,15 @@ Public Class frmMain
                 End Select
 
                 '  currentPicBox.Image = img
-
+                If blnRestartSlideShowFlag Then
+                    tmrSlideShow.Enabled = True
+                    blnRestartSlideShowFlag = False
+                End If
                 currentWMP.Visible = False
                 currentWMP.URL = ""
                 PreparePic(currentPicBox, pbxBlanker, img)
                 currentPicBox.Visible = True
+                currentPicBox.BringToFront()
                 currentWMP.Visible = False
             Case Filetype.Unknown
                 tsslblLastfile.Text = "Unhandled file " & strCurrentFilePath
@@ -701,7 +718,7 @@ Public Class frmMain
     'Tool strip buttons
 
     Private Sub ToolStripButton3_Click(sender As Object, e As EventArgs)
-        tvwMain.Expand(strCurrentFilePath)
+        'tvwMain.Expand(strCurrentFilePath)
         'Tvw.SelectNode(strCurrentFilePath, 0, False)
         ToolStripButton6_Click(sender, e)
 
@@ -721,6 +738,7 @@ Public Class frmMain
     Private Sub ToolStripButton6_Click(sender As Object, e As EventArgs) Handles tsbClear.Click
         Showlist.Clear()
         lbxShowList.Items.Clear()
+        lbxShowList.TabStop = False
         FBCShown.Clear()
         ' tsslblFilter.Text = "0"
     End Sub
@@ -762,6 +780,7 @@ Public Class frmMain
     End Sub
     Private Sub ToolStripButton15_Click(sender As Object, e As EventArgs) Handles ToolStripButton15.Click
         tmrSlideShow.Enabled = Not tmrSlideShow.Enabled
+        If tmrSlideShow.Enabled = False Then blnRestartSlideShowFlag = False
     End Sub
     Private Sub ToolStripComboBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ToolStripComboBox1.SelectedIndexChanged
         Dim i As Integer
@@ -774,6 +793,7 @@ Public Class frmMain
     Private Sub lbxShowList_SelectedIndexChanged(sender As Object, e As EventArgs) Handles lbxShowList.SelectedIndexChanged, lbxFiles.SelectedIndexChanged
         With sender
             Dim i As Long = .SelectedIndex
+            strOldPath = strCurrentFilePath
             strCurrentFilePath = .Items(i)
             lCurrentDisplayIndex = i
             tmrPicLoad.Enabled = True
@@ -825,7 +845,7 @@ Public Class frmMain
     End Sub
 
     Private Sub ToolStripTextBox1_LostFocus(sender As Object, e As EventArgs) Handles ToolStripTextBox1.LostFocus
-        Dim str = ToolStripTextBox1.Text
+        Dim str = ToolStripTextBox1.Text 'TODO fix this
         If str = "" Then
             Showlist = Sublist
         Else
@@ -865,30 +885,21 @@ Public Class frmMain
         Addpics(False)
     End Sub
 
-    Private Sub tvwMain2_Load(sender As Object, e As EventArgs)
+    Private Sub tvMain_Load(sender As Object, e As EventArgs)
 
     End Sub
 
 
 
-    Private Sub tvwMain2_Enter(sender As Object, e As EventArgs) Handles lbxShowList.Enter, lbxFiles.Enter
+    Private Sub tvMain2_Enter(sender As Object, e As EventArgs) Handles lbxShowList.Enter, lbxFiles.Enter, tvMain2.Enter
         sender.backcolor = Color.Aquamarine
     End Sub
 
-    Private Sub tvwMain2_Leave(sender As Object, e As EventArgs) Handles lbxShowList.Leave, lbxFiles.Leave
+    Private Sub tvMain2_Leave(sender As Object, e As EventArgs) Handles lbxShowList.Leave, lbxFiles.Leave, tvMain2.Leave
         sender.backcolor = Color.White
 
     End Sub
 
-    Private Sub tvwMain2_BackColorChanged(sender As Object, e As EventArgs)
-        MsgBox("Yes - " & sender.backcolor.ToString)
-    End Sub
-
-
-
-    Private Sub FileSystemWatcher1_Changed(sender As Object, e As FileSystemEventArgs)
-
-    End Sub
 
     Private Sub showButtons_Click(sender As Object, e As EventArgs) Handles showButtons.Click
         Buttons.Show()
@@ -903,7 +914,70 @@ Public Class frmMain
         Addpics(True)
     End Sub
 
-    Private Sub tvwMain2_MouseClick(sender As Object, e As MouseEventArgs)
+    Private Sub tvMain2_DirectorySelected(sender As Object, e As DirectoryInfoEventArgs) Handles tvMain2.DirectorySelected
+        PreferencesSave()
+        CurrentFolderPath = e.Directory.FullName
+        FillListbox(lbxFiles, e.Directory, CurrentFilterState, Showlist)
+        '  ControlSetFocus(lbxFiles)
+    End Sub
 
+    Private Sub tvMain2_NodeSelected(sender As Object, e As TreeViewEventArgs) Handles tvMain2.NodeSelected
+        If e.Node.ToolTipText = "My Computer" Then Exit Sub
+
+        If e.Node.ToolTipText = "" Then Exit Sub
+        ' MsgBox(e.Node.ToolTipText)
+        Dim di = New IO.DirectoryInfo(e.Node.ToolTipText)
+        CurrentFolderPath = di.FullName
+        FillListbox(lbxFiles, di, CurrentFilterState, Showlist)
+    End Sub
+
+    Private Sub lbxShowList_CollectionChanged(sender As Object, e As EventArgs) Handles lbxShowList.DataSourceChanged
+
+
+    End Sub
+
+    Private Sub tvMain2_Load(sender As Object, e As EventArgs) Handles tvMain2.Load
+
+    End Sub
+
+    Private Sub tvMain2_GotFocus(sender As Object, e As EventArgs) Handles tvMain2.GotFocus
+        HighlightCurrent(strCurrentFilePath)
+    End Sub
+
+    Protected Overrides Sub Finalize()
+        MyBase.Finalize()
+    End Sub
+
+    Private Sub AddAllFilesToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AddAllFilesToolStripMenuItem.Click
+
+    End Sub
+
+    Private Sub CurrentOnlyToolStripMenuItem2_Click(sender As Object, e As EventArgs) Handles CurrentOnlyToolStripMenuItem2.Click
+        AddFiles(False)
+    End Sub
+
+    Private Sub AllSubFoldersToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AllSubFoldersToolStripMenuItem.Click
+        AddFiles(True)
+    End Sub
+
+    Private Sub AddPicturesAndVideosToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AddPicturesAndVideosToolStripMenuItem.Click
+    End Sub
+
+    Private Sub CurrentOnlyToolStripMenuItem3_Click(sender As Object, e As EventArgs) Handles CurrentOnlyToolStripMenuItem3.Click
+        AddPicVids(False)
+    End Sub
+
+    Private Sub AllSubfoldersToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles AllSubfoldersToolStripMenuItem1.Click
+        AddPicVids(True)
+    End Sub
+
+    Private Sub AddPicVids(blnRecurse As Boolean)
+        AddFilesToCollection(Showlist, FBCShown, strPicExtensions & strVideoExtensions, blnRecurse)
+        FillShowbox(lbxShowList, FilterState.All, Showlist)
+    End Sub
+
+    Private Sub tmrLoadLastFolder_Tick(sender As Object, e As EventArgs) Handles tmrLoadLastFolder.Tick
+        HighlightCurrent(strCurrentFilePath)
+        tmrLoadLastFolder.Enabled = False
     End Sub
 End Class

@@ -25,6 +25,7 @@
             CurrentFilterState = .GetValue("Filter")
         End With
 
+
     End Sub
 
 End Module

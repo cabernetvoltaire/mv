@@ -46,6 +46,8 @@ Public Class FileSystemTree
     <Description("Notifies when file is selected either by clicking or expanding.")>
     <Category("Behavior")>
     Public Event FileSelected As EventHandler(Of FileInfoEventArgs)
+    'RaiseEvent (sender, )
+    '    Public Event DirectoryHighlighted As EventHandlerList()
 
 #End Region
 
@@ -888,6 +890,7 @@ Public Class FileSystemTree
         OnNodeCollapsed(e.Node)
     End Sub
 
+
     Private Sub tvFiles_BeforeExpand(sender As Object, e As TreeViewCancelEventArgs) Handles tvFiles.BeforeExpand
         Dim node As FileSystemNode = CType(e.Node, FileSystemNode)
         OnNodeExpanding(node)
@@ -914,6 +917,21 @@ Public Class FileSystemTree
 
             OnNodeClicked(node)
         End If
+
+    End Sub
+
+    Private Sub FileSystemTree_ParentChanged(sender As Object, e As EventArgs) Handles Me.ParentChanged
+
+    End Sub
+
+    Private Sub tvFiles_BeforeSelect(sender As Object, e As TreeViewCancelEventArgs) Handles tvFiles.BeforeSelect
+        ' MsgBox("YEs")
+    End Sub
+
+    Public Sub tvFiles_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles tvFiles.AfterSelect
+        Dim d = CType(e, DirectoryInfoEventArgs)
+
+        RaiseEvent DirectorySelected(sender, d)
 
     End Sub
 

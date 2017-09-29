@@ -37,6 +37,12 @@ Partial Class frmMain
         Me.AddAllVideosToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CurrentOnlyToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.IncludingSubsetsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.AddAllFilesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.CurrentOnlyToolStripMenuItem2 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.AllSubFoldersToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.AddPicturesAndVideosToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.CurrentOnlyToolStripMenuItem3 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.AllSubfoldersToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.SlideshowToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.FileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.NewToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -74,6 +80,7 @@ Partial Class frmMain
         Me.TableLayoutPanel2 = New System.Windows.Forms.TableLayoutPanel()
         Me.ctrFilesandPics = New System.Windows.Forms.SplitContainer()
         Me.ctrTreeandFiles = New System.Windows.Forms.SplitContainer()
+        Me.tvMain2 = New MasaSam.Forms.Controls.FileSystemTree()
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
         Me.lbxFiles = New System.Windows.Forms.ListBox()
         Me.lbxShowList = New System.Windows.Forms.ListBox()
@@ -122,7 +129,7 @@ Partial Class frmMain
         Me.tmrSlideShow = New System.Windows.Forms.Timer(Me.components)
         Me.BackgroundWorker1 = New System.ComponentModel.BackgroundWorker()
         Me.FileSystemWatcher1 = New System.IO.FileSystemWatcher()
-        Me.tvwMain = New MasaSam.Forms.Controls.FileSystemTree()
+        Me.tmrLoadLastFolder = New System.Windows.Forms.Timer(Me.components)
         Me.MenuStrip1.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
         Me.TableLayoutPanel2.SuspendLayout()
@@ -190,7 +197,7 @@ Partial Class frmMain
         '
         'ListsToolStripMenuItem
         '
-        Me.ListsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddAllPicturesToolStripMenuItem, Me.AddAllVideosToolStripMenuItem})
+        Me.ListsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddAllPicturesToolStripMenuItem, Me.AddAllVideosToolStripMenuItem, Me.AddAllFilesToolStripMenuItem, Me.AddPicturesAndVideosToolStripMenuItem})
         Me.ListsToolStripMenuItem.Name = "ListsToolStripMenuItem"
         Me.ListsToolStripMenuItem.Size = New System.Drawing.Size(65, 34)
         Me.ListsToolStripMenuItem.Text = "Lists"
@@ -199,7 +206,7 @@ Partial Class frmMain
         '
         Me.AddAllPicturesToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CurrentOnlyToolStripMenuItem, Me.IncludingSubfoldersToolStripMenuItem})
         Me.AddAllPicturesToolStripMenuItem.Name = "AddAllPicturesToolStripMenuItem"
-        Me.AddAllPicturesToolStripMenuItem.Size = New System.Drawing.Size(248, 34)
+        Me.AddAllPicturesToolStripMenuItem.Size = New System.Drawing.Size(327, 34)
         Me.AddAllPicturesToolStripMenuItem.Text = "Add all pictures"
         '
         'CurrentOnlyToolStripMenuItem
@@ -220,7 +227,7 @@ Partial Class frmMain
         '
         Me.AddAllVideosToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CurrentOnlyToolStripMenuItem1, Me.IncludingSubsetsToolStripMenuItem})
         Me.AddAllVideosToolStripMenuItem.Name = "AddAllVideosToolStripMenuItem"
-        Me.AddAllVideosToolStripMenuItem.Size = New System.Drawing.Size(248, 34)
+        Me.AddAllVideosToolStripMenuItem.Size = New System.Drawing.Size(327, 34)
         Me.AddAllVideosToolStripMenuItem.Text = "Add all videos"
         '
         'CurrentOnlyToolStripMenuItem1
@@ -234,6 +241,44 @@ Partial Class frmMain
         Me.IncludingSubsetsToolStripMenuItem.Name = "IncludingSubsetsToolStripMenuItem"
         Me.IncludingSubsetsToolStripMenuItem.Size = New System.Drawing.Size(265, 34)
         Me.IncludingSubsetsToolStripMenuItem.Text = "Including subsets"
+        '
+        'AddAllFilesToolStripMenuItem
+        '
+        Me.AddAllFilesToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CurrentOnlyToolStripMenuItem2, Me.AllSubFoldersToolStripMenuItem})
+        Me.AddAllFilesToolStripMenuItem.Name = "AddAllFilesToolStripMenuItem"
+        Me.AddAllFilesToolStripMenuItem.Size = New System.Drawing.Size(327, 34)
+        Me.AddAllFilesToolStripMenuItem.Text = "Add all files"
+        '
+        'CurrentOnlyToolStripMenuItem2
+        '
+        Me.CurrentOnlyToolStripMenuItem2.Name = "CurrentOnlyToolStripMenuItem2"
+        Me.CurrentOnlyToolStripMenuItem2.Size = New System.Drawing.Size(236, 34)
+        Me.CurrentOnlyToolStripMenuItem2.Text = "Current only"
+        '
+        'AllSubFoldersToolStripMenuItem
+        '
+        Me.AllSubFoldersToolStripMenuItem.Name = "AllSubFoldersToolStripMenuItem"
+        Me.AllSubFoldersToolStripMenuItem.Size = New System.Drawing.Size(236, 34)
+        Me.AllSubFoldersToolStripMenuItem.Text = "All sub folders"
+        '
+        'AddPicturesAndVideosToolStripMenuItem
+        '
+        Me.AddPicturesAndVideosToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CurrentOnlyToolStripMenuItem3, Me.AllSubfoldersToolStripMenuItem1})
+        Me.AddPicturesAndVideosToolStripMenuItem.Name = "AddPicturesAndVideosToolStripMenuItem"
+        Me.AddPicturesAndVideosToolStripMenuItem.Size = New System.Drawing.Size(327, 34)
+        Me.AddPicturesAndVideosToolStripMenuItem.Text = "Add pictures and videos"
+        '
+        'CurrentOnlyToolStripMenuItem3
+        '
+        Me.CurrentOnlyToolStripMenuItem3.Name = "CurrentOnlyToolStripMenuItem3"
+        Me.CurrentOnlyToolStripMenuItem3.Size = New System.Drawing.Size(230, 34)
+        Me.CurrentOnlyToolStripMenuItem3.Text = "Current only"
+        '
+        'AllSubfoldersToolStripMenuItem1
+        '
+        Me.AllSubfoldersToolStripMenuItem1.Name = "AllSubfoldersToolStripMenuItem1"
+        Me.AllSubfoldersToolStripMenuItem1.Size = New System.Drawing.Size(230, 34)
+        Me.AllSubfoldersToolStripMenuItem1.Text = "All subfolders"
         '
         'SlideshowToolStripMenuItem1
         '
@@ -491,7 +536,7 @@ Partial Class frmMain
         '
         'ctrTreeandFiles.Panel1
         '
-        Me.ctrTreeandFiles.Panel1.Controls.Add(Me.tvwMain)
+        Me.ctrTreeandFiles.Panel1.Controls.Add(Me.tvMain2)
         '
         'ctrTreeandFiles.Panel2
         '
@@ -501,6 +546,17 @@ Partial Class frmMain
         Me.ctrTreeandFiles.SplitterWidth = 15
         Me.ctrTreeandFiles.TabIndex = 0
         Me.ctrTreeandFiles.TabStop = False
+        '
+        'tvMain2
+        '
+        Me.tvMain2.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.tvMain2.FileExtensions = "*"
+        Me.tvMain2.Location = New System.Drawing.Point(0, 0)
+        Me.tvMain2.Margin = New System.Windows.Forms.Padding(6)
+        Me.tvMain2.Name = "tvMain2"
+        Me.tvMain2.RootDrive = Nothing
+        Me.tvMain2.Size = New System.Drawing.Size(345, 446)
+        Me.tvMain2.TabIndex = 0
         '
         'SplitContainer1
         '
@@ -542,6 +598,7 @@ Partial Class frmMain
         Me.lbxShowList.Name = "lbxShowList"
         Me.lbxShowList.Size = New System.Drawing.Size(345, 298)
         Me.lbxShowList.TabIndex = 0
+        Me.lbxShowList.TabStop = False
         '
         'MainWMP
         '
@@ -866,18 +923,8 @@ Partial Class frmMain
         Me.FileSystemWatcher1.EnableRaisingEvents = True
         Me.FileSystemWatcher1.SynchronizingObject = Me
         '
-        'tvwMain
+        'tmrLoadLastFolder
         '
-        Me.tvwMain.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.tvwMain.DriveReadTimeout = 2
-        Me.tvwMain.FileExtensions = "*"
-        Me.tvwMain.Location = New System.Drawing.Point(0, 0)
-        Me.tvwMain.Margin = New System.Windows.Forms.Padding(6)
-        Me.tvwMain.Name = "tvwMain"
-        Me.tvwMain.RootDrive = Nothing
-        Me.tvwMain.Size = New System.Drawing.Size(345, 446)
-        Me.tvwMain.TabIndex = 1
-        Me.tvwMain.TrackDriveState = True
         '
         'frmMain
         '
@@ -1022,5 +1069,12 @@ Partial Class frmMain
     Friend WithEvents pbxBlanker As PictureBox
     Friend WithEvents BackgroundWorker1 As System.ComponentModel.BackgroundWorker
     Friend WithEvents FileSystemWatcher1 As IO.FileSystemWatcher
-    Friend WithEvents tvwMain As Controls.FileSystemTree
+    Friend WithEvents tvMain2 As MasaSam.Forms.Controls.FileSystemTree
+    Friend WithEvents AddAllFilesToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents CurrentOnlyToolStripMenuItem2 As ToolStripMenuItem
+    Friend WithEvents AllSubFoldersToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents AddPicturesAndVideosToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents CurrentOnlyToolStripMenuItem3 As ToolStripMenuItem
+    Friend WithEvents AllSubfoldersToolStripMenuItem1 As ToolStripMenuItem
+    Friend WithEvents tmrLoadLastFolder As Timer
 End Class

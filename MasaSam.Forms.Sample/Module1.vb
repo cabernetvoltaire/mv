@@ -21,7 +21,7 @@
     Public Showlist As New List(Of String)
     Public Sublist As New List(Of String)
     Public currentPicBox As New PictureBox
-    Public Autozoomrate As Decimal = 0.2
+    Public Autozoomrate As Decimal = 0.4
 
     Public ssspeed As Integer = 200
 

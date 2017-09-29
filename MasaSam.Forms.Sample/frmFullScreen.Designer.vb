@@ -55,6 +55,7 @@ Partial Class FullScreen
         Me.fullScreenPicBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
         Me.fullScreenPicBox.TabIndex = 18
         Me.fullScreenPicBox.TabStop = False
+        Me.fullScreenPicBox.Visible = False
         '
         'FSBlanker
         '
@@ -63,6 +64,7 @@ Partial Class FullScreen
         Me.FSBlanker.Size = New System.Drawing.Size(1193, 660)
         Me.FSBlanker.TabIndex = 19
         Me.FSBlanker.TabStop = False
+        Me.FSBlanker.Visible = False
         '
         'Timer1
         '
@@ -73,9 +75,9 @@ Partial Class FullScreen
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.Black
         Me.ClientSize = New System.Drawing.Size(2492, 1144)
+        Me.Controls.Add(Me.FSBlanker)
         Me.Controls.Add(Me.fullScreenPicBox)
         Me.Controls.Add(Me.FSWMP)
-        Me.Controls.Add(Me.FSBlanker)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None
         Me.KeyPreview = True
         Me.Name = "FullScreen"
