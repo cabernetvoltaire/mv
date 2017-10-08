@@ -17,12 +17,17 @@
     Public Sub PreferencesGet()
         With My.Computer.Registry.CurrentUser
 
-            frmMain.ctrTreeandFiles.SplitterDistance = .GetValue("VertSplit")
-            frmMain.ctrFilesandPics.SplitterDistance = .GetValue("HorSplit")
-            CurrentFolderPath = .GetValue("Folder")
+            frmMain.ctrTreeandFiles.SplitterDistance = .GetValue("VertSplit", frmMain.ctrTreeandFiles.Height / 4)
+            frmMain.ctrFilesandPics.SplitterDistance = .GetValue("HorSplit", frmMain.ctrTreeandFiles.Width / 2)
+
+            CurrentFolderPath = .GetValue("Folder", "C:\")
+            If Not IO.Directory.Exists(CurrentFolderPath) Then CurrentFolderPath = "C:\"
+
             frmMain.tssMoveCopy.Text = CurrentFolderPath
             strCurrentFilePath = .GetValue("File")
-            CurrentFilterState = .GetValue("Filter")
+            If Not IO.File.Exists(strCurrentFilePath) Then strCurrentFilePath = ""
+
+            CurrentFilterState = .GetValue("Filter", 0)
         End With
 
 

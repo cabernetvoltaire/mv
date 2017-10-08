@@ -2,9 +2,8 @@
 Imports System.ComponentModel
 Imports System.IO
 Imports AxWMPLib
+Imports MasaSam
 Imports MasaSam.Forms.Controls
-
-
 
 Public Class frmMain
     Public Enum ExifOrientations As Byte
@@ -20,11 +19,12 @@ Public Class frmMain
     End Enum
     Private Const OrientationId As Integer = &H112
     Public blnSpeedRestart As Boolean = False
-    Public iSSpeeds() As Integer = {2000, 500, 50}
+    Public iSSpeeds() As Integer = {1500, 750, 50}
     Public iPlaybackSpeed() As Decimal = {0.07, 0.4, 0.65}
     Public currentWMP As New AxWMPLib.AxWindowsMediaPlayer
     Public LastPlayed As New Stack(Of String)
     Public blnAutoAdvanceFolder As Boolean = True
+    Private blnRandomStartAlways As Boolean = False
     Public Property blnRestartSlideShowFlag As Boolean = False
     Public strOldPath As String = "C:\"
     Public ChosenPlayOrder As Byte = 0
@@ -65,6 +65,7 @@ Public Class frmMain
                 tmrSlideShow.Enabled = False
 
             Case KeyRandomize
+
                 'Cycle through play orders
                 ChosenPlayOrder = (ChosenPlayOrder + 1) Mod (PlayOrder.Type - 1)
                 tsslblRandom.Text = UCase(strPlayOrder(ChosenPlayOrder))
@@ -103,7 +104,7 @@ Public Class frmMain
                 e.Handled = True
 
             Case KeyRotate
-                RotatePic(currentPicBox)
+                RotatePic(currentPicBox, e.Shift)
             Case KeyJumpAutoT
                 JumpRandom(e.Shift)
 
@@ -145,7 +146,7 @@ Public Class frmMain
                 End If
 
                 Dim Choice As Byte = e.KeyCode - KeySpeed1
-                If tmrSlideShow.Enabled Then
+                If Not currentWMP.playState = WMPLib.WMPPlayState.wmppsPlaying Then
                     tmrSlideShow.Interval = iSSpeeds(Choice)
                 Else
                     PlaybackSpeed = iPlaybackSpeed(Choice) 'TODO Options
@@ -180,6 +181,7 @@ Public Class frmMain
 
             Case KeyReStartSS
                 tmrSlideShow.Enabled = Not tmrSlideShow.Enabled
+
         End Select
         'e.Handled = True
     End Sub
@@ -292,6 +294,8 @@ Public Class frmMain
             blnRandomStartPoint = True
             tmrJumpVideo.Enabled = True
             tsslblSTART.Text = "START:RANDOM"
+
+
         Else
             MsgBox("Autotrail")
         End If
@@ -387,9 +391,12 @@ Public Class frmMain
         End With
     End Sub
     Private Sub HighlightCurrent(strPath As String)
+        If strPath = "" Then Exit Sub
+        If Len(strPath) > 265 Then Exit Sub
         Dim finfo As New IO.FileInfo(strPath)
         Dim dr As New DriveInfo(strPath)
         Dim fldr As New DirectoryInfo(strPath)
+        DateSSL.Text = finfo.LastWriteTime.ToShortDateString & " " & finfo.LastWriteTime.ToShortTimeString
         'tvMain.Collapse()
         'tvMain2.Validate()
         '        tvMain2.Collapse(strOldPath)
@@ -483,7 +490,7 @@ Public Class frmMain
             Case PlayOrder.Time
                 For Each f In List
                     Dim file As New FileInfo(f)
-                    Dim time = file.CreationTimeUtc.AddMilliseconds(Rnd(100))
+                    Dim time = file.LastWriteTime.AddMilliseconds(Rnd(100))
                     Try
                         NewListD.Add(time, file.FullName)
                     Catch ex As System.ArgumentException 'TODO could do better than this. 
@@ -559,7 +566,7 @@ Public Class frmMain
     Private Sub AddFilesToCollection(ByVal list As List(Of String), dontinclude As List(Of Boolean), extensions As String, blnRecurse As Boolean)
         Dim s As String
 
-        s = InputBox("Search for?")
+        ' s = InputBox("Search for?")
         Dim d As New DirectoryInfo(CurrentFolderPath)
 
         FindAllFilesBelow(d, list, dontinclude, extensions, False, s, blnRecurse)
@@ -598,11 +605,13 @@ Public Class frmMain
         CtrlDown = e.Control
         'GiveKey(e.KeyCode)
         HandleKeys(sender, e)
-        ' e.Handled = True
+        'e.Handled = True
+        '  MsgBox(sender.ToString & " " & e.ToString)
     End Sub
     Private Sub frmMain_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
         ShiftDown = e.Shift
         CtrlDown = e.Control
+        ' MsgBox("Ring")
     End Sub
     Private Sub frmMain_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         Settings.PreferencesSave()
@@ -638,7 +647,9 @@ Public Class frmMain
         tmrInitialise.Enabled = False
     End Sub
     Private Sub tmrPicLoad_Tick(sender As Object, e As EventArgs) Handles tmrPicLoad.Tick
+
         fType = FindType(strCurrentFilePath)
+
         HighlightCurrent(strCurrentFilePath)
         LastPlayed.Push(strCurrentFilePath)
         tsslblLastfile.Text = strCurrentFilePath
@@ -671,6 +682,7 @@ Public Class frmMain
                 If Not My.Computer.FileSystem.FileExists(strCurrentFilePath) Then Exit Select
 
                 img = GetImage(strCurrentFilePath)
+                If img Is Nothing Then Exit Sub
                 'If blnFullScreen Then FullScreen.PictureBox1.Image = img
                 tsslblZOOM.Text = UCase("Orientation -" & Orientation(ImageOrientation(img)))
                 Select Case ImageOrientation(img)
@@ -712,6 +724,7 @@ Public Class frmMain
         End If
         currentWMP.Ctlcontrols.currentPosition = NewPosition
         tmrJumpVideo.Enabled = False
+        If Not blnRandomStartAlways Then blnRandomStartPoint = False
     End Sub
 
 
@@ -749,7 +762,8 @@ Public Class frmMain
         Addpics(True)
     End Sub
     Private Sub ToolStripButton9_Click(sender As Object, e As EventArgs) Handles ToolStripButton9.Click
-        blnRandomStartPoint = Not blnRandomStartPoint
+        blnRandomStartAlways = Not blnRandomStartAlways
+        blnRandomStartPoint = blnRandomStartAlways
 
     End Sub
     Private Sub ToolStripButton10_Click(sender As Object, e As EventArgs) Handles ToolStripButton10.Click
@@ -818,17 +832,28 @@ Public Class frmMain
 
 
 
-    Private Sub RotatePic(currentPicBox As PictureBox)
+    Private Sub RotatePic(currentPicBox As PictureBox, blnLeft As Boolean)
         If currentPicBox.Image Is Nothing Then Exit Sub
         With currentPicBox.Image
-            .RotateFlip(RotateFlipType.Rotate270FlipNone)
+            If blnLeft Then
+                .RotateFlip(RotateFlipType.Rotate90FlipNone)
+            Else
+                .RotateFlip(RotateFlipType.Rotate270FlipNone)
+
+            End If
             '.SetPropertyItem(OrientationId).value = ExifOrientations.TopRight
             currentPicBox.Refresh()
+            Dim finfo As New FileInfo(strCurrentFilePath)
+            Dim dt As New Date
+            'avoid the updating of the write time
+            dt = finfo.LastWriteTime
             .Save(strCurrentFilePath)
+            finfo.LastWriteTime = dt
+
         End With
     End Sub
     Private Sub ToolStripButton16_Click(sender As Object, e As EventArgs) Handles ToolStripButton16.Click
-        RotatePic(currentPicBox)
+        RotatePic(currentPicBox, True)
     End Sub
     Private Function StringList(List As List(Of String), strSearch As String) As List(Of String)
         Dim Newlist As New List(Of String)
@@ -858,7 +883,7 @@ Public Class frmMain
 
     End Sub
 
-    Private Sub tsbTestShow_Click(sender As Object, e As EventArgs) Handles tsbTestShow.Click
+    Private Sub tsbTestShow_Click(sender As Object, e As EventArgs)
         Test.Show()
     End Sub
 
@@ -870,6 +895,7 @@ Public Class frmMain
 
     Private Sub IncludingSubfoldersToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles IncludingSubfoldersToolStripMenuItem.Click
         'Addpics(True)
+
         BackgroundWorker1.RunWorkerAsync()
     End Sub
 
@@ -891,11 +917,11 @@ Public Class frmMain
 
 
 
-    Private Sub tvMain2_Enter(sender As Object, e As EventArgs) Handles lbxShowList.Enter, lbxFiles.Enter, tvMain2.Enter
+    Private Sub tvMain2_Enter(sender As Object, e As EventArgs) Handles lbxShowList.Enter, lbxFiles.Enter
         sender.backcolor = Color.Aquamarine
     End Sub
 
-    Private Sub tvMain2_Leave(sender As Object, e As EventArgs) Handles lbxShowList.Leave, lbxFiles.Leave, tvMain2.Leave
+    Private Sub tvMain2_Leave(sender As Object, e As EventArgs) Handles lbxShowList.Leave, lbxFiles.Leave
         sender.backcolor = Color.White
 
     End Sub
@@ -914,14 +940,14 @@ Public Class frmMain
         Addpics(True)
     End Sub
 
-    Private Sub tvMain2_DirectorySelected(sender As Object, e As DirectoryInfoEventArgs) Handles tvMain2.DirectorySelected
+    Private Sub tvMain2_DirectorySelected(sender As Object, e As DirectoryInfoEventArgs)
         PreferencesSave()
         CurrentFolderPath = e.Directory.FullName
         FillListbox(lbxFiles, e.Directory, CurrentFilterState, Showlist)
         '  ControlSetFocus(lbxFiles)
     End Sub
 
-    Private Sub tvMain2_NodeSelected(sender As Object, e As TreeViewEventArgs) Handles tvMain2.NodeSelected
+    Private Sub tvMain2_NodeSelected(sender As Object, e As TreeViewEventArgs)
         If e.Node.ToolTipText = "My Computer" Then Exit Sub
 
         If e.Node.ToolTipText = "" Then Exit Sub
@@ -936,11 +962,12 @@ Public Class frmMain
 
     End Sub
 
-    Private Sub tvMain2_Load(sender As Object, e As EventArgs) Handles tvMain2.Load
+    Private Sub tvMain2_Load(sender As Object, e As EventArgs)
 
     End Sub
 
-    Private Sub tvMain2_GotFocus(sender As Object, e As EventArgs) Handles tvMain2.GotFocus
+    Private Sub tvMain2_GotFocus(sender As Object, e As EventArgs)
+
         HighlightCurrent(strCurrentFilePath)
     End Sub
 
@@ -977,7 +1004,76 @@ Public Class frmMain
     End Sub
 
     Private Sub tmrLoadLastFolder_Tick(sender As Object, e As EventArgs) Handles tmrLoadLastFolder.Tick
+        If strCurrentFilePath = "" Then Exit Sub
         HighlightCurrent(strCurrentFilePath)
         tmrLoadLastFolder.Enabled = False
+    End Sub
+
+    Private Sub RandomStartToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RandomStartToolStripMenuItem.Click
+        JumpRandom(False)
+    End Sub
+
+    Private Sub ToolStripStatusLabel1_Click(sender As Object, e As EventArgs) Handles DateSSL.Click
+
+    End Sub
+
+    Private Sub tvMain2_KeyDown(sender As Object, e As KeyEventArgs)
+        HandleKeys(sender, e)
+        e.SuppressKeyPress = True
+    End Sub
+    Delegate Sub UpdateForm_Delegate(ByVal [TS] As StatusStrip, ByVal [text] As String)
+
+    Public Sub UpdateForm_ThreadSafe(ByVal [TSS] As StatusStrip, ByVal [text] As String)
+        If [TSS].InvokeRequired Then
+            Dim MyDelegate As New UpdateForm_Delegate(AddressOf UpdateForm_ThreadSafe)
+            Me.Invoke(MyDelegate, New Object() {TSS, [text]})
+        Else
+            TSS.Text = [text]
+        End If
+    End Sub
+    Public Sub FindAllFilesBelow(d As DirectoryInfo, list As List(Of String), ByRef DontInclude As List(Of Boolean), extensions As String, blnRemove As Boolean, strSearch As String, blnRecurse As Boolean)
+
+        For Each file In d.EnumerateFiles
+            Try
+                If InStr(extensions, LCase(file.Extension)) <> 0 And file.Extension <> "" Then
+                    If InStr(LCase(file.FullName), LCase(strSearch)) <> 0 Or strSearch = "" Then
+
+                        If blnRemove Then
+                            list.Remove(file.FullName)
+                        Else
+                            list.Add(file.FullName)
+
+                            DontInclude.Add(False)
+                        End If
+                        UpdateForm_ThreadSafe(StatusStrip1, file.FullName & " (" & list.Count.ToString & " files.")
+
+                    End If
+                Else
+                    If extensions = "" Then
+                        If blnRemove Then
+                            list.Remove(file.FullName)
+                        Else
+                            list.Add(file.FullName)
+
+                            DontInclude.Add(False)
+                        End If
+                    End If
+                End If
+
+            Catch ex As PathTooLongException
+                MsgBox(ex.Message)
+            End Try
+        Next
+
+        For Each di In d.EnumerateDirectories
+            Try
+                FindAllFilesBelow(di, list, DontInclude, extensions, blnRemove, strSearch, blnRecurse)
+            Catch ex As UnauthorizedAccessException
+                Continue For
+            Catch ex As DirectoryNotFoundException
+                Continue For
+            End Try
+        Next
+
     End Sub
 End Class

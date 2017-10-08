@@ -16,7 +16,5 @@ Public NotInheritable Class DirectoryInfoEventArgs
         End Get
     End Property
 
-    Public Shared Narrowing Operator CType(v As TreeViewEventArgs) As DirectoryInfoEventArgs
-        Throw New NotImplementedException()
-    End Operator
+
 End Class

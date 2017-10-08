@@ -1,4 +1,44 @@
 ﻿Public Module KeyHandling
+    'Public Class KB
+    '    Public Property FullScreen As Integer
+    '    Public Property Random
+    '    Public Property TraverseTreeBack
+    '    Public Property JumpAutoT
+    '    Public Property BackUndo
+    '    Public Property MuteToggle
+    '    Public Property RestartSlideShow
+    '    Public Property NextFile
+    '    Public Property LoopToggle
+    '    Public Property FolderJump
+    '    Public Property PauseVideo
+    '    Public Property ZoomIn
+    '    Public Property TrueSize
+    '    Public Property CycleScope
+    '    Public Property CycleRandom
+    '    Public Property CycleMode
+    '    Public Property Rotate
+    '    Public Property CopyToggle
+    '    Public Property Filter
+    '    Public Property ScrollPic
+    '    Public Property TraverseTree
+    '    Public Property PreviousFile
+    '    Public Property ToggleSpeed
+    '    Public Property Speed1
+    '    Public Property Speed2
+    '    Public Property Speed3
+    '    Public Property MarkPoint
+    '    Public Property SmallJumpDown
+    '    Public Property SmallJumpUp
+    '    Public Property JumpToPoint
+    '    Public Property BigJumpBack
+    '    Public Property BigJumpOn
+    '    Public Property ZoomOut
+    '    Public Property ToggleThumbs
+    '    Public Property Escape
+    'End Class
+    'Public FullSizeKB As New KB
+
+
 
     Public KeyFullscreen As Integer = Keys.Scroll
     Public KeyRandomize As Integer = Keys.Pause

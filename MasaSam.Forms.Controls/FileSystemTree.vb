@@ -53,6 +53,7 @@ Public Class FileSystemTree
 
 #Region "Properties"
 
+    Private mShowFiles As Boolean = False
     <DefaultValue(False)>
     <Category("Behavior")>
     <Browsable(True)>
@@ -65,6 +66,32 @@ Public Class FileSystemTree
             Me.m_showHidden = value
         End Set
     End Property
+    Private newTraverseKey As Keys = Keys.Add
+    <DefaultValue(Keys.Add)>
+    <Category("Behavior")>
+    <Browsable(True)>
+    <Description("Gets or sets the Key which traverses the tree.")>
+    Public Property TraverseKey() As Keys
+        Get
+            Return newTraverseKey
+        End Get
+        Set(ByVal value As Keys)
+            newTraverseKey = value
+        End Set
+    End Property
+    <DefaultValue(False)>
+    <Category("Behavior")>
+    <Browsable(True)>
+    <Description("Gets or sets whether to show files in the tree.")>
+    Public Property ShowFiles() As Boolean
+        Get
+            Return mShowFiles
+        End Get
+        Set(ByVal value As Boolean)
+            mShowFiles = value
+        End Set
+    End Property
+
 
     <DefaultValue(False)>
     <Category("Behavior")>
@@ -439,6 +466,7 @@ Public Class FileSystemTree
     ''' Creates file tree for expanded directory node.
     ''' </summary>
     Private Overloads Sub CreateFileTree(ByVal node As DirectoryNode)
+        If Not Showfiles Then Exit Sub
         If (node.FileNodes.Count() = 0) Then
             Dim files = GetFiles(node.Directory)
             CreateFileTree(node, files)
@@ -929,10 +957,53 @@ Public Class FileSystemTree
     End Sub
 
     Public Sub tvFiles_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles tvFiles.AfterSelect
-        Dim d = CType(e, DirectoryInfoEventArgs)
 
-        RaiseEvent DirectorySelected(sender, d)
+        RaiseEvent DirectorySelected(Me, New DirectoryInfoEventArgs(New DirectoryInfo(e.Node.ToolTipText)))
 
+
+    End Sub
+
+    Private Sub tvFiles_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles tvFiles.PreviewKeyDown
+        'Enables traversing of the filetree
+        If e.KeyCode = TraverseKey Then
+            Traverse(e.Shift)
+        End If
+    End Sub
+
+    Private Sub Traverse(blnBack As Boolean)
+        Dim node As TreeNode
+        Dim newnode As TreeNode
+        node = tvFiles.SelectedNode
+        If Not blnBack Then
+
+            'If node has children move to first child
+            If node.Nodes.Count <> 0 Then
+                newnode = node.Nodes(0)
+
+            Else
+                'Otherwise move to next sibling
+                If node.NextNode IsNot Nothing Then
+                    newnode = node.NextNode
+                Else
+                    While node.NextNode Is Nothing
+                        node = node.Parent
+                    End While
+                    newnode = node.NextNode
+                End If
+            End If
+
+            tvFiles.SelectedNode = newnode
+        Else
+
+            If node.PrevNode IsNot Nothing Then
+                newnode = node.PrevNode
+            Else
+                While node.PrevNode Is Nothing
+                    node = node.Parent
+                End While
+                newnode = node.PrevNode
+            End If
+        End If
     End Sub
 
 #End Region

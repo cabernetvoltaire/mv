@@ -61,9 +61,9 @@
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MasaSam.Forms.Controls, Version=1.0.6478.36034, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="MasaSam.Forms.Controls, Version=1.0.6487.35861, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\File System Tree View Fresh - Backup 11 09 17\VB\MasaSam.Forms.Controls\bin\Debug\MasaSam.Forms.Controls.dll</HintPath>
+      <HintPath>..\MasaSam.Forms.Controls\bin\Debug\MasaSam.Forms.Controls.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />

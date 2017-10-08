@@ -3,52 +3,7 @@ Module FileHandling
     Public strVideoExtensions = " .webm .avi .flv .mov .mpeg .mpg. m4v .mp4 .wmv .wav .mp3 .lnk"
     Public strPicExtensions = "  .jpeg .png .jpg .bmp .gif .lnk"
 
-    Public Sub FindAllFilesBelow(d As DirectoryInfo, list As List(Of String), ByRef DontInclude As List(Of Boolean), extensions As String, blnRemove As Boolean, strSearch As String, blnRecurse As Boolean)
 
-        For Each file In d.EnumerateFiles
-            Try
-                If InStr(extensions, LCase(file.Extension)) <> 0 And file.Extension <> "" Then
-                    If InStr(LCase(file.FullName), LCase(strSearch)) <> 0 Or strSearch = "" Then
-
-                        If blnRemove Then
-                            list.Remove(file.FullName)
-                        Else
-                            list.Add(file.FullName)
-
-                            DontInclude.Add(False)
-                        End If
-                        frmMain.tsslblLastfile.Text = file.FullName & "(" & list.Count.ToString & " files)" 'TODO do this better.
-                        frmMain.Update()
-                        frmMain.tsslblFiles.Text = list.Count & " FILES LOADED"
-                    End If
-                Else
-                    If extensions = "" Then
-                        If blnRemove Then
-                            list.Remove(file.FullName)
-                        Else
-                            list.Add(file.FullName)
-
-                            DontInclude.Add(False)
-                        End If
-                    End If
-                End If
-
-            Catch ex As PathTooLongException
-                MsgBox(ex.Message)
-            End Try
-        Next
-
-        For Each di In d.EnumerateDirectories
-            Try
-                FindAllFilesBelow(di, list, DontInclude, extensions, blnRemove, strSearch, blnRecurse)
-            Catch ex As UnauthorizedAccessException
-                Continue For
-            Catch ex As DirectoryNotFoundException
-                Continue For
-            End Try
-        Next
-
-    End Sub
 
     Public Sub FillListbox(lbx As ListBox, e As IO.DirectoryInfo, Currentfilterstate As Integer, ByVal flist As List(Of String))
         If IsNothing(e) Then Exit Sub

@@ -221,6 +221,7 @@ Partial Class FindDuplicates
         Me.dgv1.RowTemplate.Height = 31
         Me.dgv1.Size = New System.Drawing.Size(2207, 486)
         Me.dgv1.TabIndex = 1
+        Me.dgv1.Visible = False
         '
         'Duplicate
         '
