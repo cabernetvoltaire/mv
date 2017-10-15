@@ -1017,12 +1017,12 @@ Public Class FileSystemTree
         End If
     End Sub
 
-    Private Sub tvFiles_BackColorChanged(sender As Object, e As EventArgs) Handles tvFiles.BackColorChanged
-        Me.BackColor = tvFiles.BackColor
-    End Sub
-
     Private Sub FileSystemTree_DirectorySelected(sender As Object, e As DirectoryInfoEventArgs) Handles Me.DirectorySelected
         SelectedFolder = e.Directory.FullName
+    End Sub
+
+    Private Sub FileSystemTree_BackColorChanged(sender As Object, e As EventArgs) Handles Me.BackColorChanged
+        tvFiles.BackColor = Me.BackColor
     End Sub
 
 #End Region
