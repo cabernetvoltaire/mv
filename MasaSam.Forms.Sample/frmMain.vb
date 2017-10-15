@@ -19,14 +19,15 @@ Public Class frmMain
     End Enum
     Private Const OrientationId As Integer = &H112
     Public blnSpeedRestart As Boolean = False
-    Public iSSpeeds() As Integer = {1500, 750, 50}
-    Public iPlaybackSpeed() As Decimal = {0.07, 0.4, 0.65}
+    Public iSSpeeds() As Integer = {1500, 900, 50}
+    Public iPlaybackSpeed() As Decimal = {0.07, 0.3, 0.75}
     Public currentWMP As New AxWMPLib.AxWindowsMediaPlayer
     Public LastPlayed As New Stack(Of String)
     Public blnAutoAdvanceFolder As Boolean = True
-    Private blnRandomStartAlways As Boolean = False
-    Public Property blnRestartSlideShowFlag As Boolean = False
-    Public strOldPath As String = "E:\"
+    Public blnRandomStartAlways As Boolean = False
+    Public blnRestartSlideShowFlag As Boolean = True
+    Public Property blnTVCurrent As Boolean
+    Public Property blnChooseRandomFile As Boolean = True
     Public ChosenPlayOrder As Byte = 0
     Public Function ImageOrientation(ByVal img As Image) As ExifOrientations
         ' Get the index of the orientation property.
@@ -106,6 +107,9 @@ Public Class frmMain
             Case KeyRotate
                 RotatePic(currentPicBox, e.Shift)
             Case KeyJumpAutoT
+                If e.Control Then
+                    ToggleRandomStartPoint()
+                End If
                 JumpRandom(e.Shift)
 
             Case KeyTraverseTree, KeyTraverseTreeBack
@@ -162,7 +166,7 @@ Public Class frmMain
             Case KeyFilter 'Cycle through listbox filters
                 CurrentFilterState = (CurrentFilterState + 1) Mod (GetMaxValue(Of FilterState)() + 1)
                 'MsgBox(CurrentFilterState.ToString)
-                FillListbox(lbxFiles, New DirectoryInfo(CurrentFolderPath), CurrentFilterState, Showlist)
+                FillListbox(lbxFiles, New DirectoryInfo(CurrentFolderPath), CurrentFilterState, Showlist, blnChooseRandomFile)
                 tsslblFilter.Text = UCase(Filterstates(CurrentFilterState))
                 e.Handled = True
 
@@ -183,7 +187,7 @@ Public Class frmMain
                 tmrSlideShow.Enabled = Not tmrSlideShow.Enabled
 
         End Select
-        'e.Handled = True
+        ' e.Handled = True
     End Sub
     Public Sub GoFullScreen(blnGo As Boolean)
 
@@ -304,6 +308,10 @@ Public Class frmMain
         strCurrentFilePath = file
         Try
             Dim info As New FileInfo(file)
+            If info.Extension = "." Then
+                Return Filetype.Unknown
+                Exit Function
+            End If
             'If it's a .lnk, find the file
             If info.Extension = ".lnk" Then
                 strCurrentFilePath = CreateObject("WScript.Shell").CreateShortcut(info.FullName).TargetPath
@@ -394,8 +402,8 @@ Public Class frmMain
         If strPath = "" Then Exit Sub
         If Len(strPath) > 265 Then Exit Sub
         Dim finfo As New IO.FileInfo(strPath)
-        Dim dr As New DriveInfo(finfo.Directory.Root.Name)
-        Dim fldr As New DirectoryInfo(finfo.Directory.FullName)
+        'Dim dr As New DriveInfo(finfo.Directory.Root.Name)
+        'Dim fldr As New DirectoryInfo(finfo.Directory.FullName)
         DateSSL.Text = finfo.LastWriteTime.ToShortDateString & " " & finfo.LastWriteTime.ToShortTimeString
         'tvMain.Collapse()
         'tvMain2.Validate()
@@ -404,7 +412,7 @@ Public Class frmMain
         tvMain2.Expand(strPath)
 
         'Tvw.SelectNode(strPath, 0, False)
-        FillListbox(lbxFiles, fldr, CurrentFilterState, LboxFiles) 'TODO
+        ' FillListbox(lbxFiles, fldr, CurrentFilterState, LboxFiles) 'TODO
         'Highlight the file in lbxFiles
         For i = 0 To lbxFiles.Items.Count - 1
             If lbxFiles.Items(i) = strPath Then
@@ -566,7 +574,7 @@ Public Class frmMain
     Private Sub AddFilesToCollection(ByVal list As List(Of String), dontinclude As List(Of Boolean), extensions As String, blnRecurse As Boolean)
         Dim s As String
 
-        ' s = InputBox("Search for?")
+        s = InputBox("Search for?")
         Dim d As New DirectoryInfo(CurrentFolderPath)
 
         FindAllFilesBelow(d, list, dontinclude, extensions, False, s, blnRecurse)
@@ -627,7 +635,7 @@ Public Class frmMain
         '  MsgBox(e.Node.ToolTipText)
         Dim di = New IO.DirectoryInfo(e.Drive.Name)
         CurrentFolderPath = di.FullName
-        FillListbox(lbxFiles, di, CurrentFilterState, Showlist)
+        FillListbox(lbxFiles, di, CurrentFilterState, Showlist, blnChooseRandomFile)
     End Sub
     Private Sub lbxFiles_SelectedIndexChanged(sender As Object, e As EventArgs)
         'Loads a new media file by triggering the PicLoad Timer
@@ -762,10 +770,14 @@ Public Class frmMain
         Addpics(True)
     End Sub
     Private Sub ToolStripButton9_Click(sender As Object, e As EventArgs) Handles ToolStripButton9.Click
+        ToggleRandomStartPoint()
+    End Sub
+
+    Private Sub ToggleRandomStartPoint()
         blnRandomStartAlways = Not blnRandomStartAlways
         blnRandomStartPoint = blnRandomStartAlways
-
     End Sub
+
     Private Sub ToolStripButton10_Click(sender As Object, e As EventArgs) Handles ToolStripButton10.Click
 
         FindDuplicates.Show()
@@ -807,7 +819,7 @@ Public Class frmMain
     Private Sub lbxShowList_SelectedIndexChanged(sender As Object, e As EventArgs) Handles lbxShowList.SelectedIndexChanged, lbxFiles.SelectedIndexChanged
         With sender
             Dim i As Long = .SelectedIndex
-            strOldPath = strCurrentFilePath
+            'strOldPath = strCurrentFilePath
             strCurrentFilePath = .Items(i)
             lCurrentDisplayIndex = i
             tmrPicLoad.Enabled = True
@@ -918,11 +930,13 @@ Public Class frmMain
 
 
     Private Sub tvMain2_Enter(sender As Object, e As EventArgs) Handles lbxShowList.Enter, lbxFiles.Enter, tvMain2.Enter
+        If sender Is tvMain2 Then blnTVCurrent = True
         sender.backcolor = Color.Aquamarine
     End Sub
 
     Private Sub tvMain2_Leave(sender As Object, e As EventArgs) Handles lbxShowList.Leave, lbxFiles.Leave, tvMain2.Leave
         sender.backcolor = Color.White
+        If sender Is tvMain2 Then blnTVCurrent = False
 
     End Sub
 
@@ -940,12 +954,7 @@ Public Class frmMain
         Addpics(True)
     End Sub
 
-    Private Sub tvMain2_DirectorySelected(sender As Object, e As DirectoryInfoEventArgs)
-        PreferencesSave()
-        CurrentFolderPath = e.Directory.FullName
-        FillListbox(lbxFiles, e.Directory, CurrentFilterState, Showlist)
-        '  ControlSetFocus(lbxFiles)
-    End Sub
+
 
     Private Sub tvMain2_NodeSelected(sender As Object, e As TreeViewEventArgs)
         If e.Node.ToolTipText = "My Computer" Then Exit Sub
@@ -954,7 +963,7 @@ Public Class frmMain
         ' MsgBox(e.Node.ToolTipText)
         Dim di = New IO.DirectoryInfo(e.Node.ToolTipText)
         CurrentFolderPath = di.FullName
-        FillListbox(lbxFiles, di, CurrentFilterState, Showlist)
+        FillListbox(lbxFiles, di, CurrentFilterState, Showlist, blnChooseRandomFile)
     End Sub
 
     Private Sub lbxShowList_CollectionChanged(sender As Object, e As EventArgs) Handles lbxShowList.DataSourceChanged
@@ -966,10 +975,7 @@ Public Class frmMain
 
     End Sub
 
-    Private Sub tvMain2_GotFocus(sender As Object, e As EventArgs)
 
-        HighlightCurrent(strCurrentFilePath)
-    End Sub
 
     Protected Overrides Sub Finalize()
         MyBase.Finalize()
@@ -1018,10 +1024,7 @@ Public Class frmMain
 
     End Sub
 
-    Private Sub tvMain2_KeyDown(sender As Object, e As KeyEventArgs)
-        HandleKeys(sender, e)
-        e.SuppressKeyPress = True
-    End Sub
+
     Delegate Sub UpdateForm_Delegate(ByVal [TS] As StatusStrip, ByVal [text] As String)
 
     Public Sub UpdateForm_ThreadSafe(ByVal [TSS] As StatusStrip, ByVal [text] As String)
@@ -1078,5 +1081,32 @@ Public Class frmMain
 
     End Sub
 
+    Private Sub tvMain2_DirectorySelected(sender As Object, e As DirectoryInfoEventArgs) Handles tvMain2.DirectorySelected
+        PreferencesSave()
+        CurrentFolderPath = e.Directory.FullName
+        ' tvMain2.Expand(CurrentFolderPath)
+        tvMain2.SelectedFolder = CurrentFolderPath
+        FillListbox(lbxFiles, e.Directory, CurrentFilterState, Showlist, blnChooseRandomFile)
+    End Sub
 
+    Private Sub tvMain2_KeyDown(sender As Object, e As KeyEventArgs) Handles tvMain2.KeyDown
+        HandleKeys(sender, e)
+        Select Case e.KeyCode
+            Case Keys.Down, Keys.Left, Keys.Right, Keys.Up, tvMain2.TraverseKey
+
+            Case Else
+                If blnTVCurrent Then e.Handled = True
+        End Select
+
+    End Sub
+
+    Private Sub tvMain2_KeyPress(sender As Object, e As KeyPressEventArgs) Handles tvMain2.KeyPress
+        e.Handled = True
+    End Sub
+
+    Private Sub btnChooseRandom_Click(sender As Object, e As EventArgs) Handles btnChooseRandom.Click
+        blnChooseRandomFile = Not blnChooseRandomFile
+
+
+    End Sub
 End Class

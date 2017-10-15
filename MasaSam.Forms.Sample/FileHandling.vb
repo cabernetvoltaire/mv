@@ -1,13 +1,14 @@
 ﻿Imports System.IO
 Module FileHandling
-    Public strVideoExtensions = " .webm .avi .flv .mov .mpeg .mpg. m4v .mp4 .wmv .wav .mp3 .lnk"
-    Public strPicExtensions = "  .jpeg .png .jpg .bmp .gif .lnk"
+    Public strVideoExtensions = " .webm .avi .flv .mov .mpeg .mpg. m4v .mkv .mp4 .wmv .wav .mp3 "
+    Public strPicExtensions = "  .jpeg .png .jpg .bmp .gif"
 
 
 
-    Public Sub FillListbox(lbx As ListBox, e As IO.DirectoryInfo, Currentfilterstate As Integer, ByVal flist As List(Of String))
+    Public Sub FillListbox(lbx As ListBox, e As IO.DirectoryInfo, Currentfilterstate As Integer, ByVal flist As List(Of String), blnRandom As Boolean)
         If IsNothing(e) Then Exit Sub
         If e.Name = "My Computer" Then Exit Sub
+
 
         Try
             lbx.Items.Clear()
@@ -58,21 +59,18 @@ Module FileHandling
             Next
             lbx.Tag = e
             If lbx.Items.Count <> 0 Then
-                lbx.SelectedIndex = 0
-                'lbx.TabStop = True
-
+                If blnRandom Then
+                    Dim s As Long = lbx.Items.Count - 1
+                    lbx.SelectedIndex = Rnd() * s
+                Else
+                    lbx.SelectedIndex = 0
+                End If
             End If
-            'flist.Clear()
-            'If Showlist.Count = 0 Then
-            '    For Each f In lbx.Items
-
-            '        Showlist.Add(f)
-            '    Next
-            'End If
-            ''frmMain.ToolStripStatusLabel4.Text = "Fileboxcontents holds " & frmMain.FileboxContents.Count
 
         Catch ex As ArgumentException
             MsgBox(ex.ToString)
+        Catch ex As IOException
+            Exit Try
         End Try
 
 

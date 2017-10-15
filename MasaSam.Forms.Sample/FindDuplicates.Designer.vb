@@ -466,7 +466,7 @@ Partial Class FindDuplicates
     Friend WithEvents dgv1 As DataGridView
     Friend WithEvents Duplicate As DataGridViewCheckBoxColumn
     Friend WithEvents Filename As DataGridViewTextBoxColumn
-    Friend WithEvents Size As DataGridViewTextBoxColumn
+    Shadows WithEvents Size As DataGridViewTextBoxColumn
     Friend WithEvents clmDate As DataGridViewTextBoxColumn
     Friend WithEvents clmPath As DataGridViewTextBoxColumn
     Friend WithEvents Button1 As Button

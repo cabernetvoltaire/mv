@@ -958,10 +958,12 @@ Public Class FileSystemTree
 
     Private Sub tvFiles_BeforeSelect(sender As Object, e As TreeViewCancelEventArgs) Handles tvFiles.BeforeSelect
         ' MsgBox("YEs")
+        ClearSelectedNodes()
+
     End Sub
 
     Public Sub tvFiles_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles tvFiles.AfterSelect
-
+        HighlightSelectedNodes()
         RaiseEvent DirectorySelected(Me, New DirectoryInfoEventArgs(New DirectoryInfo(NodePath(e))))
 
 
@@ -1023,6 +1025,10 @@ Public Class FileSystemTree
 
     Private Sub FileSystemTree_BackColorChanged(sender As Object, e As EventArgs) Handles Me.BackColorChanged
         tvFiles.BackColor = Me.BackColor
+    End Sub
+
+    Public Sub FileSystemTree_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
+
     End Sub
 
 #End Region

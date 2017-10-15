@@ -90,6 +90,7 @@ Partial Class frmMain
         Me.TableLayoutPanel2 = New System.Windows.Forms.TableLayoutPanel()
         Me.ctrFilesandPics = New System.Windows.Forms.SplitContainer()
         Me.ctrTreeandFiles = New System.Windows.Forms.SplitContainer()
+        Me.tvMain2 = New MasaSam.Forms.Controls.FileSystemTree()
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
         Me.lbxFiles = New System.Windows.Forms.ListBox()
         Me.lbxShowList = New System.Windows.Forms.ListBox()
@@ -138,7 +139,7 @@ Partial Class frmMain
         Me.BackgroundWorker1 = New System.ComponentModel.BackgroundWorker()
         Me.FileSystemWatcher1 = New System.IO.FileSystemWatcher()
         Me.tmrLoadLastFolder = New System.Windows.Forms.Timer(Me.components)
-        Me.tvMain2 = New MasaSam.Forms.Controls.FileSystemTree()
+        Me.btnChooseRandom = New System.Windows.Forms.ToolStripButton()
         Me.MenuStrip1.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
         Me.TableLayoutPanel2.SuspendLayout()
@@ -619,6 +620,19 @@ Partial Class frmMain
         Me.ctrTreeandFiles.TabIndex = 0
         Me.ctrTreeandFiles.TabStop = False
         '
+        'tvMain2
+        '
+        Me.tvMain2.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.tvMain2.FileExtensions = "*"
+        Me.tvMain2.Location = New System.Drawing.Point(0, 0)
+        Me.tvMain2.Margin = New System.Windows.Forms.Padding(6)
+        Me.tvMain2.Name = "tvMain2"
+        Me.tvMain2.RootDrive = Nothing
+        Me.tvMain2.SelectedFolder = Nothing
+        Me.tvMain2.Size = New System.Drawing.Size(345, 446)
+        Me.tvMain2.TabIndex = 0
+        Me.tvMain2.TrackDriveState = True
+        '
         'SplitContainer1
         '
         Me.SplitContainer1.Dock = System.Windows.Forms.DockStyle.Fill
@@ -698,7 +712,7 @@ Partial Class frmMain
         Me.ToolStrip1.AutoSize = False
         Me.ToolStrip1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.ToolStrip1.ImageScalingSize = New System.Drawing.Size(28, 28)
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.ToolStripButton2, Me.ToolStripSeparator3, Me.ToolStripSeparator4, Me.ToolStripLabel1, Me.tsbAddMovies, Me.TSBRemoveMovies, Me.ToolStripButton8, Me.ToolStripSeparator6, Me.tsbClear, Me.ToolStripSeparator5, Me.ToolStripSeparator7, Me.ToolStripButton10, Me.ToolStripSeparator8, Me.ToolStripButton11, Me.ToolStripButton12, Me.ToolStripSeparator9, Me.ToolStripButton13, Me.ToolStripButton15, Me.ToolStripSeparator10, Me.ToolStripComboBox1, Me.ToolStripButton16, Me.ToolStripButton3, Me.ToolStripTextBox1, Me.ToolStripButton9, Me.ToolStripButton5, Me.tsbFullscreen, Me.toolStripSeparator, Me.toolStripSeparator11, Me.showButtons})
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.ToolStripButton2, Me.ToolStripSeparator3, Me.ToolStripSeparator4, Me.ToolStripLabel1, Me.tsbAddMovies, Me.TSBRemoveMovies, Me.ToolStripButton8, Me.ToolStripSeparator6, Me.tsbClear, Me.ToolStripSeparator5, Me.ToolStripSeparator7, Me.ToolStripButton10, Me.ToolStripSeparator8, Me.ToolStripButton11, Me.ToolStripButton12, Me.ToolStripSeparator9, Me.ToolStripButton13, Me.ToolStripButton15, Me.ToolStripSeparator10, Me.ToolStripComboBox1, Me.ToolStripButton16, Me.ToolStripButton3, Me.ToolStripTextBox1, Me.ToolStripButton9, Me.btnChooseRandom, Me.ToolStripButton5, Me.tsbFullscreen, Me.toolStripSeparator, Me.toolStripSeparator11, Me.showButtons})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 0)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Size = New System.Drawing.Size(2603, 90)
@@ -979,16 +993,14 @@ Partial Class frmMain
         'tmrLoadLastFolder
         '
         '
-        'tvMain2
+        'btnChooseRandom
         '
-        Me.tvMain2.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.tvMain2.FileExtensions = "*"
-        Me.tvMain2.Location = New System.Drawing.Point(0, 0)
-        Me.tvMain2.Margin = New System.Windows.Forms.Padding(6)
-        Me.tvMain2.Name = "tvMain2"
-        Me.tvMain2.RootDrive = Nothing
-        Me.tvMain2.Size = New System.Drawing.Size(345, 446)
-        Me.tvMain2.TabIndex = 0
+        Me.btnChooseRandom.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text
+        Me.btnChooseRandom.Image = CType(resources.GetObject("btnChooseRandom.Image"), System.Drawing.Image)
+        Me.btnChooseRandom.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.btnChooseRandom.Name = "btnChooseRandom"
+        Me.btnChooseRandom.Size = New System.Drawing.Size(170, 87)
+        Me.btnChooseRandom.Text = "Choose Random"
         '
         'frmMain
         '
@@ -1150,4 +1162,5 @@ Partial Class frmMain
     Friend WithEvents RandomStartToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents DateSSL As ToolStripStatusLabel
     Friend WithEvents tvMain2 As Controls.FileSystemTree
+    Friend WithEvents btnChooseRandom As ToolStripButton
 End Class
