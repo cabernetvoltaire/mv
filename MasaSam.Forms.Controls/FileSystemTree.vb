@@ -1,6 +1,7 @@
 ﻿Imports System.ComponentModel
 Imports System.Diagnostics
 Imports System.IO
+Imports MasaSam.Forms.Controls
 
 Public Class FileSystemTree
 
@@ -262,6 +263,8 @@ Public Class FileSystemTree
         End Set
     End Property
 
+    Public Property SelectedFolder As String
+
 #End Region
 
 #Region "Methods"
@@ -466,7 +469,7 @@ Public Class FileSystemTree
     ''' Creates file tree for expanded directory node.
     ''' </summary>
     Private Overloads Sub CreateFileTree(ByVal node As DirectoryNode)
-        If Not Showfiles Then Exit Sub
+        If Not ShowFiles Then Exit Sub
         If (node.FileNodes.Count() = 0) Then
             Dim files = GetFiles(node.Directory)
             CreateFileTree(node, files)
@@ -732,6 +735,7 @@ Public Class FileSystemTree
                 Dim file As FileInfo = CType(node, FileNode).File
                 OnFileSelected(file)
         End Select
+
     End Sub
 
     ''' <summary>
@@ -958,10 +962,17 @@ Public Class FileSystemTree
 
     Public Sub tvFiles_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles tvFiles.AfterSelect
 
-        RaiseEvent DirectorySelected(Me, New DirectoryInfoEventArgs(New DirectoryInfo(e.Node.ToolTipText)))
+        RaiseEvent DirectorySelected(Me, New DirectoryInfoEventArgs(New DirectoryInfo(NodePath(e))))
 
 
     End Sub
+    Private Function NodePath(e) As String
+        Dim s As String
+        Dim myc As String = "My Computer\"
+        s = e.node.fullpath
+        If InStr(s, myc) <> 0 Then s = s.Remove(0, Len(myc))
+        Return s
+    End Function
 
     Private Sub tvFiles_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles tvFiles.PreviewKeyDown
         'Enables traversing of the filetree
@@ -1004,6 +1015,14 @@ Public Class FileSystemTree
                 newnode = node.PrevNode
             End If
         End If
+    End Sub
+
+    Private Sub tvFiles_BackColorChanged(sender As Object, e As EventArgs) Handles tvFiles.BackColorChanged
+        Me.BackColor = tvFiles.BackColor
+    End Sub
+
+    Private Sub FileSystemTree_DirectorySelected(sender As Object, e As DirectoryInfoEventArgs) Handles Me.DirectorySelected
+        SelectedFolder = e.Directory.FullName
     End Sub
 
 #End Region

@@ -26,7 +26,7 @@ Public Class frmMain
     Public blnAutoAdvanceFolder As Boolean = True
     Private blnRandomStartAlways As Boolean = False
     Public Property blnRestartSlideShowFlag As Boolean = False
-    Public strOldPath As String = "C:\"
+    Public strOldPath As String = "E:\"
     Public ChosenPlayOrder As Byte = 0
     Public Function ImageOrientation(ByVal img As Image) As ExifOrientations
         ' Get the index of the orientation property.
@@ -369,33 +369,33 @@ Public Class frmMain
 
     End Sub
 
-    Private Sub TraverseTree(Tree As TreeView, blnForward As Boolean)
+    'Private Sub TraverseTree(Tree As TreeView, blnForward As Boolean)
 
-        If Tree.SelectedNode Is Nothing Then Exit Sub
+    '    If Tree.SelectedNode Is Nothing Then Exit Sub
 
-        With Tree.SelectedNode
+    '    With Tree.SelectedNode
 
-            If blnForward Then
-                If .Nodes.Count <> 0 Then
-                    If .Index = 0 Then
-                        .FirstNode.Expand()
-                    Else
-                        .NextNode.Expand()
-                    End If
+    '        If blnForward Then
+    '            If .Nodes.Count <> 0 Then
+    '                If .Index = 0 Then
+    '                    .FirstNode.Expand()
+    '                Else
+    '                    .NextNode.Expand()
+    '                End If
 
-                Else
-                    .Parent.NextNode.Expand()
-                End If
+    '            Else
+    '                .Parent.NextNode.Expand()
+    '            End If
 
-            End If
-        End With
-    End Sub
+    '        End If
+    '    End With
+    'End Sub
     Private Sub HighlightCurrent(strPath As String)
         If strPath = "" Then Exit Sub
         If Len(strPath) > 265 Then Exit Sub
         Dim finfo As New IO.FileInfo(strPath)
-        Dim dr As New DriveInfo(strPath)
-        Dim fldr As New DirectoryInfo(strPath)
+        Dim dr As New DriveInfo(finfo.Directory.Root.Name)
+        Dim fldr As New DirectoryInfo(finfo.Directory.FullName)
         DateSSL.Text = finfo.LastWriteTime.ToShortDateString & " " & finfo.LastWriteTime.ToShortTimeString
         'tvMain.Collapse()
         'tvMain2.Validate()
@@ -404,7 +404,7 @@ Public Class frmMain
         tvMain2.Expand(strPath)
 
         'Tvw.SelectNode(strPath, 0, False)
-        ' FillListbox(lbxFiles, fldr, CurrentFilterState, LboxFiles) 'TODO
+        FillListbox(lbxFiles, fldr, CurrentFilterState, LboxFiles) 'TODO
         'Highlight the file in lbxFiles
         For i = 0 To lbxFiles.Items.Count - 1
             If lbxFiles.Items(i) = strPath Then
@@ -1005,6 +1005,7 @@ Public Class frmMain
 
     Private Sub tmrLoadLastFolder_Tick(sender As Object, e As EventArgs) Handles tmrLoadLastFolder.Tick
         If strCurrentFilePath = "" Then Exit Sub
+        ' strCurrentFilePath="E:\"
         HighlightCurrent(strCurrentFilePath)
         tmrLoadLastFolder.Enabled = False
     End Sub
@@ -1076,4 +1077,6 @@ Public Class frmMain
         Next
 
     End Sub
+
+
 End Class
