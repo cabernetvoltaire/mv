@@ -917,11 +917,11 @@ Public Class frmMain
 
 
 
-    Private Sub tvMain2_Enter(sender As Object, e As EventArgs) Handles lbxShowList.Enter, lbxFiles.Enter
+    Private Sub tvMain2_Enter(sender As Object, e As EventArgs) Handles lbxShowList.Enter, lbxFiles.Enter, tvMain2.Enter
         sender.backcolor = Color.Aquamarine
     End Sub
 
-    Private Sub tvMain2_Leave(sender As Object, e As EventArgs) Handles lbxShowList.Leave, lbxFiles.Leave
+    Private Sub tvMain2_Leave(sender As Object, e As EventArgs) Handles lbxShowList.Leave, lbxFiles.Leave, tvMain2.Leave
         sender.backcolor = Color.White
 
     End Sub
