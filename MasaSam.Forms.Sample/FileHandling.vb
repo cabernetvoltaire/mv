@@ -1,7 +1,7 @@
 ﻿Imports System.IO
 Module FileHandling
-    Public strVideoExtensions = " .webm .avi .flv .mov .mpeg .mpg. m4v .mkv .mp4 .wmv .wav .mp3 "
-    Public strPicExtensions = "  .jpeg .png .jpg .bmp .gif"
+    Public strVideoExtensions = ".webm.avi.flv.mov.mpeg.mpg.m4v.mkv.mp4.wmv.wav.mp3"
+    Public strPicExtensions = ".jpeg.png.jpg.bmp.gif"
 
 
 
@@ -15,20 +15,22 @@ Module FileHandling
             For Each f In e.EnumerateFiles
                 '                If Not IsNothing(f.FullName) Then 'frmMain.FileBoxContents.Add(f.FullName)
                 Dim s As String = LCase(f.Extension)
+
                 Select Case Currentfilterstate
                     Case FilterState.All
+
                         lbx.Items.Add(f.FullName)
                     Case FilterState.NoPicVid
 
                         'Select Case s
-                        If InStr(strVideoExtensions & strPicExtensions, s) <> 0 Then
+                        If InStr(strVideoExtensions & strPicExtensions, s) <> 0 And Len(s) > 0 Then
                         Else
                             lbx.Items.Add(f.FullName)
                         End If
 
                     Case FilterState.Piconly
                         'Select Case s
-                        If InStr(strPicExtensions, s) <> 0 Then
+                        If InStr(strPicExtensions, s) <> 0 And Len(s) > 0 Then
 
                             lbx.Items.Add(f.FullName)
                         Else
@@ -42,14 +44,14 @@ Module FileHandling
 
                     Case FilterState.Vidonly
                         'Select Case s
-                        If InStr(strVideoExtensions, s) <> 0 Then
+                        If InStr(strVideoExtensions, s) <> 0 And Len(s) > 0 Then
                             lbx.Items.Add(f.FullName)
                         End If
 
 
                     Case FilterState.PicVid
 
-                        If InStr(strVideoExtensions & strPicExtensions, s) <> 0 Then
+                        If InStr(strVideoExtensions & strPicExtensions, s) <> 0 And Len(s) > 0 Then
                             lbx.Items.Add(f.FullName)
 
 

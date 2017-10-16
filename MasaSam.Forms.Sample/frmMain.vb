@@ -61,6 +61,8 @@ Public Class frmMain
     End Sub
     Public Sub HandleKeys(sender As Object, e As KeyEventArgs)
         Select Case e.KeyCode
+            Case tvMain2.TraverseKey, tvMain2.TraverseKeyBack
+               ' tvMain2_KeyDown(sender, e)
             Case KeyEscape
                 currentWMP.Ctlcontrols.pause()
                 tmrSlideShow.Enabled = False
@@ -308,7 +310,7 @@ Public Class frmMain
         strCurrentFilePath = file
         Try
             Dim info As New FileInfo(file)
-            If info.Extension = "." Then
+            If info.Extension = "" Then
                 Return Filetype.Unknown
                 Exit Function
             End If
@@ -1108,5 +1110,9 @@ Public Class frmMain
         blnChooseRandomFile = Not blnChooseRandomFile
 
 
+    End Sub
+
+    Private Sub frmMain_KeyPress(sender As Object, e As KeyPressEventArgs) Handles MyBase.KeyPress
+        e.Handled = True
     End Sub
 End Class

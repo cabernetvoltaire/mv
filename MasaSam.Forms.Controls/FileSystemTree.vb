@@ -67,6 +67,20 @@ Public Class FileSystemTree
             Me.m_showHidden = value
         End Set
     End Property
+    Private newTraverseKeyBack As Keys = Keys.Subtract
+    <DefaultValue(Keys.Subtract)>
+    <Category("Behavior")>
+    <Browsable(True)>
+    <Description("Gets or sets the Key which traverses the tree.")>
+    Public Property TraverseKeyBack() As Keys
+        Get
+            Return newTraverseKeyBack
+        End Get
+        Set(ByVal value As Keys)
+            newTraverseKeyBack = value
+        End Set
+    End Property
+
     Private newTraverseKey As Keys = Keys.Add
     <DefaultValue(Keys.Add)>
     <Category("Behavior")>
@@ -80,6 +94,7 @@ Public Class FileSystemTree
             newTraverseKey = value
         End Set
     End Property
+
     <DefaultValue(False)>
     <Category("Behavior")>
     <Browsable(True)>
@@ -264,6 +279,7 @@ Public Class FileSystemTree
     End Property
 
     Public Property SelectedFolder As String
+
 
 #End Region
 
@@ -981,6 +997,9 @@ Public Class FileSystemTree
         If e.KeyCode = TraverseKey Then
             Traverse(e.Shift)
         End If
+        'If e.KeyCode = TraverseKeyBack Then
+        '    Traverse(True)
+        'End If
     End Sub
 
     Private Sub Traverse(blnBack As Boolean)

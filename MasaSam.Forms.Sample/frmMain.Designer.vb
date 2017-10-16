@@ -123,6 +123,7 @@ Partial Class frmMain
         Me.ToolStripButton3 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripTextBox1 = New System.Windows.Forms.ToolStripTextBox()
         Me.ToolStripButton9 = New System.Windows.Forms.ToolStripButton()
+        Me.btnChooseRandom = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripButton5 = New System.Windows.Forms.ToolStripButton()
         Me.tsbFullscreen = New System.Windows.Forms.ToolStripButton()
         Me.toolStripSeparator = New System.Windows.Forms.ToolStripSeparator()
@@ -139,7 +140,6 @@ Partial Class frmMain
         Me.BackgroundWorker1 = New System.ComponentModel.BackgroundWorker()
         Me.FileSystemWatcher1 = New System.IO.FileSystemWatcher()
         Me.tmrLoadLastFolder = New System.Windows.Forms.Timer(Me.components)
-        Me.btnChooseRandom = New System.Windows.Forms.ToolStripButton()
         Me.MenuStrip1.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
         Me.TableLayoutPanel2.SuspendLayout()
@@ -475,12 +475,14 @@ Partial Class frmMain
         '
         'tsslblFiles
         '
+        Me.tsslblFiles.BorderStyle = System.Windows.Forms.Border3DStyle.SunkenOuter
         Me.tsslblFiles.Name = "tsslblFiles"
         Me.tsslblFiles.Size = New System.Drawing.Size(61, 30)
         Me.tsslblFiles.Text = "FILES"
         '
         'tsslblFilter
         '
+        Me.tsslblFilter.BorderStyle = System.Windows.Forms.Border3DStyle.RaisedOuter
         Me.tsslblFilter.Name = "tsslblFilter"
         Me.tsslblFilter.Size = New System.Drawing.Size(73, 30)
         Me.tsslblFilter.Text = "FILTER"
@@ -511,6 +513,7 @@ Partial Class frmMain
         '
         'tsslblShowfile
         '
+        Me.tsslblShowfile.BorderStyle = System.Windows.Forms.Border3DStyle.RaisedOuter
         Me.tsslblShowfile.Name = "tsslblShowfile"
         Me.tsslblShowfile.Size = New System.Drawing.Size(111, 30)
         Me.tsslblShowfile.Text = "SHOWFILE"
@@ -710,6 +713,7 @@ Partial Class frmMain
         'ToolStrip1
         '
         Me.ToolStrip1.AutoSize = False
+        Me.ToolStrip1.BackColor = System.Drawing.SystemColors.Control
         Me.ToolStrip1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.ToolStrip1.ImageScalingSize = New System.Drawing.Size(28, 28)
         Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.ToolStripButton2, Me.ToolStripSeparator3, Me.ToolStripSeparator4, Me.ToolStripLabel1, Me.tsbAddMovies, Me.TSBRemoveMovies, Me.ToolStripButton8, Me.ToolStripSeparator6, Me.tsbClear, Me.ToolStripSeparator5, Me.ToolStripSeparator7, Me.ToolStripButton10, Me.ToolStripSeparator8, Me.ToolStripButton11, Me.ToolStripButton12, Me.ToolStripSeparator9, Me.ToolStripButton13, Me.ToolStripButton15, Me.ToolStripSeparator10, Me.ToolStripComboBox1, Me.ToolStripButton16, Me.ToolStripButton3, Me.ToolStripTextBox1, Me.ToolStripButton9, Me.btnChooseRandom, Me.ToolStripButton5, Me.tsbFullscreen, Me.toolStripSeparator, Me.toolStripSeparator11, Me.showButtons})
@@ -910,6 +914,15 @@ Partial Class frmMain
         Me.ToolStripButton9.Text = "Random Start Point"
         Me.ToolStripButton9.ToolTipText = "Random Start Point Toggle"
         '
+        'btnChooseRandom
+        '
+        Me.btnChooseRandom.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text
+        Me.btnChooseRandom.Image = CType(resources.GetObject("btnChooseRandom.Image"), System.Drawing.Image)
+        Me.btnChooseRandom.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.btnChooseRandom.Name = "btnChooseRandom"
+        Me.btnChooseRandom.Size = New System.Drawing.Size(170, 87)
+        Me.btnChooseRandom.Text = "Choose Random"
+        '
         'ToolStripButton5
         '
         Me.ToolStripButton5.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text
@@ -993,19 +1006,11 @@ Partial Class frmMain
         'tmrLoadLastFolder
         '
         '
-        'btnChooseRandom
-        '
-        Me.btnChooseRandom.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text
-        Me.btnChooseRandom.Image = CType(resources.GetObject("btnChooseRandom.Image"), System.Drawing.Image)
-        Me.btnChooseRandom.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.btnChooseRandom.Name = "btnChooseRandom"
-        Me.btnChooseRandom.Size = New System.Drawing.Size(170, 87)
-        Me.btnChooseRandom.Text = "Choose Random"
-        '
         'frmMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(11.0!, 24.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.BackColor = System.Drawing.SystemColors.Control
         Me.ClientSize = New System.Drawing.Size(2603, 1171)
         Me.Controls.Add(Me.TableLayoutPanel2)
         Me.Controls.Add(Me.StatusStrip1)
@@ -1017,6 +1022,7 @@ Partial Class frmMain
         Me.Name = "frmMain"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.WindowsDefaultBounds
         Me.Text = "Metavisua"
+        Me.TransparencyKey = System.Drawing.Color.FromArgb(CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer))
         Me.WindowState = System.Windows.Forms.FormWindowState.Maximized
         Me.MenuStrip1.ResumeLayout(False)
         Me.MenuStrip1.PerformLayout()
