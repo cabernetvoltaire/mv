@@ -25,7 +25,7 @@ Public Class frmMain
     Public LastPlayed As New Stack(Of String)
     Public blnAutoAdvanceFolder As Boolean = True
     Public blnRandomStartAlways As Boolean = False
-    Public blnRestartSlideShowFlag As Boolean = True
+    Public blnRestartSlideShowFlag As Boolean = False
     Public Property blnTVCurrent As Boolean
     Public Property blnChooseRandomFile As Boolean = True
     Public ChosenPlayOrder As Byte = 0
@@ -253,6 +253,10 @@ Public Class frmMain
         strCurrentFilePath = showpath
         tmrPicLoad.Enabled = True
     End Sub
+    Private Sub CollapseShowlist(blnOpen As Boolean)
+        SplitContainer1.Panel2Collapsed = blnOpen
+        '        ctrTreeandFiles.Panel1Collapsed = Not ctrTreeandFiles.Panel1Collapsed
+    End Sub
 
     Public Sub MediaSmallJump(e As KeyEventArgs)
         Dim iJumpFactor As Integer
@@ -343,6 +347,9 @@ Public Class frmMain
         '  MessageBox.Show(info.Extension)
     End Function
     Private Sub FillShowbox(lbxShowList As ListBox, all As Byte, showlist As List(Of String))
+        If showlist.Count = 0 Then Exit Sub
+
+        CollapseShowlist(False)
         lbxShowList.Items.Clear()
 
         For Each s In showlist
@@ -402,7 +409,7 @@ Public Class frmMain
     'End Sub
     Private Sub HighlightCurrent(strPath As String)
         If strPath = "" Then Exit Sub
-        If Len(strPath) > 265 Then Exit Sub
+        If Len(strPath) > 247 Then Exit Sub
         Dim finfo As New IO.FileInfo(strPath)
         'Dim dr As New DriveInfo(finfo.Directory.Root.Name)
         'Dim fldr As New DirectoryInfo(finfo.Directory.FullName)
@@ -763,6 +770,7 @@ Public Class frmMain
         lbxShowList.Items.Clear()
         lbxShowList.TabStop = False
         FBCShown.Clear()
+        CollapseShowlist(True)
         ' tsslblFilter.Text = "0"
     End Sub
     Private Sub ToolStripButton7_Click(sender As Object, e As EventArgs) Handles tsbAddMovies.Click
@@ -925,9 +933,6 @@ Public Class frmMain
         Addpics(False)
     End Sub
 
-    Private Sub tvMain_Load(sender As Object, e As EventArgs)
-
-    End Sub
 
 
 
@@ -959,6 +964,7 @@ Public Class frmMain
 
 
     Private Sub tvMain2_NodeSelected(sender As Object, e As TreeViewEventArgs)
+        Exit Sub
         If e.Node.ToolTipText = "My Computer" Then Exit Sub
 
         If e.Node.ToolTipText = "" Then Exit Sub
@@ -966,15 +972,6 @@ Public Class frmMain
         Dim di = New IO.DirectoryInfo(e.Node.ToolTipText)
         CurrentFolderPath = di.FullName
         FillListbox(lbxFiles, di, CurrentFilterState, Showlist, blnChooseRandomFile)
-    End Sub
-
-    Private Sub lbxShowList_CollectionChanged(sender As Object, e As EventArgs) Handles lbxShowList.DataSourceChanged
-
-
-    End Sub
-
-    Private Sub tvMain2_Load(sender As Object, e As EventArgs)
-
     End Sub
 
 
@@ -1086,8 +1083,7 @@ Public Class frmMain
     Private Sub tvMain2_DirectorySelected(sender As Object, e As DirectoryInfoEventArgs) Handles tvMain2.DirectorySelected
         PreferencesSave()
         CurrentFolderPath = e.Directory.FullName
-        ' tvMain2.Expand(CurrentFolderPath)
-        tvMain2.SelectedFolder = CurrentFolderPath
+        ' tvMain2.SelectedFolder = CurrentFolderPath
         FillListbox(lbxFiles, e.Directory, CurrentFilterState, Showlist, blnChooseRandomFile)
     End Sub
 
@@ -1114,5 +1110,9 @@ Public Class frmMain
 
     Private Sub frmMain_KeyPress(sender As Object, e As KeyPressEventArgs) Handles MyBase.KeyPress
         e.Handled = True
+    End Sub
+
+    Private Sub ToolStripButton4_Click_1(sender As Object, e As EventArgs) Handles ToolStripButton4.Click
+        CollapseShowlist(True)
     End Sub
 End Class

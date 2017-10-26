@@ -140,6 +140,7 @@ Partial Class frmMain
         Me.BackgroundWorker1 = New System.ComponentModel.BackgroundWorker()
         Me.FileSystemWatcher1 = New System.IO.FileSystemWatcher()
         Me.tmrLoadLastFolder = New System.Windows.Forms.Timer(Me.components)
+        Me.ToolStripButton4 = New System.Windows.Forms.ToolStripButton()
         Me.MenuStrip1.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
         Me.TableLayoutPanel2.SuspendLayout()
@@ -651,7 +652,7 @@ Partial Class frmMain
         '
         Me.SplitContainer1.Panel2.Controls.Add(Me.lbxShowList)
         Me.SplitContainer1.Size = New System.Drawing.Size(345, 541)
-        Me.SplitContainer1.SplitterDistance = 213
+        Me.SplitContainer1.SplitterDistance = 240
         Me.SplitContainer1.SplitterWidth = 30
         Me.SplitContainer1.TabIndex = 1
         Me.SplitContainer1.TabStop = False
@@ -664,7 +665,7 @@ Partial Class frmMain
         Me.lbxFiles.Location = New System.Drawing.Point(0, 0)
         Me.lbxFiles.Margin = New System.Windows.Forms.Padding(6)
         Me.lbxFiles.Name = "lbxFiles"
-        Me.lbxFiles.Size = New System.Drawing.Size(345, 213)
+        Me.lbxFiles.Size = New System.Drawing.Size(345, 240)
         Me.lbxFiles.TabIndex = 0
         '
         'lbxShowList
@@ -674,7 +675,7 @@ Partial Class frmMain
         Me.lbxShowList.ItemHeight = 24
         Me.lbxShowList.Location = New System.Drawing.Point(0, 0)
         Me.lbxShowList.Name = "lbxShowList"
-        Me.lbxShowList.Size = New System.Drawing.Size(345, 298)
+        Me.lbxShowList.Size = New System.Drawing.Size(345, 271)
         Me.lbxShowList.TabIndex = 0
         Me.lbxShowList.TabStop = False
         '
@@ -716,7 +717,7 @@ Partial Class frmMain
         Me.ToolStrip1.BackColor = System.Drawing.SystemColors.Control
         Me.ToolStrip1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.ToolStrip1.ImageScalingSize = New System.Drawing.Size(28, 28)
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.ToolStripButton2, Me.ToolStripSeparator3, Me.ToolStripSeparator4, Me.ToolStripLabel1, Me.tsbAddMovies, Me.TSBRemoveMovies, Me.ToolStripButton8, Me.ToolStripSeparator6, Me.tsbClear, Me.ToolStripSeparator5, Me.ToolStripSeparator7, Me.ToolStripButton10, Me.ToolStripSeparator8, Me.ToolStripButton11, Me.ToolStripButton12, Me.ToolStripSeparator9, Me.ToolStripButton13, Me.ToolStripButton15, Me.ToolStripSeparator10, Me.ToolStripComboBox1, Me.ToolStripButton16, Me.ToolStripButton3, Me.ToolStripTextBox1, Me.ToolStripButton9, Me.btnChooseRandom, Me.ToolStripButton5, Me.tsbFullscreen, Me.toolStripSeparator, Me.toolStripSeparator11, Me.showButtons})
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.ToolStripButton2, Me.ToolStripSeparator3, Me.ToolStripSeparator4, Me.ToolStripLabel1, Me.tsbAddMovies, Me.TSBRemoveMovies, Me.ToolStripButton8, Me.ToolStripSeparator6, Me.tsbClear, Me.ToolStripSeparator5, Me.ToolStripSeparator7, Me.ToolStripButton10, Me.ToolStripSeparator8, Me.ToolStripButton11, Me.ToolStripButton12, Me.ToolStripSeparator9, Me.ToolStripButton13, Me.ToolStripButton15, Me.ToolStripSeparator10, Me.ToolStripComboBox1, Me.ToolStripButton16, Me.ToolStripButton3, Me.ToolStripTextBox1, Me.ToolStripButton9, Me.btnChooseRandom, Me.ToolStripButton5, Me.tsbFullscreen, Me.toolStripSeparator, Me.toolStripSeparator11, Me.showButtons, Me.ToolStripButton4})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 0)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Size = New System.Drawing.Size(2603, 90)
@@ -1006,6 +1007,15 @@ Partial Class frmMain
         'tmrLoadLastFolder
         '
         '
+        'ToolStripButton4
+        '
+        Me.ToolStripButton4.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ToolStripButton4.Image = CType(resources.GetObject("ToolStripButton4.Image"), System.Drawing.Image)
+        Me.ToolStripButton4.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton4.Name = "ToolStripButton4"
+        Me.ToolStripButton4.Size = New System.Drawing.Size(32, 87)
+        Me.ToolStripButton4.Text = "ToolStripButton4"
+        '
         'frmMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(11.0!, 24.0!)
@@ -1169,4 +1179,5 @@ Partial Class frmMain
     Friend WithEvents DateSSL As ToolStripStatusLabel
     Friend WithEvents tvMain2 As Controls.FileSystemTree
     Friend WithEvents btnChooseRandom As ToolStripButton
+    Friend WithEvents ToolStripButton4 As ToolStripButton
 End Class

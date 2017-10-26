@@ -278,8 +278,22 @@ Public Class FileSystemTree
         End Set
     End Property
 
-    Public Property SelectedFolder As String
 
+    Private newSelectedFolder As String
+    Public Property SelectedFolder() As String
+        Get
+            Return newSelectedFolder
+        End Get
+        Set(ByVal value As String)
+            If value = "" Then Exit Property
+            Dim d As New DirectoryInfo(value)
+            If d.Parent Is Nothing Then Exit Property
+            Expand(d.Parent.FullName)
+            ClearSelectedNodes()
+            newSelectedFolder = value
+
+        End Set
+    End Property
 
 #End Region
 
@@ -997,9 +1011,7 @@ Public Class FileSystemTree
         If e.KeyCode = TraverseKey Then
             Traverse(e.Shift)
         End If
-        'If e.KeyCode = TraverseKeyBack Then
-        '    Traverse(True)
-        'End If
+
     End Sub
 
     Private Sub Traverse(blnBack As Boolean)
@@ -1039,16 +1051,14 @@ Public Class FileSystemTree
     End Sub
 
     Private Sub FileSystemTree_DirectorySelected(sender As Object, e As DirectoryInfoEventArgs) Handles Me.DirectorySelected
-        SelectedFolder = e.Directory.FullName
+        newSelectedFolder = e.Directory.FullName
     End Sub
 
     Private Sub FileSystemTree_BackColorChanged(sender As Object, e As EventArgs) Handles Me.BackColorChanged
         tvFiles.BackColor = Me.BackColor
     End Sub
 
-    Public Sub FileSystemTree_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
 
-    End Sub
 
 #End Region
 
