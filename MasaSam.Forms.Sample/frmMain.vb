@@ -61,6 +61,17 @@ Public Class frmMain
     End Sub
     Public Sub HandleKeys(sender As Object, e As KeyEventArgs)
         Select Case e.KeyCode
+            Case Keys.F5, Keys.F6, Keys.F7, Keys.F8, Keys.F9, Keys.F10, Keys.F11, Keys.F12
+                Buttons.HandleKeypress(sender, e)
+                e.Handled = True
+            Case KeyCycleMode
+                If Not blnButtonsLoaded Then
+                    Buttons.Show()
+                    blnButtonsLoaded = True
+                Else
+                    Buttons.Hide()
+                    blnButtonsLoaded = False
+                End If
             Case tvMain2.TraverseKey, tvMain2.TraverseKeyBack
                ' tvMain2_KeyDown(sender, e)
             Case KeyEscape
@@ -492,38 +503,35 @@ Public Class frmMain
         For Each f In List
             Dim file As New FileInfo(f)
             If Len(file.FullName) > 247 Then Continue For
-            Select Case Order
-                Case PlayOrder.Name
-                    NewListS.Add(File.Name & File.FullName, File.FullName)
-                Case PlayOrder.Length
-                    Try
-                        NewListL.Add(File.Length + Len(File.FullName), File.FullName)
-                    Catch ex As Exception
-
-                    End Try
-                Case PlayOrder.Time
-                    Dim time = file.LastWriteTime.AddMilliseconds(Rnd(100))
-                    Try
+            Try
+                Select Case Order
+                    Case PlayOrder.Name
+                        NewListS.Add(file.Name & file.FullName, file.FullName)
+                    Case PlayOrder.Length
+                        NewListL.Add(file.Length + Len(file.FullName), file.FullName)
+                    Case PlayOrder.Time
+                        Dim time = file.LastWriteTime.AddMilliseconds(Rnd(100))
                         NewListD.Add(time, file.FullName)
-                    Catch ex As System.ArgumentException 'TODO could do better than this. 
-                        Continue For
-                    End Try
-                Case PlayOrder.PathName
-                    NewListS.Add(file.FullName, file.FullName)
+                    Case PlayOrder.PathName
+                        NewListS.Add(file.FullName, file.FullName)
 
-                Case PlayOrder.Type
-                    NewListS.Add(file.Extension & file.Name & Str(Rnd(100)), file.FullName)
-                Case PlayOrder.Random
-                    Try
-                        NewListS.Add(Str(Rnd(List.Count)), file.FullName)
+                    Case PlayOrder.Type
+                        NewListS.Add(file.Extension & file.Name & Str(Rnd(100)), file.FullName)
+                    Case PlayOrder.Random
+                        Try
+                            NewListS.Add(Str(Rnd(List.Count)), file.FullName)
 
-                    Catch ex As System.ArgumentException
-                        NewListS.Add(Str(Rnd(List.Count)), file.FullName)
+                        Catch ex As System.ArgumentException
+                            NewListS.Add(Str(Rnd(List.Count)), file.FullName)
 
-                    Catch ex As System.IO.PathTooLongException
-                        Continue For
-                    End Try
-            End Select
+                        End Try
+                End Select
+            Catch ex As System.ArgumentException 'TODO could do better than this. 
+                Continue For
+
+            Catch ex As System.IO.PathTooLongException
+                Continue For
+            End Try
         Next
 
         If NewListD.Count <> 0 Then

@@ -26,7 +26,9 @@
     Public Sublist As New List(Of String)
     Public currentPicBox As New PictureBox
     Public Autozoomrate As Decimal = 0.4
+    Public btnFolderNames(8) As String
 
+    Public blnButtonsLoaded As Boolean
     Public ssspeed As Integer = 200
 
     Public blnFullScreen As Boolean

@@ -47,6 +47,7 @@ Partial Class Buttons
         Me.Panel1 = New System.Windows.Forms.Panel()
         Me.lbl1 = New System.Windows.Forms.Label()
         Me.btn1 = New System.Windows.Forms.Button()
+        Me.lblAlpha = New System.Windows.Forms.Label()
         Me.TableLayoutPanel1.SuspendLayout()
         Me.Panel8.SuspendLayout()
         Me.Panel7.SuspendLayout()
@@ -78,6 +79,7 @@ Partial Class Buttons
         Me.TableLayoutPanel1.Controls.Add(Me.Panel3, 2, 0)
         Me.TableLayoutPanel1.Controls.Add(Me.Panel2, 1, 0)
         Me.TableLayoutPanel1.Controls.Add(Me.Panel1, 0, 0)
+        Me.TableLayoutPanel1.Controls.Add(Me.lblAlpha, 4, 0)
         Me.TableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TableLayoutPanel1.Location = New System.Drawing.Point(0, 0)
         Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
@@ -107,10 +109,12 @@ Partial Class Buttons
         '
         'btn8
         '
+        Me.btn8.Font = New System.Drawing.Font("Rockwell", 14.14286!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btn8.Location = New System.Drawing.Point(47, 18)
         Me.btn8.Name = "btn8"
         Me.btn8.Size = New System.Drawing.Size(106, 92)
         Me.btn8.TabIndex = 1
+        Me.btn8.TabStop = False
         Me.btn8.Text = "f1"
         Me.btn8.UseVisualStyleBackColor = True
         '
@@ -135,10 +139,12 @@ Partial Class Buttons
         '
         'btn7
         '
+        Me.btn7.Font = New System.Drawing.Font("Rockwell", 14.14286!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btn7.Location = New System.Drawing.Point(47, 18)
         Me.btn7.Name = "btn7"
         Me.btn7.Size = New System.Drawing.Size(106, 92)
         Me.btn7.TabIndex = 1
+        Me.btn7.TabStop = False
         Me.btn7.Text = "f1"
         Me.btn7.UseVisualStyleBackColor = True
         '
@@ -163,10 +169,12 @@ Partial Class Buttons
         '
         'btn6
         '
+        Me.btn6.Font = New System.Drawing.Font("Rockwell", 14.14286!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btn6.Location = New System.Drawing.Point(47, 18)
         Me.btn6.Name = "btn6"
         Me.btn6.Size = New System.Drawing.Size(106, 92)
         Me.btn6.TabIndex = 1
+        Me.btn6.TabStop = False
         Me.btn6.Text = "f1"
         Me.btn6.UseVisualStyleBackColor = True
         '
@@ -191,10 +199,12 @@ Partial Class Buttons
         '
         'btn5
         '
+        Me.btn5.Font = New System.Drawing.Font("Rockwell", 14.14286!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btn5.Location = New System.Drawing.Point(47, 18)
         Me.btn5.Name = "btn5"
         Me.btn5.Size = New System.Drawing.Size(106, 92)
         Me.btn5.TabIndex = 1
+        Me.btn5.TabStop = False
         Me.btn5.Text = "f1"
         Me.btn5.UseVisualStyleBackColor = True
         '
@@ -219,10 +229,12 @@ Partial Class Buttons
         '
         'btn4
         '
+        Me.btn4.Font = New System.Drawing.Font("Rockwell", 14.14286!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btn4.Location = New System.Drawing.Point(47, 18)
         Me.btn4.Name = "btn4"
         Me.btn4.Size = New System.Drawing.Size(106, 92)
         Me.btn4.TabIndex = 1
+        Me.btn4.TabStop = False
         Me.btn4.Text = "f1"
         Me.btn4.UseVisualStyleBackColor = True
         '
@@ -247,10 +259,12 @@ Partial Class Buttons
         '
         'btn3
         '
+        Me.btn3.Font = New System.Drawing.Font("Rockwell", 14.14286!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btn3.Location = New System.Drawing.Point(47, 18)
         Me.btn3.Name = "btn3"
         Me.btn3.Size = New System.Drawing.Size(106, 92)
         Me.btn3.TabIndex = 1
+        Me.btn3.TabStop = False
         Me.btn3.Text = "f1"
         Me.btn3.UseVisualStyleBackColor = True
         '
@@ -276,10 +290,12 @@ Partial Class Buttons
         'btn2
         '
         Me.btn2.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.btn2.Font = New System.Drawing.Font("Rockwell", 14.14286!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btn2.Location = New System.Drawing.Point(47, 18)
         Me.btn2.Name = "btn2"
         Me.btn2.Size = New System.Drawing.Size(106, 92)
         Me.btn2.TabIndex = 1
+        Me.btn2.TabStop = False
         Me.btn2.Text = "f1"
         Me.btn2.UseVisualStyleBackColor = True
         '
@@ -296,6 +312,7 @@ Partial Class Buttons
         'lbl1
         '
         Me.lbl1.AutoSize = True
+        Me.lbl1.FlatStyle = System.Windows.Forms.FlatStyle.Popup
         Me.lbl1.Location = New System.Drawing.Point(65, 144)
         Me.lbl1.Name = "lbl1"
         Me.lbl1.Size = New System.Drawing.Size(71, 25)
@@ -304,26 +321,43 @@ Partial Class Buttons
         '
         'btn1
         '
+        Me.btn1.Font = New System.Drawing.Font("Rockwell", 14.14286!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btn1.Location = New System.Drawing.Point(47, 18)
         Me.btn1.Name = "btn1"
         Me.btn1.Size = New System.Drawing.Size(106, 92)
         Me.btn1.TabIndex = 1
+        Me.btn1.TabStop = False
         Me.btn1.Text = "f1"
         Me.btn1.UseVisualStyleBackColor = True
         '
+        'lblAlpha
+        '
+        Me.lblAlpha.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.lblAlpha.Font = New System.Drawing.Font("Microsoft Sans Serif", 48.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblAlpha.Location = New System.Drawing.Point(795, 0)
+        Me.lblAlpha.Name = "lblAlpha"
+        Me.lblAlpha.Size = New System.Drawing.Size(192, 208)
+        Me.lblAlpha.TabIndex = 11
+        Me.lblAlpha.Text = "A"
+        Me.lblAlpha.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        '
         'Buttons
         '
+        Me.AllowDrop = True
         Me.AutoScaleDimensions = New System.Drawing.SizeF(11.0!, 24.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btn2
         Me.ClientSize = New System.Drawing.Size(1789, 208)
         Me.Controls.Add(Me.TableLayoutPanel1)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow
+        Me.KeyPreview = True
         Me.MaximizeBox = False
         Me.MinimizeBox = False
         Me.Name = "Buttons"
-        Me.StartPosition = System.Windows.Forms.FormStartPosition.Manual
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
+        Me.Text = "Function Key Control"
         Me.TopMost = True
+        Me.TransparencyKey = System.Drawing.Color.PowderBlue
         Me.TableLayoutPanel1.ResumeLayout(False)
         Me.Panel8.ResumeLayout(False)
         Me.Panel8.PerformLayout()
@@ -370,4 +404,5 @@ Partial Class Buttons
     Friend WithEvents Panel1 As Panel
     Friend WithEvents lbl1 As Label
     Friend WithEvents btn1 As Button
+    Friend WithEvents lblAlpha As Label
 End Class
