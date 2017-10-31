@@ -2,6 +2,10 @@
 
     Public PreviewWMP() As AxWMPLib.AxWindowsMediaPlayer = {FindDuplicates.WMP1, FindDuplicates.WMP2, FindDuplicates.WMP3, FindDuplicates.WMP4, FindDuplicates.WMP5,
      FindDuplicates.WMP6, FindDuplicates.WMP7, FindDuplicates.WMP8, FindDuplicates.WMP9, FindDuplicates.WMp10, FindDuplicates.WMP11, FindDuplicates.WMP12}
+    Public btnDest() As Button = {Buttons.btn1, Buttons.btn2, Buttons.btn3, Buttons.btn4, Buttons.btn5, Buttons.btn6, Buttons.btn7, Buttons.btn8}
+    Public lblDest() As Label = {Buttons.lbl1, Buttons.lbl2, Buttons.lbl3, Buttons.lbl4, Buttons.lbl5, Buttons.lbl6, Buttons.lbl7, Buttons.lbl8}
+
+
     Public blnRandomStartPoint = False
     Public PlaybackSpeed As Double = 1
     Public lngInterval = 50

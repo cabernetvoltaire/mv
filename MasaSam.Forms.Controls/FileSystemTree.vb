@@ -288,8 +288,12 @@ Public Class FileSystemTree
             If value = "" Then Exit Property
             Dim d As New DirectoryInfo(value)
             If d.Parent Is Nothing Then Exit Property
-            Expand(d.Parent.FullName)
             ClearSelectedNodes()
+            Collapse(d.Parent.FullName)
+            Expand(d.Parent.FullName)
+            Dim nodes() As TreeNode
+            nodes = tvFiles.Nodes.Find(d.Name, True)
+            If nodes.Count <> 0 Then tvFiles.SelectedNode = nodes(0)
             newSelectedFolder = value
 
         End Set
@@ -346,14 +350,23 @@ Public Class FileSystemTree
 
     Private Sub Expand(ByVal directories As IEnumerable(Of DirectoryNode), ByVal directoryNames As List(Of String), ByVal index As Int32)
         If (directories Is Nothing Or index > directoryNames.Count - 1) Then
+
             Return
         End If
+
         For Each d In directories
             If (directoryNames(index).ToLower() = d.Directory.Name.ToLower()) Then
                 d.Expand()
                 Expand(d.DirectoryNodes, directoryNames, index + 1)
+                If index = directoryNames.Count - 1 Then
+                    m_selectedNodes.Add(d.FullName, d)
+                End If
             End If
+
         Next
+        If Not tvFiles.SelectedNode Is Nothing Then
+
+        End If
     End Sub
 
     Public Sub Collapse(ByVal fullPath As String)

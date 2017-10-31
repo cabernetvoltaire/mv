@@ -129,6 +129,7 @@ Partial Class frmMain
         Me.toolStripSeparator = New System.Windows.Forms.ToolStripSeparator()
         Me.toolStripSeparator11 = New System.Windows.Forms.ToolStripSeparator()
         Me.showButtons = New System.Windows.Forms.ToolStripButton()
+        Me.ToolStripButton4 = New System.Windows.Forms.ToolStripButton()
         Me.tmrUpdateFileList = New System.Windows.Forms.Timer(Me.components)
         Me.tmrPicLoad = New System.Windows.Forms.Timer(Me.components)
         Me.tmrJumpVideo = New System.Windows.Forms.Timer(Me.components)
@@ -140,7 +141,6 @@ Partial Class frmMain
         Me.BackgroundWorker1 = New System.ComponentModel.BackgroundWorker()
         Me.FileSystemWatcher1 = New System.IO.FileSystemWatcher()
         Me.tmrLoadLastFolder = New System.Windows.Forms.Timer(Me.components)
-        Me.ToolStripButton4 = New System.Windows.Forms.ToolStripButton()
         Me.MenuStrip1.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
         Me.TableLayoutPanel2.SuspendLayout()
@@ -652,7 +652,7 @@ Partial Class frmMain
         '
         Me.SplitContainer1.Panel2.Controls.Add(Me.lbxShowList)
         Me.SplitContainer1.Size = New System.Drawing.Size(345, 541)
-        Me.SplitContainer1.SplitterDistance = 240
+        Me.SplitContainer1.SplitterDistance = 217
         Me.SplitContainer1.SplitterWidth = 30
         Me.SplitContainer1.TabIndex = 1
         Me.SplitContainer1.TabStop = False
@@ -665,7 +665,7 @@ Partial Class frmMain
         Me.lbxFiles.Location = New System.Drawing.Point(0, 0)
         Me.lbxFiles.Margin = New System.Windows.Forms.Padding(6)
         Me.lbxFiles.Name = "lbxFiles"
-        Me.lbxFiles.Size = New System.Drawing.Size(345, 240)
+        Me.lbxFiles.Size = New System.Drawing.Size(345, 217)
         Me.lbxFiles.TabIndex = 0
         '
         'lbxShowList
@@ -675,7 +675,7 @@ Partial Class frmMain
         Me.lbxShowList.ItemHeight = 24
         Me.lbxShowList.Location = New System.Drawing.Point(0, 0)
         Me.lbxShowList.Name = "lbxShowList"
-        Me.lbxShowList.Size = New System.Drawing.Size(345, 271)
+        Me.lbxShowList.Size = New System.Drawing.Size(345, 294)
         Me.lbxShowList.TabIndex = 0
         Me.lbxShowList.TabStop = False
         '
@@ -963,6 +963,15 @@ Partial Class frmMain
         Me.showButtons.Size = New System.Drawing.Size(144, 87)
         Me.showButtons.Text = "Show Buttons"
         '
+        'ToolStripButton4
+        '
+        Me.ToolStripButton4.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ToolStripButton4.Image = CType(resources.GetObject("ToolStripButton4.Image"), System.Drawing.Image)
+        Me.ToolStripButton4.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton4.Name = "ToolStripButton4"
+        Me.ToolStripButton4.Size = New System.Drawing.Size(32, 87)
+        Me.ToolStripButton4.Text = "ToolStripButton4"
+        '
         'tmrUpdateFileList
         '
         Me.tmrUpdateFileList.Enabled = True
@@ -1006,15 +1015,6 @@ Partial Class frmMain
         '
         'tmrLoadLastFolder
         '
-        '
-        'ToolStripButton4
-        '
-        Me.ToolStripButton4.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ToolStripButton4.Image = CType(resources.GetObject("ToolStripButton4.Image"), System.Drawing.Image)
-        Me.ToolStripButton4.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripButton4.Name = "ToolStripButton4"
-        Me.ToolStripButton4.Size = New System.Drawing.Size(32, 87)
-        Me.ToolStripButton4.Text = "ToolStripButton4"
         '
         'frmMain
         '

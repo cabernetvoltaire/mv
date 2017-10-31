@@ -255,6 +255,7 @@ Public Class frmMain
     End Sub
     Private Sub CollapseShowlist(blnOpen As Boolean)
         SplitContainer1.Panel2Collapsed = blnOpen
+        SplitContainer1.SplitterDistance = SplitContainer1.Height / 3
         '        ctrTreeandFiles.Panel1Collapsed = Not ctrTreeandFiles.Panel1Collapsed
     End Sub
 
@@ -450,6 +451,7 @@ Public Class frmMain
         Dim size As Long = finfo.Length
         If path <> "" Then
             Getlist(Showlist, path, lbxShowList)
+            CollapseShowlist(False)
         End If
         Dim time As TimeSpan = TimeOperation(False)
         Dim loadrate As Single = size / time.TotalMilliseconds
@@ -487,59 +489,43 @@ Public Class frmMain
         Dim NewListS As New SortedList(Of String, String)
         Dim NewListL As New SortedList(Of Long, String)
         Dim NewListD As New SortedList(Of Date, String)
-        Select Case Order
-            Case PlayOrder.Name
-                For Each f In List
-                    Dim file As New FileInfo(f)
-                    NewListS.Add(file.Name & file.FullName, file.FullName)
-
-
-                Next
-            Case PlayOrder.Length
-                For Each f In List
-                    Dim file As New FileInfo(f)
+        For Each f In List
+            Dim file As New FileInfo(f)
+            If Len(file.FullName) > 247 Then Continue For
+            Select Case Order
+                Case PlayOrder.Name
+                    NewListS.Add(File.Name & File.FullName, File.FullName)
+                Case PlayOrder.Length
                     Try
-                        NewListL.Add(file.Length + Len(file.FullName), file.FullName)
+                        NewListL.Add(File.Length + Len(File.FullName), File.FullName)
                     Catch ex As Exception
 
                     End Try
-                Next
-            Case PlayOrder.Time
-                For Each f In List
-                    Dim file As New FileInfo(f)
+                Case PlayOrder.Time
                     Dim time = file.LastWriteTime.AddMilliseconds(Rnd(100))
                     Try
                         NewListD.Add(time, file.FullName)
                     Catch ex As System.ArgumentException 'TODO could do better than this. 
                         Continue For
                     End Try
-                Next
-            Case PlayOrder.PathName
-                For Each f In List
-                    Dim file As New FileInfo(f)
+                Case PlayOrder.PathName
                     NewListS.Add(file.FullName, file.FullName)
 
-                Next
-            Case PlayOrder.Type
-                For Each f In List
-                    Dim file As New FileInfo(f)
+                Case PlayOrder.Type
                     NewListS.Add(file.Extension & file.Name & Str(Rnd(100)), file.FullName)
-                Next
-            Case PlayOrder.Random
-                For Each f In List
+                Case PlayOrder.Random
                     Try
-                        Dim file As New FileInfo(f)
                         NewListS.Add(Str(Rnd(List.Count)), file.FullName)
 
                     Catch ex As System.ArgumentException
-                        Dim file As New FileInfo(f)
                         NewListS.Add(Str(Rnd(List.Count)), file.FullName)
 
                     Catch ex As System.IO.PathTooLongException
                         Continue For
                     End Try
-                Next
-        End Select
+            End Select
+        Next
+
         If NewListD.Count <> 0 Then
             CopyList(List, NewListD)
 
@@ -605,6 +591,12 @@ Public Class frmMain
 
     'Form Controls
     Private Sub Form1_Shown(sender As Object, e As EventArgs) Handles Me.Shown
+        GlobalInitialise()
+
+    End Sub
+
+    Private Sub GlobalInitialise()
+        CollapseShowlist(True)
         PreferencesGet()
         tmrLoadLastFolder.Enabled = True
         ' HighlightCurrent(strCurrentFilePath)
@@ -615,8 +607,8 @@ Public Class frmMain
         currentWMP.uiMode = "FULL"
         currentWMP.Dock = DockStyle.Fill
         currentPicBox = PictureBox1
-
     End Sub
+
     Private Sub Form1_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
         ShiftDown = e.Shift
         CtrlDown = e.Control
