@@ -92,6 +92,12 @@ Module FileHandling
         Next
         fs.Close()
     End Sub
+    ''' <summary>
+    ''' Loads Dest into List, and adds all to lbx
+    ''' </summary>
+    ''' <param name="list"></param>
+    ''' <param name="Dest"></param>
+    ''' <param name="lbx"></param>
     Public Sub Getlist(list As List(Of String), Dest As String, lbx As ListBox)
         Dim notlist As New List(Of String)
         Dim fs As New StreamReader(New FileStream(Dest, FileMode.OpenOrCreate, FileAccess.Read))

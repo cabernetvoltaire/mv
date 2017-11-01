@@ -290,10 +290,8 @@ Public Class FileSystemTree
             If d.Parent Is Nothing Then Exit Property
             ClearSelectedNodes()
             Collapse(d.Parent.FullName)
-            Expand(d.Parent.FullName)
-            Dim nodes() As TreeNode
-            nodes = tvFiles.Nodes.Find(d.Name, True)
-            If nodes.Count <> 0 Then tvFiles.SelectedNode = nodes(0)
+            Expand(d.FullName)
+
             newSelectedFolder = value
 
         End Set
@@ -350,7 +348,6 @@ Public Class FileSystemTree
 
     Private Sub Expand(ByVal directories As IEnumerable(Of DirectoryNode), ByVal directoryNames As List(Of String), ByVal index As Int32)
         If (directories Is Nothing Or index > directoryNames.Count - 1) Then
-
             Return
         End If
 
@@ -359,7 +356,10 @@ Public Class FileSystemTree
                 d.Expand()
                 Expand(d.DirectoryNodes, directoryNames, index + 1)
                 If index = directoryNames.Count - 1 Then
-                    m_selectedNodes.Add(d.FullName, d)
+                    Dim k As New TreeNode
+                    k = CType(d, TreeNode)
+                    tvFiles.SelectedNode = k
+                    k.BackColor = SystemColors.HighlightText
                 End If
             End If
 
@@ -1031,6 +1031,9 @@ Public Class FileSystemTree
         Dim node As TreeNode
         Dim newnode As TreeNode
         node = tvFiles.SelectedNode
+        If node Is Nothing Then
+            node = tvFiles.Nodes(0)
+        End If
         If Not blnBack Then
 
             'If node has children move to first child

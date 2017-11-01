@@ -33,29 +33,21 @@ Partial Class FindDuplicates
         Me.WMP5 = New AxWMPLib.AxWindowsMediaPlayer()
         Me.WMP6 = New AxWMPLib.AxWindowsMediaPlayer()
         Me.WMP7 = New AxWMPLib.AxWindowsMediaPlayer()
-        Me.dgv1 = New System.Windows.Forms.DataGridView()
-        Me.Duplicate = New System.Windows.Forms.DataGridViewCheckBoxColumn()
-        Me.Filename = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.Size = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.clmDate = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.clmPath = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.WMP8 = New AxWMPLib.AxWindowsMediaPlayer()
         Me.WMP9 = New AxWMPLib.AxWindowsMediaPlayer()
         Me.WMp10 = New AxWMPLib.AxWindowsMediaPlayer()
         Me.WMP11 = New AxWMPLib.AxWindowsMediaPlayer()
         Me.WMP12 = New AxWMPLib.AxWindowsMediaPlayer()
-        Me.Label2 = New System.Windows.Forms.Label()
-        Me.Button1 = New System.Windows.Forms.Button()
-        Me.Button5 = New System.Windows.Forms.Button()
+        Me.lblInfo = New System.Windows.Forms.Label()
         Me.lbxDeleteList = New System.Windows.Forms.ListBox()
         Me.lblDelete = New System.Windows.Forms.Label()
         Me.lblUnique = New System.Windows.Forms.Label()
         Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
+        Me.lblSorted = New System.Windows.Forms.Label()
         Me.lbxsorted = New System.Windows.Forms.ListBox()
         Me.lbxunique = New System.Windows.Forms.ListBox()
-        Me.lbxdelete = New System.Windows.Forms.ListBox()
         Me.lbxDuplicates = New System.Windows.Forms.ListBox()
-        Me.lblSorted = New System.Windows.Forms.Label()
+        Me.lbxdelete = New System.Windows.Forms.ListBox()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel2.SuspendLayout()
         Me.SplitContainer1.SuspendLayout()
@@ -67,7 +59,6 @@ Partial Class FindDuplicates
         CType(Me.WMP5, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.WMP6, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.WMP7, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.dgv1, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.WMP8, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.WMP9, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.WMp10, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -94,9 +85,7 @@ Partial Class FindDuplicates
         'SplitContainer1.Panel2
         '
         Me.SplitContainer1.Panel2.Controls.Add(Me.FlowLayoutPanel2)
-        Me.SplitContainer1.Panel2.Controls.Add(Me.Label2)
-        Me.SplitContainer1.Panel2.Controls.Add(Me.Button1)
-        Me.SplitContainer1.Panel2.Controls.Add(Me.Button5)
+        Me.SplitContainer1.Panel2.Controls.Add(Me.lblInfo)
         Me.SplitContainer1.Panel2.Controls.Add(Me.lbxDeleteList)
         Me.SplitContainer1.Panel2.Controls.Add(Me.lblDelete)
         Me.SplitContainer1.Panel2.Controls.Add(Me.lblUnique)
@@ -115,7 +104,6 @@ Partial Class FindDuplicates
         Me.FlowLayoutPanel2.Controls.Add(Me.WMP5)
         Me.FlowLayoutPanel2.Controls.Add(Me.WMP6)
         Me.FlowLayoutPanel2.Controls.Add(Me.WMP7)
-        Me.FlowLayoutPanel2.Controls.Add(Me.dgv1)
         Me.FlowLayoutPanel2.Controls.Add(Me.WMP8)
         Me.FlowLayoutPanel2.Controls.Add(Me.WMP9)
         Me.FlowLayoutPanel2.Controls.Add(Me.WMp10)
@@ -211,56 +199,10 @@ Partial Class FindDuplicates
         Me.WMP7.UseWaitCursor = True
         Me.WMP7.Visible = False
         '
-        'dgv1
-        '
-        Me.dgv1.AllowUserToOrderColumns = True
-        Me.dgv1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.dgv1.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.Duplicate, Me.Filename, Me.Size, Me.clmDate, Me.clmPath})
-        Me.dgv1.Location = New System.Drawing.Point(3, 407)
-        Me.dgv1.Name = "dgv1"
-        Me.dgv1.RowTemplate.Height = 31
-        Me.dgv1.Size = New System.Drawing.Size(2207, 486)
-        Me.dgv1.TabIndex = 1
-        Me.dgv1.Visible = False
-        '
-        'Duplicate
-        '
-        Me.Duplicate.HeaderText = "Column1"
-        Me.Duplicate.Name = "Duplicate"
-        Me.Duplicate.Resizable = System.Windows.Forms.DataGridViewTriState.[False]
-        '
-        'Filename
-        '
-        Me.Filename.HeaderText = "Filename"
-        Me.Filename.Name = "Filename"
-        Me.Filename.ReadOnly = True
-        Me.Filename.Width = 400
-        '
-        'Size
-        '
-        Me.Size.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCellsExceptHeader
-        Me.Size.HeaderText = "Size"
-        Me.Size.Name = "Size"
-        Me.Size.ReadOnly = True
-        Me.Size.Width = 30
-        '
-        'clmDate
-        '
-        Me.clmDate.HeaderText = "Date"
-        Me.clmDate.Name = "clmDate"
-        Me.clmDate.ReadOnly = True
-        '
-        'clmPath
-        '
-        Me.clmPath.HeaderText = "Full Path"
-        Me.clmPath.Name = "clmPath"
-        Me.clmPath.ReadOnly = True
-        Me.clmPath.Width = 1000
-        '
         'WMP8
         '
         Me.WMP8.Enabled = True
-        Me.WMP8.Location = New System.Drawing.Point(3, 899)
+        Me.WMP8.Location = New System.Drawing.Point(3, 407)
         Me.WMP8.Name = "WMP8"
         Me.WMP8.OcxState = CType(resources.GetObject("WMP8.OcxState"), System.Windows.Forms.AxHost.State)
         Me.WMP8.Size = New System.Drawing.Size(298, 398)
@@ -272,7 +214,7 @@ Partial Class FindDuplicates
         'WMP9
         '
         Me.WMP9.Enabled = True
-        Me.WMP9.Location = New System.Drawing.Point(307, 899)
+        Me.WMP9.Location = New System.Drawing.Point(307, 407)
         Me.WMP9.Name = "WMP9"
         Me.WMP9.OcxState = CType(resources.GetObject("WMP9.OcxState"), System.Windows.Forms.AxHost.State)
         Me.WMP9.Size = New System.Drawing.Size(298, 398)
@@ -284,7 +226,7 @@ Partial Class FindDuplicates
         'WMp10
         '
         Me.WMp10.Enabled = True
-        Me.WMp10.Location = New System.Drawing.Point(611, 899)
+        Me.WMp10.Location = New System.Drawing.Point(611, 407)
         Me.WMp10.Name = "WMp10"
         Me.WMp10.OcxState = CType(resources.GetObject("WMp10.OcxState"), System.Windows.Forms.AxHost.State)
         Me.WMp10.Size = New System.Drawing.Size(298, 398)
@@ -296,7 +238,7 @@ Partial Class FindDuplicates
         'WMP11
         '
         Me.WMP11.Enabled = True
-        Me.WMP11.Location = New System.Drawing.Point(915, 899)
+        Me.WMP11.Location = New System.Drawing.Point(915, 407)
         Me.WMP11.Name = "WMP11"
         Me.WMP11.OcxState = CType(resources.GetObject("WMP11.OcxState"), System.Windows.Forms.AxHost.State)
         Me.WMP11.Size = New System.Drawing.Size(298, 398)
@@ -308,7 +250,7 @@ Partial Class FindDuplicates
         'WMP12
         '
         Me.WMP12.Enabled = True
-        Me.WMP12.Location = New System.Drawing.Point(1219, 899)
+        Me.WMP12.Location = New System.Drawing.Point(1219, 407)
         Me.WMP12.Name = "WMP12"
         Me.WMP12.OcxState = CType(resources.GetObject("WMP12.OcxState"), System.Windows.Forms.AxHost.State)
         Me.WMP12.Size = New System.Drawing.Size(298, 398)
@@ -317,32 +259,13 @@ Partial Class FindDuplicates
         Me.WMP12.UseWaitCursor = True
         Me.WMP12.Visible = False
         '
-        'Label2
+        'lblInfo
         '
-        Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(367, 1441)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(71, 25)
-        Me.Label2.TabIndex = 5
-        Me.Label2.Text = "Label2"
-        '
-        'Button1
-        '
-        Me.Button1.Location = New System.Drawing.Point(827, 1353)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(258, 86)
-        Me.Button1.TabIndex = 4
-        Me.Button1.Text = "Delete All Duplicates"
-        Me.Button1.UseVisualStyleBackColor = True
-        '
-        'Button5
-        '
-        Me.Button5.Location = New System.Drawing.Point(827, 1276)
-        Me.Button5.Name = "Button5"
-        Me.Button5.Size = New System.Drawing.Size(258, 44)
-        Me.Button5.TabIndex = 10
-        Me.Button5.Text = "Delete List"
-        Me.Button5.UseVisualStyleBackColor = True
+        Me.lblInfo.AutoSize = True
+        Me.lblInfo.Location = New System.Drawing.Point(89, 1353)
+        Me.lblInfo.Name = "lblInfo"
+        Me.lblInfo.Size = New System.Drawing.Size(0, 25)
+        Me.lblInfo.TabIndex = 5
         '
         'lbxDeleteList
         '
@@ -375,49 +298,13 @@ Partial Class FindDuplicates
         '
         Me.FlowLayoutPanel1.Controls.Add(Me.lbxsorted)
         Me.FlowLayoutPanel1.Controls.Add(Me.lbxunique)
-        Me.FlowLayoutPanel1.Controls.Add(Me.lbxdelete)
         Me.FlowLayoutPanel1.Controls.Add(Me.lbxDuplicates)
+        Me.FlowLayoutPanel1.Controls.Add(Me.lbxdelete)
         Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Top
         Me.FlowLayoutPanel1.Location = New System.Drawing.Point(0, 0)
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
         Me.FlowLayoutPanel1.Size = New System.Drawing.Size(2363, 397)
         Me.FlowLayoutPanel1.TabIndex = 3
-        '
-        'lbxsorted
-        '
-        Me.lbxsorted.FormattingEnabled = True
-        Me.lbxsorted.ItemHeight = 24
-        Me.lbxsorted.Location = New System.Drawing.Point(3, 3)
-        Me.lbxsorted.Name = "lbxsorted"
-        Me.lbxsorted.Size = New System.Drawing.Size(378, 388)
-        Me.lbxsorted.TabIndex = 0
-        '
-        'lbxunique
-        '
-        Me.lbxunique.FormattingEnabled = True
-        Me.lbxunique.ItemHeight = 24
-        Me.lbxunique.Location = New System.Drawing.Point(387, 3)
-        Me.lbxunique.Name = "lbxunique"
-        Me.lbxunique.Size = New System.Drawing.Size(378, 388)
-        Me.lbxunique.TabIndex = 1
-        '
-        'lbxdelete
-        '
-        Me.lbxdelete.FormattingEnabled = True
-        Me.lbxdelete.ItemHeight = 24
-        Me.lbxdelete.Location = New System.Drawing.Point(771, 3)
-        Me.lbxdelete.Name = "lbxdelete"
-        Me.lbxdelete.Size = New System.Drawing.Size(378, 388)
-        Me.lbxdelete.TabIndex = 2
-        '
-        'lbxDuplicates
-        '
-        Me.lbxDuplicates.FormattingEnabled = True
-        Me.lbxDuplicates.ItemHeight = 24
-        Me.lbxDuplicates.Location = New System.Drawing.Point(1155, 3)
-        Me.lbxDuplicates.Name = "lbxDuplicates"
-        Me.lbxDuplicates.Size = New System.Drawing.Size(849, 388)
-        Me.lbxDuplicates.TabIndex = 3
         '
         'lblSorted
         '
@@ -427,6 +314,42 @@ Partial Class FindDuplicates
         Me.lblSorted.Size = New System.Drawing.Size(100, 25)
         Me.lblSorted.TabIndex = 4
         Me.lblSorted.Text = "SortedList"
+        '
+        'lbxsorted
+        '
+        Me.lbxsorted.FormattingEnabled = True
+        Me.lbxsorted.ItemHeight = 24
+        Me.lbxsorted.Location = New System.Drawing.Point(3, 3)
+        Me.lbxsorted.Name = "lbxsorted"
+        Me.lbxsorted.Size = New System.Drawing.Size(378, 388)
+        Me.lbxsorted.TabIndex = 4
+        '
+        'lbxunique
+        '
+        Me.lbxunique.FormattingEnabled = True
+        Me.lbxunique.ItemHeight = 24
+        Me.lbxunique.Location = New System.Drawing.Point(387, 3)
+        Me.lbxunique.Name = "lbxunique"
+        Me.lbxunique.Size = New System.Drawing.Size(378, 388)
+        Me.lbxunique.TabIndex = 5
+        '
+        'lbxDuplicates
+        '
+        Me.lbxDuplicates.FormattingEnabled = True
+        Me.lbxDuplicates.ItemHeight = 24
+        Me.lbxDuplicates.Location = New System.Drawing.Point(771, 3)
+        Me.lbxDuplicates.Name = "lbxDuplicates"
+        Me.lbxDuplicates.Size = New System.Drawing.Size(341, 388)
+        Me.lbxDuplicates.TabIndex = 7
+        '
+        'lbxdelete
+        '
+        Me.lbxdelete.FormattingEnabled = True
+        Me.lbxdelete.ItemHeight = 24
+        Me.lbxdelete.Location = New System.Drawing.Point(1118, 3)
+        Me.lbxdelete.Name = "lbxdelete"
+        Me.lbxdelete.Size = New System.Drawing.Size(378, 388)
+        Me.lbxdelete.TabIndex = 6
         '
         'FindDuplicates
         '
@@ -450,7 +373,6 @@ Partial Class FindDuplicates
         CType(Me.WMP5, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.WMP6, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.WMP7, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.dgv1, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.WMP8, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.WMP9, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.WMp10, System.ComponentModel.ISupportInitialize).EndInit()
@@ -463,24 +385,12 @@ Partial Class FindDuplicates
     End Sub
     Friend WithEvents Label1 As Label
     Friend WithEvents SplitContainer1 As SplitContainer
-    Friend WithEvents dgv1 As DataGridView
-    Friend WithEvents Duplicate As DataGridViewCheckBoxColumn
-    Friend WithEvents Filename As DataGridViewTextBoxColumn
-    Shadows WithEvents Size As DataGridViewTextBoxColumn
-    Friend WithEvents clmDate As DataGridViewTextBoxColumn
-    Friend WithEvents clmPath As DataGridViewTextBoxColumn
-    Friend WithEvents Button1 As Button
-    Friend WithEvents Label2 As Label
+    Friend WithEvents lblInfo As Label
     Friend WithEvents FlowLayoutPanel1 As FlowLayoutPanel
-    Friend WithEvents lbxsorted As ListBox
-    Friend WithEvents lbxunique As ListBox
-    Friend WithEvents lbxdelete As ListBox
     Friend WithEvents lblDelete As Label
     Friend WithEvents lblUnique As Label
     Friend WithEvents lblSorted As Label
-    Friend WithEvents lbxDuplicates As ListBox
     Friend WithEvents WMP1 As AxWMPLib.AxWindowsMediaPlayer
-    Friend WithEvents Button5 As Button
     Friend WithEvents lbxDeleteList As ListBox
     Friend WithEvents WMP4 As AxWMPLib.AxWindowsMediaPlayer
     Friend WithEvents WMP3 As AxWMPLib.AxWindowsMediaPlayer
@@ -494,4 +404,8 @@ Partial Class FindDuplicates
     Friend WithEvents WMp10 As AxWMPLib.AxWindowsMediaPlayer
     Friend WithEvents WMP11 As AxWMPLib.AxWindowsMediaPlayer
     Friend WithEvents WMP12 As AxWMPLib.AxWindowsMediaPlayer
+    Friend WithEvents lbxsorted As ListBox
+    Friend WithEvents lbxunique As ListBox
+    Friend WithEvents lbxDuplicates As ListBox
+    Friend WithEvents lbxdelete As ListBox
 End Class

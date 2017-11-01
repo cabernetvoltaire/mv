@@ -56,9 +56,13 @@
     End Enum
     Public Sub PicClick(pic As PictureBox)
         iScreenstate = (iScreenstate + 1) Mod 2
-
+        DisposePic(pic)
         Dim img As Image = GetImage(strCurrentFilePath)
         PreparePic(pic, picBlanker, img)
+    End Sub
+    Public Sub DisposePic(box As PictureBox)
+        box.Image.Dispose()
+        GC.SuppressFinalize(box)
     End Sub
     Public Sub Mousewheel(pbx1 As PictureBox, sender As Object, e As MouseEventArgs)
         ePicMousePoint.X = e.X

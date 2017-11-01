@@ -39,15 +39,7 @@ Public Class frmMain
         ' Return the orientation value.
         Return DirectCast(img.GetPropertyItem(OrientationId).Value(0), ExifOrientations)
     End Function
-    Public Enum PlayOrder As Byte
-        Original
-        Random
-        Name
-        PathName
-        Time
-        Length
-        Type
-    End Enum
+
     Dim strPlayOrder() As String = {"Original", "Random", "Name", "Path Name", "Date/Time", "Size", "Type"}
 
     Private Sub SaveShowlist()
@@ -62,16 +54,12 @@ Public Class frmMain
     Public Sub HandleKeys(sender As Object, e As KeyEventArgs)
         Select Case e.KeyCode
             Case Keys.F5, Keys.F6, Keys.F7, Keys.F8, Keys.F9, Keys.F10, Keys.F11, Keys.F12
-                Buttons.HandleKeypress(sender, e)
+                HandleKeypress(sender, e)
                 e.Handled = True
+            Case Keys.A To Keys.Z
+                ChangeButtonLetter(e)
             Case KeyCycleMode
-                If Not blnButtonsLoaded Then
-                    Buttons.Show()
-                    blnButtonsLoaded = True
-                Else
-                    Buttons.Hide()
-                    blnButtonsLoaded = False
-                End If
+                ToggleButtons()
             Case tvMain2.TraverseKey, tvMain2.TraverseKeyBack
                ' tvMain2_KeyDown(sender, e)
             Case KeyEscape
@@ -202,6 +190,13 @@ Public Class frmMain
         End Select
         ' e.Handled = True
     End Sub
+
+    Private Sub ToggleButtons()
+        Buttons_Load()
+        blnButtonsLoaded = Not blnButtonsLoaded
+        ctrPicAndButtons.Panel2Collapsed = blnButtonsLoaded
+    End Sub
+
     Public Sub GoFullScreen(blnGo As Boolean)
 
         'Dim numofMon As Integer = Screen.AllScreens.Length
@@ -264,8 +259,8 @@ Public Class frmMain
         strCurrentFilePath = showpath
         tmrPicLoad.Enabled = True
     End Sub
-    Private Sub CollapseShowlist(blnOpen As Boolean)
-        SplitContainer1.Panel2Collapsed = blnOpen
+    Public Sub CollapseShowlist(blnCollapse As Boolean)
+        SplitContainer1.Panel2Collapsed = blnCollapse
         SplitContainer1.SplitterDistance = SplitContainer1.Height / 3
         '        ctrTreeandFiles.Panel1Collapsed = Not ctrTreeandFiles.Panel1Collapsed
     End Sub
@@ -358,18 +353,7 @@ Public Class frmMain
         End Try
         '  MessageBox.Show(info.Extension)
     End Function
-    Private Sub FillShowbox(lbxShowList As ListBox, all As Byte, showlist As List(Of String))
-        If showlist.Count = 0 Then Exit Sub
 
-        CollapseShowlist(False)
-        lbxShowList.Items.Clear()
-
-        For Each s In showlist
-            lbxShowList.Items.Add(s)
-        Next
-        lbxShowList.TabStop = True
-
-    End Sub
     Private Sub SetWMP(tWMP As AxWindowsMediaPlayer)
         With currentWMP
             tWMP.URL = .URL
@@ -496,67 +480,8 @@ Public Class frmMain
         tmrPicLoad.Enabled = True
 
     End Sub
-    Private Function SetPlayOrder(Order As Byte, List As List(Of String)) As List(Of String)
-        Dim NewListS As New SortedList(Of String, String)
-        Dim NewListL As New SortedList(Of Long, String)
-        Dim NewListD As New SortedList(Of Date, String)
-        For Each f In List
-            Dim file As New FileInfo(f)
-            If Len(file.FullName) > 247 Then Continue For
-            Try
-                Select Case Order
-                    Case PlayOrder.Name
-                        NewListS.Add(file.Name & file.FullName, file.FullName)
-                    Case PlayOrder.Length
-                        NewListL.Add(file.Length + Len(file.FullName), file.FullName)
-                    Case PlayOrder.Time
-                        Dim time = file.LastWriteTime.AddMilliseconds(Rnd(100))
-                        NewListD.Add(time, file.FullName)
-                    Case PlayOrder.PathName
-                        NewListS.Add(file.FullName, file.FullName)
-
-                    Case PlayOrder.Type
-                        NewListS.Add(file.Extension & file.Name & Str(Rnd(100)), file.FullName)
-                    Case PlayOrder.Random
-                        Try
-                            NewListS.Add(Str(Rnd(List.Count)), file.FullName)
-
-                        Catch ex As System.ArgumentException
-                            NewListS.Add(Str(Rnd(List.Count)), file.FullName)
-
-                        End Try
-                End Select
-            Catch ex As System.ArgumentException 'TODO could do better than this. 
-                Continue For
-
-            Catch ex As System.IO.PathTooLongException
-                Continue For
-            End Try
-        Next
-
-        If NewListD.Count <> 0 Then
-            CopyList(List, NewListD)
-
-        ElseIf NewListS.Count <> 0 Then
-            CopyList(List, NewListS)
-        ElseIf NewListL.Count <> 0 Then
-            CopyList(List, NewListL)
-
-        End If
-
-        Return List
 
 
-
-
-    End Function
-
-    Private Sub CopyList(list As List(Of String), list2 As SortedList(Of String, String))
-        list.Clear()
-        For Each m As KeyValuePair(Of String, String) In list2
-            list.Add(m.Value)
-        Next
-    End Sub
     Private Sub CopyList(list As List(Of String), list2 As SortedList(Of Long, String))
         list.Clear()
         For Each m As KeyValuePair(Of Long, String) In list2
@@ -608,13 +533,24 @@ Public Class frmMain
         PreferencesGet()
         tmrLoadLastFolder.Enabled = True
         ' HighlightCurrent(strCurrentFilePath)
-        tmrPicLoad.Interval = lngInterval
+        tmrPicLoad.Interval = lngInterval * 3
         tmrJumpVideo.Interval = lngInterval / 50
         currentWMP = MainWMP
         currentWMP.stretchToFit = True
         currentWMP.uiMode = "FULL"
         currentWMP.Dock = DockStyle.Fill
         currentPicBox = PictureBox1
+        ToggleButtons()
+
+    End Sub
+
+    Private Sub LoadDefaultShowList()
+        Dim path As String = "Q:\Camgirls.msl"
+
+        Getlist(Showlist, path, lbxShowList)
+        CollapseShowlist(False)
+
+
     End Sub
 
     Private Sub Form1_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
@@ -693,8 +629,7 @@ Public Class frmMain
             Case Filetype.Pic
                 Dim img As Image
                 If Not currentPicBox.Image Is Nothing Then
-                    currentPicBox.Image.Dispose()
-                    GC.SuppressFinalize(Me)
+                    DisposePic(currentPicBox)
                 End If
                 If Not My.Computer.FileSystem.FileExists(strCurrentFilePath) Then Exit Select
 
@@ -733,6 +668,9 @@ Public Class frmMain
         Me.Text = "Metavisua - " & strCurrentFilePath
         tmrPicLoad.Enabled = False
     End Sub
+
+
+
     Private Sub tmrJumpVideo_Tick(sender As Object, e As EventArgs) Handles tmrJumpVideo.Tick
         'ControlSetFocus(currentWMP)
         MediaDuration = currentWMP.currentMedia.duration
@@ -948,12 +886,9 @@ Public Class frmMain
     End Sub
 
 
-    Private Sub showButtons_Click(sender As Object, e As EventArgs) Handles showButtons.Click
-        Buttons.Show()
-    End Sub
 
 
-    Private Sub MainWMP_PlayStateChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent) Handles MainWMP.PlayStateChange
+    Private Sub MainWMP_PlayStateChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent)
         PlaystateChange(sender, e)
     End Sub
 
@@ -1013,6 +948,7 @@ Public Class frmMain
         ' strCurrentFilePath="E:\"
         HighlightCurrent(strCurrentFilePath)
         tmrLoadLastFolder.Enabled = False
+        'LoadDefaultShowList()
     End Sub
 
     Private Sub RandomStartToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RandomStartToolStripMenuItem.Click
@@ -1090,7 +1026,7 @@ Public Class frmMain
     Private Sub tvMain2_KeyDown(sender As Object, e As KeyEventArgs) Handles tvMain2.KeyDown
         HandleKeys(sender, e)
         Select Case e.KeyCode
-            Case Keys.Down, Keys.Left, Keys.Right, Keys.Up, tvMain2.TraverseKey
+            Case Keys.Down, Keys.Left, Keys.Right, Keys.Up, tvMain2.TraverseKey, tvMain2.TraverseKeyBack
 
             Case Else
                 If blnTVCurrent Then e.Handled = True
@@ -1113,6 +1049,15 @@ Public Class frmMain
     End Sub
 
     Private Sub ToolStripButton4_Click_1(sender As Object, e As EventArgs) Handles ToolStripButton4.Click
-        CollapseShowlist(True)
+        'Toggle collapse
+        CollapseShowlist(Not SplitContainer1.Panel2Collapsed)
+    End Sub
+
+    Private Sub RefreshTree(sender As Object, e As DriveInfoEventArgs) Handles tvMain2.DriveActivated
+        tvMain2.Update()
+    End Sub
+
+    Private Sub ToolStripButton6_Click_1(sender As Object, e As EventArgs) Handles ToolStripButton6.Click
+        LoadDefaultShowList()
     End Sub
 End Class

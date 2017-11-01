@@ -1,10 +1,19 @@
-﻿Module General
+﻿Imports System.IO
+Module General
 
     Public PreviewWMP() As AxWMPLib.AxWindowsMediaPlayer = {FindDuplicates.WMP1, FindDuplicates.WMP2, FindDuplicates.WMP3, FindDuplicates.WMP4, FindDuplicates.WMP5,
      FindDuplicates.WMP6, FindDuplicates.WMP7, FindDuplicates.WMP8, FindDuplicates.WMP9, FindDuplicates.WMp10, FindDuplicates.WMP11, FindDuplicates.WMP12}
-    Public btnDest() As Button = {Buttons.btn1, Buttons.btn2, Buttons.btn3, Buttons.btn4, Buttons.btn5, Buttons.btn6, Buttons.btn7, Buttons.btn8}
-    Public lblDest() As Label = {Buttons.lbl1, Buttons.lbl2, Buttons.lbl3, Buttons.lbl4, Buttons.lbl5, Buttons.lbl6, Buttons.lbl7, Buttons.lbl8}
-
+    Public btnDest() As Button = {frmMain.btn1, frmMain.btn2, frmMain.btn3, frmMain.btn4, frmMain.btn5, frmMain.btn6, frmMain.btn7, frmMain.btn8}
+    Public lblDest() As Label = {frmMain.lbl1, frmMain.lbl2, frmMain.lbl3, frmMain.lbl4, frmMain.lbl5, frmMain.lbl6, frmMain.lbl7, frmMain.lbl8}
+    Public Enum PlayOrder As Byte
+        Original
+        Random
+        Name
+        PathName
+        Time
+        Length
+        Type
+    End Enum
 
     Public blnRandomStartPoint = False
     Public PlaybackSpeed As Double = 1
@@ -54,4 +63,134 @@
             Return Now - StartTime
         End If
     End Function
+    Public Sub ChangeButtonLetter(e As KeyEventArgs)
+        frmMain.lblAlpha.Text = e.KeyCode.ToString
+    End Sub
+    Public Sub InitialiseButtons()
+        Dim alph As String = "ABCDEFGH"
+        For i As Byte = 0 To 7
+            btnDest(i).Text = "F" & Str(i + 5)
+            lblDest(i).Text = alph(i)
+        Next
+    End Sub
+    ''' <summary>
+    ''' Copies list from sorted list2
+    ''' </summary>
+    ''' <param name="list"></param>
+    ''' <param name="list2"></param>
+    Private Sub CopyList(list As List(Of String), list2 As SortedList(Of String, String))
+        list.Clear()
+        For Each m As KeyValuePair(Of String, String) In list2
+            list.Add(m.Value)
+        Next
+    End Sub
+    Private Sub CopyList(list As List(Of String), list2 As SortedList(Of Long, String))
+        list.Clear()
+        For Each m As KeyValuePair(Of Long, String) In list2
+            list.Add(m.Value)
+        Next
+    End Sub
+    Private Sub CopyList(list As List(Of String), list2 As SortedList(Of Date, String))
+        list.Clear()
+        For Each m As KeyValuePair(Of Date, String) In list2
+            list.Add(m.Value)
+        Next
+    End Sub
+
+    Public Sub Buttons_Load()
+        For i As Byte = 0 To 7
+            lblDest(i).Font = New Font(lblDest(i).Font, FontStyle.Bold)
+        Next
+        ' blnButtonsLoaded = True
+        InitialiseButtons()
+    End Sub
+    Public Sub AssignButton(i As Byte, strPath As String)
+        btnFolderNames(i) = strPath
+        Dim f As New DirectoryInfo(strPath)
+        lblDest(i).Text = f.Name
+    End Sub
+    Public Sub HandleKeypress(sender As Object, e As KeyEventArgs)
+        Dim i As Byte = e.KeyCode - Keys.F5
+        If btnFolderNames(i) = "" Or e.Shift Then
+            AssignButton(i, CurrentFolderPath)
+        Else
+            CurrentFolderPath = btnFolderNames(i)
+            frmMain.tvMain2.SelectedFolder = CurrentFolderPath
+        End If
+    End Sub
+    ''' <summary>
+    ''' Fill a listbox with a list, according to a filter
+    ''' </summary>
+    ''' <param name="lbx"></param>
+    ''' <param name="Filter"></param>
+    ''' <param name="showlist"></param>
+    Public Sub FillShowbox(lbx As ListBox, Filter As Byte, showlist As List(Of String))
+        If showlist.Count = 0 Then Exit Sub
+
+        frmMain.CollapseShowlist(False)
+        lbx.Items.Clear()
+
+        For Each s In showlist
+            lbx.Items.Add(s)
+        Next
+        lbx.TabStop = True
+
+    End Sub
+    Public Function SetPlayOrder(Order As Byte, List As List(Of String)) As List(Of String)
+        Dim NewListS As New SortedList(Of String, String)
+        Dim NewListL As New SortedList(Of Long, String)
+        Dim NewListD As New SortedList(Of Date, String)
+        For Each f In List
+            Dim file As New FileInfo(f)
+            If Len(file.FullName) > 247 Then Continue For
+            Try
+                Select Case Order
+                    Case PlayOrder.Name
+                        NewListS.Add(file.Name & file.FullName, file.FullName)
+                    Case PlayOrder.Length
+                        NewListL.Add(file.Length + Len(file.FullName), file.FullName)
+                    Case PlayOrder.Time
+                        Dim time = file.LastWriteTime.AddMilliseconds(Rnd(100))
+                        NewListD.Add(time, file.FullName)
+                    Case PlayOrder.PathName
+                        NewListS.Add(file.FullName, file.FullName)
+
+                    Case PlayOrder.Type
+                        NewListS.Add(file.Extension & file.Name & Str(Rnd(100)), file.FullName)
+                    Case PlayOrder.Random
+                        Try
+                            NewListS.Add(Str(Rnd(List.Count)), file.FullName)
+
+                        Catch ex As System.ArgumentException
+                            NewListS.Add(Str(Rnd(List.Count)), file.FullName)
+
+                        End Try
+                End Select
+            Catch ex As System.ArgumentException 'TODO could do better than this. 
+                Continue For
+
+            Catch ex As System.IO.PathTooLongException
+                Continue For
+            End Try
+        Next
+
+        If NewListD.Count <> 0 Then
+            CopyList(List, NewListD)
+
+        ElseIf NewListS.Count <> 0 Then
+            CopyList(List, NewListS)
+        ElseIf NewListL.Count <> 0 Then
+            CopyList(List, NewListL)
+
+        End If
+
+        Return List
+
+
+
+
+    End Function
+
+
+
 End Module
