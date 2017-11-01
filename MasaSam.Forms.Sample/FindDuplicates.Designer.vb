@@ -25,6 +25,7 @@ Partial Class FindDuplicates
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(FindDuplicates))
         Me.Label1 = New System.Windows.Forms.Label()
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
+        Me.txtFilter = New System.Windows.Forms.TextBox()
         Me.FlowLayoutPanel2 = New System.Windows.Forms.FlowLayoutPanel()
         Me.WMP1 = New AxWMPLib.AxWindowsMediaPlayer()
         Me.WMP2 = New AxWMPLib.AxWindowsMediaPlayer()
@@ -43,11 +44,12 @@ Partial Class FindDuplicates
         Me.lblDelete = New System.Windows.Forms.Label()
         Me.lblUnique = New System.Windows.Forms.Label()
         Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
-        Me.lblSorted = New System.Windows.Forms.Label()
         Me.lbxsorted = New System.Windows.Forms.ListBox()
         Me.lbxunique = New System.Windows.Forms.ListBox()
         Me.lbxDuplicates = New System.Windows.Forms.ListBox()
         Me.lbxdelete = New System.Windows.Forms.ListBox()
+        Me.lblSorted = New System.Windows.Forms.Label()
+        Me.btnDeleteFiles = New System.Windows.Forms.Button()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel2.SuspendLayout()
         Me.SplitContainer1.SuspendLayout()
@@ -84,6 +86,8 @@ Partial Class FindDuplicates
         '
         'SplitContainer1.Panel2
         '
+        Me.SplitContainer1.Panel2.Controls.Add(Me.btnDeleteFiles)
+        Me.SplitContainer1.Panel2.Controls.Add(Me.txtFilter)
         Me.SplitContainer1.Panel2.Controls.Add(Me.FlowLayoutPanel2)
         Me.SplitContainer1.Panel2.Controls.Add(Me.lblInfo)
         Me.SplitContainer1.Panel2.Controls.Add(Me.lbxDeleteList)
@@ -94,6 +98,13 @@ Partial Class FindDuplicates
         Me.SplitContainer1.Size = New System.Drawing.Size(2614, 1640)
         Me.SplitContainer1.SplitterDistance = 247
         Me.SplitContainer1.TabIndex = 3
+        '
+        'txtFilter
+        '
+        Me.txtFilter.Location = New System.Drawing.Point(840, 1278)
+        Me.txtFilter.Name = "txtFilter"
+        Me.txtFilter.Size = New System.Drawing.Size(322, 29)
+        Me.txtFilter.TabIndex = 31
         '
         'FlowLayoutPanel2
         '
@@ -306,15 +317,6 @@ Partial Class FindDuplicates
         Me.FlowLayoutPanel1.Size = New System.Drawing.Size(2363, 397)
         Me.FlowLayoutPanel1.TabIndex = 3
         '
-        'lblSorted
-        '
-        Me.lblSorted.AutoSize = True
-        Me.lblSorted.Location = New System.Drawing.Point(183, 403)
-        Me.lblSorted.Name = "lblSorted"
-        Me.lblSorted.Size = New System.Drawing.Size(100, 25)
-        Me.lblSorted.TabIndex = 4
-        Me.lblSorted.Text = "SortedList"
-        '
         'lbxsorted
         '
         Me.lbxsorted.FormattingEnabled = True
@@ -350,6 +352,24 @@ Partial Class FindDuplicates
         Me.lbxdelete.Name = "lbxdelete"
         Me.lbxdelete.Size = New System.Drawing.Size(378, 388)
         Me.lbxdelete.TabIndex = 6
+        '
+        'lblSorted
+        '
+        Me.lblSorted.AutoSize = True
+        Me.lblSorted.Location = New System.Drawing.Point(183, 403)
+        Me.lblSorted.Name = "lblSorted"
+        Me.lblSorted.Size = New System.Drawing.Size(100, 25)
+        Me.lblSorted.TabIndex = 4
+        Me.lblSorted.Text = "SortedList"
+        '
+        'btnDeleteFiles
+        '
+        Me.btnDeleteFiles.Location = New System.Drawing.Point(844, 1360)
+        Me.btnDeleteFiles.Name = "btnDeleteFiles"
+        Me.btnDeleteFiles.Size = New System.Drawing.Size(317, 48)
+        Me.btnDeleteFiles.TabIndex = 32
+        Me.btnDeleteFiles.Text = "Delete &Files"
+        Me.btnDeleteFiles.UseVisualStyleBackColor = True
         '
         'FindDuplicates
         '
@@ -408,4 +428,6 @@ Partial Class FindDuplicates
     Friend WithEvents lbxunique As ListBox
     Friend WithEvents lbxDuplicates As ListBox
     Friend WithEvents lbxdelete As ListBox
+    Friend WithEvents txtFilter As TextBox
+    Friend WithEvents btnDeleteFiles As Button
 End Class

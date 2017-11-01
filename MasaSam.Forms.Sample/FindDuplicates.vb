@@ -128,11 +128,17 @@ Public Class FindDuplicates
             If i <= 11 Then
                 PreviewWMP(i).URL = strpath
                 PreviewWMP(i).Visible = True
-                lbxDeleteList.Items.Add(row)
-            Else
+                If InStr(row, txtFilter.Text) <> 0 Then
+                    If deletelist.Contains(row) Then
+                    Else
+                        deletelist.Add(row)
+                    End If
 
+                Else
+
+                End If
+                i += 1
             End If
-            i += 1
         Next
 
     End Sub
@@ -170,8 +176,22 @@ Public Class FindDuplicates
         Return uniquedups
     End Function
 
-    Private Sub lbxunique_SelectedIndexChanged_1(sender As Object, e As EventArgs) Handles lbxunique.SelectedIndexChanged
-        Dim path As String = lbxunique.Items(lbxunique.SelectedIndex)
+    Private Sub lbxunique_SelectedIndexChanged_1(sender As Object, e As EventArgs) Handles lbxunique.SelectedIndexChanged, lbxDeleteList.SelectedIndexChanged
+        Dim path As String = sender.Items(sender.SelectedIndex)
         finddups(path)
+    End Sub
+
+    Private Sub lbxunique_DoubleClick(sender As Object, e As EventArgs) Handles lbxunique.DoubleClick
+    End Sub
+
+    Private Sub lbxDeleteList_DoubleClick(sender As Object, e As EventArgs) Handles lbxDeleteList.DoubleClick
+        FillShowbox(lbxDeleteList, FilterState.All, deletelist)
+
+    End Sub
+
+    Private Sub btnDeleteFiles_Click(sender As Object, e As EventArgs) Handles btnDeleteFiles.Click
+        If MsgBox("Are you sure you want to delete all these files?", MsgBoxStyle.Critical, "DELETE FILES?") = MsgBoxResult.Ok Then
+            MsgBox("Deleting files (not really)")
+        End If
     End Sub
 End Class
