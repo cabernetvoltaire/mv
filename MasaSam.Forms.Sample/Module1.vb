@@ -141,8 +141,8 @@ Module General
         Dim NewListL As New SortedList(Of Long, String)
         Dim NewListD As New SortedList(Of Date, String)
         For Each f In List
+            If Len(f) > 247 Then Continue For
             Dim file As New FileInfo(f)
-            If Len(file.FullName) > 247 Then Continue For
             Try
                 Select Case Order
                     Case PlayOrder.Name

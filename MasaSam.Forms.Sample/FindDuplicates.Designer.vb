@@ -25,7 +25,7 @@ Partial Class FindDuplicates
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(FindDuplicates))
         Me.Label1 = New System.Windows.Forms.Label()
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
-        Me.txtFilter = New System.Windows.Forms.TextBox()
+        Me.btnDeleteFiles = New System.Windows.Forms.Button()
         Me.FlowLayoutPanel2 = New System.Windows.Forms.FlowLayoutPanel()
         Me.WMP1 = New AxWMPLib.AxWindowsMediaPlayer()
         Me.WMP2 = New AxWMPLib.AxWindowsMediaPlayer()
@@ -49,7 +49,10 @@ Partial Class FindDuplicates
         Me.lbxDuplicates = New System.Windows.Forms.ListBox()
         Me.lbxdelete = New System.Windows.Forms.ListBox()
         Me.lblSorted = New System.Windows.Forms.Label()
-        Me.btnDeleteFiles = New System.Windows.Forms.Button()
+        Me.lblExclude = New System.Windows.Forms.Label()
+        Me.txtExclude = New System.Windows.Forms.TextBox()
+        Me.txtInclude = New System.Windows.Forms.TextBox()
+        Me.lblInclude = New System.Windows.Forms.Label()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel2.SuspendLayout()
         Me.SplitContainer1.SuspendLayout()
@@ -86,8 +89,11 @@ Partial Class FindDuplicates
         '
         'SplitContainer1.Panel2
         '
+        Me.SplitContainer1.Panel2.Controls.Add(Me.lblInclude)
+        Me.SplitContainer1.Panel2.Controls.Add(Me.txtInclude)
+        Me.SplitContainer1.Panel2.Controls.Add(Me.lblExclude)
         Me.SplitContainer1.Panel2.Controls.Add(Me.btnDeleteFiles)
-        Me.SplitContainer1.Panel2.Controls.Add(Me.txtFilter)
+        Me.SplitContainer1.Panel2.Controls.Add(Me.txtExclude)
         Me.SplitContainer1.Panel2.Controls.Add(Me.FlowLayoutPanel2)
         Me.SplitContainer1.Panel2.Controls.Add(Me.lblInfo)
         Me.SplitContainer1.Panel2.Controls.Add(Me.lbxDeleteList)
@@ -99,12 +105,14 @@ Partial Class FindDuplicates
         Me.SplitContainer1.SplitterDistance = 247
         Me.SplitContainer1.TabIndex = 3
         '
-        'txtFilter
+        'btnDeleteFiles
         '
-        Me.txtFilter.Location = New System.Drawing.Point(840, 1278)
-        Me.txtFilter.Name = "txtFilter"
-        Me.txtFilter.Size = New System.Drawing.Size(322, 29)
-        Me.txtFilter.TabIndex = 31
+        Me.btnDeleteFiles.Location = New System.Drawing.Point(844, 1417)
+        Me.btnDeleteFiles.Name = "btnDeleteFiles"
+        Me.btnDeleteFiles.Size = New System.Drawing.Size(317, 48)
+        Me.btnDeleteFiles.TabIndex = 32
+        Me.btnDeleteFiles.Text = "Delete &Files"
+        Me.btnDeleteFiles.UseVisualStyleBackColor = True
         '
         'FlowLayoutPanel2
         '
@@ -362,14 +370,37 @@ Partial Class FindDuplicates
         Me.lblSorted.TabIndex = 4
         Me.lblSorted.Text = "SortedList"
         '
-        'btnDeleteFiles
+        'lblExclude
         '
-        Me.btnDeleteFiles.Location = New System.Drawing.Point(844, 1360)
-        Me.btnDeleteFiles.Name = "btnDeleteFiles"
-        Me.btnDeleteFiles.Size = New System.Drawing.Size(317, 48)
-        Me.btnDeleteFiles.TabIndex = 32
-        Me.btnDeleteFiles.Text = "Delete &Files"
-        Me.btnDeleteFiles.UseVisualStyleBackColor = True
+        Me.lblExclude.AutoSize = True
+        Me.lblExclude.Location = New System.Drawing.Point(650, 1317)
+        Me.lblExclude.Name = "lblExclude"
+        Me.lblExclude.Size = New System.Drawing.Size(82, 25)
+        Me.lblExclude.TabIndex = 33
+        Me.lblExclude.Text = "Exclude"
+        '
+        'txtExclude
+        '
+        Me.txtExclude.Location = New System.Drawing.Point(839, 1313)
+        Me.txtExclude.Name = "txtExclude"
+        Me.txtExclude.Size = New System.Drawing.Size(322, 29)
+        Me.txtExclude.TabIndex = 31
+        '
+        'txtInclude
+        '
+        Me.txtInclude.Location = New System.Drawing.Point(839, 1367)
+        Me.txtInclude.Name = "txtInclude"
+        Me.txtInclude.Size = New System.Drawing.Size(322, 29)
+        Me.txtInclude.TabIndex = 34
+        '
+        'lblInclude
+        '
+        Me.lblInclude.AutoSize = True
+        Me.lblInclude.Location = New System.Drawing.Point(650, 1367)
+        Me.lblInclude.Name = "lblInclude"
+        Me.lblInclude.Size = New System.Drawing.Size(75, 25)
+        Me.lblInclude.TabIndex = 35
+        Me.lblInclude.Text = "Include"
         '
         'FindDuplicates
         '
@@ -428,6 +459,9 @@ Partial Class FindDuplicates
     Friend WithEvents lbxunique As ListBox
     Friend WithEvents lbxDuplicates As ListBox
     Friend WithEvents lbxdelete As ListBox
-    Friend WithEvents txtFilter As TextBox
     Friend WithEvents btnDeleteFiles As Button
+    Friend WithEvents lblInclude As Label
+    Friend WithEvents txtInclude As TextBox
+    Friend WithEvents lblExclude As Label
+    Friend WithEvents txtExclude As TextBox
 End Class

@@ -128,14 +128,15 @@ Public Class FindDuplicates
             If i <= 11 Then
                 PreviewWMP(i).URL = strpath
                 PreviewWMP(i).Visible = True
-                If InStr(row, txtFilter.Text) <> 0 Then
-                    If deletelist.Contains(row) Then
-                    Else
+                If InStr(row, txtExclude.Text) <> 0 And txtExclude.Text <> "" Then
+                    If Not deletelist.Contains(row) Then
                         deletelist.Add(row)
                     End If
-
-                Else
-
+                End If
+                If InStr(row, txtInclude.Text) <> 0 And txtInclude.Text <> "" Then
+                    If Not deletelist.Contains(row) Then
+                        deletelist.Add(row)
+                    End If
                 End If
                 i += 1
             End If

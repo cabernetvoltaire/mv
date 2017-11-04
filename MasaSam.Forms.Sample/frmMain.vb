@@ -24,7 +24,7 @@ Public Class frmMain
     Public currentWMP As New AxWMPLib.AxWindowsMediaPlayer
     Public LastPlayed As New Stack(Of String)
     Public blnAutoAdvanceFolder As Boolean = True
-    Public blnRandomStartAlways As Boolean = False
+    Public blnRandomStartAlways As Boolean = True
     Public blnRestartSlideShowFlag As Boolean = False
     Public Property blnTVCurrent As Boolean
     Public Property blnChooseRandomFile As Boolean = True
@@ -41,6 +41,7 @@ Public Class frmMain
     End Function
 
     Dim strPlayOrder() As String = {"Original", "Random", "Name", "Path Name", "Date/Time", "Size", "Type"}
+    Dim strButtonDests(8, 26, 1) As String
 
     Private Sub SaveShowlist()
         Dim path As String
@@ -888,7 +889,7 @@ Public Class frmMain
 
 
 
-    Private Sub MainWMP_PlayStateChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent)
+    Private Sub MainWMP_PlayStateChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent) Handles MainWMP.PlayStateChange
         PlaystateChange(sender, e)
     End Sub
 
@@ -951,9 +952,9 @@ Public Class frmMain
         'LoadDefaultShowList()
     End Sub
 
-    Private Sub RandomStartToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RandomStartToolStripMenuItem.Click
-        JumpRandom(False)
-    End Sub
+    'Private Sub RandomStartToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RandomStartToolStripMenuItem.Click
+    '    JumpRandom(False)
+    'End Sub
 
     Private Sub ToolStripStatusLabel1_Click(sender As Object, e As EventArgs) Handles DateSSL.Click
 

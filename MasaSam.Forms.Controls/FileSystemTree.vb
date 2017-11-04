@@ -933,7 +933,7 @@ Public Class FileSystemTree
     End Sub
 
     Private Sub Timer_Tick(sender As Object, e As EventArgs)
-
+        Exit Sub
         For Each node As FileSystemNode In Me.tvFiles.Nodes(0).Nodes
 
             ' if node is drive node
