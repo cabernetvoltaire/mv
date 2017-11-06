@@ -1,6 +1,43 @@
 ﻿Imports System.IO
 Module General
+    Public Enum ExifOrientations As Byte
+        Unknown = 0
+        TopLeft = 1
+        TopRight = 2
+        BottomRight = 3
+        BottomLeft = 4
+        LeftTop = 5
+        RightTop = 6
+        RightBottom = 7
+        LeftBottom = 8
+    End Enum
+    Private Const OrientationId As Integer = &H112
+    Public blnSpeedRestart As Boolean = False
+    Public iSSpeeds() As Integer = {1500, 900, 50}
+    Public iPlaybackSpeed() As Decimal = {0.03, 0.5, 0.75}
+    Public currentWMP As New AxWMPLib.AxWindowsMediaPlayer
+    Public LastPlayed As New Stack(Of String)
+    Public blnAutoAdvanceFolder As Boolean = True
+    Public blnRandomStartAlways As Boolean = True
+    Public blnRestartSlideShowFlag As Boolean = False
+    Public Property blnTVCurrent As Boolean
+    Public Property strButtonFile As String
+    Public Property blnChooseRandomFile As Boolean = True
+    Public iCurrentAlpha As Integer = 0
+    Public ChosenPlayOrder As Byte = 0
+    Public Function ImageOrientation(ByVal img As Image) As ExifOrientations
+        ' Get the index of the orientation property.
+        Dim orientation_index As Integer = Array.IndexOf(img.PropertyIdList, OrientationId)
 
+        ' If there is no such property, return Unknown.
+        If (orientation_index < 0) Then Return ExifOrientations.Unknown
+
+        ' Return the orientation value.
+        Return DirectCast(img.GetPropertyItem(OrientationId).Value(0), ExifOrientations)
+    End Function
+
+    Public strPlayOrder() As String = {"Original", "Random", "Name", "Path Name", "Date/Time", "Size", "Type"}
+    Public Property lngListSizeBytes As Long
     Public PreviewWMP() As AxWMPLib.AxWindowsMediaPlayer = {FindDuplicates.WMP1, FindDuplicates.WMP2, FindDuplicates.WMP3, FindDuplicates.WMP4, FindDuplicates.WMP5,
      FindDuplicates.WMP6, FindDuplicates.WMP7, FindDuplicates.WMP8, FindDuplicates.WMP9, FindDuplicates.WMp10, FindDuplicates.WMP11, FindDuplicates.WMP12}
     Public btnDest() As Button = {frmMain.btn1, frmMain.btn2, frmMain.btn3, frmMain.btn4, frmMain.btn5, frmMain.btn6, frmMain.btn7, frmMain.btn8}
@@ -14,6 +51,7 @@ Module General
         Length
         Type
     End Enum
+    Public lngShowlistLines As Long = 0
 
     Public blnRandomStartPoint = False
     Public PlaybackSpeed As Double = 1
@@ -35,7 +73,7 @@ Module General
     Public Sublist As New List(Of String)
     Public currentPicBox As New PictureBox
     Public Autozoomrate As Decimal = 0.4
-    Public btnFolderNames(8) As String
+    Public strVisibleButtons(8) As String
 
     Public blnButtonsLoaded As Boolean
     Public ssspeed As Integer = 200
@@ -63,16 +101,7 @@ Module General
             Return Now - StartTime
         End If
     End Function
-    Public Sub ChangeButtonLetter(e As KeyEventArgs)
-        frmMain.lblAlpha.Text = e.KeyCode.ToString
-    End Sub
-    Public Sub InitialiseButtons()
-        Dim alph As String = "ABCDEFGH"
-        For i As Byte = 0 To 7
-            btnDest(i).Text = "F" & Str(i + 5)
-            lblDest(i).Text = alph(i)
-        Next
-    End Sub
+
     ''' <summary>
     ''' Copies list from sorted list2
     ''' </summary>
@@ -104,17 +133,26 @@ Module General
         ' blnButtonsLoaded = True
         InitialiseButtons()
     End Sub
-    Public Sub AssignButton(i As Byte, strPath As String)
-        btnFolderNames(i) = strPath
+    Public Sub AssignButton(i As Byte, j As Integer, strPath As String)
+        strVisibleButtons(i) = strPath
         Dim f As New DirectoryInfo(strPath)
+        strButtonFilePath(i, j, 1) = strPath
+
         lblDest(i).Text = f.Name
+        strButtonCaptions(i, j, 1) = f.Name
     End Sub
-    Public Sub HandleKeypress(sender As Object, e As KeyEventArgs)
+    ''' <summary>
+    ''' Assigns names to buttons
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    Public Sub HandleFunctionKeyDown(sender As Object, e As KeyEventArgs)
         Dim i As Byte = e.KeyCode - Keys.F5
-        If btnFolderNames(i) = "" Or e.Shift Then
-            AssignButton(i, CurrentFolderPath)
+        If strVisibleButtons(i) = "" Or e.Shift Then
+            AssignButton(i, iCurrentAlpha, CurrentFolderPath) 'Just assign
+
         Else
-            CurrentFolderPath = btnFolderNames(i)
+            CurrentFolderPath = strVisibleButtons(i) 'Switch to this folder
             frmMain.tvMain2.SelectedFolder = CurrentFolderPath
         End If
     End Sub

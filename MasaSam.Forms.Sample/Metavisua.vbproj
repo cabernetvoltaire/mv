@@ -117,6 +117,7 @@
     <Compile Include="KeyHandling.vb" />
     <Compile Include="FileHandling.vb" />
     <Compile Include="Module1.vb" />
+    <Compile Include="ButtonHandling.vb" />
     <Compile Include="My Project\Resources.Designer.vb">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

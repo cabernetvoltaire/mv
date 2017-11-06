@@ -5,6 +5,14 @@ Module FileHandling
 
 
 
+    ''' <summary>
+    ''' Fills the listbox with files from a given folder, in a given filter state
+    ''' </summary>
+    ''' <param name="lbx"></param>
+    ''' <param name="e"></param>
+    ''' <param name="Currentfilterstate"></param>
+    ''' <param name="flist"></param>
+    ''' <param name="blnRandom"></param>
     Public Sub FillListbox(lbx As ListBox, e As IO.DirectoryInfo, Currentfilterstate As Integer, ByVal flist As List(Of String), blnRandom As Boolean)
         If IsNothing(e) Then Exit Sub
         If e.Name = "My Computer" Then Exit Sub
@@ -84,6 +92,11 @@ Module FileHandling
         Next
     End Sub
 
+    ''' <summary>
+    ''' Actually saves the store list
+    ''' </summary>
+    ''' <param name="list"></param>
+    ''' <param name="Dest"></param>
     Public Sub StoreList(list As List(Of String), Dest As String)
         If Dest = "" Then Exit Sub
         Dim fs As New StreamWriter(New FileStream(Dest, FileMode.Create, FileAccess.Write))
@@ -99,7 +112,9 @@ Module FileHandling
     ''' <param name="Dest"></param>
     ''' <param name="lbx"></param>
     Public Sub Getlist(list As List(Of String), Dest As String, lbx As ListBox)
+
         Dim notlist As New List(Of String)
+        Dim count As Long = 0
         Dim fs As New StreamReader(New FileStream(Dest, FileMode.OpenOrCreate, FileAccess.Read))
         Do While fs.Peek <> -1
             Dim s As String = fs.ReadLine
@@ -108,6 +123,7 @@ Module FileHandling
                 Dim f As New FileInfo(s)
                 If f.Exists Then
                     list.Add(s)
+                    count += 1
                     lbx.Items.Add(s)
                 Else
                     notlist.Add(s)
@@ -117,11 +133,16 @@ Module FileHandling
             End Try
 
 
-            frmMain.tsslblLastfile.Text = s & "(" & list.Count & ")"
+            frmMain.tbLastFile.Text = s & "(" & list.Count & ")"
+            frmMain.TSPB.Value = Math.Min(count * 40, frmMain.TSPB.Maximum)
             frmMain.Update()
         Loop
+        frmMain.TSPB.Visible = False
+
         If lbx.Items.Count <> 0 Then lbx.TabStop = True
         fs.Close()
+        lngShowlistLines = Showlist.Count
+
         If notlist.Count = 0 Then Exit Sub
         If MsgBox(notlist.Count & " files were not found. Remove from list?", vbYesNo, "Metavisua") = MsgBoxResult.Yes Then
             For Each s In notlist

@@ -74,15 +74,16 @@ Partial Class frmMain
         Me.VideoToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
-        Me.tsslblFiles = New System.Windows.Forms.ToolStripStatusLabel()
-        Me.tsslblFilter = New System.Windows.Forms.ToolStripStatusLabel()
-        Me.tsslblRandom = New System.Windows.Forms.ToolStripStatusLabel()
-        Me.tsslblSPEED = New System.Windows.Forms.ToolStripStatusLabel()
-        Me.tsslblSTART = New System.Windows.Forms.ToolStripStatusLabel()
-        Me.tsslblZOOM = New System.Windows.Forms.ToolStripStatusLabel()
-        Me.tsslblShowfile = New System.Windows.Forms.ToolStripStatusLabel()
-        Me.tsslblLastfile = New System.Windows.Forms.ToolStripStatusLabel()
-        Me.DateSSL = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.TSPB = New System.Windows.Forms.ToolStripProgressBar()
+        Me.tbFiles = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.tbFilter = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.tbRandom = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.tbSpeed = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.tbStartpoint = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.tbZoom = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.tbShowfile = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.tbLastFile = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.tbDate = New System.Windows.Forms.ToolStripStatusLabel()
         Me.tssFolderInfo = New System.Windows.Forms.ToolStripStatusLabel()
         Me.tssMoveCopy = New System.Windows.Forms.ToolStripStatusLabel()
         Me.tssFilter = New System.Windows.Forms.ToolStripStatusLabel()
@@ -93,7 +94,7 @@ Partial Class frmMain
         Me.ctrFilesandPics = New System.Windows.Forms.SplitContainer()
         Me.ctrTreeandFiles = New System.Windows.Forms.SplitContainer()
         Me.tvMain2 = New MasaSam.Forms.Controls.FileSystemTree()
-        Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
+        Me.MasterContainer = New System.Windows.Forms.SplitContainer()
         Me.lbxFiles = New System.Windows.Forms.ListBox()
         Me.lbxShowList = New System.Windows.Forms.ListBox()
         Me.ctrPicAndButtons = New System.Windows.Forms.SplitContainer()
@@ -158,6 +159,7 @@ Partial Class frmMain
         Me.toolStripSeparator = New System.Windows.Forms.ToolStripSeparator()
         Me.toolStripSeparator11 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripButton4 = New System.Windows.Forms.ToolStripButton()
+        Me.ToolStripButton6 = New System.Windows.Forms.ToolStripButton()
         Me.tmrUpdateFileList = New System.Windows.Forms.Timer(Me.components)
         Me.tmrPicLoad = New System.Windows.Forms.Timer(Me.components)
         Me.tmrJumpVideo = New System.Windows.Forms.Timer(Me.components)
@@ -169,7 +171,7 @@ Partial Class frmMain
         Me.BackgroundWorker1 = New System.ComponentModel.BackgroundWorker()
         Me.FileSystemWatcher1 = New System.IO.FileSystemWatcher()
         Me.tmrLoadLastFolder = New System.Windows.Forms.Timer(Me.components)
-        Me.ToolStripButton6 = New System.Windows.Forms.ToolStripButton()
+        Me.tmrMediaSpeed = New System.Windows.Forms.Timer(Me.components)
         Me.MenuStrip1.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
         Me.TableLayoutPanel2.SuspendLayout()
@@ -181,10 +183,10 @@ Partial Class frmMain
         Me.ctrTreeandFiles.Panel1.SuspendLayout()
         Me.ctrTreeandFiles.Panel2.SuspendLayout()
         Me.ctrTreeandFiles.SuspendLayout()
-        CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.SplitContainer1.Panel1.SuspendLayout()
-        Me.SplitContainer1.Panel2.SuspendLayout()
-        Me.SplitContainer1.SuspendLayout()
+        CType(Me.MasterContainer, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.MasterContainer.Panel1.SuspendLayout()
+        Me.MasterContainer.Panel2.SuspendLayout()
+        Me.MasterContainer.SuspendLayout()
         CType(Me.ctrPicAndButtons, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ctrPicAndButtons.Panel1.SuspendLayout()
         Me.ctrPicAndButtons.Panel2.SuspendLayout()
@@ -521,69 +523,77 @@ Partial Class frmMain
         '
         Me.StatusStrip1.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.StatusStrip1.ImageScalingSize = New System.Drawing.Size(28, 28)
-        Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsslblFiles, Me.tsslblFilter, Me.tsslblRandom, Me.tsslblSPEED, Me.tsslblSTART, Me.tsslblZOOM, Me.tsslblShowfile, Me.tsslblLastfile, Me.DateSSL})
+        Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.TSPB, Me.tbFiles, Me.tbFilter, Me.tbRandom, Me.tbSpeed, Me.tbStartpoint, Me.tbZoom, Me.tbShowfile, Me.tbLastFile, Me.tbDate})
         Me.StatusStrip1.Location = New System.Drawing.Point(0, 1136)
         Me.StatusStrip1.Name = "StatusStrip1"
         Me.StatusStrip1.Size = New System.Drawing.Size(2603, 35)
         Me.StatusStrip1.TabIndex = 16
         Me.StatusStrip1.Text = "StatusStrip1"
         '
-        'tsslblFiles
+        'TSPB
         '
-        Me.tsslblFiles.BorderStyle = System.Windows.Forms.Border3DStyle.SunkenOuter
-        Me.tsslblFiles.Name = "tsslblFiles"
-        Me.tsslblFiles.Size = New System.Drawing.Size(61, 30)
-        Me.tsslblFiles.Text = "FILES"
+        Me.TSPB.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
+        Me.TSPB.Name = "TSPB"
+        Me.TSPB.Size = New System.Drawing.Size(500, 29)
+        Me.TSPB.Style = System.Windows.Forms.ProgressBarStyle.Continuous
+        Me.TSPB.Visible = False
         '
-        'tsslblFilter
+        'tbFiles
         '
-        Me.tsslblFilter.BorderStyle = System.Windows.Forms.Border3DStyle.RaisedOuter
-        Me.tsslblFilter.Name = "tsslblFilter"
-        Me.tsslblFilter.Size = New System.Drawing.Size(73, 30)
-        Me.tsslblFilter.Text = "FILTER"
+        Me.tbFiles.BorderStyle = System.Windows.Forms.Border3DStyle.SunkenOuter
+        Me.tbFiles.Name = "tbFiles"
+        Me.tbFiles.Size = New System.Drawing.Size(61, 30)
+        Me.tbFiles.Text = "FILES"
         '
-        'tsslblRandom
+        'tbFilter
         '
-        Me.tsslblRandom.Name = "tsslblRandom"
-        Me.tsslblRandom.Size = New System.Drawing.Size(106, 30)
-        Me.tsslblRandom.Text = "RANDOM"
+        Me.tbFilter.BorderStyle = System.Windows.Forms.Border3DStyle.RaisedOuter
+        Me.tbFilter.Name = "tbFilter"
+        Me.tbFilter.Size = New System.Drawing.Size(73, 30)
+        Me.tbFilter.Text = "FILTER"
         '
-        'tsslblSPEED
+        'tbRandom
         '
-        Me.tsslblSPEED.Name = "tsslblSPEED"
-        Me.tsslblSPEED.Size = New System.Drawing.Size(73, 30)
-        Me.tsslblSPEED.Text = "SPEED"
+        Me.tbRandom.Name = "tbRandom"
+        Me.tbRandom.Size = New System.Drawing.Size(106, 30)
+        Me.tbRandom.Text = "RANDOM"
         '
-        'tsslblSTART
+        'tbSpeed
         '
-        Me.tsslblSTART.Name = "tsslblSTART"
-        Me.tsslblSTART.Size = New System.Drawing.Size(132, 30)
-        Me.tsslblSTART.Text = "STARTPOINT"
+        Me.tbSpeed.Name = "tbSpeed"
+        Me.tbSpeed.Size = New System.Drawing.Size(73, 30)
+        Me.tbSpeed.Text = "SPEED"
         '
-        'tsslblZOOM
+        'tbStartpoint
         '
-        Me.tsslblZOOM.Name = "tsslblZOOM"
-        Me.tsslblZOOM.Size = New System.Drawing.Size(76, 30)
-        Me.tsslblZOOM.Text = "ZOOM"
+        Me.tbStartpoint.Name = "tbStartpoint"
+        Me.tbStartpoint.Size = New System.Drawing.Size(132, 30)
+        Me.tbStartpoint.Text = "STARTPOINT"
         '
-        'tsslblShowfile
+        'tbZoom
         '
-        Me.tsslblShowfile.BorderStyle = System.Windows.Forms.Border3DStyle.RaisedOuter
-        Me.tsslblShowfile.Name = "tsslblShowfile"
-        Me.tsslblShowfile.Size = New System.Drawing.Size(111, 30)
-        Me.tsslblShowfile.Text = "SHOWFILE"
+        Me.tbZoom.Name = "tbZoom"
+        Me.tbZoom.Size = New System.Drawing.Size(76, 30)
+        Me.tbZoom.Text = "ZOOM"
         '
-        'tsslblLastfile
+        'tbShowfile
         '
-        Me.tsslblLastfile.Name = "tsslblLastfile"
-        Me.tsslblLastfile.Size = New System.Drawing.Size(97, 30)
-        Me.tsslblLastfile.Text = "LASTFILE"
+        Me.tbShowfile.BorderStyle = System.Windows.Forms.Border3DStyle.RaisedOuter
+        Me.tbShowfile.Name = "tbShowfile"
+        Me.tbShowfile.Size = New System.Drawing.Size(111, 30)
+        Me.tbShowfile.Text = "SHOWFILE"
         '
-        'DateSSL
+        'tbLastFile
         '
-        Me.DateSSL.Name = "DateSSL"
-        Me.DateSSL.Size = New System.Drawing.Size(61, 30)
-        Me.DateSSL.Text = "DATE"
+        Me.tbLastFile.Name = "tbLastFile"
+        Me.tbLastFile.Size = New System.Drawing.Size(97, 30)
+        Me.tbLastFile.Text = "LASTFILE"
+        '
+        'tbDate
+        '
+        Me.tbDate.Name = "tbDate"
+        Me.tbDate.Size = New System.Drawing.Size(61, 30)
+        Me.tbDate.Text = "DATE"
         '
         'tssFolderInfo
         '
@@ -670,7 +680,7 @@ Partial Class frmMain
         '
         'ctrTreeandFiles.Panel2
         '
-        Me.ctrTreeandFiles.Panel2.Controls.Add(Me.SplitContainer1)
+        Me.ctrTreeandFiles.Panel2.Controls.Add(Me.MasterContainer)
         Me.ctrTreeandFiles.Size = New System.Drawing.Size(345, 1002)
         Me.ctrTreeandFiles.SplitterDistance = 446
         Me.ctrTreeandFiles.SplitterWidth = 15
@@ -690,25 +700,25 @@ Partial Class frmMain
         Me.tvMain2.TabIndex = 0
         Me.tvMain2.TrackDriveState = True
         '
-        'SplitContainer1
+        'MasterContainer
         '
-        Me.SplitContainer1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.SplitContainer1.Location = New System.Drawing.Point(0, 0)
-        Me.SplitContainer1.Name = "SplitContainer1"
-        Me.SplitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal
+        Me.MasterContainer.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.MasterContainer.Location = New System.Drawing.Point(0, 0)
+        Me.MasterContainer.Name = "MasterContainer"
+        Me.MasterContainer.Orientation = System.Windows.Forms.Orientation.Horizontal
         '
-        'SplitContainer1.Panel1
+        'MasterContainer.Panel1
         '
-        Me.SplitContainer1.Panel1.Controls.Add(Me.lbxFiles)
+        Me.MasterContainer.Panel1.Controls.Add(Me.lbxFiles)
         '
-        'SplitContainer1.Panel2
+        'MasterContainer.Panel2
         '
-        Me.SplitContainer1.Panel2.Controls.Add(Me.lbxShowList)
-        Me.SplitContainer1.Size = New System.Drawing.Size(345, 541)
-        Me.SplitContainer1.SplitterDistance = 216
-        Me.SplitContainer1.SplitterWidth = 30
-        Me.SplitContainer1.TabIndex = 1
-        Me.SplitContainer1.TabStop = False
+        Me.MasterContainer.Panel2.Controls.Add(Me.lbxShowList)
+        Me.MasterContainer.Size = New System.Drawing.Size(345, 541)
+        Me.MasterContainer.SplitterDistance = 216
+        Me.MasterContainer.SplitterWidth = 30
+        Me.MasterContainer.TabIndex = 1
+        Me.MasterContainer.TabStop = False
         '
         'lbxFiles
         '
@@ -730,7 +740,6 @@ Partial Class frmMain
         Me.lbxShowList.Name = "lbxShowList"
         Me.lbxShowList.Size = New System.Drawing.Size(345, 295)
         Me.lbxShowList.TabIndex = 0
-        Me.lbxShowList.TabStop = False
         '
         'ctrPicAndButtons
         '
@@ -749,6 +758,7 @@ Partial Class frmMain
         'ctrPicAndButtons.Panel2
         '
         Me.ctrPicAndButtons.Panel2.BackColor = System.Drawing.Color.Transparent
+        Me.ctrPicAndButtons.Panel2.CausesValidation = False
         Me.ctrPicAndButtons.Panel2.Controls.Add(Me.btnRow)
         Me.ctrPicAndButtons.Panel2MinSize = 100
         Me.ctrPicAndButtons.Size = New System.Drawing.Size(2222, 1002)
@@ -1323,6 +1333,15 @@ Partial Class frmMain
         Me.ToolStripButton4.Size = New System.Drawing.Size(32, 87)
         Me.ToolStripButton4.Text = "ToolStripButton4"
         '
+        'ToolStripButton6
+        '
+        Me.ToolStripButton6.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ToolStripButton6.Image = CType(resources.GetObject("ToolStripButton6.Image"), System.Drawing.Image)
+        Me.ToolStripButton6.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton6.Name = "ToolStripButton6"
+        Me.ToolStripButton6.Size = New System.Drawing.Size(32, 87)
+        Me.ToolStripButton6.Text = "ToolStripButton6"
+        '
         'tmrUpdateFileList
         '
         Me.tmrUpdateFileList.Enabled = True
@@ -1367,14 +1386,8 @@ Partial Class frmMain
         'tmrLoadLastFolder
         '
         '
-        'ToolStripButton6
+        'tmrMediaSpeed
         '
-        Me.ToolStripButton6.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ToolStripButton6.Image = CType(resources.GetObject("ToolStripButton6.Image"), System.Drawing.Image)
-        Me.ToolStripButton6.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripButton6.Name = "ToolStripButton6"
-        Me.ToolStripButton6.Size = New System.Drawing.Size(32, 87)
-        Me.ToolStripButton6.Text = "ToolStripButton6"
         '
         'frmMain
         '
@@ -1406,10 +1419,10 @@ Partial Class frmMain
         Me.ctrTreeandFiles.Panel2.ResumeLayout(False)
         CType(Me.ctrTreeandFiles, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ctrTreeandFiles.ResumeLayout(False)
-        Me.SplitContainer1.Panel1.ResumeLayout(False)
-        Me.SplitContainer1.Panel2.ResumeLayout(False)
-        CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.SplitContainer1.ResumeLayout(False)
+        Me.MasterContainer.Panel1.ResumeLayout(False)
+        Me.MasterContainer.Panel2.ResumeLayout(False)
+        CType(Me.MasterContainer, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.MasterContainer.ResumeLayout(False)
         Me.ctrPicAndButtons.Panel1.ResumeLayout(False)
         Me.ctrPicAndButtons.Panel2.ResumeLayout(False)
         CType(Me.ctrPicAndButtons, System.ComponentModel.ISupportInitialize).EndInit()
@@ -1488,9 +1501,9 @@ Partial Class frmMain
     Friend WithEvents ToolStripButton8 As ToolStripButton
     Friend WithEvents tmrCheckFolders As Timer
     Friend WithEvents ToolStripButton9 As ToolStripButton
-    Friend WithEvents tsslblFiles As ToolStripStatusLabel
+    Friend WithEvents tbFiles As ToolStripStatusLabel
     Friend WithEvents ToolStripButton10 As ToolStripButton
-    Friend WithEvents tsslblFilter As ToolStripStatusLabel
+    Friend WithEvents tbFilter As ToolStripStatusLabel
     Friend WithEvents FileToolStripMenuItem1 As ToolStripMenuItem
     Friend WithEvents ListsToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents AddAllPicturesToolStripMenuItem As ToolStripMenuItem
@@ -1504,7 +1517,7 @@ Partial Class frmMain
     Friend WithEvents ToolStripButton12 As ToolStripButton
     Friend WithEvents OpenFileDialog1 As OpenFileDialog
     Friend WithEvents SaveFileDialog1 As SaveFileDialog
-    Friend WithEvents SplitContainer1 As SplitContainer
+    Friend WithEvents MasterContainer As SplitContainer
     Friend WithEvents lbxFiles As ListBox
     Friend WithEvents lbxShowList As ListBox
     Friend WithEvents LoadToolStripMenuItem As ToolStripMenuItem
@@ -1525,12 +1538,12 @@ Partial Class frmMain
     Friend WithEvents ToolStripButton3 As ToolStripButton
     Friend WithEvents ToolStripButton5 As ToolStripButton
     Friend WithEvents ToolStripTextBox1 As ToolStripTextBox
-    Friend WithEvents tsslblRandom As ToolStripStatusLabel
-    Friend WithEvents tsslblLastfile As ToolStripStatusLabel
-    Friend WithEvents tsslblShowfile As ToolStripStatusLabel
-    Friend WithEvents tsslblSTART As ToolStripStatusLabel
-    Friend WithEvents tsslblSPEED As ToolStripStatusLabel
-    Friend WithEvents tsslblZOOM As ToolStripStatusLabel
+    Friend WithEvents tbRandom As ToolStripStatusLabel
+    Friend WithEvents tbLastFile As ToolStripStatusLabel
+    Friend WithEvents tbShowfile As ToolStripStatusLabel
+    Friend WithEvents tbStartpoint As ToolStripStatusLabel
+    Friend WithEvents tbSpeed As ToolStripStatusLabel
+    Friend WithEvents tbZoom As ToolStripStatusLabel
     Friend WithEvents toolStripSeparator As ToolStripSeparator
     Friend WithEvents toolStripSeparator11 As ToolStripSeparator
     Friend WithEvents SlideshowToolStripMenuItem1 As ToolStripMenuItem
@@ -1553,7 +1566,7 @@ Partial Class frmMain
     Friend WithEvents NormalToolStripMenuItem1 As ToolStripMenuItem
     Friend WithEvents FastToolStripMenuItem1 As ToolStripMenuItem
     Friend WithEvents RandomStartToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents DateSSL As ToolStripStatusLabel
+    Friend WithEvents tbDate As ToolStripStatusLabel
     Friend WithEvents tvMain2 As Controls.FileSystemTree
     Friend WithEvents btnChooseRandom As ToolStripButton
     Friend WithEvents ToolStripButton4 As ToolStripButton
@@ -1589,4 +1602,6 @@ Partial Class frmMain
     Friend WithEvents ButtonListToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ButtonListToolStripMenuItem1 As ToolStripMenuItem
     Friend WithEvents ToolStripButton6 As ToolStripButton
+    Friend WithEvents TSPB As ToolStripProgressBar
+    Friend WithEvents tmrMediaSpeed As Timer
 End Class
