@@ -53,11 +53,16 @@ Module ButtonHandling
         KeyAssignmentsStore(strButtonFile)
 
     End Sub
-    Public Sub KeyAssignmentsRestore()
+    Public Sub KeyAssignmentsRestore(Optional filename As String = "")
 
         Dim intIndex, intLetter As Integer
         Dim path As String
-        path = frmMain.LoadButtonList()
+        If filename = "" Then
+            path = frmMain.LoadButtonList()
+        Else
+            path = filename
+        End If
+        If path = "" Then Exit Sub
         'Get the file path
         Dim fs As New StreamReader(New FileStream(path, FileMode.OpenOrCreate, FileAccess.Read))
         Dim s As String

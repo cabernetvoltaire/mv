@@ -83,7 +83,6 @@ Partial Class FullScreen
         Me.Name = "FullScreen"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.Manual
         Me.Text = "Form1"
-        Me.WindowState = System.Windows.Forms.FormWindowState.Maximized
         CType(Me.FSWMP, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.fullScreenPicBox, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.FSBlanker, System.ComponentModel.ISupportInitialize).EndInit()

@@ -1,30 +1,27 @@
 ﻿Imports System.IO
 Module General
-    Public Enum ExifOrientations As Byte
-        Unknown = 0
-        TopLeft = 1
-        TopRight = 2
-        BottomRight = 3
-        BottomLeft = 4
-        LeftTop = 5
-        RightTop = 6
-        RightBottom = 7
-        LeftBottom = 8
-    End Enum
-    Private Const OrientationId As Integer = &H112
-    Public blnSpeedRestart As Boolean = False
-    Public iSSpeeds() As Integer = {1500, 900, 50}
-    Public iPlaybackSpeed() As Decimal = {0.03, 0.5, 0.75}
-    Public currentWMP As New AxWMPLib.AxWindowsMediaPlayer
-    Public LastPlayed As New Stack(Of String)
-    Public blnAutoAdvanceFolder As Boolean = True
-    Public blnRandomStartAlways As Boolean = True
-    Public blnRestartSlideShowFlag As Boolean = False
-    Public Property blnTVCurrent As Boolean
-    Public Property strButtonFile As String
-    Public Property blnChooseRandomFile As Boolean = True
-    Public iCurrentAlpha As Integer = 0
-    Public ChosenPlayOrder As Byte = 0
+
+    Public Sub ProgressBarOn(max As Long)
+        With frmMain.TSPB
+            .Value = 0
+            .Maximum = Math.Max(lngListSizeBytes, 100)
+            .Visible = True
+        End With
+
+    End Sub
+    Public Sub ProgressBarOff()
+        With frmMain.TSPB
+            .Visible = False
+        End With
+
+    End Sub
+    Public Sub ProgressIncrement(st As Integer, max As Long)
+        With frmMain.TSPB
+            .Maximum = max
+            .Value = (.Value + st) Mod max
+        End With
+    End Sub
+
     Public Function ImageOrientation(ByVal img As Image) As ExifOrientations
         ' Get the index of the orientation property.
         Dim orientation_index As Integer = Array.IndexOf(img.PropertyIdList, OrientationId)
@@ -142,20 +139,37 @@ Module General
         strButtonCaptions(i, j, 1) = f.Name
     End Sub
     ''' <summary>
-    ''' Assigns names to buttons
+    ''' Assigns paths to buttons, moves files, or switches to folders
     ''' </summary>
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     Public Sub HandleFunctionKeyDown(sender As Object, e As KeyEventArgs)
         Dim i As Byte = e.KeyCode - Keys.F5
         If strVisibleButtons(i) = "" Or e.Shift Then
-            AssignButton(i, iCurrentAlpha, CurrentFolderPath) 'Just assign
+            If e.Control Then
+                MoveFiles(Showlist, strVisibleButtons(i), frmMain.lbxShowList)
+            Else
+                AssignButton(i, iCurrentAlpha, CurrentFolderPath) 'Just assign
+
+            End If
+
+        ElseIf e.Control Then
+
+            MoveFiles(ListfromListbox(frmMain.lbxFiles), strVisibleButtons(i), frmMain.lbxFiles)
 
         Else
+
             CurrentFolderPath = strVisibleButtons(i) 'Switch to this folder
             frmMain.tvMain2.SelectedFolder = CurrentFolderPath
         End If
     End Sub
+    Public Function ListfromListbox(lbx As ListBox) As List(Of String)
+        Dim s As New List(Of String)
+        For Each l In lbx.SelectedItems
+            s.Add(l)
+        Next
+        Return s
+    End Function
     ''' <summary>
     ''' Fill a listbox with a list, according to a filter
     ''' </summary>
@@ -164,12 +178,13 @@ Module General
     ''' <param name="showlist"></param>
     Public Sub FillShowbox(lbx As ListBox, Filter As Byte, showlist As List(Of String))
         If showlist.Count = 0 Then Exit Sub
-
+        ProgressBarOn(1000)
         frmMain.CollapseShowlist(False)
         lbx.Items.Clear()
 
         For Each s In showlist
             lbx.Items.Add(s)
+            ProgressIncrement(1, 1000)
         Next
         lbx.TabStop = True
 

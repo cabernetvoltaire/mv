@@ -79,4 +79,8 @@ Public Class FullScreen
     Private Sub FSBlanker_Click(sender As Object, e As EventArgs) Handles FSBlanker.Click
 
     End Sub
+
+    Private Sub FullScreen_Load(sender As Object, e As EventArgs) Handles Me.Load
+        Me.WindowState = FormWindowState.Maximized
+    End Sub
 End Class

@@ -192,7 +192,15 @@ Public Class FindDuplicates
 
     Private Sub btnDeleteFiles_Click(sender As Object, e As EventArgs) Handles btnDeleteFiles.Click
         If MsgBox("Are you sure you want to delete all these files?", MsgBoxStyle.Critical, "DELETE FILES?") = MsgBoxResult.Ok Then
-            MsgBox("Deleting files (not really)")
+            MsgBox("Click to delete files")
+            For Each file In lbxDeleteList.Items
+                My.Computer.FileSystem.DeleteFile(file, FileIO.UIOption.AllDialogs, FileIO.RecycleOption.SendToRecycleBin)
+            Next
+            MsgBox("Finished")
         End If
+    End Sub
+
+    Private Sub FlowLayoutPanel1_Paint(sender As Object, e As PaintEventArgs) Handles FlowLayoutPanel1.Paint
+
     End Sub
 End Class

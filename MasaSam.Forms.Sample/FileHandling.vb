@@ -4,7 +4,6 @@ Module FileHandling
     Public strPicExtensions = ".jpeg.png.jpg.bmp.gif"
 
 
-
     ''' <summary>
     ''' Fills the listbox with files from a given folder, in a given filter state
     ''' </summary>
@@ -28,12 +27,15 @@ Module FileHandling
                     Case FilterState.All
 
                         lbx.Items.Add(f.FullName)
+                        FileboxContents.Add(f.FullName)
                     Case FilterState.NoPicVid
 
                         'Select Case s
                         If InStr(strVideoExtensions & strPicExtensions, s) <> 0 And Len(s) > 0 Then
                         Else
                             lbx.Items.Add(f.FullName)
+                            FileboxContents.Add(f.FullName)
+
                         End If
 
                     Case FilterState.Piconly
@@ -41,12 +43,14 @@ Module FileHandling
                         If InStr(strPicExtensions, s) <> 0 And Len(s) > 0 Then
 
                             lbx.Items.Add(f.FullName)
+                            FileboxContents.Add(f.FullName)
                         Else
                         End If
                     Case FilterState.LinkOnly
                         Select Case s
                             Case ".lnk"
                                 lbx.Items.Add(f.FullName)
+                                FileboxContents.Add(f.FullName)
                             Case Else
                         End Select
 
@@ -54,6 +58,7 @@ Module FileHandling
                         'Select Case s
                         If InStr(strVideoExtensions, s) <> 0 And Len(s) > 0 Then
                             lbx.Items.Add(f.FullName)
+                            FileboxContents.Add(f.FullName)
                         End If
 
 
@@ -61,6 +66,7 @@ Module FileHandling
 
                         If InStr(strVideoExtensions & strPicExtensions, s) <> 0 And Len(s) > 0 Then
                             lbx.Items.Add(f.FullName)
+                            FileboxContents.Add(f.FullName)
 
 
                         End If
@@ -100,8 +106,10 @@ Module FileHandling
     Public Sub StoreList(list As List(Of String), Dest As String)
         If Dest = "" Then Exit Sub
         Dim fs As New StreamWriter(New FileStream(Dest, FileMode.Create, FileAccess.Write))
+
         For Each s In list
             fs.WriteLine(s)
+
         Next
         fs.Close()
     End Sub
@@ -111,6 +119,7 @@ Module FileHandling
     ''' <param name="list"></param>
     ''' <param name="Dest"></param>
     ''' <param name="lbx"></param>
+    '''
     Public Sub Getlist(list As List(Of String), Dest As String, lbx As ListBox)
 
         Dim notlist As New List(Of String)
@@ -134,6 +143,7 @@ Module FileHandling
 
 
             frmMain.tbLastFile.Text = s & "(" & list.Count & ")"
+            ProgressIncrement(40, frmMain.TSPB.Maximum)
             frmMain.TSPB.Value = Math.Min(count * 40, frmMain.TSPB.Maximum)
             frmMain.Update()
         Loop
@@ -150,4 +160,51 @@ Module FileHandling
             Next
         End If
     End Sub
+    Public Sub MoveFiles(files As List(Of String), strDest As String, lbx1 As ListBox)
+        If files.Count > 1 Then
+            Dim s As String
+            s = InputBox("Name of folder to create? (Blank means none)", "Create sub-folder", "")
+            s = strDest & "\" & s
+            Try
+                IO.Directory.CreateDirectory(s)
+            Catch ex As IO.DirectoryNotFoundException
+            End Try
+        End If
+        Dim file As String
+        For Each file In files
+
+            Dim m As New FileInfo(file)
+            With My.Computer.FileSystem
+                Dim spath As String = strDest & "\" & m.Name
+                If .FileExists(spath) Then Exit For
+                If blnCopyMode Then
+                    .CopyFile(m.FullName, spath)
+
+                Else
+                    ' currentPicBox.Image.Dispose()
+                    'Deal with existing files
+
+                    .MoveFile(m.FullName, spath)
+
+                    lbx1.Items.Remove(m.FullName)
+                End If
+            End With
+
+        Next
+
+        'With current file(s)
+        'Move file to destination folder
+        'If more than one file
+        'Create a new folder to put them in.
+    End Sub
+    Public Function MakeSubList(list As List(Of String), str As String) As List(Of String)
+        Dim s As New List(Of String)
+        For Each file In list
+            If InStr(file, str) <> 0 Then
+                s.Add(file)
+            End If
+        Next
+        Return s
+    End Function
+
 End Module
