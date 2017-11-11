@@ -95,15 +95,10 @@ Public Class frmMain
                 ChosenPlayOrder = (ChosenPlayOrder + 1) Mod (PlayOrder.Type)
                 tbRandom.Text = "ORDER:" & UCase(strPlayOrder(ChosenPlayOrder))
                 Showlist = SetPlayOrder(ChosenPlayOrder, Showlist)
-                FillShowbox(lbxShowList, FilterState.All, Showlist)
+                FillShowbox(lbxShowList, CurrentFilterState, Showlist)
+                FileboxContents = SetPlayOrder(ChosenPlayOrder, FileboxContents)
+                FillShowbox(lbxFiles, CurrentFilterState, FileboxContents)
                 tbFiles.Text = lngShowlistLines & " FILES IN SHOWLIST"
-                'blnRandom = Not blnRandom
-                'If blnRandom Then
-                '    tsslblRandom.Text = "RANDOM"
-                'Else
-                '    tsslblRandom.Text = "ORDERED"
-
-                'End If
 
 
             Case KeyNextFile, KeyPreviousFile
@@ -447,6 +442,7 @@ Public Class frmMain
         If strPath = "" Then Exit Sub
         If Len(strPath) > 247 Then Exit Sub
         Dim finfo As New FileInfo(strPath)
+
         tbDate.Text = finfo.LastWriteTime.ToShortDateString & " " & finfo.LastWriteTime.ToShortTimeString
 
         'tvMain2.SelectedFolder = strPath 'Keeps snapping to C:\
@@ -519,17 +515,7 @@ Public Class frmMain
         AddFilesToCollection(Showlist, FBCShown, strPicExtensions, blnRecurse)
         FillShowbox(lbxShowList, FilterState.All, Showlist)
     End Sub
-    Private Sub AddFilesToCollection(ByVal list As List(Of String), dontinclude As List(Of Boolean), extensions As String, blnRecurse As Boolean)
-        Dim s As String
 
-        s = InputBox("Search for?")
-        Dim d As New DirectoryInfo(CurrentFolderPath)
-
-        FindAllFilesBelow(d, list, dontinclude, extensions, False, s, blnRecurse)
-
-        lngShowlistLines = list.Count
-
-    End Sub
 
     Private Sub RemoveFilesFromCollection(ByVal list As List(Of String), dontinclude As List(Of Boolean), extensions As String)
         Dim d As New System.IO.DirectoryInfo(CurrentFolderPath)
@@ -562,7 +548,14 @@ Public Class frmMain
         currentWMP.Dock = DockStyle.Fill
         currentPicBox = PictureBox1
         ToggleButtons()
-        KeyAssignmentsRestore(strButtonFile)
+        Try
+            KeyAssignmentsRestore(strButtonFile)
+        Catch ex As FileNotFoundException
+
+            Exit Try
+        Catch ex As DirectoryNotFoundException
+            Exit Try
+        End Try
     End Sub
 
     Private Sub LoadDefaultShowList()
@@ -995,55 +988,7 @@ Public Class frmMain
             TSS.Text = [text]
         End If
     End Sub
-    Public Sub FindAllFilesBelow(d As DirectoryInfo, list As List(Of String), ByRef DontInclude As List(Of Boolean), extensions As String, blnRemove As Boolean, strSearch As String, blnRecurse As Boolean)
-        ProgressBarOn(1000)
 
-        For Each file In d.EnumerateFiles
-            Try
-                If InStr(extensions, LCase(file.Extension)) <> 0 And file.Extension <> "" Then
-                    If InStr(LCase(file.FullName), LCase(strSearch)) <> 0 Or strSearch = "" Then
-
-                        If blnRemove Then
-                            list.Remove(file.FullName)
-                        Else
-                            list.Add(file.FullName)
-
-                            DontInclude.Add(False)
-                        End If
-                        tbFiles.Text = file.FullName & " (" & list.Count.ToString & " files.)"
-
-                    End If
-                Else
-                    If extensions = "" Then
-                        If blnRemove Then
-                            list.Remove(file.FullName)
-                        Else
-                            list.Add(file.FullName)
-
-                            DontInclude.Add(False)
-                        End If
-                    End If
-                End If
-
-            Catch ex As PathTooLongException
-                MsgBox(ex.Message)
-            End Try
-
-            ProgressIncrement(1, 1000)
-        Next
-        ProgressBarOff()
-
-        For Each di In d.EnumerateDirectories
-            Try
-                FindAllFilesBelow(di, list, DontInclude, extensions, blnRemove, strSearch, blnRecurse)
-            Catch ex As UnauthorizedAccessException
-                Continue For
-            Catch ex As DirectoryNotFoundException
-                Continue For
-            End Try
-        Next
-
-    End Sub
 
     Private Sub tvMain2_DirectorySelected(sender As Object, e As DirectoryInfoEventArgs) Handles tvMain2.DirectorySelected
         PreferencesSave()
@@ -1166,6 +1111,7 @@ Public Class frmMain
         If MsgBox("This deletes all files in showlist. Sure?", MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
             For Each file In lbxShowList.Items
                 My.Computer.FileSystem.DeleteFile(file, FileIO.UIOption.AllDialogs, FileIO.RecycleOption.SendToRecycleBin)
+
             Next
             lbxShowList.Items.Clear()
             CollapseShowlist(True)
@@ -1183,6 +1129,21 @@ Public Class frmMain
 
     Private Sub lbxShowList_GotFocus(sender As Object, e As EventArgs) Handles lbxShowList.GotFocus
         PFocus = CtrlFocus.ShowList
+
+    End Sub
+
+    Private Sub LinearToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles LinearToolStripMenuItem.Click
+        'AssignLinear()
+    End Sub
+
+    Private Sub HarvestFolderToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles HarvestFolderToolStripMenuItem.Click
+        Dim di As New DirectoryInfo(CurrentFolderPath)
+        HarvestFolder(di)
+        FillListbox(lbxFiles, di, CurrentFilterState, FileboxContents, False)
+    End Sub
+
+    Private Sub DeleteEmptyFoldersToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles DeleteEmptyFoldersToolStripMenuItem.Click
+        DeleteEmptyFolders(New DirectoryInfo(CurrentFolderPath))
 
     End Sub
 End Class

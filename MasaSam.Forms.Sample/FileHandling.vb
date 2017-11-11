@@ -197,6 +197,101 @@ Module FileHandling
         'If more than one file
         'Create a new folder to put them in.
     End Sub
+    Public Sub AddFilesToCollection(ByVal list As List(Of String), dontinclude As List(Of Boolean), extensions As String, blnRecurse As Boolean)
+        Dim s As String
+
+        s = InputBox("Search for?")
+        Dim d As New DirectoryInfo(CurrentFolderPath)
+
+        FindAllFilesBelow(d, list, dontinclude, extensions, False, s, blnRecurse)
+
+        lngShowlistLines = list.Count
+
+    End Sub
+    Public Sub FindAllFilesBelow(d As DirectoryInfo, list As List(Of String), ByRef DontInclude As List(Of Boolean), extensions As String, blnRemove As Boolean, strSearch As String, blnRecurse As Boolean)
+        ProgressBarOn(1000)
+
+        For Each file In d.EnumerateFiles
+            Try
+                If InStr(extensions, LCase(file.Extension)) <> 0 And file.Extension <> "" Then
+                    If InStr(LCase(file.FullName), LCase(strSearch)) <> 0 Or strSearch = "" Then
+
+                        If blnRemove Then
+                            list.Remove(file.FullName)
+                        Else
+                            list.Add(file.FullName)
+
+                            DontInclude.Add(False)
+                        End If
+                        'tbFiles.Text = file.FullName & " (" & list.Count.ToString & " files.)"
+
+                    End If
+                Else
+                    If extensions = "" Then
+                        If blnRemove Then
+                            list.Remove(file.FullName)
+                        Else
+                            list.Add(file.FullName)
+
+                            DontInclude.Add(False)
+                        End If
+                    End If
+                End If
+
+            Catch ex As PathTooLongException
+                MsgBox(ex.Message)
+            End Try
+
+            ProgressIncrement(1, 1000)
+        Next
+        ProgressBarOff()
+
+        For Each di In d.EnumerateDirectories
+            Try
+                FindAllFilesBelow(di, list, DontInclude, extensions, blnRemove, strSearch, blnRecurse)
+            Catch ex As UnauthorizedAccessException
+                Continue For
+            Catch ex As DirectoryNotFoundException
+                Continue For
+            End Try
+        Next
+
+    End Sub
+    ''' <summary>
+    ''' Moves all the files in d to its parent, if it exists. Returns true if successful
+    ''' </summary>
+    ''' <param name="d"></param>
+    Public Function Promotefiles(d As DirectoryInfo) As Boolean
+        If Not IO.Directory.Exists(d.FullName) Then
+            Return False
+        End If
+        For Each file In d.EnumerateFiles
+            My.Computer.FileSystem.MoveFile(file.FullName, d.Parent.FullName & "\" & file.Name)
+
+        Next
+
+        Return True
+    End Function
+
+    Public Function DeleteEmptyFolders(d As DirectoryInfo) As Boolean
+        If Not MsgBox("This deletes all empty directories", MsgBoxStyle.OkCancel) = MsgBoxResult.Ok Then
+            Return False
+        Else
+            For Each di In d.EnumerateDirectories
+                If di.EnumerateFiles.Count = 0 Then
+                    di.Delete()
+                End If
+            Next
+        End If
+        Return True
+    End Function
+    Public Sub HarvestFolder(d As DirectoryInfo)
+        For Each di In d.EnumerateDirectories
+            HarvestFolder(di)
+            Promotefiles(di)
+        Next
+
+    End Sub
     Public Function MakeSubList(list As List(Of String), str As String) As List(Of String)
         Dim s As New List(Of String)
         For Each file In list

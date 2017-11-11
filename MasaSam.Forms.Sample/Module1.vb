@@ -130,14 +130,7 @@ Module General
         ' blnButtonsLoaded = True
         InitialiseButtons()
     End Sub
-    Public Sub AssignButton(i As Byte, j As Integer, strPath As String)
-        strVisibleButtons(i) = strPath
-        Dim f As New DirectoryInfo(strPath)
-        strButtonFilePath(i, j, 1) = strPath
 
-        lblDest(i).Text = f.Name
-        strButtonCaptions(i, j, 1) = f.Name
-    End Sub
     ''' <summary>
     ''' Assigns paths to buttons, moves files, or switches to folders
     ''' </summary>
@@ -204,6 +197,9 @@ Module General
                         NewListL.Add(file.Length + Len(file.FullName), file.FullName)
                     Case PlayOrder.Time
                         Dim time = file.LastWriteTime.AddMilliseconds(Rnd(100))
+                        Dim time2 = file.LastAccessTime.AddMilliseconds(Rnd(100))
+                        If time2 < time Then time = time2
+
                         NewListD.Add(time, file.FullName)
                     Case PlayOrder.PathName
                         NewListS.Add(file.FullName, file.FullName)
@@ -221,7 +217,8 @@ Module General
                 End Select
             Catch ex As System.ArgumentException 'TODO could do better than this. 
                 Continue For
-
+            Catch ex As IO.FileNotFoundException
+                Continue For
             Catch ex As System.IO.PathTooLongException
                 Continue For
             End Try
