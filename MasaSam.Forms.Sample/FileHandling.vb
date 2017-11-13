@@ -139,6 +139,9 @@ Module FileHandling
                 End If
             Catch ex As System.IO.PathTooLongException
                 Continue Do
+            Catch ex As System.ArgumentException
+                MsgBox(ex.Message, MsgBoxStyle.OkOnly)
+                Exit Sub
             End Try
 
 
@@ -266,32 +269,59 @@ Module FileHandling
             Return False
         End If
         For Each file In d.EnumerateFiles
-            My.Computer.FileSystem.MoveFile(file.FullName, d.Parent.FullName & "\" & file.Name)
+            If Len(file.FullName) <= 247 Then
+                My.Computer.FileSystem.MoveFile(file.FullName, d.Parent.FullName & "\" & file.Name)
+            End If
 
         Next
 
         Return True
     End Function
 
-    Public Function DeleteEmptyFolders(d As DirectoryInfo) As Boolean
-        If Not MsgBox("This deletes all empty directories", MsgBoxStyle.OkCancel) = MsgBoxResult.Ok Then
-            Return False
-        Else
+    Public Function DeleteEmptyFolders(d As DirectoryInfo, blnRecurse As Boolean) As Boolean
+
+
+        ProgressBarOn(1000)
+
+        For Each di In d.EnumerateDirectories
+            If blnRecurse Then DeleteEmptyFolders(di, True)
+            If di.EnumerateDirectories.Count = 0 And di.EnumerateFiles.Count = 0 Then
+                di.Delete()
+                ProgressIncrement(1, 1000)
+            End If
+        Next
+
+        Return True
+    End Function
+    Public Sub HarvestFolder(d As DirectoryInfo, blnRecurse As Boolean)
+        If blnRecurse Then
             For Each di In d.EnumerateDirectories
-                If di.EnumerateFiles.Count = 0 Then
-                    di.Delete()
-                End If
+                HarvestFolder(di, True)
+                Promotefiles(di)
             Next
         End If
-        Return True
-    End Function
-    Public Sub HarvestFolder(d As DirectoryInfo)
-        For Each di In d.EnumerateDirectories
-            HarvestFolder(di)
-            Promotefiles(di)
-        Next
+        Promotefiles(d)
 
     End Sub
+    Public Sub HarvestFolder(d As DirectoryInfo, target As DirectoryInfo, blnRecurse As Boolean)
+        If blnRecurse Then
+            For Each di In d.EnumerateDirectories
+                HarvestFolder(di, True)
+                Dim s As New List(Of String)
+                For Each file In di.EnumerateFiles
+
+                    s.Add(file.FullName)
+                Next
+                MoveFiles(s, target.FullName, frmMain.lbxFiles)
+            Next
+        End If
+
+    End Sub
+    Public Function Sublists(d As Directory)
+
+
+    End Function
+
     Public Function MakeSubList(list As List(Of String), str As String) As List(Of String)
         Dim s As New List(Of String)
         For Each file In list

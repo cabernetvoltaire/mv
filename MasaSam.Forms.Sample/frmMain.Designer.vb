@@ -32,6 +32,9 @@ Partial Class frmMain
         Me.SaveToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.SaveListToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ButtonListToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ButtonFilesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ShowlistFilesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ListsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.AddAllPicturesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CurrentOnlyToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -59,6 +62,10 @@ Partial Class frmMain
         Me.Screen2ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.AssignButtonsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.LinearToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.HarvestFolderToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.DeleteEmptyFoldersToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.HarvestFoldersToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.DuplicatesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.FileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.NewToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.OpenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -137,17 +144,12 @@ Partial Class frmMain
         Me.ToolStripSeparator3 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripSeparator4 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripLabel1 = New System.Windows.Forms.ToolStripLabel()
-        Me.tsbAddMovies = New System.Windows.Forms.ToolStripButton()
-        Me.TSBRemoveMovies = New System.Windows.Forms.ToolStripButton()
-        Me.ToolStripButton8 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripSeparator6 = New System.Windows.Forms.ToolStripSeparator()
         Me.tsbClear = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripSeparator5 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripSeparator7 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripButton10 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripSeparator8 = New System.Windows.Forms.ToolStripSeparator()
-        Me.ToolStripButton11 = New System.Windows.Forms.ToolStripButton()
-        Me.ToolStripButton12 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripSeparator9 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripButton13 = New System.Windows.Forms.ToolStripComboBox()
         Me.ToolStripButton15 = New System.Windows.Forms.ToolStripButton()
@@ -181,8 +183,6 @@ Partial Class frmMain
         Me.tmrLoadLastFolder = New System.Windows.Forms.Timer(Me.components)
         Me.tmrMediaSpeed = New System.Windows.Forms.Timer(Me.components)
         Me.tmrUpdateForm = New System.Windows.Forms.Timer(Me.components)
-        Me.HarvestFolderToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.DeleteEmptyFoldersToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip1.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
         Me.TableLayoutPanel2.SuspendLayout()
@@ -221,7 +221,7 @@ Partial Class frmMain
         'MenuStrip1
         '
         Me.MenuStrip1.ImageScalingSize = New System.Drawing.Size(28, 28)
-        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FileToolStripMenuItem1, Me.ListsToolStripMenuItem, Me.SlideshowToolStripMenuItem1, Me.VideoToolStripMenuItem1, Me.FullScreenToolStripMenuItem1, Me.AssignButtonsToolStripMenuItem, Me.HarvestFolderToolStripMenuItem})
+        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FileToolStripMenuItem1, Me.ListsToolStripMenuItem, Me.SlideshowToolStripMenuItem1, Me.VideoToolStripMenuItem1, Me.FullScreenToolStripMenuItem1, Me.AssignButtonsToolStripMenuItem, Me.HarvestFolderToolStripMenuItem, Me.DuplicatesToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
         Me.MenuStrip1.Size = New System.Drawing.Size(2603, 38)
@@ -230,7 +230,7 @@ Partial Class frmMain
         '
         'FileToolStripMenuItem1
         '
-        Me.FileToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.LoadToolStripMenuItem, Me.SaveToolStripMenuItem1})
+        Me.FileToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.LoadToolStripMenuItem, Me.SaveToolStripMenuItem1, Me.ButtonFilesToolStripMenuItem, Me.ToolStripMenuItem1, Me.ShowlistFilesToolStripMenuItem})
         Me.FileToolStripMenuItem1.Name = "FileToolStripMenuItem1"
         Me.FileToolStripMenuItem1.Size = New System.Drawing.Size(56, 34)
         Me.FileToolStripMenuItem1.Text = "File"
@@ -239,7 +239,7 @@ Partial Class frmMain
         '
         Me.LoadToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ShowListToolStripMenuItem, Me.ButtonListToolStripMenuItem})
         Me.LoadToolStripMenuItem.Name = "LoadToolStripMenuItem"
-        Me.LoadToolStripMenuItem.Size = New System.Drawing.Size(149, 34)
+        Me.LoadToolStripMenuItem.Size = New System.Drawing.Size(255, 34)
         Me.LoadToolStripMenuItem.Text = "&Load"
         '
         'ShowListToolStripMenuItem
@@ -261,20 +261,42 @@ Partial Class frmMain
         '
         Me.SaveToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SaveListToolStripMenuItem, Me.ButtonListToolStripMenuItem1})
         Me.SaveToolStripMenuItem1.Name = "SaveToolStripMenuItem1"
-        Me.SaveToolStripMenuItem1.Size = New System.Drawing.Size(149, 34)
+        Me.SaveToolStripMenuItem1.Size = New System.Drawing.Size(255, 34)
         Me.SaveToolStripMenuItem1.Text = "&Save"
         '
         'SaveListToolStripMenuItem
         '
         Me.SaveListToolStripMenuItem.Name = "SaveListToolStripMenuItem"
-        Me.SaveListToolStripMenuItem.Size = New System.Drawing.Size(203, 34)
+        Me.SaveListToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.S), System.Windows.Forms.Keys)
+        Me.SaveListToolStripMenuItem.Size = New System.Drawing.Size(329, 34)
         Me.SaveListToolStripMenuItem.Text = "&Show List"
         '
         'ButtonListToolStripMenuItem1
         '
         Me.ButtonListToolStripMenuItem1.Name = "ButtonListToolStripMenuItem1"
-        Me.ButtonListToolStripMenuItem1.Size = New System.Drawing.Size(203, 34)
+        Me.ButtonListToolStripMenuItem1.ShortcutKeys = CType(((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.Shift) _
+            Or System.Windows.Forms.Keys.S), System.Windows.Forms.Keys)
+        Me.ButtonListToolStripMenuItem1.Size = New System.Drawing.Size(329, 34)
         Me.ButtonListToolStripMenuItem1.Text = "Button List"
+        '
+        'ButtonFilesToolStripMenuItem
+        '
+        Me.ButtonFilesToolStripMenuItem.Name = "ButtonFilesToolStripMenuItem"
+        Me.ButtonFilesToolStripMenuItem.Size = New System.Drawing.Size(255, 34)
+        Me.ButtonFilesToolStripMenuItem.Text = "&Button files"
+        '
+        'ToolStripMenuItem1
+        '
+        Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
+        Me.ToolStripMenuItem1.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.O), System.Windows.Forms.Keys)
+        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(255, 34)
+        Me.ToolStripMenuItem1.Text = "&Showlist"
+        '
+        'ShowlistFilesToolStripMenuItem
+        '
+        Me.ShowlistFilesToolStripMenuItem.Name = "ShowlistFilesToolStripMenuItem"
+        Me.ShowlistFilesToolStripMenuItem.Size = New System.Drawing.Size(255, 34)
+        Me.ShowlistFilesToolStripMenuItem.Text = "S&howlist files"
         '
         'ListsToolStripMenuItem
         '
@@ -453,6 +475,31 @@ Partial Class frmMain
         Me.LinearToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.L), System.Windows.Forms.Keys)
         Me.LinearToolStripMenuItem.Size = New System.Drawing.Size(224, 34)
         Me.LinearToolStripMenuItem.Text = "linear"
+        '
+        'HarvestFolderToolStripMenuItem
+        '
+        Me.HarvestFolderToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.DeleteEmptyFoldersToolStripMenuItem, Me.HarvestFoldersToolStripMenuItem})
+        Me.HarvestFolderToolStripMenuItem.Name = "HarvestFolderToolStripMenuItem"
+        Me.HarvestFolderToolStripMenuItem.Size = New System.Drawing.Size(158, 34)
+        Me.HarvestFolderToolStripMenuItem.Text = "Harvest Folder"
+        '
+        'DeleteEmptyFoldersToolStripMenuItem
+        '
+        Me.DeleteEmptyFoldersToolStripMenuItem.Name = "DeleteEmptyFoldersToolStripMenuItem"
+        Me.DeleteEmptyFoldersToolStripMenuItem.Size = New System.Drawing.Size(300, 34)
+        Me.DeleteEmptyFoldersToolStripMenuItem.Text = "Delete Empty Folders"
+        '
+        'HarvestFoldersToolStripMenuItem
+        '
+        Me.HarvestFoldersToolStripMenuItem.Name = "HarvestFoldersToolStripMenuItem"
+        Me.HarvestFoldersToolStripMenuItem.Size = New System.Drawing.Size(300, 34)
+        Me.HarvestFoldersToolStripMenuItem.Text = "Harvest Folders"
+        '
+        'DuplicatesToolStripMenuItem
+        '
+        Me.DuplicatesToolStripMenuItem.Name = "DuplicatesToolStripMenuItem"
+        Me.DuplicatesToolStripMenuItem.Size = New System.Drawing.Size(137, 34)
+        Me.DuplicatesToolStripMenuItem.Text = "Duplicates..."
         '
         'FileToolStripMenuItem
         '
@@ -743,7 +790,6 @@ Partial Class frmMain
         Me.tvMain2.SelectedFolder = Nothing
         Me.tvMain2.Size = New System.Drawing.Size(345, 446)
         Me.tvMain2.TabIndex = 0
-        Me.tvMain2.TrackDriveState = True
         '
         'MasterContainer
         '
@@ -1133,7 +1179,7 @@ Partial Class frmMain
         Me.ToolStrip1.BackColor = System.Drawing.SystemColors.Control
         Me.ToolStrip1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.ToolStrip1.ImageScalingSize = New System.Drawing.Size(28, 28)
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.ToolStripButton2, Me.ToolStripSeparator3, Me.ToolStripSeparator4, Me.ToolStripLabel1, Me.tsbAddMovies, Me.TSBRemoveMovies, Me.ToolStripButton8, Me.ToolStripSeparator6, Me.tsbClear, Me.ToolStripSeparator5, Me.ToolStripSeparator7, Me.ToolStripButton10, Me.ToolStripSeparator8, Me.ToolStripButton11, Me.ToolStripButton12, Me.ToolStripSeparator9, Me.ToolStripButton13, Me.ToolStripButton15, Me.ToolStripSeparator10, Me.ToolStripComboBox1, Me.ToolStripButton16, Me.ToolStripButton3, Me.ToolStripTextBox1, Me.ToolStripButton9, Me.btnChooseRandom, Me.ToolStripButton5, Me.tsbFullscreen, Me.toolStripSeparator, Me.toolStripSeparator11, Me.ToolStripButton4, Me.ToolStripButton6, Me.ToolStripButton7, Me.ToolStripButton14, Me.ToolStripButton17, Me.ToolStripButton18})
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.ToolStripButton2, Me.ToolStripSeparator3, Me.ToolStripSeparator4, Me.ToolStripLabel1, Me.ToolStripSeparator6, Me.tsbClear, Me.ToolStripSeparator5, Me.ToolStripSeparator7, Me.ToolStripButton10, Me.ToolStripSeparator8, Me.ToolStripSeparator9, Me.ToolStripButton13, Me.ToolStripButton15, Me.ToolStripSeparator10, Me.ToolStripComboBox1, Me.ToolStripButton16, Me.ToolStripButton3, Me.ToolStripTextBox1, Me.ToolStripButton9, Me.btnChooseRandom, Me.ToolStripButton5, Me.tsbFullscreen, Me.toolStripSeparator, Me.toolStripSeparator11, Me.ToolStripButton4, Me.ToolStripButton6, Me.ToolStripButton7, Me.ToolStripButton14, Me.ToolStripButton17, Me.ToolStripButton18})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 0)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Size = New System.Drawing.Size(2603, 90)
@@ -1175,34 +1221,6 @@ Partial Class frmMain
         Me.ToolStripLabel1.Size = New System.Drawing.Size(45, 87)
         Me.ToolStripLabel1.Text = "tsl1"
         '
-        'tsbAddMovies
-        '
-        Me.tsbAddMovies.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.tsbAddMovies.Name = "tsbAddMovies"
-        Me.tsbAddMovies.Size = New System.Drawing.Size(121, 87)
-        Me.tsbAddMovies.Text = "AddMovies"
-        Me.tsbAddMovies.ToolTipText = "AddAllMoviesToCollection"
-        '
-        'TSBRemoveMovies
-        '
-        Me.TSBRemoveMovies.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text
-        Me.TSBRemoveMovies.Image = CType(resources.GetObject("TSBRemoveMovies.Image"), System.Drawing.Image)
-        Me.TSBRemoveMovies.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.TSBRemoveMovies.Name = "TSBRemoveMovies"
-        Me.TSBRemoveMovies.Size = New System.Drawing.Size(185, 87)
-        Me.TSBRemoveMovies.Text = "tsbRemoveMovies"
-        Me.TSBRemoveMovies.ToolTipText = "RemoveMovies"
-        '
-        'ToolStripButton8
-        '
-        Me.ToolStripButton8.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text
-        Me.ToolStripButton8.Image = CType(resources.GetObject("ToolStripButton8.Image"), System.Drawing.Image)
-        Me.ToolStripButton8.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripButton8.Name = "ToolStripButton8"
-        Me.ToolStripButton8.Size = New System.Drawing.Size(152, 87)
-        Me.ToolStripButton8.Text = "AddAllPictures"
-        Me.ToolStripButton8.ToolTipText = "AddAllPictures"
-        '
         'ToolStripSeparator6
         '
         Me.ToolStripSeparator6.Name = "ToolStripSeparator6"
@@ -1242,26 +1260,6 @@ Partial Class frmMain
         '
         Me.ToolStripSeparator8.Name = "ToolStripSeparator8"
         Me.ToolStripSeparator8.Size = New System.Drawing.Size(6, 90)
-        '
-        'ToolStripButton11
-        '
-        Me.ToolStripButton11.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text
-        Me.ToolStripButton11.Image = CType(resources.GetObject("ToolStripButton11.Image"), System.Drawing.Image)
-        Me.ToolStripButton11.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripButton11.Name = "ToolStripButton11"
-        Me.ToolStripButton11.Size = New System.Drawing.Size(95, 87)
-        Me.ToolStripButton11.Text = "StoreList"
-        Me.ToolStripButton11.ToolTipText = "Store List"
-        '
-        'ToolStripButton12
-        '
-        Me.ToolStripButton12.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text
-        Me.ToolStripButton12.Image = CType(resources.GetObject("ToolStripButton12.Image"), System.Drawing.Image)
-        Me.ToolStripButton12.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripButton12.Name = "ToolStripButton12"
-        Me.ToolStripButton12.Size = New System.Drawing.Size(93, 87)
-        Me.ToolStripButton12.Text = "LoadList"
-        Me.ToolStripButton12.ToolTipText = "Load list"
         '
         'ToolStripSeparator9
         '
@@ -1477,19 +1475,6 @@ Partial Class frmMain
         Me.tmrUpdateForm.Enabled = True
         Me.tmrUpdateForm.Interval = 10000
         '
-        'HarvestFolderToolStripMenuItem
-        '
-        Me.HarvestFolderToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.DeleteEmptyFoldersToolStripMenuItem})
-        Me.HarvestFolderToolStripMenuItem.Name = "HarvestFolderToolStripMenuItem"
-        Me.HarvestFolderToolStripMenuItem.Size = New System.Drawing.Size(158, 34)
-        Me.HarvestFolderToolStripMenuItem.Text = "Harvest Folder"
-        '
-        'DeleteEmptyFoldersToolStripMenuItem
-        '
-        Me.DeleteEmptyFoldersToolStripMenuItem.Name = "DeleteEmptyFoldersToolStripMenuItem"
-        Me.DeleteEmptyFoldersToolStripMenuItem.Size = New System.Drawing.Size(300, 34)
-        Me.DeleteEmptyFoldersToolStripMenuItem.Text = "Delete Empty Folders"
-        '
         'frmMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(11.0!, 24.0!)
@@ -1598,8 +1583,6 @@ Partial Class frmMain
     Friend WithEvents tsbClear As ToolStripButton
     Friend WithEvents ToolStripSeparator4 As ToolStripSeparator
     Friend WithEvents ToolStripLabel1 As ToolStripLabel
-    Friend WithEvents tsbAddMovies As ToolStripButton
-    Friend WithEvents ToolStripButton8 As ToolStripButton
     Friend WithEvents tmrCheckFolders As Timer
     Friend WithEvents ToolStripButton9 As ToolStripButton
     Friend WithEvents tbFiles As ToolStripStatusLabel
@@ -1614,8 +1597,6 @@ Partial Class frmMain
     Friend WithEvents CurrentOnlyToolStripMenuItem1 As ToolStripMenuItem
     Friend WithEvents IncludingSubsetsToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator5 As ToolStripSeparator
-    Friend WithEvents ToolStripButton11 As ToolStripButton
-    Friend WithEvents ToolStripButton12 As ToolStripButton
     Friend WithEvents OpenFileDialog1 As OpenFileDialog
     Friend WithEvents SaveFileDialog1 As SaveFileDialog
     Friend WithEvents MasterContainer As SplitContainer
@@ -1626,7 +1607,6 @@ Partial Class frmMain
     Friend WithEvents SaveToolStripMenuItem1 As ToolStripMenuItem
     Friend WithEvents SaveListToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripButton13 As ToolStripComboBox
-    Friend WithEvents TSBRemoveMovies As ToolStripButton
     Friend WithEvents ToolStripButton15 As ToolStripButton
     Friend WithEvents ToolStripComboBox1 As ToolStripComboBox
     Friend WithEvents tmrSlideShow As Timer
@@ -1668,7 +1648,6 @@ Partial Class frmMain
     Friend WithEvents FastToolStripMenuItem1 As ToolStripMenuItem
     Friend WithEvents RandomStartToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents tbDate As ToolStripStatusLabel
-    Friend WithEvents tvMain2 As Controls.FileSystemTree
     Friend WithEvents btnChooseRandom As ToolStripButton
     Friend WithEvents ToolStripButton4 As ToolStripButton
     Friend WithEvents ctrPicAndButtons As SplitContainer
@@ -1716,4 +1695,10 @@ Partial Class frmMain
     Friend WithEvents LinearToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents HarvestFolderToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents DeleteEmptyFoldersToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents tvMain2 As Controls.FileSystemTree
+    Friend WithEvents HarvestFoldersToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ButtonFilesToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ShowlistFilesToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItem1 As ToolStripMenuItem
+    Friend WithEvents DuplicatesToolStripMenuItem As ToolStripMenuItem
 End Class

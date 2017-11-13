@@ -234,12 +234,27 @@ Module General
 
         End If
 
+
         Return List
 
 
 
 
     End Function
+    ''' <summary>
+    ''' Removes an item from a listbox, and its associated list, advances selected to next. 
+    ''' </summary>
+    ''' <param name="item"></param>
+    ''' <param name="lbx"></param>
+    ''' <param name="lst"></param>
+    Public Sub RemoveFromListBox(item As String, lbx As ListBox, lst As List(Of String))
+        Dim s As Integer = lbx.FindString(item)
+        lbx.SelectedItem = lbx.Items((s) Mod lbx.Items.Count) 'actually an increment, because of 0 start. 
+        lbx.Items.Remove(item)
+        lst.Remove(item)
+
+
+    End Sub
 
 
 

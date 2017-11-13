@@ -54,6 +54,7 @@ Partial Class FindDuplicates
         Me.lbxdelete = New System.Windows.Forms.ListBox()
         Me.lblSorted = New System.Windows.Forms.Label()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
         Me.SplitContainer1.SuspendLayout()
         Me.FlowLayoutPanel2.SuspendLayout()
@@ -86,6 +87,10 @@ Partial Class FindDuplicates
         Me.SplitContainer1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.SplitContainer1.Location = New System.Drawing.Point(0, 0)
         Me.SplitContainer1.Name = "SplitContainer1"
+        '
+        'SplitContainer1.Panel1
+        '
+        Me.SplitContainer1.Panel1.Controls.Add(Me.lbxsorted)
         '
         'SplitContainer1.Panel2
         '
@@ -347,7 +352,6 @@ Partial Class FindDuplicates
         '
         'FlowLayoutPanel1
         '
-        Me.FlowLayoutPanel1.Controls.Add(Me.lbxsorted)
         Me.FlowLayoutPanel1.Controls.Add(Me.lbxunique)
         Me.FlowLayoutPanel1.Controls.Add(Me.lbxDuplicates)
         Me.FlowLayoutPanel1.Controls.Add(Me.lbxdelete)
@@ -359,18 +363,19 @@ Partial Class FindDuplicates
         '
         'lbxsorted
         '
+        Me.lbxsorted.Dock = System.Windows.Forms.DockStyle.Fill
         Me.lbxsorted.FormattingEnabled = True
         Me.lbxsorted.ItemHeight = 24
-        Me.lbxsorted.Location = New System.Drawing.Point(3, 3)
+        Me.lbxsorted.Location = New System.Drawing.Point(0, 0)
         Me.lbxsorted.Name = "lbxsorted"
-        Me.lbxsorted.Size = New System.Drawing.Size(378, 388)
+        Me.lbxsorted.Size = New System.Drawing.Size(247, 1640)
         Me.lbxsorted.TabIndex = 4
         '
         'lbxunique
         '
         Me.lbxunique.FormattingEnabled = True
         Me.lbxunique.ItemHeight = 24
-        Me.lbxunique.Location = New System.Drawing.Point(387, 3)
+        Me.lbxunique.Location = New System.Drawing.Point(3, 3)
         Me.lbxunique.Name = "lbxunique"
         Me.lbxunique.Size = New System.Drawing.Size(378, 388)
         Me.lbxunique.TabIndex = 5
@@ -379,7 +384,7 @@ Partial Class FindDuplicates
         '
         Me.lbxDuplicates.FormattingEnabled = True
         Me.lbxDuplicates.ItemHeight = 24
-        Me.lbxDuplicates.Location = New System.Drawing.Point(771, 3)
+        Me.lbxDuplicates.Location = New System.Drawing.Point(387, 3)
         Me.lbxDuplicates.Name = "lbxDuplicates"
         Me.lbxDuplicates.Size = New System.Drawing.Size(341, 388)
         Me.lbxDuplicates.TabIndex = 7
@@ -388,7 +393,7 @@ Partial Class FindDuplicates
         '
         Me.lbxdelete.FormattingEnabled = True
         Me.lbxdelete.ItemHeight = 24
-        Me.lbxdelete.Location = New System.Drawing.Point(1118, 3)
+        Me.lbxdelete.Location = New System.Drawing.Point(734, 3)
         Me.lbxdelete.Name = "lbxdelete"
         Me.lbxdelete.Size = New System.Drawing.Size(378, 388)
         Me.lbxdelete.TabIndex = 6
@@ -412,6 +417,7 @@ Partial Class FindDuplicates
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "FindDuplicates"
         Me.Text = "FindDuplicates"
+        Me.SplitContainer1.Panel1.ResumeLayout(False)
         Me.SplitContainer1.Panel2.ResumeLayout(False)
         Me.SplitContainer1.Panel2.PerformLayout()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).EndInit()

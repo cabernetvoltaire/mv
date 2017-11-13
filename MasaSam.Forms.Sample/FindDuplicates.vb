@@ -98,8 +98,14 @@ Public Class FindDuplicates
         duplist.Clear()
         lbxDuplicates.Items.Clear()
         Dim i As Integer = 0
+        If Not File.Exists(strFilePath) Then
+            MsgBox("File not found")
+            Exit Sub
+        End If
+
         Dim finfo As New IO.FileInfo(strFilePath)
-        Dim length As Long = finfo.Length
+
+            Dim length As Long = finfo.Length
         For i = 0 To sortedList.Count - 1
             Dim f As New IO.FileInfo(sortedList.Item(i))
             If f.Length = length Then
@@ -117,8 +123,13 @@ Public Class FindDuplicates
         '    End If
         'Next
         For i = 0 To 11
-            PreviewWMP(i).URL = ""
-            PreviewWMP(i).Visible = False
+            Try
+                PreviewWMP(i).URL = ""
+                PreviewWMP(i).Visible = False
+
+            Catch ex As System.Runtime.InteropServices.InvalidComObjectException
+                Continue For
+            End Try
 
         Next
         i = 0
@@ -126,24 +137,36 @@ Public Class FindDuplicates
         For Each row In lbxDuplicates.Items
             Dim strpath As String = row.ToString
             If i <= 11 Then
-                PreviewWMP(i).URL = strpath
-                PreviewWMP(i).Visible = True
-                If InStr(row, txtExclude.Text) <> 0 And txtExclude.Text <> "" Then
-                    If Not deletelist.Contains(row) Then
-                        deletelist.Add(row)
-                    End If
-                End If
-                If InStr(row, txtInclude.Text) <> 0 And txtInclude.Text <> "" Then
-                    If Not deletelist.Contains(row) Then
-                        deletelist.Add(row)
-                    End If
-                End If
+                Try
+                    PreviewWMP(i).URL = strpath
+                    PreviewWMP(i).Visible = True
+
+                Catch ex As System.Runtime.InteropServices.InvalidComObjectException
+                    Continue For
+                End Try
+                ExcludeRows(row)
+                IncludeRows(row)
                 i += 1
             End If
         Next
 
     End Sub
 
+    Private Sub IncludeRows(row As Object)
+        If InStr(row, txtInclude.Text) <> 0 And txtInclude.Text <> "" Then
+            If Not deletelist.Contains(row) Then
+                deletelist.Add(row)
+            End If
+        End If
+    End Sub
+
+    Private Sub ExcludeRows(row As Object)
+        If InStr(row, txtExclude.Text) <> 0 And txtExclude.Text <> "" Then
+            If deletelist.Contains(row) Then
+                deletelist.Remove(row)
+            End If
+        End If
+    End Sub
 
 
 
@@ -182,11 +205,10 @@ Public Class FindDuplicates
         finddups(path)
     End Sub
 
-    Private Sub lbxunique_DoubleClick(sender As Object, e As EventArgs) Handles lbxunique.DoubleClick
-    End Sub
 
     Private Sub lbxDeleteList_DoubleClick(sender As Object, e As EventArgs) Handles lbxDeleteList.DoubleClick
         FillShowbox(lbxDeleteList, FilterState.All, deletelist)
+
 
     End Sub
 
@@ -200,7 +222,4 @@ Public Class FindDuplicates
         End If
     End Sub
 
-    Private Sub FlowLayoutPanel1_Paint(sender As Object, e As PaintEventArgs) Handles FlowLayoutPanel1.Paint
-
-    End Sub
 End Class

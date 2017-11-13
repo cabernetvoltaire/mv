@@ -78,16 +78,14 @@ Public Class frmMain
                 e.Handled = True
             Case Keys.A To Keys.Z
                 ChangeButtonLetter(e)
-            Case KeyCycleMode
+            Case KeyToggleButtons
                 ToggleButtons()
-            Case tvMain2.TraverseKey, tvMain2.TraverseKeyBack
-               ' tvMain2_KeyDown(sender, e)
             Case KeyEscape
                 currentWMP.Ctlcontrols.pause()
                 currentWMP.URL = ""
                 tmrSlideShow.Enabled = False
                 currentPicBox.Image = Nothing
-               'currentPicBox.Image.Dispose()
+                currentPicBox.Image.Dispose()
 
             Case KeyRandomize
 
@@ -279,12 +277,14 @@ Public Class frmMain
                 End If
             Else
                 'Otherwise, advance the playlist. 
-                'TODO what happens when diff is negative and 0 is reached?
-                If lCurrentDisplayIndex = 0 And Not blnForward Then
-                    lCurrentDisplayIndex = Showlist.Count - 1
-                Else
+                If Showlist.Count > 0 Then
 
-                    lCurrentDisplayIndex = (lCurrentDisplayIndex + diff) Mod Showlist.Count
+                    If lCurrentDisplayIndex = 0 And Not blnForward Then
+                        lCurrentDisplayIndex = Showlist.Count - 1
+                    Else
+
+                        lCurrentDisplayIndex = (lCurrentDisplayIndex + diff) Mod Showlist.Count
+                    End If
                 End If
                 StartToShow(Showlist(lCurrentDisplayIndex))
 
@@ -442,11 +442,17 @@ Public Class frmMain
         If strPath = "" Then Exit Sub
         If Len(strPath) > 247 Then Exit Sub
         Dim finfo As New FileInfo(strPath)
+        If InStr(":\", strPath) = Len(strPath) - 2 Then
+        Else
+            Dim s As String = Path.GetDirectoryName(strPath)
+            If tvMain2.SelectedFolder <> s Then
+                tvMain2.SelectedFolder = Path.GetDirectoryName(strPath)
+            End If
 
-        tbDate.Text = finfo.LastWriteTime.ToShortDateString & " " & finfo.LastWriteTime.ToShortTimeString
+        End If
+            tbDate.Text = finfo.LastWriteTime.ToShortDateString & " " & finfo.LastWriteTime.ToShortTimeString
 
-        'tvMain2.SelectedFolder = strPath 'Keeps snapping to C:\
-        tvMain2.Expand(strPath) 'Doesn't allow fast scrolling down (keeps opening folders)
+        'tvMain2.Expand(strPath) 'Doesn't allow fast scrolling down (keeps opening folders)
 
         HighlightListboxSelected(strPath, lbxFiles)
         If Not MasterContainer.Panel2Collapsed Then
@@ -486,7 +492,6 @@ Public Class frmMain
         Dim Number As Long
         'Number = (Rnd(1) * (flist.Count - 1))
         '    While FBCShown(Number) And flist.Count >= played
-        Number = (Rnd(1) * (flist.Count - 1)) 'HACK Danger of infinite loop with small folders
         'End While 'TODO implement the Don't show again feature
         strCurrentFilePath = flist(Number)
         played += 1
@@ -567,7 +572,7 @@ Public Class frmMain
 
     End Sub
 
-    Private Sub Form1_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
+Private Sub frmMain_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
         ShiftDown = e.Shift
         CtrlDown = e.Control
         'GiveKey(e.KeyCode)
@@ -722,10 +727,10 @@ Public Class frmMain
         CollapseShowlist(True)
         ' tsslblFilter.Text = "0"
     End Sub
-    Private Sub ToolStripButton7_Click(sender As Object, e As EventArgs) Handles tsbAddMovies.Click
+    Private Sub ToolStripButton7_Click(sender As Object, e As EventArgs)
         AddMovies(True)
     End Sub
-    Private Sub ToolStripButton8_Click(sender As Object, e As EventArgs) Handles ToolStripButton8.Click
+    Private Sub ToolStripButton8_Click(sender As Object, e As EventArgs)
         Addpics(True)
     End Sub
     Private Sub ToolStripButton9_Click(sender As Object, e As EventArgs) Handles ToolStripButton9.Click
@@ -741,12 +746,12 @@ Public Class frmMain
 
         FindDuplicates.Show()
     End Sub
-    Private Sub ToolStripButton11_Click(sender As Object, e As EventArgs) Handles ToolStripButton11.Click
+    Private Sub ToolStripButton11_Click(sender As Object, e As EventArgs)
         SaveShowlist()
         'currentPicBox.Tag = currentPicBox.ImageLocation
         'FullScreen.Show()
     End Sub
-    Private Sub ToolStripButton12_Click(sender As Object, e As EventArgs) Handles ToolStripButton12.Click
+    Private Sub ToolStripButton12_Click(sender As Object, e As EventArgs)
         LoadShowList()
     End Sub
     Private Sub ToolStripButton13_Click(sender As Object, e As EventArgs) Handles ToolStripButton13.Click
@@ -758,7 +763,7 @@ Public Class frmMain
         Showlist = SetPlayOrder(i, Showlist)
         FillShowbox(lbxShowList, FilterState.All, Showlist)
     End Sub
-    Private Sub ToolStripButton14_Click(sender As Object, e As EventArgs) Handles TSBRemoveMovies.Click
+    Private Sub ToolStripButton14_Click(sender As Object, e As EventArgs)
         RemoveFilesFromCollection(Showlist, FBCShown, strVideoExtensions)
         FillShowbox(lbxShowList, FilterState.All, Showlist)
 
@@ -777,11 +782,11 @@ Public Class frmMain
 
     Private Sub Listbox_SelectedIndexChanged(sender As Object, e As EventArgs) Handles lbxShowList.SelectedIndexChanged, lbxFiles.SelectedIndexChanged
         With sender
+            Dim i As Long = .SelectedIndex
             If .Items.count = 0 Then
                 .items.add("If there is nothing showing here, check your filters")
-            Else
+            ElseIf i >= 0 Then
                 tmrPicLoad.Enabled = False
-                Dim i As Long = .SelectedIndex
                 'strOldPath = strCurrentFilePath
                 strCurrentFilePath = .Items(i)
                 lCurrentDisplayIndex = i
@@ -891,13 +896,11 @@ Public Class frmMain
 
 
     Private Sub tvMain2_Enter(sender As Object, e As EventArgs) Handles lbxShowList.Enter, lbxFiles.Enter, tvMain2.Enter
-        If sender Is tvMain2 Then blnTVCurrent = True
         sender.backcolor = Color.Aquamarine
     End Sub
 
     Private Sub tvMain2_Leave(sender As Object, e As EventArgs) Handles lbxShowList.Leave, lbxFiles.Leave, tvMain2.Leave
         sender.backcolor = Color.White
-        If sender Is tvMain2 Then blnTVCurrent = False
 
     End Sub
 
@@ -1003,7 +1006,7 @@ Public Class frmMain
             Case Keys.Down, Keys.Left, Keys.Right, Keys.Up, tvMain2.TraverseKey, tvMain2.TraverseKeyBack
 
             Case Else
-                If blnTVCurrent Then e.Handled = True
+                If PFocus = CtrlFocus.Tree Then e.Handled = True
         End Select
 
     End Sub
@@ -1027,7 +1030,7 @@ Public Class frmMain
         CollapseShowlist(Not MasterContainer.Panel2Collapsed)
     End Sub
 
-    Private Sub RefreshTree(sender As Object, e As DriveInfoEventArgs) Handles tvMain2.DriveActivated
+    Private Sub RefreshTree(sender As Object, e As DriveInfoEventArgs)
         tvMain2.Update()
     End Sub
 
@@ -1084,17 +1087,7 @@ Public Class frmMain
         Process.Start(lbxFiles.SelectedItem)
     End Sub
 
-    Private Sub Screen1ToolStripMenuItem_Click(sender As Object, e As EventArgs)
-        blnSecondScreen = False
-    End Sub
 
-    Private Sub Screen2ToolStripMenuItem_Click(sender As Object, e As EventArgs)
-        blnSecondScreen = True
-    End Sub
-
-    Private Sub Screen2ToolStripMenuItem_Click_1(sender As Object, e As EventArgs) Handles Screen2ToolStripMenuItem.Click
-        blnSecondScreen = sender.checked
-    End Sub
 
     Private Sub ToolStripButton7_Click_1(sender As Object, e As EventArgs) Handles ToolStripButton7.Click
         Dim s As String
@@ -1137,13 +1130,25 @@ Public Class frmMain
     End Sub
 
     Private Sub HarvestFolderToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles HarvestFolderToolStripMenuItem.Click
-        Dim di As New DirectoryInfo(CurrentFolderPath)
-        HarvestFolder(di)
-        FillListbox(lbxFiles, di, CurrentFilterState, FileboxContents, False)
+
     End Sub
 
     Private Sub DeleteEmptyFoldersToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles DeleteEmptyFoldersToolStripMenuItem.Click
-        DeleteEmptyFolders(New DirectoryInfo(CurrentFolderPath))
+        If Not MsgBox("This deletes all empty directories", MsgBoxStyle.OkCancel) = MsgBoxResult.Ok Then
+            Exit Sub
+        Else
+            DeleteEmptyFolders(New DirectoryInfo(CurrentFolderPath), True)
+        End If
+
+    End Sub
+
+    Private Sub HarvestFoldersToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles HarvestFoldersToolStripMenuItem.Click
+        Dim di As New DirectoryInfo(CurrentFolderPath)
+        HarvestFolder(di, di, True)
+        FillListbox(lbxFiles, di, CurrentFilterState, FileboxContents, False)
+    End Sub
+
+    Private Sub lbxFiles_KeyDown(sender As Object, e As KeyEventArgs) Handles lbxFiles.KeyDown
 
     End Sub
 End Class

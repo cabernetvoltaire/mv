@@ -86,6 +86,7 @@
     Public KeyBigJumpOnAlt = Keys.E
     Public KeyZoomOut = Keys.Oemcomma
     Public KeyToggleThumbs = Keys.Oem3
+    Public KeyToggleButtons = Keys.B
     Public KeyEscape = Keys.Escape
 
     Public Enum FilterState
