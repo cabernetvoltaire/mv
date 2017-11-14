@@ -318,6 +318,9 @@ Public Class FileSystemTree
             End If
         Next
     End Function
+    Public Sub Rename(strPath As String)
+
+    End Sub
 
     Public Sub Expand(ByVal fullPath As String)
         Dim directoryNames As New List(Of String)(fullPath.Split(Path.DirectorySeparatorChar))
@@ -456,6 +459,7 @@ Public Class FileSystemTree
             End If
         End If
     End Sub
+
 
     ''' <summary>
     ''' Creates directory tree for exanded directory node.
@@ -898,7 +902,7 @@ Public Class FileSystemTree
 #Region "Event Handlers"
 
     Private Sub FileSystemTree_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-
+        Me.Dock = DockStyle.Fill
         ' if drive state should be tracked,
         ' enable timer that does that
         If (TrackDriveState) Then
@@ -1022,9 +1026,27 @@ Public Class FileSystemTree
     Private Sub tvFiles_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles tvFiles.PreviewKeyDown
         'Enables traversing of the filetree
         If e.KeyCode = TraverseKey Then
-            Traverse(e.Shift)
+            Traverse(False)
         End If
+        If e.KeyCode = TraverseKeyBack Then
+            Traverse(True)
+        End If
+        If e.KeyCode = Keys.F2 Then
+            tvFiles.LabelEdit = True
+            Dim nd As TreeNode = tvFiles.SelectedNode
+            If Not (nd Is Nothing) And Not (nd.Parent Is Nothing) Then
+                tvFiles.SelectedNode = nd
+                tvFiles.LabelEdit = True
+                If Not nd.IsEditing Then
+                    nd.BeginEdit()
+                End If
+            Else
+                MessageBox.Show("No tree node selected or selected node is a root node." &
+                  Microsoft.VisualBasic.ControlChars.Cr &
+                  "Editing of root nodes is not allowed.", "Invalid selection")
+            End If
 
+        End If
     End Sub
 
     Private Sub Traverse(blnBack As Boolean)
@@ -1052,18 +1074,22 @@ Public Class FileSystemTree
                 End If
             End If
 
-            tvFiles.SelectedNode = newnode
         Else
 
+            'Traverse backward
+            'If there is an older sibling, move to its youngest, most removed descendant. 
             If node.PrevNode IsNot Nothing Then
                 newnode = node.PrevNode
-            Else
-                While node.PrevNode Is Nothing
-                    node = node.Parent
+                While newnode.Nodes.Count <> 0
+                    newnode = newnode.Nodes(newnode.Nodes.Count - 1)
                 End While
-                newnode = node.PrevNode
+            Else
+                'Otheriwse move to parent
+
+                newnode = node.Parent
             End If
         End If
+        tvFiles.SelectedNode = newnode
     End Sub
 
     Private Sub FileSystemTree_DirectorySelected(sender As Object, e As DirectoryInfoEventArgs) Handles Me.DirectorySelected
@@ -1073,6 +1099,54 @@ Public Class FileSystemTree
     Private Sub FileSystemTree_BackColorChanged(sender As Object, e As EventArgs) Handles Me.BackColorChanged
         tvFiles.BackColor = Me.BackColor
     End Sub
+
+    Private Sub FileSystemTree_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
+
+    End Sub
+
+    Private Sub tvFiles_AfterLabelEdit(sender As Object, e As NodeLabelEditEventArgs) Handles tvFiles.AfterLabelEdit
+        Dim oldlabel As String = e.Label
+
+        e = RelabelFolder(e)
+        Try
+
+            My.Computer.FileSystem.RenameDirectory(NodePath(e), e.Label)
+        Catch ex As Exception
+            e = RelabelFolder(e) 'TODO improve this.
+        End Try
+        Replace(e.Node.FullPath, oldlabel, e.Label)
+
+
+    End Sub
+
+    Private Shared Function RelabelFolder(e As NodeLabelEditEventArgs) As NodeLabelEditEventArgs
+        If Not (e.Label Is Nothing) Then
+            If e.Label.Length > 0 Then
+                If e.Label.IndexOfAny(New Char() {"@"c, "."c, ","c, "!"c}) = -1 Then
+                    ' Stop editing without canceling the label change.
+                    e.Node.EndEdit(False)
+                Else
+                    ' Cancel the label edit action, inform the user, and
+                    ' place the node in edit mode again. 
+                    e.CancelEdit = True
+                    MessageBox.Show("Invalid tree node label." &
+              Microsoft.VisualBasic.ControlChars.Cr &
+              "The invalid characters are: '@','.', ',', '!'",
+              "Node Label Edit")
+                    e.Node.BeginEdit()
+                End If
+            Else
+                ' Cancel the label edit action, inform the user, and
+                ' place the node in edit mode again. 
+                e.CancelEdit = True
+                MessageBox.Show("Invalid tree node label." &
+           Microsoft.VisualBasic.ControlChars.Cr &
+           "The label cannot be blank", "Node Label Edit")
+                e.Node.BeginEdit()
+            End If
+        End If
+        Return e
+    End Function
 
 
 

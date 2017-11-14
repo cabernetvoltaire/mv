@@ -133,7 +133,7 @@ Public Class FindDuplicates
 
         Next
         i = 0
-
+        deletelist.Clear()
         For Each row In lbxDuplicates.Items
             Dim strpath As String = row.ToString
             If i <= 11 Then
@@ -144,8 +144,9 @@ Public Class FindDuplicates
                 Catch ex As System.Runtime.InteropServices.InvalidComObjectException
                     Continue For
                 End Try
-                ExcludeRows(row)
+
                 IncludeRows(row)
+                '   ExcludeRows(row)
                 i += 1
             End If
         Next

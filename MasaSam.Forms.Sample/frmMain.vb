@@ -6,7 +6,10 @@ Imports MasaSam
 Imports MasaSam.Forms.Controls
 
 Public Class frmMain
+
     Public Property blnSecondScreen As Boolean
+    Dim newThread As New Threading.Thread(AddressOf LoadShowList)
+
 
     Private Sub SaveButtonlist()
         Dim path As String
@@ -85,7 +88,6 @@ Public Class frmMain
                 currentWMP.URL = ""
                 tmrSlideShow.Enabled = False
                 currentPicBox.Image = Nothing
-                currentPicBox.Image.Dispose()
 
             Case KeyRandomize
 
@@ -450,7 +452,7 @@ Public Class frmMain
             End If
 
         End If
-            tbDate.Text = finfo.LastWriteTime.ToShortDateString & " " & finfo.LastWriteTime.ToShortTimeString
+        tbDate.Text = finfo.LastWriteTime.ToShortDateString & " " & finfo.LastWriteTime.ToShortTimeString
 
         'tvMain2.Expand(strPath) 'Doesn't allow fast scrolling down (keeps opening folders)
 
@@ -572,7 +574,7 @@ Public Class frmMain
 
     End Sub
 
-Private Sub frmMain_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
+    Private Sub frmMain_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
         ShiftDown = e.Shift
         CtrlDown = e.Control
         'GiveKey(e.KeyCode)
@@ -753,6 +755,7 @@ Private Sub frmMain_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyD
     End Sub
     Private Sub ToolStripButton12_Click(sender As Object, e As EventArgs)
         LoadShowList()
+        'newThread.Start()
     End Sub
     Private Sub ToolStripButton13_Click(sender As Object, e As EventArgs) Handles ToolStripButton13.Click
 
@@ -800,7 +803,9 @@ Private Sub frmMain_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyD
 
 
     Private Sub ShowListToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ShowListToolStripMenuItem.Click
+
         LoadShowList()
+        'newThread.Start()
     End Sub
     Private Sub tmrSlideShow_Tick(sender As Object, e As EventArgs) Handles tmrSlideShow.Tick
         AdvanceFile(True)
@@ -1003,7 +1008,7 @@ Private Sub frmMain_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyD
     Private Sub tvMain2_KeyDown(sender As Object, e As KeyEventArgs) Handles tvMain2.KeyDown
         HandleKeys(sender, e)
         Select Case e.KeyCode
-            Case Keys.Down, Keys.Left, Keys.Right, Keys.Up, tvMain2.TraverseKey, tvMain2.TraverseKeyBack
+            Case Keys.Down, Keys.Left, Keys.Right, Keys.Up, tvMain2.TraverseKey, tvMain2.TraverseKeyBack, Keys.Tab
 
             Case Else
                 If PFocus = CtrlFocus.Tree Then e.Handled = True
@@ -1149,6 +1154,10 @@ Private Sub frmMain_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyD
     End Sub
 
     Private Sub lbxFiles_KeyDown(sender As Object, e As KeyEventArgs) Handles lbxFiles.KeyDown
+
+    End Sub
+
+    Private Sub ContextMenuStrip1_Opening(sender As Object, e As CancelEventArgs)
 
     End Sub
 End Class
