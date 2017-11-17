@@ -21,9 +21,10 @@
     Public Const OrientationId As Integer = &H112
     Public blnSpeedRestart As Boolean = False
     Public iSSpeeds() As Integer = {1500, 900, 50}
-    Public iPlaybackSpeed() As Decimal = {0.03, 0.5, 0.75}
+    Public iPlaybackSpeed() As Decimal = {0.1, 0.5, 0.75}
     Public currentWMP As New AxWMPLib.AxWindowsMediaPlayer
     Public LastPlayed As New Stack(Of String)
+    Public LastFolder As New Stack(Of String)
     Public blnAutoAdvanceFolder As Boolean = True
     Public blnRandomStartAlways As Boolean = True
     Public blnRestartSlideShowFlag As Boolean = False
@@ -43,6 +44,8 @@
             .SetValue("File", strCurrentFilePath)
             .SetValue("Filter", CurrentFilterState)
             .SetValue("LastButtonFolder", strButtonFile)
+            .SetValue("LastAlpha", iCurrentAlpha)
+
         End With
 
     End Sub
@@ -50,12 +53,16 @@
         With My.Computer.Registry.CurrentUser
             frmMain.ctrTreeandFiles.SplitterDistance = .GetValue("VertSplit", frmMain.ctrTreeandFiles.Height / 4)
             frmMain.ctrFilesandPics.SplitterDistance = .GetValue("HorSplit", frmMain.ctrTreeandFiles.Width / 2)
-            CurrentFolderPath = .GetValue("Folder", "C:\")
+            'CurrentFolderPath = .GetValue("Folder", "C:\")
+            ChangeFolder(.GetValue("Folder", "C:\"), False)
             strCurrentFilePath = .GetValue("File")
             CurrentFilterState = .GetValue("Filter", 0)
             strButtonFile = .GetValue("LastButtonFolder", "")
+
+            iCurrentAlpha = .GetValue("LastAlpha", 0)
+
         End With
-        If Not IO.Directory.Exists(CurrentFolderPath) Then CurrentFolderPath = "C:\"
+        If Not IO.Directory.Exists(CurrentFolderPath) Then ChangeFolder("C:\", True)
         If Not IO.File.Exists(strCurrentFilePath) Then strCurrentFilePath = ""
         frmMain.tssMoveCopy.Text = CurrentFolderPath
 

@@ -183,6 +183,7 @@ Partial Class frmMain
         Me.tmrLoadLastFolder = New System.Windows.Forms.Timer(Me.components)
         Me.tmrMediaSpeed = New System.Windows.Forms.Timer(Me.components)
         Me.tmrUpdateForm = New System.Windows.Forms.Timer(Me.components)
+        Me.tmrSlowMo = New System.Windows.Forms.Timer(Me.components)
         Me.MenuStrip1.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
         Me.TableLayoutPanel2.SuspendLayout()
@@ -1475,6 +1476,9 @@ Partial Class frmMain
         Me.tmrUpdateForm.Enabled = True
         Me.tmrUpdateForm.Interval = 10000
         '
+        'tmrSlowMo
+        '
+        '
         'frmMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(11.0!, 24.0!)
@@ -1701,4 +1705,5 @@ Partial Class frmMain
     Friend WithEvents ShowlistFilesToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItem1 As ToolStripMenuItem
     Friend WithEvents DuplicatesToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents tmrSlowMo As Timer
 End Class

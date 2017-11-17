@@ -935,6 +935,11 @@ Public Class FileSystemTree
         End If
 
     End Sub
+    Public Sub RemoveNode(strpath As String)
+        'Expand(strpath)
+        tvFiles.SelectedNode.Remove()
+
+    End Sub
 
     Private Sub Timer_Tick(sender As Object, e As EventArgs)
         Exit Sub
@@ -1100,9 +1105,7 @@ Public Class FileSystemTree
         tvFiles.BackColor = Me.BackColor
     End Sub
 
-    Private Sub FileSystemTree_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
 
-    End Sub
 
     Private Sub tvFiles_AfterLabelEdit(sender As Object, e As NodeLabelEditEventArgs) Handles tvFiles.AfterLabelEdit
         Dim oldlabel As String = e.Label

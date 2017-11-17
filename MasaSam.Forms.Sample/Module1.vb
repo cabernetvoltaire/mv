@@ -138,24 +138,37 @@ Module General
     ''' <param name="e"></param>
     Public Sub HandleFunctionKeyDown(sender As Object, e As KeyEventArgs)
         Dim i As Byte = e.KeyCode - Keys.F5
-        If strVisibleButtons(i) = "" Or e.Shift Then
-            If e.Control Then
+        If strVisibleButtons(i) = "" Or e.Shift Then 'Simple assign
+            If e.Control Then 'Move files if CTRL held
                 MoveFiles(Showlist, strVisibleButtons(i), frmMain.lbxShowList)
             Else
                 AssignButton(i, iCurrentAlpha, CurrentFolderPath) 'Just assign
+                KeyAssignmentsStore(strButtonFile)
 
             End If
 
         ElseIf e.Control Then
-
-            MoveFiles(ListfromListbox(frmMain.lbxFiles), strVisibleButtons(i), frmMain.lbxFiles)
+            'Otherwise move selected
+            Select Case PFocus
+                Case CtrlFocus.Files
+                    MoveFiles(ListfromListbox(frmMain.lbxFiles), strVisibleButtons(i), frmMain.lbxFiles)
+                Case CtrlFocus.Tree
+                    MoveFolder(CurrentFolderPath, strVisibleButtons(i), frmMain.tvMain2)
+            End Select
 
         Else
-
-            CurrentFolderPath = strVisibleButtons(i) 'Switch to this folder
+            ChangeFolder(strVisibleButtons(i), True)
             frmMain.tvMain2.SelectedFolder = CurrentFolderPath
         End If
     End Sub
+
+    Public Sub ChangeFolder(strPath As String, blnSHow As Boolean)
+        LastFolder.Push(CurrentFolderPath)
+        CurrentFolderPath = strPath 'Switch to this folder
+
+        ' If blnSHow Then frmMain.tvMain2.SelectedFolder = CurrentFolderPath
+    End Sub
+
     Public Function ListfromListbox(lbx As ListBox) As List(Of String)
         Dim s As New List(Of String)
         For Each l In lbx.SelectedItems
@@ -256,6 +269,11 @@ Module General
 
     End Sub
 
+    Public Sub MediaAdvance(wmp As AxWMPLib.AxWindowsMediaPlayer, stp As Long)
+        wmp.Ctlcontrols.step(stp)
+        wmp.Refresh()
 
+
+    End Sub
 
 End Module

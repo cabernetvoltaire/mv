@@ -54,8 +54,13 @@ Module ButtonHandling
 
     End Sub
 
+
+    ''' <summary>
+    ''' Loads just the current row of buttons
+    ''' </summary>
     Public Sub LoadCurrentButtonSet()
         For i = 0 To 7
+            frmMain.lblAlpha.Text = Chr(Keys.A + iCurrentAlpha).ToString
             Dim s As String
             strVisibleButtons(i) = strButtonFilePath(i, iCurrentAlpha, 1)
             s = strButtonCaptions(i, iCurrentAlpha, 1)
@@ -91,6 +96,7 @@ Module ButtonHandling
         Dim fs As New StreamReader(New FileStream(path, FileMode.OpenOrCreate, FileAccess.Read))
         Dim s As String
         Do While fs.Peek <> -1
+            'TODO:What if file is wrong format?
             s = fs.ReadLine
             intIndex = Val(s.Split("|")(0))
             intLetter = Val(s.Split("|")(1))

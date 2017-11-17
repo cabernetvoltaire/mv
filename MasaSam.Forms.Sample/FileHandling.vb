@@ -163,6 +163,23 @@ Module FileHandling
             Next
         End If
     End Sub
+    Public Sub MoveFolder(strDir As String, strDest As String, tvw As MasaSam.Forms.Controls.FileSystemTree)
+        If MsgBox("This will move current folder to " & strDest & ". Are you sure?") = MsgBoxResult.Ok Then
+            Try
+
+                '    My.Computer.FileSystem.MoveDirectory(strDir,strDest)
+                tvw.RemoveNode(strDir)
+            Catch ex As Exception
+                MsgBox(ex.Message)
+            End Try
+        End If
+    End Sub
+    ''' <summary>
+    ''' Moves files to strDest, and removes them from lbx1 asking for a subfolder in destination if more than one file
+    ''' </summary>
+    ''' <param name="files"></param>
+    ''' <param name="strDest"></param>
+    ''' <param name="lbx1"></param>
     Public Sub MoveFiles(files As List(Of String), strDest As String, lbx1 As ListBox)
         If files.Count > 1 Then
             Dim s As String
@@ -186,8 +203,12 @@ Module FileHandling
                 Else
                     ' currentPicBox.Image.Dispose()
                     'Deal with existing files
+                    Try
 
-                    .MoveFile(m.FullName, spath)
+                        .MoveFile(m.FullName, spath)
+                    Catch ex As Exception
+                        MsgBox(ex.Message)
+                    End Try
 
                     lbx1.Items.Remove(m.FullName)
                 End If
@@ -303,6 +324,12 @@ Module FileHandling
         Promotefiles(d)
 
     End Sub
+    ''' <summary>
+    ''' Takes files in d and places them in target, recursively for subfolders if selected
+    ''' </summary>
+    ''' <param name="d"></param>
+    ''' <param name="target"></param>
+    ''' <param name="blnRecurse"></param>
     Public Sub HarvestFolder(d As DirectoryInfo, target As DirectoryInfo, blnRecurse As Boolean)
         If blnRecurse Then
             For Each di In d.EnumerateDirectories
@@ -317,15 +344,11 @@ Module FileHandling
         End If
 
     End Sub
-    Public Function Sublists(d As Directory)
-
-
-    End Function
 
     Public Function MakeSubList(list As List(Of String), str As String) As List(Of String)
         Dim s As New List(Of String)
         For Each file In list
-            If InStr(file, str) <> 0 Then
+            If InStr(UCase(file), UCase(str)) <> 0 Then
                 s.Add(file)
             End If
         Next
