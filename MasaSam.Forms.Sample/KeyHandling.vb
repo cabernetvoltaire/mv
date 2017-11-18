@@ -98,8 +98,8 @@
         LinkOnly
         NoPicVid
     End Enum
-    Public Filterstates = {"All", "Picture only", "Videos only", "Pictures and videos", "Links only", "Not pictures or videos"}
-
+    Public Filterstates As String() = {"All", "Picture only", "Videos only", "Pictures and videos", "Links only", "Not pictures or videos"}
+    Public FilterColours As Color() = {Color.White, Color.YellowGreen, Color.Turquoise, Color.Teal, Color.SpringGreen, Color.SkyBlue}
     Public CurrentFilterState As Integer = FilterState.All
     'Public CurrentFolder As New IO.DirectoryInfo(C:\)
     Public Sub ControlSetFocus(control As Control)

@@ -14,6 +14,7 @@ Module MovieHandler
         frmMain.tmrJumpVideo.Enabled = True
     End Sub
     Public Sub PlaystateChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent)
+        'MsgBox(e.newState)
         Select Case e.newState
             Case WMPLib.WMPPlayState.wmppsMediaEnded
                 Dim KeyEvent As New KeyEventArgs(KeyNextFile)

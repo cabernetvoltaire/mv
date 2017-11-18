@@ -1,6 +1,7 @@
 ﻿Option Explicit On
 Imports System.ComponentModel
 Imports System.IO
+Imports System.Threading
 Imports AxWMPLib
 Imports MasaSam
 Imports MasaSam.Forms.Controls
@@ -8,6 +9,7 @@ Imports MasaSam.Forms.Controls
 Public Class frmMain
 
     Public Property blnSecondScreen As Boolean
+    Public Property LastShowList As String
     Dim newThread As New Threading.Thread(AddressOf LoadShowList)
 
 
@@ -57,6 +59,7 @@ Public Class frmMain
             Me.Show()
         End If
         If path = "" Then Exit Sub
+        LastShowList = path
         Dim finfo As New FileInfo(path)
         Dim size As Long = finfo.Length
         Dim time As TimeSpan
@@ -71,7 +74,7 @@ Public Class frmMain
             time = TimeOperation(False)
             loadrate = size / time.TotalMilliseconds
         End If
-
+        ProgressBarOff()
         tbShowfile.Text = "SHOWFILE LOADED:" & path
     End Sub
     Public Sub HandleKeys(sender As Object, e As KeyEventArgs)
@@ -88,6 +91,7 @@ Public Class frmMain
                 currentWMP.URL = ""
                 tmrSlideShow.Enabled = False
                 currentPicBox.Image = Nothing
+                'currentPicBox.Image.Dispose()
 
             Case KeyRandomize
                 'Cycle through play orders
@@ -97,7 +101,6 @@ Public Class frmMain
                 FillShowbox(lbxShowList, CurrentFilterState, Showlist)
                 FileboxContents = SetPlayOrder(ChosenPlayOrder, FileboxContents)
                 FillShowbox(lbxFiles, CurrentFilterState, FileboxContents)
-                tbFiles.Text = lngShowlistLines & " FILES IN SHOWLIST"
 
 
             Case KeyNextFile, KeyPreviousFile
@@ -467,21 +470,18 @@ Public Class frmMain
         If strPath = "" Then Exit Sub
         If Len(strPath) > 247 Then Exit Sub
         Dim finfo As New FileInfo(strPath)
+        UpdateFileInfo(finfo)
         If InStr(":\", strPath) = Len(strPath) - 2 Then
+
         Else
             Dim s As String = Path.GetDirectoryName(strPath)
-            If tvMain2.SelectedFolder <> s Then
-                tvMain2.SelectedFolder = Path.GetDirectoryName(strPath)
-            End If
-
+            If tvMain2.SelectedFolder <> s Then tvMain2.SelectedFolder = s 'Only change tree if it needs changing
         End If
-        tbDate.Text = finfo.LastWriteTime.ToShortDateString & " " & finfo.LastWriteTime.ToShortTimeString
 
-        'tvMain2.Expand(strPath) 'Doesn't allow fast scrolling down (keeps opening folders)
 
-        HighlightListboxSelected(strPath, lbxFiles)
+        HighlightListboxSelected(strPath, lbxFiles) 'Highlight the current file in lbxFiles
         If Not MasterContainer.Panel2Collapsed Then
-            'Highlight the file in lbxShowlist
+            'Highlight the file in lbxShowlist, but only if it has the focus
             If PFocus = CtrlFocus.ShowList Then
                 HighlightListboxSelected(strPath, lbxShowList)
             End If
@@ -543,11 +543,6 @@ Public Class frmMain
         Next
     End Sub
 
-    Private Sub Addpics(blnRecurse As Boolean)
-        AddFilesToCollection(Showlist, FBCShown, strPicExtensions, blnRecurse)
-        FillShowbox(lbxShowList, FilterState.All, Showlist)
-    End Sub
-
 
     Private Sub RemoveFilesFromCollection(ByVal list As List(Of String), dontinclude As List(Of Boolean), extensions As String)
         Dim d As New System.IO.DirectoryInfo(CurrentFolderPath)
@@ -570,7 +565,7 @@ Public Class frmMain
         CollapseShowlist(True)
         PreferencesGet()
         Randomize()
-
+        AssignExtensionFilters()
         tmrLoadLastFolder.Enabled = True
 
         tmrPicLoad.Interval = lngInterval
@@ -582,7 +577,7 @@ Public Class frmMain
         currentPicBox = PictureBox1
         'Exit Sub
         Try
-            KeyAssignmentsRestore(strButtonFile)
+            'KeyAssignmentsRestore(strButtonFile)
             If Not blnButtonsLoaded Then ToggleButtons()
 
         Catch ex As FileNotFoundException
@@ -657,23 +652,7 @@ Public Class frmMain
         tbLastFile.Text = strCurrentFilePath
         Select Case fType
             Case Filetype.Movie
-                If blnRandomStartPoint Then
-                    tbStartpoint.Text = "START:RANDOM"
-                Else
-                    tbStartpoint.Text = "START:NORMAL"
-
-                End If
-                currentPicBox.Visible = False
-
-                currentWMP.URL = strCurrentFilePath
-                If PlaybackSpeed <> 1 Then currentWMP.settings.rate = PlaybackSpeed
-                currentWMP.Visible = True
-                currentWMP.BringToFront()
-
-                If tmrSlideShow.Enabled Then
-                    blnRestartSlideShowFlag = True
-                    tmrSlideShow.Enabled = False 'Slideshow stops if movie. Create separate timer for movie slideshows. 
-                End If
+                HandleMovie()
 
             Case Filetype.Pic
                 Dim img As Image
@@ -685,28 +664,14 @@ Public Class frmMain
                 img = GetImage(strCurrentFilePath)
                 If img Is Nothing Then Exit Sub
                 'If blnFullScreen Then FullScreen.PictureBox1.Image = img
-                tbZoom.Text = UCase("Orientation -" & Orientation(ImageOrientation(img)))
-                Select Case ImageOrientation(img)
-                    Case ExifOrientations.BottomRight
-                        img.RotateFlip(RotateFlipType.Rotate180FlipNone)
-                    Case ExifOrientations.RightTop
-                        img.RotateFlip(RotateFlipType.Rotate90FlipNone)
-                    Case ExifOrientations.LeftBottom
-                        img.RotateFlip(RotateFlipType.Rotate270FlipNone)
-
-                End Select
-
-                '  currentPicBox.Image = img
+                OrientPic(img)
+                'Resume if in middle of slideshow
                 If blnRestartSlideShowFlag Then
                     tmrSlideShow.Enabled = True
                     blnRestartSlideShowFlag = False
                 End If
-                currentWMP.Visible = False
-                currentWMP.URL = ""
-                PreparePic(currentPicBox, pbxBlanker, img)
-                currentPicBox.Visible = True
-                currentPicBox.BringToFront()
-                currentWMP.Visible = False
+
+                MovietoPic(img)
             Case Filetype.Unknown
                 tbLastFile.Text = "Unhandled file " & strCurrentFilePath
                 tmrPicLoad.Enabled = False
@@ -718,7 +683,47 @@ Public Class frmMain
         tmrPicLoad.Enabled = False
     End Sub
 
+    Private Sub MovietoPic(img As Image)
+        currentWMP.Visible = False
+        currentWMP.URL = ""
+        PreparePic(currentPicBox, pbxBlanker, img)
+        currentPicBox.Visible = True
+        currentPicBox.BringToFront()
+        currentWMP.Visible = False
+    End Sub
 
+    Private Sub OrientPic(img As Image)
+        tbZoom.Text = UCase("Orientation -" & Orientation(ImageOrientation(img)))
+        Select Case ImageOrientation(img)
+            Case ExifOrientations.BottomRight
+                img.RotateFlip(RotateFlipType.Rotate180FlipNone)
+            Case ExifOrientations.RightTop
+                img.RotateFlip(RotateFlipType.Rotate90FlipNone)
+            Case ExifOrientations.LeftBottom
+                img.RotateFlip(RotateFlipType.Rotate270FlipNone)
+
+        End Select
+    End Sub
+
+    Private Sub HandleMovie()
+        If blnRandomStartPoint Then
+            tbStartpoint.Text = "START:RANDOM"
+        Else
+            tbStartpoint.Text = "START:NORMAL"
+
+        End If
+        currentPicBox.Visible = False
+
+        currentWMP.URL = strCurrentFilePath
+        If PlaybackSpeed <> 1 Then currentWMP.settings.rate = PlaybackSpeed
+        currentWMP.Visible = True
+        currentWMP.BringToFront()
+
+        If tmrSlideShow.Enabled Then
+            blnRestartSlideShowFlag = True
+            tmrSlideShow.Enabled = False 'Slideshow stops if movie. Create separate timer for movie slideshows. 
+        End If
+    End Sub
 
     Private Sub tmrJumpVideo_Tick(sender As Object, e As EventArgs) Handles tmrJumpVideo.Tick
         'ControlSetFocus(currentWMP)
@@ -907,21 +912,21 @@ Public Class frmMain
         SaveShowlist()
     End Sub
 
-    Private Sub IncludingSubfoldersToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles IncludingSubfoldersToolStripMenuItem.Click
+    Private Sub IncludingSubfoldersToolStripMenuItem_Click(sender As Object, e As EventArgs)
         'Addpics(True)
 
         BackgroundWorker1.RunWorkerAsync()
     End Sub
 
-    Private Sub IncludingSubsetsToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles IncludingSubsetsToolStripMenuItem.Click
+    Private Sub IncludingSubsetsToolStripMenuItem_Click(sender As Object, e As EventArgs)
         AddMovies(True)
     End Sub
 
-    Private Sub CurrentOnlyToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles CurrentOnlyToolStripMenuItem1.Click
+    Private Sub CurrentOnlyToolStripMenuItem1_Click(sender As Object, e As EventArgs)
         AddMovies(False)
     End Sub
 
-    Private Sub CurrentOnlyToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CurrentOnlyToolStripMenuItem.Click
+    Private Sub CurrentOnlyToolStripMenuItem_Click(sender As Object, e As EventArgs)
         Addpics(False)
     End Sub
 
@@ -954,7 +959,8 @@ Public Class frmMain
         ' MsgBox(e.Node.ToolTipText)
         Dim di = New IO.DirectoryInfo(e.Node.ToolTipText)
         ChangeFolder(di.FullName, True)
-        FillListbox(lbxFiles, di, CurrentFilterState, Showlist, blnChooseRandomFile)
+        tmrListbox.Interval = 750
+        tmrListbox.Enabled = True
     End Sub
 
 
@@ -963,26 +969,26 @@ Public Class frmMain
         MyBase.Finalize()
     End Sub
 
-    Private Sub AddAllFilesToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AddAllFilesToolStripMenuItem.Click
+    Private Sub AddAllFilesToolStripMenuItem_Click(sender As Object, e As EventArgs)
 
     End Sub
 
-    Private Sub CurrentOnlyToolStripMenuItem2_Click(sender As Object, e As EventArgs) Handles CurrentOnlyToolStripMenuItem2.Click
+    Private Sub CurrentOnlyToolStripMenuItem2_Click(sender As Object, e As EventArgs)
         AddFiles(False)
     End Sub
 
-    Private Sub AllSubFoldersToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AllSubFoldersToolStripMenuItem.Click
+    Private Sub AllSubFoldersToolStripMenuItem_Click(sender As Object, e As EventArgs)
         AddFiles(True)
     End Sub
 
-    Private Sub AddPicturesAndVideosToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AddPicturesAndVideosToolStripMenuItem.Click
+    Private Sub AddPicturesAndVideosToolStripMenuItem_Click(sender As Object, e As EventArgs)
     End Sub
 
-    Private Sub CurrentOnlyToolStripMenuItem3_Click(sender As Object, e As EventArgs) Handles CurrentOnlyToolStripMenuItem3.Click
+    Private Sub CurrentOnlyToolStripMenuItem3_Click(sender As Object, e As EventArgs)
         AddPicVids(False)
     End Sub
 
-    Private Sub AllSubfoldersToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles AllSubfoldersToolStripMenuItem1.Click
+    Private Sub AllSubfoldersToolStripMenuItem1_Click(sender As Object, e As EventArgs)
         AddPicVids(True)
     End Sub
 
@@ -1009,10 +1015,6 @@ Public Class frmMain
     '    JumpRandom(False)
     'End Sub
 
-    Private Sub ToolStripStatusLabel1_Click(sender As Object, e As EventArgs) Handles tbDate.Click
-
-    End Sub
-
 
     Delegate Sub UpdateForm_Delegate(ByVal [TS] As StatusStrip, ByVal [text] As String)
 
@@ -1031,10 +1033,11 @@ Public Class frmMain
         ChangeFolder(e.Directory.FullName, True)
         ' tvMain2.SelectedFolder = CurrentFolderPath
         FillListbox(lbxFiles, e.Directory, CurrentFilterState, Showlist, blnChooseRandomFile)
+        If lbxFiles.Items.Count = 0 Then tbFiles.Text = "0/" & Str(Showlist.Count)
     End Sub
 
     Private Sub tvMain2_KeyDown(sender As Object, e As KeyEventArgs) Handles tvMain2.KeyDown
-        HandleKeys(sender, e)
+        'HandleKeys(sender, e)
         Select Case e.KeyCode
             Case Keys.Down, Keys.Left, Keys.Right, Keys.Up, tvMain2.TraverseKey, tvMain2.TraverseKeyBack, Keys.Tab
 
@@ -1121,7 +1124,23 @@ Public Class frmMain
         Process.Start(lbxFiles.SelectedItem)
     End Sub
 
+    Public Sub UpdateFileInfo(f As FileInfo)
+        Dim listcount = lbxFiles.Items.Count
+        Dim showcount = lbxShowList.Items.Count
+        tbDate.Text = f.LastWriteTime.ToShortDateString & " " & f.LastWriteTime.ToShortTimeString
+        tbFiles.Text = listcount & "/" & showcount
+        tbFilter.Text = "Filter:" & Filterstates(CurrentFilterState)
+        tbLastFile.Text = strCurrentFilePath
+        tbRandom.Text = "ORDER:" & UCase(strPlayOrder(ChosenPlayOrder))
+        tbShowfile.Text = "SHOWFILE"
+        tbSpeed.Text = tbSpeed.Text = "SPEED (" & PlaybackSpeed * 100 & "%)"
+        If blnRandomStartPoint Then
+            tbStartpoint.Text = "START:RANDOM"
+        Else
+            tbStartpoint.Text = "START:NORMAL"
+        End If
 
+    End Sub
 
     Private Sub ToolStripButton7_Click_1(sender As Object, e As EventArgs) Handles ToolStripButton7.Click
         SelectSubList()
@@ -1134,7 +1153,9 @@ Public Class frmMain
         If lbxShowList.Items.Count = 0 Then
             CollapseShowlist(False)
             Showlist = MakeSubList(FileboxContents, s)
+
         Else
+            Oldlist = Showlist
             lbxShowList.Items.Clear()
             Showlist = MakeSubList(Showlist, s)
         End If
@@ -1216,10 +1237,37 @@ Public Class frmMain
     End Sub
 
     Private Sub tmrSlowMo_Tick(sender As Object, e As EventArgs) Handles tmrSlowMo.Tick
-        MediaAdvance(currentWMP,1)
+        MediaAdvance(currentWMP, 1)
     End Sub
 
     Private Sub tvMain2_Load(sender As Object, e As EventArgs) Handles tvMain2.Load
 
+    End Sub
+
+    Private Sub AddCurrentFileListToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AddCurrentFileListToolStripMenuItem.Click
+        AddCurrentType(False)
+    End Sub
+
+    Private Sub AddCurrentAndSubfoldersToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AddCurrentAndSubfoldersToolStripMenuItem.Click
+        AddCurrentType(True)
+    End Sub
+
+    Private Sub DuplicatesToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles DuplicatesToolStripMenuItem.Click
+        FindDuplicates.Show()
+
+    End Sub
+
+    Private Sub lbxShowList_TextChanged(sender As Object, e As EventArgs) Handles lbxShowList.TextChanged
+        If Oldlist.Count <> 0 Then
+            If MsgBox("Revert list?") Then
+                Showlist = Oldlist
+                FillShowbox(lbxShowList, CurrentFilterState, Showlist)
+            End If
+        End If
+    End Sub
+
+    Private Sub tmrListbox_Tick(sender As Object, e As EventArgs) Handles tmrListbox.Tick
+        FillListbox(lbxFiles, New DirectoryInfo(CurrentFolderPath), CurrentFilterState, Showlist, blnChooseRandomFile)
+        tmrListbox.Enabled = False
     End Sub
 End Class

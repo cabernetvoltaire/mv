@@ -2,6 +2,16 @@
 Module FileHandling
     Public strVideoExtensions = ".webm.avi.flv.mov.mpeg.mpg.m4v.mkv.mp4.wmv.wav.mp3"
     Public strPicExtensions = ".jpeg.png.jpg.bmp.gif"
+    Dim strFilterExtensions(6) As String
+    Public Sub AssignExtensionFilters()
+        strFilterExtensions(FilterState.All) = ""
+        strFilterExtensions(FilterState.Piconly) = strPicExtensions
+        strFilterExtensions(FilterState.PicVid) = strPicExtensions & strVideoExtensions
+        strFilterExtensions(FilterState.LinkOnly) = ".lnk"
+        strFilterExtensions(FilterState.Vidonly) = strVideoExtensions
+        strFilterExtensions(FilterState.NoPicVid) = strPicExtensions & strVideoExtensions & "NOT"
+    End Sub
+
 
 
     ''' <summary>
@@ -15,7 +25,9 @@ Module FileHandling
     Public Sub FillListbox(lbx As ListBox, e As IO.DirectoryInfo, Currentfilterstate As Integer, ByVal flist As List(Of String), blnRandom As Boolean)
         If IsNothing(e) Then Exit Sub
         If e.Name = "My Computer" Then Exit Sub
-
+        If lbx.Name = "lbxFiles" Then
+            lbx.BackColor = FilterColours(Currentfilterstate)
+        End If
 
         Try
             lbx.Items.Clear()
@@ -114,7 +126,7 @@ Module FileHandling
         fs.Close()
     End Sub
     ''' <summary>
-    ''' Loads Dest into List, and adds all to lbx
+    ''' Loads Dest into List, and adds all to lbx. Any files not found are put in notlist, which can then be removed from the lbx
     ''' </summary>
     ''' <param name="list"></param>
     ''' <param name="Dest"></param>
@@ -124,8 +136,10 @@ Module FileHandling
 
         Dim notlist As New List(Of String)
         Dim count As Long = 0
+
+
         Dim fs As New StreamReader(New FileStream(Dest, FileMode.OpenOrCreate, FileAccess.Read))
-        Do While fs.Peek <> -1
+            Do While fs.Peek <> -1
             Dim s As String = fs.ReadLine
 
             Try
@@ -140,7 +154,7 @@ Module FileHandling
             Catch ex As System.IO.PathTooLongException
                 Continue Do
             Catch ex As System.ArgumentException
-                MsgBox(ex.Message, MsgBoxStyle.OkOnly)
+                MsgBox(ex.Message)
                 Exit Sub
             End Try
 
@@ -161,6 +175,9 @@ Module FileHandling
             For Each s In notlist
                 list.Remove(s)
             Next
+            If MsgBox("Re-save list?") Then
+                StoreList(list, Dest)
+            End If
         End If
     End Sub
     Public Sub MoveFolder(strDir As String, strDest As String, tvw As MasaSam.Forms.Controls.FileSystemTree)
@@ -221,43 +238,78 @@ Module FileHandling
         'If more than one file
         'Create a new folder to put them in.
     End Sub
-    Public Sub AddFilesToCollection(ByVal list As List(Of String), dontinclude As List(Of Boolean), extensions As String, blnRecurse As Boolean)
-        Dim s As String
-
-        s = InputBox("Search for?")
-        Dim d As New DirectoryInfo(CurrentFolderPath)
-
-        FindAllFilesBelow(d, list, dontinclude, extensions, False, s, blnRecurse)
-
-        lngShowlistLines = list.Count
+    Public Sub AddCurrentType(blnRecurse As Boolean)
+        AddFilesToCollection(Showlist, FBCShown, strFilterExtensions(CurrentFilterState), blnRecurse)
+        FillShowbox(frmMain.lbxShowList, FilterState.All, Showlist)
 
     End Sub
+
+    Public Sub Addpics(blnRecurse As Boolean)
+        AddFilesToCollection(Showlist, FBCShown, strPicExtensions, blnRecurse)
+        FillShowbox(frmMain.lbxShowList, FilterState.All, Showlist)
+    End Sub
+
+    Public Sub AddFilesToCollection(ByVal list As List(Of String), dontinclude As List(Of Boolean), extensions As String, blnRecurse As Boolean)
+        Dim s As String
+        Dim d As New DirectoryInfo(CurrentFolderPath)
+
+        s = InputBox("Only include files containing? (Leave empty to add all)")
+        FindAllFilesBelow(d, list, dontinclude, extensions, False, s, blnRecurse)
+
+
+    End Sub
+
+    ''' <summary>
+    ''' Adds all files in d of given extension, or removes them, to the list, only including strSearch 
+    ''' </summary>
+    ''' <param name="d"></param>
+    ''' <param name="list"></param>
+    ''' <param name="DontInclude"></param>
+    ''' <param name="extensions"></param>
+    ''' <param name="blnRemove"></param>
+    ''' <param name="strSearch"></param>
+    ''' <param name="blnRecurse"></param>
     Public Sub FindAllFilesBelow(d As DirectoryInfo, list As List(Of String), ByRef DontInclude As List(Of Boolean), extensions As String, blnRemove As Boolean, strSearch As String, blnRecurse As Boolean)
         ProgressBarOn(1000)
 
         For Each file In d.EnumerateFiles
             Try
-                If InStr(extensions, LCase(file.Extension)) <> 0 And file.Extension <> "" Then
-                    If InStr(LCase(file.FullName), LCase(strSearch)) <> 0 Or strSearch = "" Then
+                If InStr("NOT", extensions) <> 0 Then
+                    If InStr(extensions, LCase(file.Extension)) = 0 And file.Extension <> "" Then
+                        'Only include if NOT the given extension
+                        If InStr(LCase(file.FullName), LCase(strSearch)) = 0 Or strSearch = "" Then
+                            If blnRemove Then
+                                list.Remove(file.FullName)
+                            Else
+                                list.Add(file.FullName)
 
-                        If blnRemove Then
-                            list.Remove(file.FullName)
-                        Else
-                            list.Add(file.FullName)
+                                DontInclude.Add(False)
+                            End If
 
-                            DontInclude.Add(False)
                         End If
-                        'tbFiles.Text = file.FullName & " (" & list.Count.ToString & " files.)"
-
                     End If
                 Else
-                    If extensions = "" Then
-                        If blnRemove Then
-                            list.Remove(file.FullName)
-                        Else
-                            list.Add(file.FullName)
 
-                            DontInclude.Add(False)
+                        If InStr(extensions, LCase(file.Extension)) <> 0 And file.Extension <> "" Then
+                        If InStr(LCase(file.FullName), LCase(strSearch)) <> 0 Or strSearch = "" Then
+                            If blnRemove Then
+                                list.Remove(file.FullName)
+                            Else
+                                list.Add(file.FullName)
+
+                                DontInclude.Add(False)
+                            End If
+
+                        End If
+                    Else
+                        If extensions = "" Then
+                            If blnRemove Then
+                                list.Remove(file.FullName)
+                            Else
+                                list.Add(file.FullName)
+
+                                DontInclude.Add(False)
+                            End If
                         End If
                     End If
                 End If
@@ -269,16 +321,18 @@ Module FileHandling
             ProgressIncrement(1, 1000)
         Next
         ProgressBarOff()
+        If blnRecurse Then
 
-        For Each di In d.EnumerateDirectories
-            Try
-                FindAllFilesBelow(di, list, DontInclude, extensions, blnRemove, strSearch, blnRecurse)
-            Catch ex As UnauthorizedAccessException
-                Continue For
-            Catch ex As DirectoryNotFoundException
-                Continue For
-            End Try
-        Next
+            For Each di In d.EnumerateDirectories
+                Try
+                    FindAllFilesBelow(di, list, DontInclude, extensions, blnRemove, strSearch, blnRecurse)
+                Catch ex As UnauthorizedAccessException
+                    Continue For
+                Catch ex As DirectoryNotFoundException
+                    Continue For
+                End Try
+            Next
+        End If
 
     End Sub
     ''' <summary>

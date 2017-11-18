@@ -67,6 +67,8 @@ Module General
     Public fType As Filetype
     Public blnRandom As Boolean = False
     Public Showlist As New List(Of String)
+    Public Oldlist As New List(Of String)
+
     Public Sublist As New List(Of String)
     Public currentPicBox As New PictureBox
     Public Autozoomrate As Decimal = 0.4
@@ -193,7 +195,7 @@ Module General
             ProgressIncrement(1, 1000)
         Next
         lbx.TabStop = True
-
+        ProgressBarOff()
     End Sub
     Public Function SetPlayOrder(Order As Byte, List As List(Of String)) As List(Of String)
         Dim NewListS As New SortedList(Of String, String)
@@ -207,7 +209,18 @@ Module General
                     Case PlayOrder.Name
                         NewListS.Add(file.Name & file.FullName, file.FullName)
                     Case PlayOrder.Length
-                        NewListL.Add(file.Length + Len(file.FullName), file.FullName)
+                        Try
+                            Dim l As Long
+                            l = file.Length
+                            While NewListL.ContainsKey(l)
+                                l += 1
+                            End While
+                            NewListL.Add(l, file.FullName)
+
+                        Catch ex As ArgumentException
+                            MsgBox("Fail")
+
+                        End Try
                     Case PlayOrder.Time
                         Dim time = file.LastWriteTime.AddMilliseconds(Rnd(100))
                         Dim time2 = file.LastAccessTime.AddMilliseconds(Rnd(100))
@@ -221,10 +234,16 @@ Module General
                         NewListS.Add(file.Extension & file.Name & Str(Rnd(100)), file.FullName)
                     Case PlayOrder.Random
                         Try
-                            NewListS.Add(Str(Rnd(List.Count)), file.FullName)
+                            Dim l As Long
+                            l = Rnd(10 * List.Count)
+                            While NewListS.ContainsKey(Str(l))
+                                l = Rnd(10 * List.Count)
+
+                            End While
+                            NewListS.Add(Str(l), file.FullName)
 
                         Catch ex As System.ArgumentException
-                            NewListS.Add(Str(Rnd(List.Count)), file.FullName)
+                            MsgBox(ex.Message) '                            NewListS.Add(Str(Rnd(List.Count)), file.FullName)
 
                         End Try
                 End Select
