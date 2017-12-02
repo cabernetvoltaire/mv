@@ -26,8 +26,20 @@ Partial Class FindDuplicates
         Me.Label1 = New System.Windows.Forms.Label()
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
         Me.lbxsorted = New System.Windows.Forms.ListBox()
+        Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
+        Me.Label4 = New System.Windows.Forms.Label()
+        Me.lbxunique = New System.Windows.Forms.ListBox()
+        Me.lbxDeleteList = New System.Windows.Forms.ListBox()
         Me.lbxSave = New System.Windows.Forms.ListBox()
+        Me.lbxDuplicates = New System.Windows.Forms.ListBox()
         Me.btnDeleteFiles = New System.Windows.Forms.Button()
+        Me.Label3 = New System.Windows.Forms.Label()
+        Me.Label5 = New System.Windows.Forms.Label()
+        Me.Label6 = New System.Windows.Forms.Label()
+        Me.Panel1 = New System.Windows.Forms.Panel()
+        Me.RadioButton2 = New System.Windows.Forms.RadioButton()
+        Me.RadioButton1 = New System.Windows.Forms.RadioButton()
+        Me.Label2 = New System.Windows.Forms.Label()
         Me.FlowLayoutPanel2 = New System.Windows.Forms.FlowLayoutPanel()
         Me.WMP1 = New AxWMPLib.AxWindowsMediaPlayer()
         Me.WMP2 = New AxWMPLib.AxWindowsMediaPlayer()
@@ -41,25 +53,20 @@ Partial Class FindDuplicates
         Me.WMp10 = New AxWMPLib.AxWindowsMediaPlayer()
         Me.WMP11 = New AxWMPLib.AxWindowsMediaPlayer()
         Me.WMP12 = New AxWMPLib.AxWindowsMediaPlayer()
+        Me.FlowLayoutPanel3 = New System.Windows.Forms.FlowLayoutPanel()
         Me.lblInfo = New System.Windows.Forms.Label()
-        Me.lbxDeleteList = New System.Windows.Forms.ListBox()
         Me.lblDelete = New System.Windows.Forms.Label()
         Me.lblUnique = New System.Windows.Forms.Label()
         Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
-        Me.lbxunique = New System.Windows.Forms.ListBox()
-        Me.lbxDuplicates = New System.Windows.Forms.ListBox()
         Me.lblSorted = New System.Windows.Forms.Label()
-        Me.Label2 = New System.Windows.Forms.Label()
-        Me.FlowLayoutPanel3 = New System.Windows.Forms.FlowLayoutPanel()
-        Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
-        Me.Label3 = New System.Windows.Forms.Label()
-        Me.Label4 = New System.Windows.Forms.Label()
-        Me.Label5 = New System.Windows.Forms.Label()
-        Me.Label6 = New System.Windows.Forms.Label()
+        Me.Panel2 = New System.Windows.Forms.Panel()
+        Me.AutoList = New System.Windows.Forms.Button()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
         Me.SplitContainer1.SuspendLayout()
+        Me.TableLayoutPanel1.SuspendLayout()
+        Me.Panel1.SuspendLayout()
         Me.FlowLayoutPanel2.SuspendLayout()
         CType(Me.WMP1, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.WMP2, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -73,7 +80,7 @@ Partial Class FindDuplicates
         CType(Me.WMp10, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.WMP11, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.WMP12, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.TableLayoutPanel1.SuspendLayout()
+        Me.Panel2.SuspendLayout()
         Me.SuspendLayout()
         '
         'Label1
@@ -120,6 +127,64 @@ Partial Class FindDuplicates
         Me.lbxsorted.Size = New System.Drawing.Size(600, 1640)
         Me.lbxsorted.TabIndex = 4
         '
+        'TableLayoutPanel1
+        '
+        Me.TableLayoutPanel1.ColumnCount = 3
+        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 622.0!))
+        Me.TableLayoutPanel1.Controls.Add(Me.Label4, 1, 0)
+        Me.TableLayoutPanel1.Controls.Add(Me.lbxunique, 0, 1)
+        Me.TableLayoutPanel1.Controls.Add(Me.lbxDeleteList, 1, 3)
+        Me.TableLayoutPanel1.Controls.Add(Me.lbxSave, 0, 3)
+        Me.TableLayoutPanel1.Controls.Add(Me.lbxDuplicates, 1, 1)
+        Me.TableLayoutPanel1.Controls.Add(Me.Label3, 0, 0)
+        Me.TableLayoutPanel1.Controls.Add(Me.Label5, 0, 2)
+        Me.TableLayoutPanel1.Controls.Add(Me.Label6, 1, 2)
+        Me.TableLayoutPanel1.Controls.Add(Me.Panel1, 2, 1)
+        Me.TableLayoutPanel1.Controls.Add(Me.Panel2, 2, 3)
+        Me.TableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Top
+        Me.TableLayoutPanel1.Location = New System.Drawing.Point(0, 873)
+        Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
+        Me.TableLayoutPanel1.RowCount = 4
+        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle())
+        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 57.70863!))
+        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40.0!))
+        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 42.29137!))
+        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+        Me.TableLayoutPanel1.Size = New System.Drawing.Size(2010, 732)
+        Me.TableLayoutPanel1.TabIndex = 36
+        '
+        'Label4
+        '
+        Me.Label4.AutoSize = True
+        Me.Label4.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.Label4.Location = New System.Drawing.Point(697, 0)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(688, 25)
+        Me.Label4.TabIndex = 34
+        Me.Label4.Text = "Duplicates of file clicked"
+        '
+        'lbxunique
+        '
+        Me.lbxunique.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.lbxunique.FormattingEnabled = True
+        Me.lbxunique.ItemHeight = 24
+        Me.lbxunique.Location = New System.Drawing.Point(3, 28)
+        Me.lbxunique.Name = "lbxunique"
+        Me.lbxunique.Size = New System.Drawing.Size(688, 378)
+        Me.lbxunique.TabIndex = 5
+        '
+        'lbxDeleteList
+        '
+        Me.lbxDeleteList.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.lbxDeleteList.FormattingEnabled = True
+        Me.lbxDeleteList.ItemHeight = 24
+        Me.lbxDeleteList.Location = New System.Drawing.Point(697, 452)
+        Me.lbxDeleteList.Name = "lbxDeleteList"
+        Me.lbxDeleteList.Size = New System.Drawing.Size(688, 277)
+        Me.lbxDeleteList.TabIndex = 8
+        '
         'lbxSave
         '
         Me.lbxSave.Dock = System.Windows.Forms.DockStyle.Fill
@@ -130,14 +195,92 @@ Partial Class FindDuplicates
         Me.lbxSave.Size = New System.Drawing.Size(688, 277)
         Me.lbxSave.TabIndex = 6
         '
+        'lbxDuplicates
+        '
+        Me.lbxDuplicates.FormattingEnabled = True
+        Me.lbxDuplicates.ItemHeight = 24
+        Me.lbxDuplicates.Location = New System.Drawing.Point(697, 28)
+        Me.lbxDuplicates.Name = "lbxDuplicates"
+        Me.lbxDuplicates.Size = New System.Drawing.Size(688, 364)
+        Me.lbxDuplicates.TabIndex = 7
+        '
         'btnDeleteFiles
         '
-        Me.btnDeleteFiles.Location = New System.Drawing.Point(1391, 452)
+        Me.btnDeleteFiles.Location = New System.Drawing.Point(104, 28)
         Me.btnDeleteFiles.Name = "btnDeleteFiles"
         Me.btnDeleteFiles.Size = New System.Drawing.Size(317, 48)
         Me.btnDeleteFiles.TabIndex = 32
         Me.btnDeleteFiles.Text = "Delete &Files"
         Me.btnDeleteFiles.UseVisualStyleBackColor = True
+        '
+        'Label3
+        '
+        Me.Label3.AutoSize = True
+        Me.Label3.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.Label3.Location = New System.Drawing.Point(3, 0)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(688, 25)
+        Me.Label3.TabIndex = 33
+        Me.Label3.Text = "Unique Files with Duplicates (Click to see)"
+        '
+        'Label5
+        '
+        Me.Label5.AutoSize = True
+        Me.Label5.Location = New System.Drawing.Point(3, 409)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(407, 25)
+        Me.Label5.TabIndex = 35
+        Me.Label5.Text = "Files that will NOT be deleted (Click to switch)"
+        '
+        'Label6
+        '
+        Me.Label6.AutoSize = True
+        Me.Label6.Location = New System.Drawing.Point(697, 409)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(380, 25)
+        Me.Label6.TabIndex = 36
+        Me.Label6.Text = "Files that WILL be deleted (Click to switch)"
+        '
+        'Panel1
+        '
+        Me.Panel1.Controls.Add(Me.RadioButton2)
+        Me.Panel1.Controls.Add(Me.RadioButton1)
+        Me.Panel1.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.Panel1.Location = New System.Drawing.Point(1391, 28)
+        Me.Panel1.Name = "Panel1"
+        Me.Panel1.Size = New System.Drawing.Size(616, 378)
+        Me.Panel1.TabIndex = 37
+        '
+        'RadioButton2
+        '
+        Me.RadioButton2.AutoSize = True
+        Me.RadioButton2.Location = New System.Drawing.Point(122, 148)
+        Me.RadioButton2.Name = "RadioButton2"
+        Me.RadioButton2.Size = New System.Drawing.Size(154, 29)
+        Me.RadioButton2.TabIndex = 1
+        Me.RadioButton2.TabStop = True
+        Me.RadioButton2.Text = "RadioButton2"
+        Me.RadioButton2.UseVisualStyleBackColor = True
+        '
+        'RadioButton1
+        '
+        Me.RadioButton1.AutoSize = True
+        Me.RadioButton1.Location = New System.Drawing.Point(122, 90)
+        Me.RadioButton1.Name = "RadioButton1"
+        Me.RadioButton1.Size = New System.Drawing.Size(154, 29)
+        Me.RadioButton1.TabIndex = 0
+        Me.RadioButton1.TabStop = True
+        Me.RadioButton1.Text = "RadioButton1"
+        Me.RadioButton1.UseVisualStyleBackColor = True
+        '
+        'Label2
+        '
+        Me.Label2.AutoSize = True
+        Me.Label2.Location = New System.Drawing.Point(682, 950)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(255, 25)
+        Me.Label2.TabIndex = 8
+        Me.Label2.Text = "Unique Files with Duplicates"
         '
         'FlowLayoutPanel2
         '
@@ -304,6 +447,13 @@ Partial Class FindDuplicates
         Me.WMP12.UseWaitCursor = True
         Me.WMP12.Visible = False
         '
+        'FlowLayoutPanel3
+        '
+        Me.FlowLayoutPanel3.Location = New System.Drawing.Point(131, 899)
+        Me.FlowLayoutPanel3.Name = "FlowLayoutPanel3"
+        Me.FlowLayoutPanel3.Size = New System.Drawing.Size(490, 48)
+        Me.FlowLayoutPanel3.TabIndex = 9
+        '
         'lblInfo
         '
         Me.lblInfo.AutoSize = True
@@ -311,16 +461,6 @@ Partial Class FindDuplicates
         Me.lblInfo.Name = "lblInfo"
         Me.lblInfo.Size = New System.Drawing.Size(0, 25)
         Me.lblInfo.TabIndex = 5
-        '
-        'lbxDeleteList
-        '
-        Me.lbxDeleteList.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.lbxDeleteList.FormattingEnabled = True
-        Me.lbxDeleteList.ItemHeight = 24
-        Me.lbxDeleteList.Location = New System.Drawing.Point(697, 452)
-        Me.lbxDeleteList.Name = "lbxDeleteList"
-        Me.lbxDeleteList.Size = New System.Drawing.Size(688, 277)
-        Me.lbxDeleteList.TabIndex = 8
         '
         'lblDelete
         '
@@ -348,25 +488,6 @@ Partial Class FindDuplicates
         Me.FlowLayoutPanel1.Size = New System.Drawing.Size(2010, 397)
         Me.FlowLayoutPanel1.TabIndex = 3
         '
-        'lbxunique
-        '
-        Me.lbxunique.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.lbxunique.FormattingEnabled = True
-        Me.lbxunique.ItemHeight = 24
-        Me.lbxunique.Location = New System.Drawing.Point(3, 28)
-        Me.lbxunique.Name = "lbxunique"
-        Me.lbxunique.Size = New System.Drawing.Size(688, 378)
-        Me.lbxunique.TabIndex = 5
-        '
-        'lbxDuplicates
-        '
-        Me.lbxDuplicates.FormattingEnabled = True
-        Me.lbxDuplicates.ItemHeight = 24
-        Me.lbxDuplicates.Location = New System.Drawing.Point(697, 28)
-        Me.lbxDuplicates.Name = "lbxDuplicates"
-        Me.lbxDuplicates.Size = New System.Drawing.Size(688, 364)
-        Me.lbxDuplicates.TabIndex = 7
-        '
         'lblSorted
         '
         Me.lblSorted.AutoSize = True
@@ -376,85 +497,24 @@ Partial Class FindDuplicates
         Me.lblSorted.TabIndex = 4
         Me.lblSorted.Text = "SortedList"
         '
-        'Label2
+        'Panel2
         '
-        Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(682, 950)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(255, 25)
-        Me.Label2.TabIndex = 8
-        Me.Label2.Text = "Unique Files with Duplicates"
+        Me.Panel2.Controls.Add(Me.AutoList)
+        Me.Panel2.Controls.Add(Me.btnDeleteFiles)
+        Me.Panel2.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.Panel2.Location = New System.Drawing.Point(1391, 452)
+        Me.Panel2.Name = "Panel2"
+        Me.Panel2.Size = New System.Drawing.Size(616, 277)
+        Me.Panel2.TabIndex = 38
         '
-        'FlowLayoutPanel3
+        'AutoList
         '
-        Me.FlowLayoutPanel3.Location = New System.Drawing.Point(131, 899)
-        Me.FlowLayoutPanel3.Name = "FlowLayoutPanel3"
-        Me.FlowLayoutPanel3.Size = New System.Drawing.Size(490, 48)
-        Me.FlowLayoutPanel3.TabIndex = 9
-        '
-        'TableLayoutPanel1
-        '
-        Me.TableLayoutPanel1.ColumnCount = 3
-        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 622.0!))
-        Me.TableLayoutPanel1.Controls.Add(Me.Label4, 1, 0)
-        Me.TableLayoutPanel1.Controls.Add(Me.lbxunique, 0, 1)
-        Me.TableLayoutPanel1.Controls.Add(Me.lbxDeleteList, 1, 3)
-        Me.TableLayoutPanel1.Controls.Add(Me.lbxSave, 0, 3)
-        Me.TableLayoutPanel1.Controls.Add(Me.lbxDuplicates, 1, 1)
-        Me.TableLayoutPanel1.Controls.Add(Me.btnDeleteFiles, 2, 3)
-        Me.TableLayoutPanel1.Controls.Add(Me.Label3, 0, 0)
-        Me.TableLayoutPanel1.Controls.Add(Me.Label5, 0, 2)
-        Me.TableLayoutPanel1.Controls.Add(Me.Label6, 1, 2)
-        Me.TableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Top
-        Me.TableLayoutPanel1.Location = New System.Drawing.Point(0, 873)
-        Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
-        Me.TableLayoutPanel1.RowCount = 4
-        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle())
-        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 57.70863!))
-        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40.0!))
-        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 42.29137!))
-        Me.TableLayoutPanel1.Size = New System.Drawing.Size(2010, 732)
-        Me.TableLayoutPanel1.TabIndex = 36
-        '
-        'Label3
-        '
-        Me.Label3.AutoSize = True
-        Me.Label3.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.Label3.Location = New System.Drawing.Point(3, 0)
-        Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(688, 25)
-        Me.Label3.TabIndex = 33
-        Me.Label3.Text = "Unique Files with Duplicates (Click to see)"
-        '
-        'Label4
-        '
-        Me.Label4.AutoSize = True
-        Me.Label4.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.Label4.Location = New System.Drawing.Point(697, 0)
-        Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(688, 25)
-        Me.Label4.TabIndex = 34
-        Me.Label4.Text = "Duplicates of file clicked"
-        '
-        'Label5
-        '
-        Me.Label5.AutoSize = True
-        Me.Label5.Location = New System.Drawing.Point(3, 409)
-        Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(407, 25)
-        Me.Label5.TabIndex = 35
-        Me.Label5.Text = "Files that will NOT be deleted (Click to switch)"
-        '
-        'Label6
-        '
-        Me.Label6.AutoSize = True
-        Me.Label6.Location = New System.Drawing.Point(697, 409)
-        Me.Label6.Name = "Label6"
-        Me.Label6.Size = New System.Drawing.Size(380, 25)
-        Me.Label6.TabIndex = 36
-        Me.Label6.Text = "Files that WILL be deleted (Click to switch)"
+        Me.AutoList.Location = New System.Drawing.Point(104, 117)
+        Me.AutoList.Name = "AutoList"
+        Me.AutoList.Size = New System.Drawing.Size(317, 48)
+        Me.AutoList.TabIndex = 33
+        Me.AutoList.Text = "Find &All"
+        Me.AutoList.UseVisualStyleBackColor = True
         '
         'FindDuplicates
         '
@@ -466,11 +526,16 @@ Partial Class FindDuplicates
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "FindDuplicates"
         Me.Text = "FindDuplicates"
+        Me.WindowState = System.Windows.Forms.FormWindowState.Maximized
         Me.SplitContainer1.Panel1.ResumeLayout(False)
         Me.SplitContainer1.Panel2.ResumeLayout(False)
         Me.SplitContainer1.Panel2.PerformLayout()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.SplitContainer1.ResumeLayout(False)
+        Me.TableLayoutPanel1.ResumeLayout(False)
+        Me.TableLayoutPanel1.PerformLayout()
+        Me.Panel1.ResumeLayout(False)
+        Me.Panel1.PerformLayout()
         Me.FlowLayoutPanel2.ResumeLayout(False)
         CType(Me.WMP1, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.WMP2, System.ComponentModel.ISupportInitialize).EndInit()
@@ -484,8 +549,7 @@ Partial Class FindDuplicates
         CType(Me.WMp10, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.WMP11, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.WMP12, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.TableLayoutPanel1.ResumeLayout(False)
-        Me.TableLayoutPanel1.PerformLayout()
+        Me.Panel2.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -523,4 +587,9 @@ Partial Class FindDuplicates
     Friend WithEvents FlowLayoutPanel3 As FlowLayoutPanel
     Friend WithEvents Label5 As Label
     Friend WithEvents Label6 As Label
+    Friend WithEvents Panel1 As Panel
+    Friend WithEvents RadioButton2 As RadioButton
+    Friend WithEvents RadioButton1 As RadioButton
+    Friend WithEvents Panel2 As Panel
+    Friend WithEvents AutoList As Button
 End Class

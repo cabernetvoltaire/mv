@@ -1,31 +1,16 @@
 ﻿Option Explicit On
 Imports System.ComponentModel
 Imports System.IO
-Imports System.Threading
 Imports AxWMPLib
-Imports MasaSam
 Imports MasaSam.Forms.Controls
-
 Public Class frmMain
-
-    Public Property blnSecondScreen As Boolean
+    Public Property blnSecondScreen As Boolean = True
     Public Property LastShowList As String
-    Dim newThread As New Threading.Thread(AddressOf LoadShowList)
+    Public Property blnLink As Boolean
 
 
-    Private Sub SaveButtonlist()
-        Dim path As String
-        With SaveFileDialog1
-            .DefaultExt = "msb"
-            .Filter = "Metavisua button files|*.msb|All files|*.*"
-            If .ShowDialog() = System.Windows.Forms.DialogResult.OK Then
-                path = .FileName
-                Me.Show()
-            End If
-            path = .FileName
-        End With
-        KeyAssignmentsStore(path)
-    End Sub
+
+
     Private Sub SaveShowlist()
         Dim path As String
         With SaveFileDialog1
@@ -79,33 +64,40 @@ Public Class frmMain
     End Sub
     Public Sub HandleKeys(sender As Object, e As KeyEventArgs)
         Select Case e.KeyCode
+            Case Keys.Enter
+                If e.Control And blnLink Then
+                    blnLink = False
+                    HighlightCurrent(strCurrentFilePath)
+
+                End If
             Case Keys.F5, Keys.F6, Keys.F7, Keys.F8, Keys.F9, Keys.F10, Keys.F11, Keys.F12
                 HandleFunctionKeyDown(sender, e)
                 e.Handled = True
             Case Keys.A To Keys.Z
-                ChangeButtonLetter(e)
+                If Not e.Control Then
+                    ChangeButtonLetter(e)
+                Else
+                    Select Case e.KeyCode
+                        Case Keys.I
+                            CreateNewDirectory(CurrentFolderPath)
+
+
+                    End Select
+
+                End If
             Case KeyToggleButtons
                 ToggleButtons()
             Case KeyEscape
-                currentWMP.Ctlcontrols.pause()
-                currentWMP.URL = ""
-                tmrSlideShow.Enabled = False
-                currentPicBox.Image = Nothing
-                'currentPicBox.Image.Dispose()
+                CancelDisplay()                'currentPicBox.Image.Dispose()
 
             Case KeyRandomize
                 'Cycle through play orders
-                ChosenPlayOrder = (ChosenPlayOrder + 1) Mod (PlayOrder.Type)
-                tbRandom.Text = "ORDER:" & UCase(strPlayOrder(ChosenPlayOrder))
-                Showlist = SetPlayOrder(ChosenPlayOrder, Showlist)
-                FillShowbox(lbxShowList, CurrentFilterState, Showlist)
-                FileboxContents = SetPlayOrder(ChosenPlayOrder, FileboxContents)
-                FillShowbox(lbxFiles, CurrentFilterState, FileboxContents)
-
+                ChosenPlayOrder = (ChosenPlayOrder + 1) Mod (PlayOrder.Type + 1)
+                UpdatePlayOrder()
 
             Case KeyNextFile, KeyPreviousFile
 
-                AdvanceFile(e.KeyCode = KeyNextFile)
+                AdvanceFile(e.KeyCode = KeyNextFile, CtrlDown)
                 e.Handled = True
                 tmrSlideShow.Enabled = False
 
@@ -161,23 +153,49 @@ Public Class frmMain
             Case KeyFilter 'Cycle through listbox filters
                 CurrentFilterState = (CurrentFilterState + 1) Mod (GetMaxValue(Of FilterState)() + 1)
                 'MsgBox(CurrentFilterState.ToString)
-                FillListbox(lbxFiles, New DirectoryInfo(CurrentFolderPath), CurrentFilterState, Showlist, blnChooseRandomFile)
+                FillListbox(lbxFiles, New DirectoryInfo(CurrentFolderPath), FileboxContents, blnChooseRandomFile)
                 tbFilter.Text = UCase(Filterstates(CurrentFilterState))
                 e.Handled = True
             Case KeySelect
                 SelectSubList()
 
             Case KeyFullscreen
+                If ShiftDown Then
+                    blnSecondScreen = True
+                Else
+                    blnSecondScreen = False
+                End If
                 GoFullScreen(Not blnFullScreen)
                 e.Handled = True
+
+            Case KeyDelete
+                'Use Movefiles with current selected list, and option to delete. 
+                CancelDisplay()
+                Select Case PFocus
+                    Case CtrlFocus.Files
+                        MoveFiles(ListfromListbox(lbxFiles), "", lbxFiles)
+                    Case CtrlFocus.Tree
+                        DeleteFolder(tvMain2)
+                    Case CtrlFocus.ShowList
+                        '                        If MsgBox("This will DELETE ALL the showlist files! Is this what you want?", MsgBoxStyle.YesNoCancel) <> MsgBoxResult.Yes Then Exit Sub
+                        MoveFiles(ListfromListbox(lbxShowList), "", lbxShowList)
+                End Select
+                'DisposePic(currentPicBox)
+                'Deletefile(strCurrentFilePath)
+                'UpdateBoxes(strCurrentFilePath, "")
+
+
 
             Case KeyLoopToggle
                 currentWMP.settings.setMode("loop", Not currentWMP.settings.getMode("loop"))
                 e.Handled = True
 
+
             Case KeyJumpToPoint
             Case KeyBackUndo
                 ChangeFolder(LastFolder.Pop, True)
+                tvMain2.SelectedFolder = CurrentFolderPath
+
                 'strCurrentFilePath = LastPlayed.Pop
                 'tmrPicLoad.Enabled = True
 
@@ -187,6 +205,40 @@ Public Class frmMain
         End Select
 
         ' e.Handled = True
+    End Sub
+
+    Public Sub CancelDisplay()
+        currentWMP.Ctlcontrols.pause()
+        currentWMP.URL = ""
+        tmrSlideShow.Enabled = False
+        currentPicBox.Image = Nothing
+    End Sub
+
+    Private Sub DeleteFolder(tvw As FileSystemTree)
+        With My.Computer.FileSystem
+            If .DirectoryExists(CurrentFolderPath) Then
+                Dim m As MsgBoxResult
+                m = MsgBox("Delete folder " & CurrentFolderPath & "?", MsgBoxStyle.YesNoCancel)
+                If m = MsgBoxResult.Yes Then
+                    .DeleteDirectory(CurrentFolderPath, FileIO.UIOption.OnlyErrorDialogs, FileIO.RecycleOption.SendToRecycleBin)
+                    tvw.RemoveNode(CurrentFolderPath)
+                ElseIf m = MsgBoxResult.No Or m = MsgBoxResult.Cancel Then
+                    ControlSetFocus(lbxFiles)
+
+                End If
+            End If
+        End With
+    End Sub
+
+
+    Private Sub UpdatePlayOrder()
+        tbRandom.Text = "ORDER:" & UCase(strPlayOrder(ChosenPlayOrder))
+        Showlist = SetPlayOrder(ChosenPlayOrder, Showlist)
+        lbxShowList.Items.Clear()
+        FillShowbox(lbxShowList, CurrentFilterState, Showlist)
+        lbxFiles.Items.Clear()
+        FileboxContents = SetPlayOrder(ChosenPlayOrder, FileboxContents)
+        FillShowbox(lbxFiles, CurrentFilterState, FileboxContents)
     End Sub
 
 
@@ -279,43 +331,60 @@ Public Class frmMain
         blnFullScreen = Not blnFullScreen
         tmrPicLoad.Enabled = True
     End Sub
-    Public Sub AdvanceFile(blnForward As Boolean)
+    Public Sub AdvanceFile(blnForward As Boolean, blnFileListAdvance As Boolean)
         Dim diff As Integer
         If blnForward Then
             diff = 1
         Else
             diff = -1
         End If
+
         If blnRandom Then
 
             SelectRandomToPlay(Showlist)
         Else
             'Advance using whichever control has focus 
-            Select Case PFocus
-                Case CtrlFocus.Tree, CtrlFocus.Files
+            'Changed so that single key can advance lbxfiles instead of lbxshowlist irrespective of focus, but always lbxfiles if showlist hidden
+            If blnFileListAdvance Then
+                lbxFiles.SelectionMode = SelectionMode.One
+                If lbxFiles.Items.Count = 0 Then Exit Sub 'if no filelist, then give up.
 
-                    If lbxFiles.Items.Count = 0 Then Exit Sub 'if not filelist, then give up.
+                If lbxFiles.SelectedIndex = 0 And Not blnForward Then
+                    lbxFiles.SelectedIndex = lbxFiles.Items.Count - 1
+                Else
+                    lbxFiles.SelectedIndex = (lbxFiles.SelectedIndex + diff) Mod lbxFiles.Items.Count
 
-                    If lbxFiles.SelectedIndex = 0 And Not blnForward Then
-                        lbxFiles.SelectedIndex = lbxFiles.Items.Count - 1
-                    Else
-                        lbxFiles.SelectedIndex = (lbxFiles.SelectedIndex + diff) Mod lbxFiles.Items.Count
+                End If
 
-                    End If
+            Else
+                Select Case PFocus
+                    Case CtrlFocus.Tree, CtrlFocus.Files
+                        lbxFiles.SelectionMode = SelectionMode.One
+                        If lbxFiles.Items.Count = 0 Then Exit Sub 'if not filelist, then give up.
 
-                Case Else
-                    'Otherwise, advance the playlist. 
-                    If Showlist.Count > 0 Then
-
-                        If lCurrentDisplayIndex = 0 And Not blnForward Then
-                            lCurrentDisplayIndex = Showlist.Count - 1
+                        If lbxFiles.SelectedIndex = 0 And Not blnForward Then
+                            lbxFiles.SelectedIndex = lbxFiles.Items.Count - 1
                         Else
+                            lbxFiles.SelectedIndex = (lbxFiles.SelectedIndex + diff) Mod lbxFiles.Items.Count
 
-                            lCurrentDisplayIndex = (lCurrentDisplayIndex + diff) Mod Showlist.Count
                         End If
-                        StartToShow(Showlist(lCurrentDisplayIndex))
-                    End If
-            End Select
+
+                    Case Else
+                        lbxShowList.SelectionMode = SelectionMode.One
+
+                        'Otherwise, advance the playlist. 
+                        If Showlist.Count > 0 Then
+
+                            If lCurrentDisplayIndex = 0 And Not blnForward Then
+                                lCurrentDisplayIndex = Showlist.Count - 1
+                            Else
+
+                                lCurrentDisplayIndex = (lCurrentDisplayIndex + diff) Mod Showlist.Count '
+                            End If
+                            StartToShow(Showlist(lCurrentDisplayIndex))
+                        End If
+                End Select
+            End If
         End If
 
         'If Main is the current form
@@ -386,7 +455,8 @@ Public Class frmMain
             MsgBox("Autotrail")
         End If
     End Sub
-    Private Function FindType(file As String) As Filetype
+    Public Function FindType(file As String) As Filetype
+        blnLink = False
         Try
             Dim info As New FileInfo(file)
             If info.Extension = "" Then
@@ -395,12 +465,18 @@ Public Class frmMain
             End If
             'If it's a .lnk, find the file
             If info.Extension = ".lnk" Then
+                blnLink = True
                 strCurrentFilePath = CreateObject("WScript.Shell").CreateShortcut(info.FullName).TargetPath
                 Try
+                    If My.Computer.FileSystem.FileExists(strCurrentFilePath) Then
 
-                    info = New FileInfo(strCurrentFilePath)
+                        info = New FileInfo(strCurrentFilePath)
+                    Else
+                        Return Filetype.Unknown
+                        Exit Function
+                    End If
+
                 Catch ex As Exception
-
                 End Try
             End If
             strExt = LCase(info.Extension)
@@ -474,15 +550,22 @@ Public Class frmMain
         If InStr(":\", strPath) = Len(strPath) - 2 Then
 
         Else
-            Dim s As String = Path.GetDirectoryName(strPath)
-            If tvMain2.SelectedFolder <> s Then tvMain2.SelectedFolder = s 'Only change tree if it needs changing
+            If Not blnLink Then
+
+                Dim s As String = Path.GetDirectoryName(strPath)
+                If tvMain2.SelectedFolder <> s Then tvMain2.SelectedFolder = s 'Only change tree if it needs changing
+            End If
         End If
 
 
-        HighlightListboxSelected(strPath, lbxFiles) 'Highlight the current file in lbxFiles
+        If Not blnLink Then
+            If lbxFiles.SelectedItem <> strPath Then
+                HighlightListboxSelected(strPath, lbxFiles) 'Highlight the current file in lbxFiles
+            End If
+        End If
         If Not MasterContainer.Panel2Collapsed Then
             'Highlight the file in lbxShowlist, but only if it has the focus
-            If PFocus = CtrlFocus.ShowList Then
+            If PFocus = CtrlFocus.ShowList AndAlso Not CtrlDown Then
                 HighlightListboxSelected(strPath, lbxShowList)
             End If
         End If
@@ -510,7 +593,7 @@ Public Class frmMain
     End Sub
     Private Sub AddFiles(blnRecurse As Boolean)
         AddFilesToCollection(Showlist, FBCShown, "", blnRecurse)
-        FillShowbox(lbxFiles, FilterState.All, Showlist)
+        FillShowbox(lbxShowList, CurrentFilterState, Showlist)
     End Sub
     Private Sub SelectRandomToPlay(flist As List(Of String))
         If flist.Count = 0 Then Exit Sub
@@ -557,6 +640,7 @@ Public Class frmMain
 
     'Form Controls
     Private Sub Form1_Shown(sender As Object, e As EventArgs) Handles Me.Shown
+
         GlobalInitialise()
 
     End Sub
@@ -577,7 +661,7 @@ Public Class frmMain
         currentPicBox = PictureBox1
         'Exit Sub
         Try
-            'KeyAssignmentsRestore(strButtonFile)
+            KeyAssignmentsRestore(strButtonFile)
             If Not blnButtonsLoaded Then ToggleButtons()
 
         Catch ex As FileNotFoundException
@@ -624,7 +708,7 @@ Public Class frmMain
         '  MsgBox(e.Node.ToolTipText)
         Dim di = New IO.DirectoryInfo(e.Drive.Name)
         ChangeFolder(di.FullName, True)
-        FillListbox(lbxFiles, di, CurrentFilterState, Showlist, blnChooseRandomFile)
+        FillListbox(lbxFiles, di, Showlist, blnChooseRandomFile)
     End Sub
     Private Sub lbxFiles_SelectedIndexChanged(sender As Object, e As EventArgs)
         'Loads a new media file by triggering the PicLoad Timer
@@ -662,7 +746,10 @@ Public Class frmMain
                 If Not My.Computer.FileSystem.FileExists(strCurrentFilePath) Then Exit Select
 
                 img = GetImage(strCurrentFilePath)
-                If img Is Nothing Then Exit Sub
+                If img Is Nothing Then
+                    tmrPicLoad.Enabled = False
+                    Exit Sub
+                End If
                 'If blnFullScreen Then FullScreen.PictureBox1.Image = img
                 OrientPic(img)
                 'Resume if in middle of slideshow
@@ -747,7 +834,7 @@ Public Class frmMain
 
 
     End Sub
-    Private Sub ToolStripButton4_Click(sender As Object, e As EventArgs) Handles tsbFullscreen.Click
+    Private Sub ToolStripButton4_Click(sender As Object, e As EventArgs)
         GoFullScreen(True)
 
     End Sub
@@ -756,11 +843,10 @@ Public Class frmMain
     End Sub
     Private Sub ToolStripButton6_Click(sender As Object, e As EventArgs) Handles tsbClear.Click
         Showlist.Clear()
+
         lbxShowList.Items.Clear()
-        lbxShowList.TabStop = False
+        CollapseShowlist(True)
         FBCShown.Clear()
-        'CollapseShowlist(True)
-        ' tsslblFilter.Text = "0"
     End Sub
     Private Sub ToolStripButton7_Click(sender As Object, e As EventArgs)
         AddMovies(True)
@@ -768,7 +854,7 @@ Public Class frmMain
     Private Sub ToolStripButton8_Click(sender As Object, e As EventArgs)
         Addpics(True)
     End Sub
-    Private Sub ToolStripButton9_Click(sender As Object, e As EventArgs) Handles ToolStripButton9.Click
+    Private Sub ToolStripButton9_Click(sender As Object, e As EventArgs)
         ToggleRandomStartPoint()
     End Sub
 
@@ -777,9 +863,11 @@ Public Class frmMain
         blnRandomStartPoint = blnRandomStartAlways
     End Sub
 
-    Private Sub ToolStripButton10_Click(sender As Object, e As EventArgs) Handles ToolStripButton10.Click
+    Private Sub ToolStripButton10_Click(sender As Object, e As EventArgs)
 
         FindDuplicates.Show()
+        'Duplicates2.Flist = Showlist
+        'Duplicates2.Show()
     End Sub
     Private Sub ToolStripButton11_Click(sender As Object, e As EventArgs)
         SaveShowlist()
@@ -797,14 +885,14 @@ Public Class frmMain
         Dim i As Integer
         i = ToolStripButton13.SelectedIndex
         Showlist = SetPlayOrder(i, Showlist)
-        FillShowbox(lbxShowList, FilterState.All, Showlist)
+        FillShowbox(lbxShowList, CurrentFilterState, Showlist)
     End Sub
     Private Sub ToolStripButton14_Click(sender As Object, e As EventArgs)
         RemoveFilesFromCollection(Showlist, FBCShown, strVideoExtensions)
         FillShowbox(lbxShowList, FilterState.All, Showlist)
 
     End Sub
-    Private Sub ToolStripButton15_Click(sender As Object, e As EventArgs) Handles ToolStripButton15.Click
+    Private Sub ToolStripButton15_Click(sender As Object, e As EventArgs)
         tmrSlideShow.Enabled = Not tmrSlideShow.Enabled
         If tmrSlideShow.Enabled = False Then blnRestartSlideShowFlag = False
     End Sub
@@ -825,7 +913,10 @@ Public Class frmMain
                 tmrPicLoad.Enabled = False
                 'strOldPath = strCurrentFilePath
                 strCurrentFilePath = .Items(i)
-                lCurrentDisplayIndex = i
+                If sender.Equals(lbxShowList) Then
+                    lCurrentDisplayIndex = i
+                End If
+
                 tmrPicLoad.Enabled = True
             End If
         End With
@@ -835,13 +926,15 @@ Public Class frmMain
 
 
 
-    Private Sub ShowListToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ShowListToolStripMenuItem.Click
-
+    Private Sub ShowListToolStripMenuItem_Click(sender As Object, e As EventArgs)
+        ' LoadFiles.RunWorkerAsync()
         LoadShowList()
+
         'newThread.Start()
     End Sub
+
     Private Sub tmrSlideShow_Tick(sender As Object, e As EventArgs) Handles tmrSlideShow.Tick
-        AdvanceFile(True)
+        AdvanceFile(True, False)
         'tmrSlideShow.Interval = ssspeed
 
 
@@ -860,7 +953,6 @@ Public Class frmMain
                 .RotateFlip(RotateFlipType.Rotate270FlipNone)
 
             End If
-            '.SetPropertyItem(OrientationId).value = ExifOrientations.TopRight
             currentPicBox.Refresh()
             Dim finfo As New FileInfo(strCurrentFilePath)
             Dim dt As New Date
@@ -871,7 +963,7 @@ Public Class frmMain
 
         End With
     End Sub
-    Private Sub ToolStripButton16_Click(sender As Object, e As EventArgs) Handles ToolStripButton16.Click
+    Private Sub ToolStripButton16_Click(sender As Object, e As EventArgs)
         RotatePic(currentPicBox, True)
     End Sub
     Private Function StringList(List As List(Of String), strSearch As String) As List(Of String)
@@ -898,7 +990,7 @@ Public Class frmMain
         End If
 
         Showlist = SetPlayOrder(0, Showlist)
-        FillShowbox(lbxShowList, FilterState.All, Showlist)
+        FillShowbox(lbxShowList, CurrentFilterState, Showlist)
 
     End Sub
 
@@ -908,14 +1000,13 @@ Public Class frmMain
 
 
 
-    Private Sub SaveListToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SaveListToolStripMenuItem.Click
+    Private Sub SaveListToolStripMenuItem_Click(sender As Object, e As EventArgs)
         SaveShowlist()
     End Sub
 
     Private Sub IncludingSubfoldersToolStripMenuItem_Click(sender As Object, e As EventArgs)
-        'Addpics(True)
+        Addpics(True)
 
-        BackgroundWorker1.RunWorkerAsync()
     End Sub
 
     Private Sub IncludingSubsetsToolStripMenuItem_Click(sender As Object, e As EventArgs)
@@ -945,9 +1036,6 @@ Public Class frmMain
 
 
 
-    Private Sub AddPicturesBGW_DoWork(sender As Object, e As DoWorkEventArgs) Handles BackgroundWorker1.DoWork
-        Addpics(True)
-    End Sub
 
 
 
@@ -1000,7 +1088,7 @@ Public Class frmMain
 
         lbxFiles.Items.Remove(strold)
         lbxShowList.Items.Remove(strold)
-        lbxShowList.Items.Add(strnew)
+        If strnew <> "" Then lbxShowList.Items.Add(strnew)
     End Sub
     Private Sub tmrLoadLastFolder_Tick(sender As Object, e As EventArgs) Handles tmrLoadLastFolder.Tick
         If strCurrentFilePath = "" Then Exit Sub
@@ -1011,29 +1099,15 @@ Public Class frmMain
     End Sub
 
 
-    'Private Sub RandomStartToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RandomStartToolStripMenuItem.Click
-    '    JumpRandom(False)
-    'End Sub
 
-
-    Delegate Sub UpdateForm_Delegate(ByVal [TS] As StatusStrip, ByVal [text] As String)
-
-    Public Sub UpdateForm_ThreadSafe(ByVal [TSS] As StatusStrip, ByVal [text] As String)
-        If [TSS].InvokeRequired Then
-            Dim MyDelegate As New UpdateForm_Delegate(AddressOf UpdateForm_ThreadSafe)
-            Me.Invoke(MyDelegate, New Object() {TSS, [text]})
-        Else
-            TSS.Text = [text]
-        End If
-    End Sub
 
 
     Private Sub tvMain2_DirectorySelected(sender As Object, e As DirectoryInfoEventArgs) Handles tvMain2.DirectorySelected
         PreferencesSave()
         ChangeFolder(e.Directory.FullName, True)
-        ' tvMain2.SelectedFolder = CurrentFolderPath
-        FillListbox(lbxFiles, e.Directory, CurrentFilterState, Showlist, blnChooseRandomFile)
-        If lbxFiles.Items.Count = 0 Then tbFiles.Text = "0/" & Str(Showlist.Count)
+
+        tmrUpdateFolderSelection.Interval = 500
+        tmrUpdateFolderSelection.Enabled = True
     End Sub
 
     Private Sub tvMain2_KeyDown(sender As Object, e As KeyEventArgs) Handles tvMain2.KeyDown
@@ -1106,14 +1180,15 @@ Public Class frmMain
 
     End Sub
 
-    Private Sub ButtonListToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ButtonListToolStripMenuItem.Click
+    Private Sub ButtonListToolStripMenuItem_Click(sender As Object, e As EventArgs)
         KeyAssignmentsRestore()
         CollapseShowlist(False)
     End Sub
 
-    Private Sub ButtonListToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles ButtonListToolStripMenuItem1.Click
+    Private Sub ButtonListToolStripMenuItem1_Click(sender As Object, e As EventArgs)
         SaveButtonlist()
     End Sub
+
 
     Private Sub tmrUpdateForm_Tick(sender As Object, e As EventArgs) Handles tmrUpdateForm.Tick
         Me.Update()
@@ -1127,7 +1202,11 @@ Public Class frmMain
     Public Sub UpdateFileInfo(f As FileInfo)
         Dim listcount = lbxFiles.Items.Count
         Dim showcount = lbxShowList.Items.Count
-        tbDate.Text = f.LastWriteTime.ToShortDateString & " " & f.LastWriteTime.ToShortTimeString
+        Dim dt As Date
+        dt = f.LastAccessTime
+        If f.LastWriteTime < dt Then dt = f.LastWriteTime
+        If f.CreationTime < dt Then dt = f.CreationTime
+        tbDate.Text = dt.ToShortDateString & " " & dt.ToShortTimeString
         tbFiles.Text = listcount & "/" & showcount
         tbFilter.Text = "Filter:" & Filterstates(CurrentFilterState)
         tbLastFile.Text = strCurrentFilePath
@@ -1147,19 +1226,29 @@ Public Class frmMain
     End Sub
 
     Private Sub SelectSubList()
-        Dim s As String = InputBox("Enter selection string")
-        lbxShowList.Items.Clear()
-        'If PFocus=CtrlFocus.Files
-        If lbxShowList.Items.Count = 0 Then
-            CollapseShowlist(False)
-            Showlist = MakeSubList(FileboxContents, s)
 
-        Else
-            Oldlist = Showlist
-            lbxShowList.Items.Clear()
-            Showlist = MakeSubList(Showlist, s)
+        Dim s As String = InputBox("Enter selection string")
+        If s = "" Then Exit Sub
+        If PFocus = CtrlFocus.Tree Then
+            ControlSetFocus(lbxFiles)
         End If
-        FillShowbox(lbxShowList, CurrentFilterState, Showlist)
+        If PFocus = CtrlFocus.Files Then
+            SelectFromListbox(lbxFiles, s)
+        ElseIf PFocus = CtrlFocus.ShowList Then
+            SelectFromListbox(lbxShowList, s)
+
+            Exit Sub
+            If lbxShowList.Items.Count = 0 Then
+                CollapseShowlist(False)
+                Showlist = MakeSubList(FileboxContents, s)
+
+            Else
+                Oldlist = Showlist
+                lbxShowList.Items.Clear()
+                Showlist = MakeSubList(Showlist, s)
+            End If
+            FillShowbox(lbxShowList, CurrentFilterState, Showlist)
+        End If
     End Sub
 
     Private Sub ToolStripButton14_Click_1(sender As Object, e As EventArgs) Handles ToolStripButton14.Click
@@ -1183,7 +1272,6 @@ Public Class frmMain
 
     Private Sub lbxFiles_GotFocus(sender As Object, e As EventArgs) Handles lbxFiles.GotFocus
         PFocus = CtrlFocus.Files
-
     End Sub
 
     Private Sub lbxShowList_GotFocus(sender As Object, e As EventArgs) Handles lbxShowList.GotFocus
@@ -1213,19 +1301,14 @@ Public Class frmMain
         HarvestCurrent()
     End Sub
 
-    Private Sub HarvestUp()
-        Dim di As New DirectoryInfo(CurrentFolderPath)
-        HarvestFolder(di, di.Parent, True)
-        FillListbox(lbxFiles, di, CurrentFilterState, FileboxContents, False)
 
-    End Sub
     ''' <summary>
-    ''' 
+    ''' Takes all files in subfolders of di, and places them in di
     ''' </summary>
     Private Sub HarvestCurrent()
         Dim di As New DirectoryInfo(CurrentFolderPath)
         HarvestFolder(di, di, True)
-        FillListbox(lbxFiles, di, CurrentFilterState, FileboxContents, False)
+        FillListbox(lbxFiles, di, FileboxContents, False)
     End Sub
 
     Private Sub lbxFiles_KeyDown(sender As Object, e As KeyEventArgs) Handles lbxFiles.KeyDown
@@ -1267,7 +1350,86 @@ Public Class frmMain
     End Sub
 
     Private Sub tmrListbox_Tick(sender As Object, e As EventArgs) Handles tmrListbox.Tick
-        FillListbox(lbxFiles, New DirectoryInfo(CurrentFolderPath), CurrentFilterState, Showlist, blnChooseRandomFile)
+        FillListbox(lbxFiles, New DirectoryInfo(CurrentFolderPath), FileboxContents, blnChooseRandomFile)
         tmrListbox.Enabled = False
+    End Sub
+
+    Private Sub ToolStripComboBox2_Click(sender As Object, e As EventArgs) Handles ToolStripComboBox2.Click
+
+    End Sub
+
+    Private Sub ToolStripComboBox2_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ToolStripComboBox2.SelectedIndexChanged
+        ChosenPlayOrder = ToolStripComboBox2.SelectedIndex
+        UpdatePlayOrder()
+    End Sub
+
+    Private Sub frmMain_Load(sender As Object, e As EventArgs) Handles Me.Load
+        For i = 0 To 5
+            ToolStripComboBox2.Items.Add(strPlayOrder(i))
+        Next
+
+    End Sub
+
+    Private Sub tvMain2_DragLeave(sender As Object, e As EventArgs) Handles tvMain2.DragLeave
+
+    End Sub
+
+    Private Sub btn1_MouseClick(sender As Object, e As MouseEventArgs) Handles btn1.MouseClick
+        'If e.Button = MouseButtons.Right Then
+        FolderSelect.Show()
+        'End If
+    End Sub
+
+    Private Sub LoadListToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles LoadListToolStripMenuItem1.Click
+        'LoadFiles.RunWorkerAsync()
+        LoadShowList()
+
+    End Sub
+
+    Private Sub SaveListToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles SaveListToolStripMenuItem1.Click
+        SaveShowlist()
+    End Sub
+
+    Private Sub LoadListToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles LoadListToolStripMenuItem.Click
+        LoadButtonList()
+        KeyAssignmentsRestore(strButtonFile)
+    End Sub
+
+    Private Sub SaveListasToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SaveListasToolStripMenuItem.Click
+        SaveButtonlist()
+
+    End Sub
+
+    Private Sub NewListToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles NewListToolStripMenuItem.Click
+        NewButtonList()
+    End Sub
+
+    Private Sub ToolStripLabel2_Click(sender As Object, e As EventArgs) Handles tsbuttontn.Click
+        Thumbnails.Show()
+    End Sub
+
+    Private Sub ToolStripLabel2_Click_1(sender As Object, e As EventArgs) Handles ToolStripLabel2.Click
+        ToggleControl()
+
+
+    End Sub
+
+    Private Sub ToggleControl()
+        CtrlDown = Not CtrlDown
+    End Sub
+
+    Private Sub BurstFolderToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles BurstFolderToolStripMenuItem.Click
+        BurstFolder(New DirectoryInfo(CurrentFolderPath))
+    End Sub
+
+    Private Sub LoadFiles_DoWork(sender As Object, e As DoWorkEventArgs) Handles LoadFiles.DoWork
+        LoadShowList()
+    End Sub
+
+    Private Sub tmrUpdateFolderSelection_Tick(sender As Object, e As EventArgs) Handles tmrUpdateFolderSelection.Tick
+        ' tvMain2.SelectedFolder = CurrentFolderPath
+        FillListbox(lbxFiles, New DirectoryInfo(CurrentFolderPath), Showlist, blnChooseRandomFile)
+        If lbxFiles.Items.Count = 0 Then tbFiles.Text = "0/" & Str(Showlist.Count)
+        tmrUpdateFolderSelection.Enabled = False
     End Sub
 End Class

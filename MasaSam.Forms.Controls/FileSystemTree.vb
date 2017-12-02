@@ -473,6 +473,11 @@ Public Class FileSystemTree
                 Dim directories = dirNode.Directory.GetDirectories()
                 CreateDirectoryTree(dirNode, directories)
                 CreateFileTree(dirNode)
+            Catch ex As System.IO.DirectoryNotFoundException
+                If (HideUnauthorizedDirectories = True) Then
+                    remove.Add(dirNode)
+                End If
+                Continue For
             Catch ex As UnauthorizedAccessException
                 If (HideUnauthorizedDirectories = True) Then
                     remove.Add(dirNode)
@@ -1107,7 +1112,7 @@ Public Class FileSystemTree
 
 
 
-    Private Sub tvFiles_AfterLabelEdit(sender As Object, e As NodeLabelEditEventArgs) Handles tvFiles.AfterLabelEdit
+    Public Sub tvFiles_AfterLabelEdit(sender As Object, e As NodeLabelEditEventArgs) Handles tvFiles.AfterLabelEdit
         Dim oldlabel As String = e.Label
 
         e = RelabelFolder(e)
@@ -1115,7 +1120,8 @@ Public Class FileSystemTree
 
             My.Computer.FileSystem.RenameDirectory(NodePath(e), e.Label)
         Catch ex As Exception
-            e = RelabelFolder(e) 'TODO improve this.
+            MsgBox(ex.Message)
+            '            e = RelabelFolder(e) 'TODO improve this.
         End Try
         Replace(e.Node.FullPath, oldlabel, e.Label)
 

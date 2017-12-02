@@ -1,4 +1,4 @@
-﻿Module Settings
+﻿Public Module Settings
     Public Enum ExifOrientations As Byte
         Unknown = 0
         TopLeft = 1
@@ -20,7 +20,7 @@
 
     Public Const OrientationId As Integer = &H112
     Public blnSpeedRestart As Boolean = False
-    Public iSSpeeds() As Integer = {1500, 900, 50}
+    Public iSSpeeds() As Integer = {1500, 900, 400}
     Public iPlaybackSpeed() As Decimal = {0.1, 0.5, 0.75}
     Public currentWMP As New AxWMPLib.AxWindowsMediaPlayer
     Public LastPlayed As New Stack(Of String)

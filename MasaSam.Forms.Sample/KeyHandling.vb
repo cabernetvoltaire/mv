@@ -89,6 +89,7 @@
     Public KeyToggleButtons = Keys.OemOpenBrackets
     Public KeyEscape = Keys.Escape
     Public KeySelect = Keys.F3
+    Public KeyDelete = Keys.Delete
 
     Public Enum FilterState
         All

@@ -61,8 +61,11 @@
         PreparePic(pic, picBlanker, img)
     End Sub
     Public Sub DisposePic(box As PictureBox)
+
         box.Image.Dispose()
+
         GC.SuppressFinalize(box)
+        box.Image = Nothing
     End Sub
     Public Sub Mousewheel(pbx1 As PictureBox, sender As Object, e As MouseEventArgs)
         ePicMousePoint.X = e.X
@@ -92,7 +95,7 @@
 
         Else
             'Wheel advances file if nothing else held
-            frmMain.AdvanceFile(e.Delta < 0)
+            frmMain.AdvanceFile(e.Delta < 0, False)
             frmMain.tmrSlideShow.Enabled = False 'Break slideshow if scrolled
             Dim img As Image = GetImage(strCurrentFilePath)
             PreparePic(pbx1, picBlanker, img)
@@ -101,7 +104,7 @@
     End Sub
 
     Public Function GetImage(strPath As String) As Image
-        If strCurrentFilePath = "" Then Return Nothing
+        If strPath = "" Then Return Nothing
         Try
             Dim img As Image = Image.FromFile(strPath)
             Return img

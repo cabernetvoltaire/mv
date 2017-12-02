@@ -1,10 +1,15 @@
-﻿Imports System.IO
-Module General
+﻿Option Explicit On
+Imports System.IO
+
+Public Module General
+    Public Property blnSecondScreen As Boolean = True
+    Public Property LastShowList As String
+    Public Property blnLink As Boolean
 
     Public Sub ProgressBarOn(max As Long)
         With frmMain.TSPB
             .Value = 0
-            .Maximum = Math.Max(lngListSizeBytes, 100)
+            .Maximum = max 'Math.Max(lngListSizeBytes, 100)
             .Visible = True
         End With
 
@@ -15,11 +20,13 @@ Module General
         End With
 
     End Sub
-    Public Sub ProgressIncrement(st As Integer, max As Long)
+    Public Sub ProgressIncrement(st As Integer)
         With frmMain.TSPB
-            .Maximum = max
-            .Value = (.Value + st) Mod max
+            '   .Maximum = max
+            .Value = (.Value + st) Mod .Maximum
+
         End With
+        frmMain.Update()
     End Sub
 
     Public Function ImageOrientation(ByVal img As Image) As ExifOrientations
@@ -106,6 +113,13 @@ Module General
     ''' </summary>
     ''' <param name="list"></param>
     ''' <param name="list2"></param>
+    Public Sub CopyList(list As List(Of String), list2 As ListBox)
+        list.Clear()
+        For Each m In list2.Items
+            list.Add(m)
+        Next
+    End Sub
+
     Private Sub CopyList(list As List(Of String), list2 As SortedList(Of String, String))
         list.Clear()
         For Each m As KeyValuePair(Of String, String) In list2
@@ -125,6 +139,9 @@ Module General
         Next
     End Sub
 
+    ''' <summary>
+    ''' Only load the labels of the current set. 
+    ''' </summary>
     Public Sub Buttons_Load()
         For i As Byte = 0 To 7
             lblDest(i).Font = New Font(lblDest(i).Font, FontStyle.Bold)
@@ -140,27 +157,33 @@ Module General
     ''' <param name="e"></param>
     Public Sub HandleFunctionKeyDown(sender As Object, e As KeyEventArgs)
         Dim i As Byte = e.KeyCode - Keys.F5
-        If strVisibleButtons(i) = "" Or e.Shift Then 'Simple assign
-            If e.Control Then 'Move files if CTRL held
-                MoveFiles(Showlist, strVisibleButtons(i), frmMain.lbxShowList)
-            Else
-                AssignButton(i, iCurrentAlpha, CurrentFolderPath) 'Just assign
-                KeyAssignmentsStore(strButtonFile)
+        If e.Control Then 'Move files if CTRL held
+            frmMain.CancelDisplay()
 
-            End If
-
-        ElseIf e.Control Then
-            'Otherwise move selected
             Select Case PFocus
                 Case CtrlFocus.Files
                     MoveFiles(ListfromListbox(frmMain.lbxFiles), strVisibleButtons(i), frmMain.lbxFiles)
                 Case CtrlFocus.Tree
                     MoveFolder(CurrentFolderPath, strVisibleButtons(i), frmMain.tvMain2)
+                Case CtrlFocus.ShowList
+                    ' If MsgBox("This will move all the showlist files to the folder " & strVisibleButtons(i) & ". Is this what you want?", MsgBoxStyle.YesNoCancel) <> MsgBoxResult.Yes Then Exit Sub
+                    MoveFiles(ListfromListbox(frmMain.lbxShowList), strVisibleButtons(i), frmMain.lbxShowList)
             End Select
 
         Else
-            ChangeFolder(strVisibleButtons(i), True)
-            frmMain.tvMain2.SelectedFolder = CurrentFolderPath
+            If e.Shift Or strVisibleButtons(i) = "" Then
+                AssignButton(i, iCurrentAlpha, CurrentFolderPath) 'Just assign
+                If My.Computer.FileSystem.FileExists(strButtonFile) Then
+                    KeyAssignmentsStore(strButtonFile)
+                Else
+                    SaveButtonlist()
+                End If
+            Else
+
+                ChangeFolder(strVisibleButtons(i), True)
+                frmMain.tvMain2.SelectedFolder = CurrentFolderPath
+            End If
+
         End If
     End Sub
 
@@ -183,37 +206,54 @@ Module General
     ''' </summary>
     ''' <param name="lbx"></param>
     ''' <param name="Filter"></param>
-    ''' <param name="showlist"></param>
-    Public Sub FillShowbox(lbx As ListBox, Filter As Byte, showlist As List(Of String))
-        If showlist.Count = 0 Then Exit Sub
-        ProgressBarOn(1000)
-        frmMain.CollapseShowlist(False)
-        lbx.Items.Clear()
+    ''' <param name="lst"></param>
+    Public Sub FillShowbox(lbx As ListBox, Filter As Byte, ByVal lst As List(Of String))
+        If lst.Count = 0 Then Exit Sub
+        ProgressBarOn(lst.Count)
+        If lbx.Equals(frmMain.lbxShowList) Then
+            frmMain.CollapseShowlist(False)
+        Else
+            lbx.Items.Clear()
 
-        For Each s In showlist
+        End If
+
+
+        For Each s In lst
             lbx.Items.Add(s)
-            ProgressIncrement(1, 1000)
+            ProgressIncrement(1)
         Next
         lbx.TabStop = True
         ProgressBarOff()
     End Sub
-    Public Function SetPlayOrder(Order As Byte, List As List(Of String)) As List(Of String)
+    Public Function SetPlayOrder(Order As Byte, ByVal List As List(Of String)) As List(Of String)
         Dim NewListS As New SortedList(Of String, String)
         Dim NewListL As New SortedList(Of Long, String)
-        Dim NewListD As New SortedList(Of Date, String)
+        Dim NewListD As New SortedList(Of DateTime, String)
         For Each f In List
             If Len(f) > 247 Then Continue For
             Dim file As New FileInfo(f)
+            'frmMain.ListBox1.BringToFront()
+
             Try
                 Select Case Order
                     Case PlayOrder.Name
-                        NewListS.Add(file.Name & file.FullName, file.FullName)
+                        Dim l As Long = 0
+                        Dim s As String
+                        s = file.Name & Str(l)
+                        While NewListS.ContainsKey(s)
+                            l += 1
+                            s = file.Name & Str(l)
+                            '               frmMain.ListBox1.Items.Add(s)
+
+                        End While
+                        NewListS.Add(s, file.FullName)
                     Case PlayOrder.Length
                         Try
                             Dim l As Long
                             l = file.Length
                             While NewListL.ContainsKey(l)
                                 l += 1
+                                'MsgBox(l)
                             End While
                             NewListL.Add(l, file.FullName)
 
@@ -222,32 +262,43 @@ Module General
 
                         End Try
                     Case PlayOrder.Time
-                        Dim time = file.LastWriteTime.AddMilliseconds(Rnd(100))
-                        Dim time2 = file.LastAccessTime.AddMilliseconds(Rnd(100))
+                        Dim time As DateTime = file.LastWriteTime
+                        Dim time2 As DateTime = file.LastAccessTime
                         If time2 < time Then time = time2
-
+                        'MsgBox(time)
+                        While NewListD.ContainsKey(time)
+                            time = time.AddSeconds(1)
+                        End While
                         NewListD.Add(time, file.FullName)
                     Case PlayOrder.PathName
-                        NewListS.Add(file.FullName, file.FullName)
+                        Dim l As Long = 0
+                        Dim s As String
+                        s = file.FullName & Str(l)
+                        While NewListS.ContainsKey(s)
+                            l += 1
+                            s = file.FullName & Str(l)
+                            '               frmMain.ListBox1.Items.Add(s)
+
+                        End While
+                        '                        MsgBox(file.FullName)
+                        NewListS.Add(s, file.FullName)
 
                     Case PlayOrder.Type
-                        NewListS.Add(file.Extension & file.Name & Str(Rnd(100)), file.FullName)
+                        NewListS.Add(file.Extension & file.Name & Str(Rnd() * (100)), file.FullName)
+
                     Case PlayOrder.Random
-                        Try
-                            Dim l As Long
-                            l = Rnd(10 * List.Count)
-                            While NewListS.ContainsKey(Str(l))
-                                l = Rnd(10 * List.Count)
+                        Dim l As Long
+                        l = Int(Rnd() * (100 * List.Count))
+                        While NewListS.ContainsKey(Str(l))
+                            l = Int(Rnd() * (100 * List.Count))
+                            '                       frmMain.ListBox1.Items.Add(l)
 
-                            End While
-                            NewListS.Add(Str(l), file.FullName)
+                        End While
+                        NewListS.Add(Str(l), file.FullName)
 
-                        Catch ex As System.ArgumentException
-                            MsgBox(ex.Message) '                            NewListS.Add(Str(Rnd(List.Count)), file.FullName)
-
-                        End Try
                 End Select
             Catch ex As System.ArgumentException 'TODO could do better than this. 
+                MsgBox(ex.Message)
                 Continue For
             Catch ex As IO.FileNotFoundException
                 Continue For
@@ -294,5 +345,20 @@ Module General
 
 
     End Sub
+
+    Public Function SelectFromListbox(lbx As ListBox, s As String) As List(Of String)
+        Dim ls As New List(Of String)
+        Dim i As Long
+        lbx.SelectedItem = Nothing
+        lbx.SelectionMode = SelectionMode.MultiExtended
+        For i = 0 To lbx.Items.Count - 1
+
+            If InStr(UCase(lbx.Items(i)), UCase(s)) <> 0 Then
+                lbx.SetSelected(i, True)
+                'ls.Add(it)
+            End If
+        Next
+        Return ls
+    End Function
 
 End Module

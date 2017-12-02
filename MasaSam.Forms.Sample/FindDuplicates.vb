@@ -13,10 +13,8 @@ Public Class FindDuplicates
         'Add current showlist, in size sorted order, to lbxSorted
         sortedList = SetPlayOrder(PlayOrder.Length, Showlist)
         FillShowbox(lbxsorted, FilterState.All, sortedList)
-        'CreateDeleteArray(sortedList)
-        '  DeletesandUniques()
         uniquelist = ExtractDups(sortedList)
-        MsgBox("There are " & uniquelist.Count & "unique files, out of " & Showlist.Count)
+        MsgBox("There are " & uniquelist.Count & " unique files having duplicates, out of " & Showlist.Count)
 
         FillShowbox(lbxunique, FilterState.All, uniquelist)
         'Create a list of unique files, by ignoring any which have the same length as the previous one.
@@ -71,47 +69,6 @@ Public Class FindDuplicates
     End Sub
 
     ''' <summary>
-    ''' Creates duplist from sortedlist, based on length, and puts them in lbxsorted
-    ''' </summary>
-    Private Sub HighlightPossDups()
-        Dim blnDontIncludeLast = True
-        Dim lastlength As Long
-        Dim lastpath As String = ""
-        Dim lastinfo As IO.FileInfo = Nothing
-
-        For Each file In sortedList
-
-            Dim finfo As New IO.FileInfo(file)
-            Dim currlength As Long
-            currlength = finfo.Length
-            Dim currpath As String = finfo.FullName
-            If currlength = lastlength And currpath <> lastpath Then
-                If Not blnDontIncludeLast Then
-                    duplist.Add(lastinfo.FullName)
-
-                End If
-                duplist.Add(file)
-                blnDontIncludeLast = True
-            Else
-                blnDontIncludeLast = False
-            End If
-            lastinfo = finfo
-            lastpath = finfo.FullName
-            lastlength = finfo.Length
-        Next
-        lbxsorted.Items.Clear()
-        For Each f In duplist
-            lbxsorted.Items.Add(f)
-        Next
-    End Sub
-
-
-
-
-
-
-
-    ''' <summary>
     ''' Finds duplicates of the given file within the current Showlist and adds them to duplist, which is then written to lbxDuplicates. The appropriate controls then show the files in lbxDuplicates
     ''' </summary>
     ''' <param name="strFilePath"></param>
@@ -133,6 +90,7 @@ Public Class FindDuplicates
             If f.Length = length Then duplist.Add(f.FullName)
 
         Next
+        'Fill the duplicates box
         FillShowbox(lbxDuplicates, FilterState.All, duplist)
         For i = 0 To 11
             Try
@@ -144,6 +102,7 @@ Public Class FindDuplicates
             End Try
 
         Next
+        'Show and split
         i = 0
         deletelist.Clear()
         For Each row In lbxDuplicates.Items
@@ -159,14 +118,7 @@ Public Class FindDuplicates
                 If i = 0 Then
                     If Not lbxSave.Items.Contains(row) Then lbxSave.Items.Add(row)
                 Else
-                    If Not lbxSave.Items.Contains(row) Then lbxDeleteList.Items.Add(row)
-                    'End If
-                    'If deletelist.Contains(row) Then
-                    'Else
-                    '    If i > 0 Then deletelist.Add(row)
-                    '    End If
-                    '    'IncludeRows(row)
-                    '    '   ExcludeRows(row)
+                    If Not lbxDeleteList.Items.Contains(row) Then lbxDeleteList.Items.Add(row)
                 End If
                 i += 1
             End If
@@ -210,14 +162,11 @@ Public Class FindDuplicates
         Return uniquedups
     End Function
 
-    Private Sub lbxunique_SelectedIndexChanged_1(sender As Object, e As EventArgs) Handles lbxunique.SelectedIndexChanged, lbxDeleteList.SelectedIndexChanged, lbxSave.SelectedIndexChanged, lbxDuplicates.SelectedIndexChanged
+    Private Sub lbxunique_SelectedIndexChanged_1(sender As Object, e As EventArgs) Handles lbxunique.SelectedIndexChanged, lbxDeleteList.SelectedIndexChanged, lbxSave.SelectedIndexChanged, lbxDuplicates.SelectedIndexChanged, lbxsorted.SelectedIndexChanged
         Dim path As String = sender.Items(sender.SelectedIndex)
         finddups(path)
     End Sub
-    Private Sub CreateDeleteArray(uniquelist, sortedlist)
 
-
-    End Sub
 
     Private Sub lbxDeleteList_DoubleClick(sender As Object, e As EventArgs) Handles lbxDeleteList.DoubleClick
         FillShowbox(lbxDeleteList, FilterState.All, deletelist)
@@ -230,65 +179,47 @@ Public Class FindDuplicates
             MsgBox("Click to delete files")
             For Each file In lbxDeleteList.Items
                 My.Computer.FileSystem.DeleteFile(file, FileIO.UIOption.AllDialogs, FileIO.RecycleOption.SendToRecycleBin)
+                RemoveFromListBox(file, lbxDeleteList, deletelist)
+                RemoveFromListBox(file, lbxsorted, sortedList)
+                RemoveFromListBox(file, lbxDuplicates, duplist)
+
             Next
             MsgBox("Finished")
         End If
-    End Sub
-
-    Private Sub CreateDeleteArray(list As List(Of String))
-
-        Dim i As Long = 0
-        Dim j As Long = 0
-        Dim lastlength As Long = 0
-        Dim path As String = ""
-        For Each path In list
-
-            Dim finfo As New FileInfo(path)
-            If finfo.Length = lastlength Then
-                'Move to the right and write on same line
-                j += 1
-                blnDelete(i, j) = True
-            Else
-                'If have moved to right, make new line. Otherwise, overwrite
-                If j > 0 Then
-                    i += 1
-                    j = 0
-                End If
-
-            End If
-            lastlength = finfo.Length
-            DeleteArray(i, j) = path
-        Next
-        For i = 0 To 10
-            For j = 0 To 10
-                path = path & "," & DeleteArray(i, j)
-            Next
-            path = ""
-        Next
-    End Sub
-
-    Private Sub lbxDuplicates_SelectedIndexChanged(sender As Object, e As EventArgs) Handles lbxDuplicates.SelectedIndexChanged
-
     End Sub
 
 
 
     Private Sub lbxDuplicates_MouseDoubleClick(sender As Object, e As MouseEventArgs) Handles lbxDuplicates.MouseDoubleClick
         If blnClicktoSave Then
-            lbxSave.Items.Add(lbxDuplicates.SelectedItem)
-            lbxDeleteList.Items.Remove(lbxDuplicates.SelectedItem)
+            If Not lbxSave.Items.Contains(lbxDuplicates.SelectedItem) Then lbxSave.Items.Add(lbxDuplicates.SelectedItem)
+            If lbxDeleteList.Items.Contains(lbxDuplicates.SelectedItem) Then lbxDeleteList.Items.Remove(lbxDuplicates.SelectedItem)
         Else
-            lbxSave.Items.Remove(lbxDuplicates.SelectedItem)
-            lbxDeleteList.Items.Add(lbxDuplicates.SelectedItem)
+            If lbxSave.Items.Contains(lbxDuplicates.SelectedItem) Then lbxSave.Items.Remove(lbxDuplicates.SelectedItem)
+            If Not lbxDeleteList.Items.Contains(lbxDuplicates.SelectedItem) Then lbxDeleteList.Items.Add(lbxDuplicates.SelectedItem)
 
         End If
-    End Sub
-
-    Private Sub Label4_Click(sender As Object, e As EventArgs) Handles Label4.Click
 
     End Sub
 
-    Private Sub Label6_Click(sender As Object, e As EventArgs) Handles Label6.Click
+    Private Sub lbxSave_MouseDoubleClick(sender As Object, e As MouseEventArgs) Handles lbxSave.MouseDoubleClick
+        lbxSave.Items.Remove(lbxSave.SelectedItem)
+        If Not lbxDeleteList.Items.Contains(lbxSave.SelectedItem) Then lbxDeleteList.Items.Add(lbxSave.SelectedItem)
 
+    End Sub
+
+    Private Sub lbxDeleteList_MouseDoubleClick(sender As Object, e As MouseEventArgs) Handles lbxDeleteList.MouseDoubleClick
+        lbxDeleteList.Items.Remove(lbxDeleteList.SelectedItem)
+        If Not lbxSave.Items.Contains(lbxDeleteList.SelectedItem) Then lbxSave.Items.Add(lbxDeleteList.SelectedItem)
+
+    End Sub
+
+    Private Sub AutoList_Click(sender As Object, e As EventArgs) Handles AutoList.Click
+        With lbxunique
+            While .SelectedIndex < .Items.Count - 1
+                .SelectedItem = .Items(.SelectedIndex + 1)
+                frmMain.Update()
+            End While
+        End With
     End Sub
 End Class
