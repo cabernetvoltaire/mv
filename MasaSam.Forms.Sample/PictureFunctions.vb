@@ -24,7 +24,7 @@
     Public Property bImageDimensionState As Byte
     Public Property ShiftDown As Boolean
     Public Property CtrlDown As Boolean
-    Public Property ZoneSize As Decimal = 0.7
+    Public Property ZoneSize As Decimal = 0.5
 
     Public Function ClassifyImage(lvpw As Long, lvph As Long, liw As Long, lih As Long) As Byte
         Dim s As String
@@ -105,11 +105,13 @@
 
     Public Function GetImage(strPath As String) As Image
         If strPath = "" Then Return Nothing
+        Return LoadImage(strPath)
+        Exit Function
         Try
             Dim img As Image = Image.FromFile(strPath)
             Return img
         Catch ex As Exception
-            MsgBox(ex.Message)
+            'MsgBox(ex.Message)
             Return Nothing
 
         End Try

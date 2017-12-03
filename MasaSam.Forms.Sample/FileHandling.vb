@@ -214,16 +214,18 @@ Module FileHandling
         Next
         Return s
     End Function
-    Public Sub MoveFolder(strDir As String, strDest As String, tvw As MasaSam.Forms.Controls.FileSystemTree)
-        If MsgBox("This will move current folder to " & strDest & ". Are you sure?", MsgBoxStyle.OkCancel) = MsgBoxResult.Ok Then
-            Try
-
-                My.Computer.FileSystem.MoveDirectory(strDir, strDest)
-                tvw.RemoveNode(strDir)
-            Catch ex As Exception
-                MsgBox(ex.Message)
-            End Try
+    Public Sub MoveFolder(strDir As String, strDest As String, tvw As MasaSam.Forms.Controls.FileSystemTree, blnOverride As Boolean)
+        If Not blnOverride Then
+            If MsgBox("This will move current folder to " & strDest & ". Are you sure?", MsgBoxStyle.OkCancel) <> MsgBoxResult.Ok Then Exit Sub
         End If
+        Try
+
+                    My.Computer.FileSystem.MoveDirectory(strDir, strDest)
+                    tvw.RemoveNode(strDir)
+                Catch ex As Exception
+                    MsgBox(ex.Message)
+                End Try
+
     End Sub
 
 
@@ -272,12 +274,18 @@ Module FileHandling
                         If Not currentPicBox.Image Is Nothing Then DisposePic(currentPicBox)
 
                         lbx1.Items.Remove(m.FullName)
+
                         If strDest = "" Then
 
                             Deletefile(m.FullName)
                         Else
+                            'MsgBox("Start")
+
                             .MoveFile(m.FullName, spath)
+                            '.DeleteFile(m.FullName)
+                            'MsgBox("Finish")
                         End If
+
 
                     Catch ex As IOException
                         Continue For
@@ -287,8 +295,7 @@ Module FileHandling
             End With
         Next
         lbx1.SelectionMode = SelectionMode.One
-
-        lbx1.SetSelected(Math.Max(Math.Min(ind, lbx1.Items.Count - 1), 0), True)
+        If lbx1.Items.Count <> 0 Then lbx1.SetSelected(Math.Max(Math.Min(ind, lbx1.Items.Count - 1), 0), True)
 
         'With current file(s)
         'Move file to destination folder
@@ -297,7 +304,7 @@ Module FileHandling
     End Sub
 
     Public Function CreateNewDirectory(strDest As String) As String
-        Dim s As String = InputBox("Name of folder to create? (Blank means none)", "Create sub-folder", "")
+        Dim s As String = InputBox("Name of folder to create? (Blank means none)", "Create sub-folder", frmMain.LastSelection)
         s = strDest & "\" & s
         Try
             IO.Directory.CreateDirectory(s)
@@ -330,10 +337,8 @@ Module FileHandling
 
 
     End Sub
-
     Private Sub PreFindAllFiles(blnRecurse As Boolean, d As DirectoryInfo)
         Dim l As Long = FileCount(d, 0, blnRecurse)
-        '  MsgBox(Str(l) & " files")
         ProgressBarOn(l)
     End Sub
 
@@ -367,7 +372,7 @@ Module FileHandling
 
         For Each file In d.EnumerateFiles
             Try
-                If InStr("NOT", extensions) <> 0 Then
+                If InStr(LCase(extensions), LCase("NOT")) <> 0 Then
                     If InStr(extensions, LCase(file.Extension)) = 0 And file.Extension <> "" Then
                         'Only include if NOT the given extension
                         If InStr(LCase(file.FullName), LCase(strSearch)) = 0 Or strSearch = "" Then
@@ -383,8 +388,8 @@ Module FileHandling
                     End If
                 Else
 
-                    If InStr(extensions, LCase(file.Extension)) <> 0 And file.Extension <> "" Then
-                        If InStr(LCase(file.FullName), LCase(strSearch)) <> 0 Or strSearch = "" Then
+                    If InStr(extensions, LCase(file.Extension)) <> 0 And file.Extension <> "" Then 'File has an extension, and an appropriate one
+                        If InStr(LCase(file.FullName), LCase(strSearch)) <> 0 Or strSearch = "" Then 'Either search is empty, or matches search
                             If blnRemove Then
                                 list.Remove(file.FullName)
                             Else
@@ -396,13 +401,16 @@ Module FileHandling
                         End If
                     Else
                         If extensions = "" Then
-                            If blnRemove Then
-                                list.Remove(file.FullName)
-                            Else
-                                list.Add(file.FullName)
+                            If InStr(LCase(file.FullName), LCase(strSearch)) <> 0 Or strSearch = "" Then
+                                If blnRemove Then
+                                    list.Remove(file.FullName)
+                                Else
+                                    list.Add(file.FullName)
 
-                                DontInclude.Add(False)
+                                    DontInclude.Add(False)
+                                End If
                             End If
+
                         End If
                     End If
                 End If

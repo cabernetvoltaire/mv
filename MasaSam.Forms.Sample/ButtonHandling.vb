@@ -10,15 +10,17 @@ Module ButtonHandling
     ''' Assigns all the buttons in a generation, beginning with strCurrentFilePath
     ''' </summary>
     Public Sub AssignLinear()
-        '    Dim d As New DirectoryInfo(CurrentFolderPath)
-        '    Dim i As Byte = 0
-        '    While i <= 7
-        '        AssignButton(i, iCurrentAlpha, f.FullName)
-        '        i += 1
-        '    End While
+        'Dim d As New DirectoryInfo(CurrentFolderPath)
+        'Dim dnum As Int16
 
-
+        'Dim i As Byte = 0
+        'While i <= 7
+        '    Dim di As DirectoryInfo = d.EnumerateDirectories(i)
+        '    AssignButton(i, iCurrentAlpha, di.FullName)
+        '    i += 1
+        'End While
     End Sub
+
     Private Sub AssignButton(Index As Integer, strDraggedPath As String)
         Dim strCaption As String
 

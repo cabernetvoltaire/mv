@@ -7,9 +7,7 @@ Public Class frmMain
     Public Property blnSecondScreen As Boolean = True
     Public Property LastShowList As String
     Public Property blnLink As Boolean
-
-
-
+    Public Property LastSelection As String
 
     Private Sub SaveShowlist()
         Dim path As String
@@ -131,6 +129,7 @@ Public Class frmMain
                 'Handled by Treeview behaviour unless focus is elsewhere. 
                 'We want the traverse keys always to work. 
                 If PFocus <> CtrlFocus.Tree Then
+                    ControlSetFocus(tvMain2)
                     tvMain2_KeyDown(sender, e)
                     e.Handled = True
                 End If
@@ -274,7 +273,7 @@ Public Class frmMain
         End If
         PlaybackSpeed = iPlaybackSpeed(Choice) 'TODO Options
 
-        'TODO This means you can't change Slideshow speed while watching a movie, which makes sense. 
+        'TODO This means you can't change Slideshow speed while watching a movie, which makes sense. This has recently broken though. 
 
         If Choice = KeyToggleSpeed - KeySpeed1 Then
             PlaybackSpeed = 1
@@ -373,7 +372,7 @@ Public Class frmMain
                         lbxShowList.SelectionMode = SelectionMode.One
 
                         'Otherwise, advance the playlist. 
-                        If Showlist.Count > 0 Then
+                        If Showlist.Count > 0 Then 'TODO There's a problem with the application of lCurrentDisplayIndex
 
                             If lCurrentDisplayIndex = 0 And Not blnForward Then
                                 lCurrentDisplayIndex = Showlist.Count - 1
@@ -842,12 +841,17 @@ Public Class frmMain
         SelectRandomToPlay(Showlist)
     End Sub
     Private Sub ToolStripButton6_Click(sender As Object, e As EventArgs) Handles tsbClear.Click
+        ClearShowList()
+    End Sub
+
+    Private Sub ClearShowList()
         Showlist.Clear()
 
         lbxShowList.Items.Clear()
         CollapseShowlist(True)
         FBCShown.Clear()
     End Sub
+
     Private Sub ToolStripButton7_Click(sender As Object, e As EventArgs)
         AddMovies(True)
     End Sub
@@ -995,7 +999,7 @@ Public Class frmMain
     End Sub
 
     Private Sub tsbTestShow_Click(sender As Object, e As EventArgs)
-        Test.Show()
+        'Test.Show()
     End Sub
 
 
@@ -1105,9 +1109,12 @@ Public Class frmMain
     Private Sub tvMain2_DirectorySelected(sender As Object, e As DirectoryInfoEventArgs) Handles tvMain2.DirectorySelected
         PreferencesSave()
         ChangeFolder(e.Directory.FullName, True)
+        FillListbox(lbxFiles, New DirectoryInfo(CurrentFolderPath), Showlist, blnChooseRandomFile)
+        If lbxFiles.Items.Count = 0 Then tbFiles.Text = "0/" & Str(Showlist.Count)
+        '        tmrUpdateFolderSelection.Enabled = False
 
-        tmrUpdateFolderSelection.Interval = 500
-        tmrUpdateFolderSelection.Enabled = True
+        tmrUpdateFolderSelection.Interval = 750
+        tmrUpdateFolderSelection.Enabled = False
     End Sub
 
     Private Sub tvMain2_KeyDown(sender As Object, e As KeyEventArgs) Handles tvMain2.KeyDown
@@ -1125,7 +1132,7 @@ Public Class frmMain
         e.Handled = True
     End Sub
 
-    Private Sub btnChooseRandom_Click(sender As Object, e As EventArgs) Handles btnChooseRandom.Click
+    Private Sub btnChooseRandom_Click(sender As Object, e As EventArgs)
         blnChooseRandomFile = Not blnChooseRandomFile
 
 
@@ -1144,7 +1151,7 @@ Public Class frmMain
         tvMain2.Update()
     End Sub
 
-    Private Sub ToolStripButton6_Click_1(sender As Object, e As EventArgs) Handles ToolStripButton6.Click
+    Private Sub ToolStripButton6_Click_1(sender As Object, e As EventArgs)
         LoadDefaultShowList()
     End Sub
 
@@ -1207,11 +1214,11 @@ Public Class frmMain
         If f.LastWriteTime < dt Then dt = f.LastWriteTime
         If f.CreationTime < dt Then dt = f.CreationTime
         tbDate.Text = dt.ToShortDateString & " " & dt.ToShortTimeString
-        tbFiles.Text = listcount & "/" & showcount
-        tbFilter.Text = "Filter:" & Filterstates(CurrentFilterState)
+        tbFiles.Text = "FOLDER:" & listcount & " SHOW:" & showcount
+        tbFilter.Text = "FILTER:" & Filterstates(CurrentFilterState)
         tbLastFile.Text = strCurrentFilePath
         tbRandom.Text = "ORDER:" & UCase(strPlayOrder(ChosenPlayOrder))
-        tbShowfile.Text = "SHOWFILE"
+        tbShowfile.Text = "SHOWFILE: " & LastShowList
         tbSpeed.Text = tbSpeed.Text = "SPEED (" & PlaybackSpeed * 100 & "%)"
         If blnRandomStartPoint Then
             tbStartpoint.Text = "START:RANDOM"
@@ -1221,14 +1228,45 @@ Public Class frmMain
 
     End Sub
 
-    Private Sub ToolStripButton7_Click_1(sender As Object, e As EventArgs) Handles ToolStripButton7.Click
+    Private Sub ToolStripButton7_Click_1(sender As Object, e As EventArgs)
         SelectSubList()
     End Sub
+    Private Function Subdividelist(list As List(Of String), iGroups As Int16)
+        'On the current sort parameter
+        'Select each chunk
+        'Move each chunk to a subfolder of the destination
+        'On date
+        Dim a As FileInfo
+        Dim z As FileInfo
+        a = New FileInfo(list(0))
+        z = New FileInfo(list(list.Count - 1))
+        Dim ldate As Date = a.CreationTime
+        Dim udate As Date = z.CreationTime
+        Dim span As TimeSpan = udate - ldate
+        Dim chunk As New TimeSpan(span.Ticks / iGroups)
+        Dim f As FileInfo
+        lbxFiles.SelectionMode = SelectionMode.MultiExtended
+        MsgBox("Selecting from " & a.CreationTime.ToShortDateString & " to " & (a.CreationTime + chunk).ToShortDateString)
+        For Each fileref In list
+            f = New FileInfo(fileref)
+            If f.CreationTime < a.CreationTime + chunk Then
+                For i = 0 To lbxFiles.Items.Count - 1
+                    If InStr(UCase(lbxFiles.Items(i)), UCase(fileref)) <> 0 Then
+                        lbxFiles.SetSelected(i, True)
+                    End If
+                Next
+            End If
+        Next
+        'Move to the first subfolder
 
-    Private Sub SelectSubList()
+
+
+    End Function
+
+    Private Function SelectSubList() As String
 
         Dim s As String = InputBox("Enter selection string")
-        If s = "" Then Exit Sub
+        If s = "" Then Exit Function
         If PFocus = CtrlFocus.Tree Then
             ControlSetFocus(lbxFiles)
         End If
@@ -1237,7 +1275,7 @@ Public Class frmMain
         ElseIf PFocus = CtrlFocus.ShowList Then
             SelectFromListbox(lbxShowList, s)
 
-            Exit Sub
+            Exit Function
             If lbxShowList.Items.Count = 0 Then
                 CollapseShowlist(False)
                 Showlist = MakeSubList(FileboxContents, s)
@@ -1249,7 +1287,9 @@ Public Class frmMain
             End If
             FillShowbox(lbxShowList, CurrentFilterState, Showlist)
         End If
-    End Sub
+        LastSelection = s
+        Return s
+    End Function
 
     Private Sub ToolStripButton14_Click_1(sender As Object, e As EventArgs) Handles ToolStripButton14.Click
         DeleteShowListFiles()
@@ -1281,7 +1321,7 @@ Public Class frmMain
     End Sub
 
     Private Sub LinearToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles LinearToolStripMenuItem.Click
-        'AssignLinear()
+        AssignLinear()
     End Sub
 
     Private Sub HarvestFolderToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles HarvestFolderToolStripMenuItem.Click
@@ -1391,7 +1431,7 @@ Public Class frmMain
     End Sub
 
     Private Sub LoadListToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles LoadListToolStripMenuItem.Click
-        LoadButtonList()
+        strButtonFile = LoadButtonList()
         KeyAssignmentsRestore(strButtonFile)
     End Sub
 
@@ -1404,18 +1444,9 @@ Public Class frmMain
         NewButtonList()
     End Sub
 
-    Private Sub ToolStripLabel2_Click(sender As Object, e As EventArgs) Handles tsbuttontn.Click
-        Thumbnails.Show()
-    End Sub
-
-    Private Sub ToolStripLabel2_Click_1(sender As Object, e As EventArgs) Handles ToolStripLabel2.Click
-        ToggleControl()
-
-
-    End Sub
 
     Private Sub ToggleControl()
-        CtrlDown = Not CtrlDown
+        blnMoveMode = Not blnMoveMode
     End Sub
 
     Private Sub BurstFolderToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles BurstFolderToolStripMenuItem.Click
@@ -1427,9 +1458,31 @@ Public Class frmMain
     End Sub
 
     Private Sub tmrUpdateFolderSelection_Tick(sender As Object, e As EventArgs) Handles tmrUpdateFolderSelection.Tick
-        ' tvMain2.SelectedFolder = CurrentFolderPath
-        FillListbox(lbxFiles, New DirectoryInfo(CurrentFolderPath), Showlist, blnChooseRandomFile)
-        If lbxFiles.Items.Count = 0 Then tbFiles.Text = "0/" & Str(Showlist.Count)
+        'tvMain2.SelectedFolder = CurrentFolderPath 'TODO Dodgy?
         tmrUpdateFolderSelection.Enabled = False
+    End Sub
+
+    Private Sub ClearCurrentListToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ClearCurrentListToolStripMenuItem.Click
+        ClearShowList()
+    End Sub
+    Private Sub PicFullScreen() Handles PictureBox1.DoubleClick
+        If ShiftDown Then
+            blnSecondScreen = True
+        Else
+            blnSecondScreen = False
+        End If
+        GoFullScreen(True)
+
+    End Sub
+    Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles SelectGroup.Click
+        Subdividelist(FileboxContents, 4)
+    End Sub
+
+    Private Sub TnButton_Click(sender As Object, e As EventArgs) Handles TnButton.Click
+        Thumbnails.Show()
+    End Sub
+
+    Private Sub toggleMove_Click(sender As Object, e As EventArgs) Handles toggleMove.Click
+        ToggleControl()
     End Sub
 End Class

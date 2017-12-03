@@ -5,6 +5,8 @@ Public Module General
     Public Property blnSecondScreen As Boolean = True
     Public Property LastShowList As String
     Public Property blnLink As Boolean
+    Public Property blnMoveMode As Boolean = False
+
 
     Public Sub ProgressBarOn(max As Long)
         With frmMain.TSPB
@@ -157,14 +159,14 @@ Public Module General
     ''' <param name="e"></param>
     Public Sub HandleFunctionKeyDown(sender As Object, e As KeyEventArgs)
         Dim i As Byte = e.KeyCode - Keys.F5
-        If e.Control Then 'Move files if CTRL held
+        If e.Control Or blnMoveMode Then 'Move files if CTRL held
             frmMain.CancelDisplay()
 
             Select Case PFocus
                 Case CtrlFocus.Files
                     MoveFiles(ListfromListbox(frmMain.lbxFiles), strVisibleButtons(i), frmMain.lbxFiles)
                 Case CtrlFocus.Tree
-                    MoveFolder(CurrentFolderPath, strVisibleButtons(i), frmMain.tvMain2)
+                    MoveFolder(CurrentFolderPath, strVisibleButtons(i), frmMain.tvMain2, blnMoveMode)
                 Case CtrlFocus.ShowList
                     ' If MsgBox("This will move all the showlist files to the folder " & strVisibleButtons(i) & ". Is this what you want?", MsgBoxStyle.YesNoCancel) <> MsgBoxResult.Yes Then Exit Sub
                     MoveFiles(ListfromListbox(frmMain.lbxShowList), strVisibleButtons(i), frmMain.lbxShowList)
@@ -224,6 +226,7 @@ Public Module General
         Next
         lbx.TabStop = True
         ProgressBarOff()
+        frmMain.UpdateFileInfo(New FileInfo(strCurrentFilePath))
     End Sub
     Public Function SetPlayOrder(Order As Byte, ByVal List As List(Of String)) As List(Of String)
         Dim NewListS As New SortedList(Of String, String)
@@ -345,7 +348,13 @@ Public Module General
 
 
     End Sub
-
+    Public Function LoadImage(fname As String) As Image
+        Dim FileStream1 As New System.IO.FileStream(fname, IO.FileMode.Open, IO.FileAccess.Read)
+        Dim MyImage As Image = Image.FromStream(FileStream1)
+        FileStream1.Close()
+        FileStream1.Dispose()
+        Return MyImage
+    End Function
     Public Function SelectFromListbox(lbx As ListBox, s As String) As List(Of String)
         Dim ls As New List(Of String)
         Dim i As Long
@@ -355,7 +364,6 @@ Public Module General
 
             If InStr(UCase(lbx.Items(i)), UCase(s)) <> 0 Then
                 lbx.SetSelected(i, True)
-                'ls.Add(it)
             End If
         Next
         Return ls

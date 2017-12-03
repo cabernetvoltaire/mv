@@ -113,6 +113,12 @@
     <Compile Include="FolderSelect.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Sublists.Designer.vb">
+      <DependentUpon>Sublists.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Sublists.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmFullScreen.Designer.vb">
       <DependentUpon>frmFullScreen.vb</DependentUpon>
     </Compile>
@@ -145,12 +151,6 @@
     </Compile>
     <Compile Include="Settings.vb" />
     <Compile Include="Subsets.vb" />
-    <Compile Include="Test.Designer.vb">
-      <DependentUpon>Test.vb</DependentUpon>
-    </Compile>
-    <Compile Include="Test.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="Thumbnails.Designer.vb">
       <DependentUpon>Thumbnails.vb</DependentUpon>
     </Compile>
@@ -175,6 +175,9 @@
     <EmbeddedResource Include="FolderSelect.resx">
       <DependentUpon>FolderSelect.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Sublists.resx">
+      <DependentUpon>Sublists.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmFullScreen.resx">
       <DependentUpon>frmFullScreen.vb</DependentUpon>
     </EmbeddedResource>
@@ -187,10 +190,6 @@
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Test.resx">
-      <DependentUpon>Test.vb</DependentUpon>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Thumbnails.resx">
       <DependentUpon>Thumbnails.vb</DependentUpon>
