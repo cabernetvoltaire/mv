@@ -1,6 +1,7 @@
 ﻿Imports System.IO
 Module FileHandling
     Public blnSuppressCreate As Boolean = False
+    Public blnChooseOne As Boolean = True
     Public strVideoExtensions = ".webm.avi.flv.mov.mpeg.mpg.m4v.mkv.mp4.wmv.wav.mp3.3gp"
     Public strPicExtensions = ".jpeg.png.jpg.bmp.gif"
 
@@ -57,7 +58,6 @@ Module FileHandling
                         'FileboxContents.Add(f.FullName)
                     Case FilterState.NoPicVid
 
-                        'Select Case s
                         If InStr(strVideoExtensions & strPicExtensions, s) <> 0 And Len(s) > 0 Then
                         Else
                             lbx.Items.Add(f.FullName)
@@ -66,7 +66,6 @@ Module FileHandling
                         End If
 
                     Case FilterState.Piconly
-                        'Select Case s
                         If InStr(strPicExtensions, s) <> 0 And Len(s) > 0 Then
 
                             lbx.Items.Add(f.FullName)
@@ -74,38 +73,29 @@ Module FileHandling
                         Else
                         End If
                     Case FilterState.LinkOnly
-                        Select Case s
-                            Case ".lnk"
-                                lbx.Items.Add(f.FullName)
-                                'FileboxContents.Add(f.FullName)
-                            Case Else
-                        End Select
+                        If s = ".lnk" Then
+                            lbx.Items.Add(f.FullName)
+                            'FileboxContents.Add(f.FullName)
+                        End If
 
                     Case FilterState.Vidonly
-                        'Select Case s
                         If InStr(strVideoExtensions, s) <> 0 And Len(s) > 0 Then
                             lbx.Items.Add(f.FullName)
                             'FileboxContents.Add(f.FullName)
                         End If
 
-
                     Case FilterState.PicVid
-
                         If InStr(strVideoExtensions & strPicExtensions, s) <> 0 And Len(s) > 0 Then
                             lbx.Items.Add(f.FullName)
                             'FileboxContents.Add(f.FullName)
-
-
                         End If
                 End Select
 
             Next
             If lbx.Equals(frmMain.lbxFiles) Then
-
                 CopyList(FileboxContents, lbx)
             Else
                 CopyList(Showlist, lbx)
-
             End If
 
             lbx.Tag = e
@@ -248,13 +238,20 @@ Module FileHandling
         For Each file In files
             Dim m As New FileInfo(file)
             With My.Computer.FileSystem
-                Dim i As Int16 = 0
-                Dim spath As String = s & "\" & m.Name
+                Dim i As Long = 0
+                Dim spath As String
+                If s <> "" And InStr(s, "\") = s.Length - 1 Then
+                    spath = s & m.Name
+
+                Else
+                    spath = s & "\" & m.Name
+
+                End If
                 While .FileExists(spath)
                     Dim x = m.Extension
                     Dim b = InStr(spath, "(")
                     If b = 0 Then
-                        Replace(spath, x, "(" & i & ")")
+                        spath = Replace(spath, x, "(" & i & ")" & x)
                     Else
                         spath = Left(spath, b - 1) & "(" & i & ")" & x
                     End If
@@ -297,14 +294,10 @@ Module FileHandling
         lbx1.SelectionMode = SelectionMode.One
         If lbx1.Items.Count <> 0 Then lbx1.SetSelected(Math.Max(Math.Min(ind, lbx1.Items.Count - 1), 0), True)
 
-        'With current file(s)
-        'Move file to destination folder
-        'If more than one file
-        'Create a new folder to put them in.
     End Sub
 
     Public Function CreateNewDirectory(strDest As String) As String
-        Dim s As String = InputBox("Name of folder to create? (Blank means none)", "Create sub-folder", frmMain.LastSelection)
+        Dim s As String = InputBox("Name of folder to create? (Blank means none)", "Create sub-folder", lastselection)
         s = strDest & "\" & s
         Try
             IO.Directory.CreateDirectory(s)
@@ -331,9 +324,12 @@ Module FileHandling
         Dim d As New DirectoryInfo(CurrentFolderPath)
 
         s = InputBox("Only include files containing? (Leave empty to add all)")
-        PreFindallFiles(blnRecurse, d)
+        If blnChooseOne Then
+        Else
+            PreFindAllFiles(blnRecurse, d)
+        End If
 
-        FindAllFilesBelow(d, list, dontinclude, extensions, False, s, blnRecurse)
+        FindAllFilesBelow(d, list, dontinclude, extensions, False, s, blnRecurse, blnChooseOne)
 
 
     End Sub
@@ -367,41 +363,30 @@ Module FileHandling
     ''' <param name="blnRemove"></param>
     ''' <param name="strSearch"></param>
     ''' <param name="blnRecurse"></param>
-    Public Sub FindAllFilesBelow(d As DirectoryInfo, list As List(Of String), ByRef DontInclude As List(Of Boolean), extensions As String, blnRemove As Boolean, strSearch As String, blnRecurse As Boolean)
+    Public Sub FindAllFilesBelow(d As DirectoryInfo, list As List(Of String), ByRef DontInclude As List(Of Boolean), extensions As String, blnRemove As Boolean, strSearch As String, blnRecurse As Boolean, blnOneOnly As Boolean)
 
 
         For Each file In d.EnumerateFiles
-            Try
-                If InStr(LCase(extensions), LCase("NOT")) <> 0 Then
-                    If InStr(extensions, LCase(file.Extension)) = 0 And file.Extension <> "" Then
-                        'Only include if NOT the given extension
-                        If InStr(LCase(file.FullName), LCase(strSearch)) = 0 Or strSearch = "" Then
-                            If blnRemove Then
-                                list.Remove(file.FullName)
-                            Else
-                                list.Add(file.FullName)
+                Try
+                    If InStr(LCase(extensions), LCase("NOT")) <> 0 Then
+                        If InStr(extensions, LCase(file.Extension)) = 0 And file.Extension <> "" Then
+                            'Only include if NOT the given extension
+                            If InStr(LCase(file.FullName), LCase(strSearch)) = 0 Or strSearch = "" Then
+                                If blnRemove Then
+                                    list.Remove(file.FullName)
+                                Else
 
-                                DontInclude.Add(False)
+                                    list.Add(file.FullName)
+
+                                    DontInclude.Add(False)
+                                End If
+
                             End If
-
-                        End If
-                    End If
-                Else
-
-                    If InStr(extensions, LCase(file.Extension)) <> 0 And file.Extension <> "" Then 'File has an extension, and an appropriate one
-                        If InStr(LCase(file.FullName), LCase(strSearch)) <> 0 Or strSearch = "" Then 'Either search is empty, or matches search
-                            If blnRemove Then
-                                list.Remove(file.FullName)
-                            Else
-                                list.Add(file.FullName)
-
-                                DontInclude.Add(False)
-                            End If
-
                         End If
                     Else
-                        If extensions = "" Then
-                            If InStr(LCase(file.FullName), LCase(strSearch)) <> 0 Or strSearch = "" Then
+
+                        If InStr(extensions, LCase(file.Extension)) <> 0 And file.Extension <> "" Then 'File has an extension, and an appropriate one
+                            If InStr(LCase(file.FullName), LCase(strSearch)) <> 0 Or strSearch = "" Then 'Either search is empty, or matches search
                                 If blnRemove Then
                                     list.Remove(file.FullName)
                                 Else
@@ -409,25 +394,37 @@ Module FileHandling
 
                                     DontInclude.Add(False)
                                 End If
-                            End If
 
+                            End If
+                        Else
+                            If extensions = "" Then
+                                If InStr(LCase(file.FullName), LCase(strSearch)) <> 0 Or strSearch = "" Then
+                                    If blnRemove Then
+                                        list.Remove(file.FullName)
+                                    Else
+                                        list.Add(file.FullName)
+
+                                        DontInclude.Add(False)
+                                    End If
+                                End If
+
+                            End If
                         End If
                     End If
-                End If
-
+                If blnOneOnly Then Exit For
             Catch ex As PathTooLongException
-                MsgBox(ex.Message)
-            End Try
+                    MsgBox(ex.Message)
+                End Try
 
-            ProgressIncrement(1)
-        Next
-        ProgressBarOff()
+                ProgressIncrement(1)
+            Next
+            ProgressBarOff()
         If blnRecurse Then
 
             For Each di In d.EnumerateDirectories
                 Try
 
-                    FindAllFilesBelow(di, list, DontInclude, extensions, blnRemove, strSearch, blnRecurse)
+                    FindAllFilesBelow(di, list, DontInclude, extensions, blnRemove, strSearch, blnRecurse, blnOneOnly)
                 Catch ex As UnauthorizedAccessException
                     Continue For
                 Catch ex As DirectoryNotFoundException
@@ -479,8 +476,13 @@ Module FileHandling
         Return True
     End Function
     Public Function FileCount(d As DirectoryInfo, count As Integer, blnRecurse As Boolean) As Long
+        Try
+            count = count + d.EnumerateFiles.Count
 
-        count = count + d.EnumerateFiles.Count
+        Catch ex As UnauthorizedAccessException
+            Return 0
+            Exit Function
+        End Try
         If blnRecurse Then
             For Each di In d.EnumerateDirectories
                 count = FileCount(di, count, True)

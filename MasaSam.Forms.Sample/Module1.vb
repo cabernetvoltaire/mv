@@ -6,6 +6,7 @@ Public Module General
     Public Property LastShowList As String
     Public Property blnLink As Boolean
     Public Property blnMoveMode As Boolean = False
+    Public Property lastselection As String
 
 
     Public Sub ProgressBarOn(max As Long)
@@ -47,6 +48,7 @@ Public Module General
     Public PreviewWMP() As AxWMPLib.AxWindowsMediaPlayer = {FindDuplicates.WMP1, FindDuplicates.WMP2, FindDuplicates.WMP3, FindDuplicates.WMP4, FindDuplicates.WMP5,
      FindDuplicates.WMP6, FindDuplicates.WMP7, FindDuplicates.WMP8, FindDuplicates.WMP9, FindDuplicates.WMp10, FindDuplicates.WMP11, FindDuplicates.WMP12}
     Public btnDest() As Button = {frmMain.btn1, frmMain.btn2, frmMain.btn3, frmMain.btn4, frmMain.btn5, frmMain.btn6, frmMain.btn7, frmMain.btn8}
+
     Public lblDest() As Label = {frmMain.lbl1, frmMain.lbl2, frmMain.lbl3, frmMain.lbl4, frmMain.lbl5, frmMain.lbl6, frmMain.lbl7, frmMain.lbl8}
     Public Enum PlayOrder As Byte
         Original
@@ -351,6 +353,7 @@ Public Module General
     Public Function LoadImage(fname As String) As Image
         Dim FileStream1 As New System.IO.FileStream(fname, IO.FileMode.Open, IO.FileAccess.Read)
         Dim MyImage As Image = Image.FromStream(FileStream1)
+
         FileStream1.Close()
         FileStream1.Dispose()
         Return MyImage

@@ -105,16 +105,20 @@
 
     Public Function GetImage(strPath As String) As Image
         If strPath = "" Then Return Nothing
-        Return LoadImage(strPath)
-        Exit Function
-        Try
-            Dim img As Image = Image.FromFile(strPath)
-            Return img
-        Catch ex As Exception
-            'MsgBox(ex.Message)
-            Return Nothing
+        If InStr(strPath, ".gif") = 0 Then
+            Return LoadImage(strPath)
 
-        End Try
+            Exit Function 'This Causes problems if extension is .gif
+        Else
+            Try
+                Dim img As Image = Image.FromFile(strPath)
+                Return img
+            Catch ex As Exception
+                'MsgBox(ex.Message)
+                Return Nothing
+
+            End Try
+        End If
     End Function
 
     Public Sub PreparePic(pbx As PictureBox, pbxBlanker As PictureBox, img As Image)

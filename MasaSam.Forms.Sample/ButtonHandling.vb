@@ -68,10 +68,19 @@ Module ButtonHandling
         For i = 0 To 7
              frmMain.lblAlpha.Text = Chr(Keys.A + iCurrentAlpha).ToString
             Dim s As String
-            strVisibleButtons(i) = strButtonFilePath(i, iCurrentAlpha, 1)
+            Dim f As String = strButtonFilePath(i, iCurrentAlpha, 1)
+
+            strVisibleButtons(i) = f
             s = strButtonCaptions(i, iCurrentAlpha, 1)
             If s <> "" Then
                 lblDest(i).Text = s
+                If My.Computer.FileSystem.DirectoryExists(f) Then
+                    lblDest(i).ForeColor = Color.Black
+
+                Else
+                    lblDest(i).ForeColor = Color.Gray
+
+                End If
 
             Else
                 lblDest(i).Text = "ABCDEFGH"(i)
