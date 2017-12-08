@@ -10,23 +10,47 @@ Module ButtonHandling
     ''' Assigns all the buttons in a generation, beginning with strCurrentFilePath
     ''' </summary>
     Public Sub AssignLinear()
-        'Dim d As New DirectoryInfo(CurrentFolderPath)
-        'Dim dnum As Int16
+        Dim d As New DirectoryInfo(CurrentFolderPath)
+        Dim i As Byte
+        For Each di In d.EnumerateDirectories
+            AssignButton(i, iCurrentAlpha, di.FullName)
+            i += 1
+            If i = 8 Then Exit Sub
+        Next
+    End Sub
+    Public Sub AssignAlphabetic()
 
-        'Dim i As Byte = 0
-        'While i <= 7
-        '    Dim di As DirectoryInfo = d.EnumerateDirectories(i)
-        '    AssignButton(i, iCurrentAlpha, di.FullName)
-        '    i += 1
-        'End While
+        Dim dlist As New List(Of String)
+        Dim d As New DirectoryInfo(CurrentFolderPath)
+        FindAllFoldersBelow(d, dlist, True)
+        ' dlist = SetPlayOrder(PlayOrder.Name, dlist)
+        dlist.Sort()
+        Dim n(26) As Integer
+        For i = 0 To dlist.Count - 1
+            Dim s As String = dlist.Item(i)
+            Dim sht As String = New DirectoryInfo(s).Name
+            Dim l As String = UCase(sht(0))
+            Dim k As Int16 = Asc(l) - Asc("A")
+            If k >= 0 AndAlso k < 26 Then
+                If n(k) < 8 Then
+
+                    AssignButton(n(k), k, s)
+                    '                   strButtonFilePath(n(k), k, 1) = s
+                    n(k) += 1
+                End If
+            End If
+
+        Next
+
     End Sub
 
-    Private Sub AssignButton(Index As Integer, strDraggedPath As String)
+
+    Private Sub AssignButton(Index As Integer, Path As String)
         Dim strCaption As String
 
         'Assign dropped path to this button.
-        strButtonFilePath(Index, iCurrentAlpha, 1) = strDraggedPath
-        lblDest(Index).Enabled = IO.Directory.Exists(strDraggedPath)
+        strButtonFilePath(Index, iCurrentAlpha, 1) = Path
+        lblDest(Index).Enabled = IO.Directory.Exists(Path)
         'Give it a caption.
         'Default Caption will be the folder name
         strCaption = Right(strButtonFilePath(Index, iCurrentAlpha, 1), "\")
@@ -34,7 +58,7 @@ Module ButtonHandling
         lblDest(Index).Text = strCaption
         strButtonCaptions(Index, iCurrentAlpha, 1) = strCaption
         'Assign the key to this.
-        SetDirectory(strDraggedPath, Index)
+        SetDirectory(Path, Index)
         If My.Computer.FileSystem.FileExists(strButtonFile) Then
             KeyAssignmentsStore(strButtonFile)
         Else
@@ -43,7 +67,7 @@ Module ButtonHandling
 
     End Sub
     Public Sub AssignButton(i As Byte, j As Integer, strPath As String)
-        If strVisibleButtons(i) <> "" Then
+        If strVisibleButtons(i) <> "" And Not blnMoveMode Then
             If Not MsgBox("Replace button assignment for F" & i + 4 & "?", MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then Exit Sub
         End If
         strVisibleButtons(i) = strPath

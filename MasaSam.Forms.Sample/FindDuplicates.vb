@@ -8,7 +8,12 @@ Public Class FindDuplicates
     Public blnClicktoSave As Boolean = True
     Dim DeleteArray(1000, 100) As String
     Dim blnDelete(1000, 100) As Boolean
+
+    Public PreviewWMP() As AxWMPLib.AxWindowsMediaPlayer
+
     Private Sub FindDuplicates_Shown(sender As Object, e As EventArgs) Handles Me.Shown
+
+
         ArrangePreviews()
         'Add current showlist, in size sorted order, to lbxSorted
         sortedList = SetPlayOrder(PlayOrder.Length, Showlist)
@@ -53,18 +58,16 @@ Public Class FindDuplicates
     ''' <summary>
     ''' Places 12 Preview controls
     ''' </summary>
-    Private Shared Sub ArrangePreviews()
+    Private Sub ArrangePreviews()
         For i = 0 To 11
+            PreviewWMP(i) = New AxWMPLib.AxWindowsMediaPlayer
+            FlowLayoutPanel2.Controls.Add(PreviewWMP(i))
             PreviewWMP(i).Width = 250
             PreviewWMP(i).Height = 250
             PreviewWMP(i).Left = 250 * i
             PreviewWMP(i).Top = 0 + 250 * CInt(i > 6)
-            Try
 
-                PreviewWMP(i).uiMode = "None"
-            Catch ex As System.Runtime.InteropServices.InvalidComObjectException
-                Continue For
-            End Try
+            PreviewWMP(i).uiMode = "None"
         Next
     End Sub
 
@@ -87,6 +90,7 @@ Public Class FindDuplicates
             Dim length As Long = finfo.Length
         For i = 0 To sortedList.Count - 1
             Dim f As New IO.FileInfo(sortedList.Item(i))
+            If Not f.Exists Then Continue For
             If f.Length = length Then duplist.Add(f.FullName)
 
         Next
@@ -94,17 +98,18 @@ Public Class FindDuplicates
         FillShowbox(lbxDuplicates, FilterState.All, duplist)
         For i = 0 To 11
             Try
-                PreviewWMP(i).URL = ""
+                'PreviewWMP(i).URL
                 PreviewWMP(i).Visible = False
-
+                GC.Collect()
             Catch ex As System.Runtime.InteropServices.InvalidComObjectException
+                MsgBox(ex.Message)
                 Continue For
             End Try
 
         Next
         'Show and split
         i = 0
-        deletelist.Clear()
+            deletelist.Clear()
         For Each row In lbxDuplicates.Items
             Dim strpath As String = row.ToString
             If i <= 11 Then
@@ -112,7 +117,10 @@ Public Class FindDuplicates
                     PreviewWMP(i).URL = strpath
                     PreviewWMP(i).Visible = True
 
-                Catch ex As System.Runtime.InteropServices.InvalidComObjectException
+                Catch ex As Exception
+                    MsgBox(ex.Message)
+                    Continue For
+
                 End Try
 
                 If i = 0 Then
@@ -163,7 +171,9 @@ Public Class FindDuplicates
     End Function
 
     Private Sub lbxunique_SelectedIndexChanged_1(sender As Object, e As EventArgs) Handles lbxunique.SelectedIndexChanged, lbxDeleteList.SelectedIndexChanged, lbxSave.SelectedIndexChanged, lbxDuplicates.SelectedIndexChanged, lbxsorted.SelectedIndexChanged
-        Dim path As String = sender.Items(sender.SelectedIndex)
+        Dim lbx As ListBox = sender
+        If lbx.SelectedIndex <= 0 Then Exit Sub
+        Dim path As String = lbx.Items(lbx.SelectedIndex)
         finddups(path)
     End Sub
 
@@ -177,13 +187,12 @@ Public Class FindDuplicates
     Private Sub btnDeleteFiles_Click(sender As Object, e As EventArgs) Handles btnDeleteFiles.Click
         If MsgBox("Are you sure you want to delete all these files?", MsgBoxStyle.Critical, "DELETE FILES?") = MsgBoxResult.Ok Then
             MsgBox("Click to delete files")
+            Dim s As New List(Of String)
             For Each file In lbxDeleteList.Items
-                My.Computer.FileSystem.DeleteFile(file, FileIO.UIOption.AllDialogs, FileIO.RecycleOption.SendToRecycleBin)
-                RemoveFromListBox(file, lbxDeleteList, deletelist)
-                RemoveFromListBox(file, lbxsorted, sortedList)
-                RemoveFromListBox(file, lbxDuplicates, duplist)
+                s.Add(file)
 
             Next
+            MoveFiles(s, "", lbxDeleteList)
             MsgBox("Finished")
         End If
     End Sub

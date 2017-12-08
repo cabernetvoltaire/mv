@@ -1,7 +1,7 @@
 ﻿Imports System.IO
 Module FileHandling
     Public blnSuppressCreate As Boolean = False
-    Public blnChooseOne As Boolean = True
+    Public blnChooseOne As Boolean = False
     Public strVideoExtensions = ".webm.avi.flv.mov.mpeg.mpg.m4v.mkv.mp4.wmv.wav.mp3.3gp"
     Public strPicExtensions = ".jpeg.png.jpg.bmp.gif"
 
@@ -209,15 +209,32 @@ Module FileHandling
             If MsgBox("This will move current folder to " & strDest & ". Are you sure?", MsgBoxStyle.OkCancel) <> MsgBoxResult.Ok Then Exit Sub
         End If
         Try
+            With My.Computer.FileSystem
+                .MoveDirectory(strDir, strDest & "\" & .GetDirectoryInfo(strDir).Name)
+                UpdateButton(strDir, strDest & "\" & .GetDirectoryInfo(strDir).Name)
+                tvw.RemoveNode(strDir)
+            End With
 
-                    My.Computer.FileSystem.MoveDirectory(strDir, strDest)
-                    tvw.RemoveNode(strDir)
-                Catch ex As Exception
-                    MsgBox(ex.Message)
+
+        Catch ex As Exception
+            MsgBox(ex.Message)
                 End Try
 
     End Sub
 
+    Private Sub UpdateButton(strPath As String, strDest As String)
+        For i = 0 To 25
+            For j = 0 To 7
+                Dim s = strButtonFilePath(j, i, 1)
+                If s = strPath Then
+                    strButtonFilePath(j, i, 1) = strDest
+                    Exit For
+                    Exit For
+                End If
+            Next
+        Next
+
+    End Sub
 
     ''' <summary>
     ''' Moves files to strDest, and removes them from lbx1 asking for a subfolder in destination if more than one file. If strDest is empty, files are deleted.
@@ -233,21 +250,20 @@ Module FileHandling
             If Not blnSuppressCreate Then s = CreateNewDirectory(strDest)
         End If
         Dim file As String
-        frmMain.CancelDisplay()
 
         For Each file In files
             Dim m As New FileInfo(file)
             With My.Computer.FileSystem
                 Dim i As Long = 0
                 Dim spath As String
-                If s <> "" And InStr(s, "\") = s.Length - 1 Then
+                If InStr(s, "\") = s.Length - 1 Or s = "" Then
                     spath = s & m.Name
 
                 Else
                     spath = s & "\" & m.Name
 
                 End If
-                While .FileExists(spath)
+                While .FileExists(spath) 'Existing path
                     Dim x = m.Extension
                     Dim b = InStr(spath, "(")
                     If b = 0 Then
@@ -328,14 +344,21 @@ Module FileHandling
         Else
             PreFindAllFiles(blnRecurse, d)
         End If
+        frmMain.Cursor = Cursors.WaitCursor
 
         FindAllFilesBelow(d, list, dontinclude, extensions, False, s, blnRecurse, blnChooseOne)
 
+        frmMain.Cursor = Cursors.Default
 
     End Sub
     Private Sub PreFindAllFiles(blnRecurse As Boolean, d As DirectoryInfo)
-        Dim l As Long = FileCount(d, 0, blnRecurse)
-        ProgressBarOn(l)
+        If blnChooseOne Then
+            Dim l As Long = FolderCount(d, 0, blnRecurse)
+            ProgressBarOn(l)
+        Else
+            Dim l As Long = FileCount(d, 0, blnRecurse)
+            ProgressBarOn(l)
+        End If
     End Sub
 
     Public Sub Deletefile(s As String)
@@ -367,58 +390,58 @@ Module FileHandling
 
 
         For Each file In d.EnumerateFiles
-                Try
-                    If InStr(LCase(extensions), LCase("NOT")) <> 0 Then
-                        If InStr(extensions, LCase(file.Extension)) = 0 And file.Extension <> "" Then
-                            'Only include if NOT the given extension
-                            If InStr(LCase(file.FullName), LCase(strSearch)) = 0 Or strSearch = "" Then
-                                If blnRemove Then
-                                    list.Remove(file.FullName)
-                                Else
+            Try
+                If InStr(LCase(extensions), LCase("NOT")) <> 0 Then
+                    If InStr(extensions, LCase(file.Extension)) = 0 And file.Extension <> "" Then
+                        'Only include if NOT the given extension
+                        If InStr(LCase(file.FullName), LCase(strSearch)) = 0 Or strSearch = "" Then
+                            If blnRemove Then
+                                list.Remove(file.FullName)
+                            Else
 
-                                    list.Add(file.FullName)
+                                list.Add(file.FullName)
 
-                                    DontInclude.Add(False)
-                                End If
-
+                                DontInclude.Add(False)
                             End If
-                        End If
-                    Else
 
-                        If InStr(extensions, LCase(file.Extension)) <> 0 And file.Extension <> "" Then 'File has an extension, and an appropriate one
-                            If InStr(LCase(file.FullName), LCase(strSearch)) <> 0 Or strSearch = "" Then 'Either search is empty, or matches search
-                                If blnRemove Then
-                                    list.Remove(file.FullName)
-                                Else
-                                    list.Add(file.FullName)
-
-                                    DontInclude.Add(False)
-                                End If
-
-                            End If
-                        Else
-                            If extensions = "" Then
-                                If InStr(LCase(file.FullName), LCase(strSearch)) <> 0 Or strSearch = "" Then
-                                    If blnRemove Then
-                                        list.Remove(file.FullName)
-                                    Else
-                                        list.Add(file.FullName)
-
-                                        DontInclude.Add(False)
-                                    End If
-                                End If
-
-                            End If
                         End If
                     End If
-                If blnOneOnly Then Exit For
-            Catch ex As PathTooLongException
-                    MsgBox(ex.Message)
-                End Try
+                Else
 
-                ProgressIncrement(1)
-            Next
-            ProgressBarOff()
+                    If InStr(extensions, LCase(file.Extension)) <> 0 And file.Extension <> "" Then 'File has an extension, and an appropriate one
+                        If InStr(LCase(file.FullName), LCase(strSearch)) <> 0 Or strSearch = "" Then 'Either search is empty, or matches search
+                            If blnRemove Then
+                                list.Remove(file.FullName)
+                            Else
+                                list.Add(file.FullName)
+
+                                DontInclude.Add(False)
+                            End If
+
+                        End If
+                    Else
+                        If extensions = "" Then
+                            If InStr(LCase(file.FullName), LCase(strSearch)) <> 0 Or strSearch = "" Then
+                                If blnRemove Then
+                                    list.Remove(file.FullName)
+                                Else
+                                    list.Add(file.FullName)
+
+                                    DontInclude.Add(False)
+                                End If
+                            End If
+
+                        End If
+                    End If
+                End If
+                If blnOneOnly Then Exit For 'Exits each folder when one file has been found matching the condition.
+            Catch ex As PathTooLongException
+                MsgBox(ex.Message)
+            End Try
+
+            ProgressIncrement(1)
+        Next
+        ProgressBarOff()
         If blnRecurse Then
 
             For Each di In d.EnumerateDirectories
@@ -432,7 +455,33 @@ Module FileHandling
                 End Try
             Next
         End If
+    End Sub
+    Public Sub FindAllFoldersBelow(d As DirectoryInfo, list As List(Of String), blnRecurse As Boolean)
 
+
+        For Each di In d.EnumerateDirectories
+            Try
+
+                list.Add(di.FullName)
+
+            Catch ex As PathTooLongException
+                MsgBox(ex.Message)
+            End Try
+
+        Next
+        If blnRecurse Then
+
+            For Each di In d.EnumerateDirectories
+                Try
+
+                    FindAllFoldersBelow(di, list, blnRecurse)
+                Catch ex As UnauthorizedAccessException
+                    Continue For
+                Catch ex As DirectoryNotFoundException
+                    Continue For
+                End Try
+            Next
+        End If
     End Sub
     ''' <summary>
     ''' Moves all the files in d to its parent, if it exists. Returns true if successful
@@ -461,19 +510,34 @@ Module FileHandling
     Public Function DeleteEmptyFolders(d As DirectoryInfo, blnRecurse As Boolean) As Boolean
 
 
-        ProgressBarOn(1000)
 
         For Each di In d.EnumerateDirectories
+            ProgressBarOn(d.EnumerateDirectories.Count)
             If blnRecurse Then DeleteEmptyFolders(di, True)
             If di.EnumerateDirectories.Count = 0 And di.EnumerateFiles.Count = 0 Then
                 di.Delete()
-
+                frmMain.tvMain2.RemoveNode(di.FullName)
                 ProgressIncrement(1)
             End If
 
         Next
 
         Return True
+    End Function
+    Public Function FolderCount(d As DirectoryInfo, count As Integer, blnRecurse As Boolean) As Long
+        Try
+            count = count + d.EnumerateDirectories.Count
+
+        Catch ex As UnauthorizedAccessException
+            Return 0
+            Exit Function
+        End Try
+        If blnRecurse Then
+            For Each di In d.EnumerateDirectories
+                count = FolderCount(di, count, True)
+            Next
+        End If
+        Return count
     End Function
     Public Function FileCount(d As DirectoryInfo, count As Integer, blnRecurse As Boolean) As Long
         Try

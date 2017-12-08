@@ -45,8 +45,6 @@ Public Module General
 
     Public strPlayOrder() As String = {"Original", "Random", "Name", "Path Name", "Date/Time", "Size", "Type"}
     Public Property lngListSizeBytes As Long
-    Public PreviewWMP() As AxWMPLib.AxWindowsMediaPlayer = {FindDuplicates.WMP1, FindDuplicates.WMP2, FindDuplicates.WMP3, FindDuplicates.WMP4, FindDuplicates.WMP5,
-     FindDuplicates.WMP6, FindDuplicates.WMP7, FindDuplicates.WMP8, FindDuplicates.WMP9, FindDuplicates.WMp10, FindDuplicates.WMP11, FindDuplicates.WMP12}
     Public btnDest() As Button = {frmMain.btn1, frmMain.btn2, frmMain.btn3, frmMain.btn4, frmMain.btn5, frmMain.btn6, frmMain.btn7, frmMain.btn8}
 
     Public lblDest() As Label = {frmMain.lbl1, frmMain.lbl2, frmMain.lbl3, frmMain.lbl4, frmMain.lbl5, frmMain.lbl6, frmMain.lbl7, frmMain.lbl8}
@@ -183,19 +181,25 @@ Public Module General
                     SaveButtonlist()
                 End If
             Else
+                If strVisibleButtons(i) <> CurrentFolderPath Then
+                    ChangeFolder(strVisibleButtons(i), True)
 
-                ChangeFolder(strVisibleButtons(i), True)
-                frmMain.tvMain2.SelectedFolder = CurrentFolderPath
+                    frmMain.tvMain2.SelectedFolder = CurrentFolderPath
+                End If
             End If
 
         End If
     End Sub
 
     Public Sub ChangeFolder(strPath As String, blnSHow As Boolean)
-        LastFolder.Push(CurrentFolderPath)
-        CurrentFolderPath = strPath 'Switch to this folder
+        If strPath = CurrentFolderPath Then
+        Else
 
-        ' If blnSHow Then frmMain.tvMain2.SelectedFolder = CurrentFolderPath
+            LastFolder.Push(CurrentFolderPath)
+            CurrentFolderPath = strPath 'Switch to this folder
+
+            'If blnSHow Then frmMain.tvMain2.SelectedFolder = CurrentFolderPath
+        End If
     End Sub
 
     Public Function ListfromListbox(lbx As ListBox) As List(Of String)
@@ -336,7 +340,10 @@ Public Module General
     ''' <param name="lbx"></param>
     ''' <param name="lst"></param>
     Public Sub RemoveFromListBox(item As String, lbx As ListBox, lst As List(Of String))
+        Exit Sub
+        If item = "" Then Exit Sub
         Dim s As Integer = lbx.FindString(item)
+        If s = "" Then Exit Sub
         lbx.SelectedItem = lbx.Items((s) Mod lbx.Items.Count) 'actually an increment, because of 0 start. 
         lbx.Items.Remove(item)
         lst.Remove(item)
@@ -352,11 +359,18 @@ Public Module General
     End Sub
     Public Function LoadImage(fname As String) As Image
         Dim FileStream1 As New System.IO.FileStream(fname, IO.FileMode.Open, IO.FileAccess.Read)
-        Dim MyImage As Image = Image.FromStream(FileStream1)
+        Try
+            Dim MyImage As Image = Image.FromStream(FileStream1)
+            FileStream1.Close()
+            FileStream1.Dispose()
+            Return MyImage
+        Catch ex As System.ArgumentException
+            FileStream1.Close()
+            FileStream1.Dispose()
+            Return Nothing
+        End Try
 
-        FileStream1.Close()
-        FileStream1.Dispose()
-        Return MyImage
+
     End Function
     Public Function SelectFromListbox(lbx As ListBox, s As String) As List(Of String)
         Dim ls As New List(Of String)
@@ -372,4 +386,12 @@ Public Module General
         Return ls
     End Function
 
+    Public Function ReturnListOfDirectories(ByVal list As List(Of String), strPath As String) As List(Of String)
+        Dim d As New DirectoryInfo(strPath)
+        For Each di In d.EnumerateDirectories
+            list.Add(di.Name)
+            list = ReturnListOfDirectories(list, di.Name)
+        Next
+        Return list
+    End Function
 End Module

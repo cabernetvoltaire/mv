@@ -23,7 +23,7 @@ Partial Class FolderSelect
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
-        Me.FileSystemTree1 = New MasaSam.Forms.Controls.FileSystemTree()
+        Me.fst1 = New MasaSam.Forms.Controls.FileSystemTree()
         Me.Panel1 = New System.Windows.Forms.Panel()
         Me.TextBox1 = New System.Windows.Forms.TextBox()
         Me.Label1 = New System.Windows.Forms.Label()
@@ -36,7 +36,7 @@ Partial Class FolderSelect
         '
         Me.TableLayoutPanel1.ColumnCount = 1
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-        Me.TableLayoutPanel1.Controls.Add(Me.FileSystemTree1, 0, 0)
+        Me.TableLayoutPanel1.Controls.Add(Me.fst1, 0, 0)
         Me.TableLayoutPanel1.Controls.Add(Me.Panel1, 0, 1)
         Me.TableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TableLayoutPanel1.Location = New System.Drawing.Point(0, 0)
@@ -49,15 +49,15 @@ Partial Class FolderSelect
         '
         'FileSystemTree1
         '
-        Me.FileSystemTree1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.FileSystemTree1.FileExtensions = "*"
-        Me.FileSystemTree1.Location = New System.Drawing.Point(6, 6)
-        Me.FileSystemTree1.Margin = New System.Windows.Forms.Padding(6)
-        Me.FileSystemTree1.Name = "FileSystemTree1"
-        Me.FileSystemTree1.RootDrive = Nothing
-        Me.FileSystemTree1.SelectedFolder = Nothing
-        Me.FileSystemTree1.Size = New System.Drawing.Size(694, 681)
-        Me.FileSystemTree1.TabIndex = 0
+        Me.fst1.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.fst1.FileExtensions = "*"
+        Me.fst1.Location = New System.Drawing.Point(6, 6)
+        Me.fst1.Margin = New System.Windows.Forms.Padding(6)
+        Me.fst1.Name = "FileSystemTree1"
+        Me.fst1.RootDrive = Nothing
+        Me.fst1.SelectedFolder = Nothing
+        Me.fst1.Size = New System.Drawing.Size(694, 681)
+        Me.fst1.TabIndex = 0
         '
         'Panel1
         '
@@ -111,7 +111,7 @@ Partial Class FolderSelect
     End Sub
 
     Friend WithEvents TableLayoutPanel1 As TableLayoutPanel
-    Friend WithEvents FileSystemTree1 As Controls.FileSystemTree
+    Friend WithEvents fst1 As Controls.FileSystemTree
     Friend WithEvents Panel1 As Panel
     Friend WithEvents TextBox1 As TextBox
     Friend WithEvents Label1 As Label

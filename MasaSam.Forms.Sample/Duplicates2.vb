@@ -1,7 +1,7 @@
 ﻿Public Class Duplicates2
     Private newFlist As List(Of String)
     Private uniques As New List(Of String)
-    Private duplicates() As List(Of String)
+    Private duplicates() As List(Of String) = Nothing
 
     Private Sub AnalyzeDuplicates()
         Dim lastlength As Long = 0
@@ -50,7 +50,8 @@
         FillShowbox(lbxsorted, CurrentFilterState, Flist)
         AnalyzeDuplicates()
         FillShowbox(lbxunique, CurrentFilterState, uniques)
-        FillShowbox(lbxduplicates, CurrentFilterState, duplicates(0))
+
+        'FillShowbox(lbxduplicates, CurrentFilterState, duplicates(0))
     End Sub
 
     Private Sub lbxunique_SelectedIndexChanged(sender As Object, e As EventArgs) Handles lbxunique.SelectedIndexChanged

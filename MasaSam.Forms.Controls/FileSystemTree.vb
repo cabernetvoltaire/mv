@@ -342,6 +342,9 @@ Public Class FileSystemTree
         End If
     End Sub
 
+    Public Sub RefreshTree(ByVal path As String)
+
+    End Sub
     Private Sub ExpandDriveNode(ByVal dn As DriveNode, ByVal driveName As String, ByVal directoryNames As List(Of String))
         If (dn.Drive.Name.ToLower() = driveName.ToLower()) Then
             dn.Expand()

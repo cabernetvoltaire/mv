@@ -209,6 +209,8 @@ Public Class frmMain
     Public Sub CancelDisplay()
         currentWMP.Ctlcontrols.pause()
         currentWMP.URL = ""
+        'currentPicBox.Dispose()
+        GC.Collect()
         tmrSlideShow.Enabled = False
         currentPicBox.Image = Nothing
     End Sub
@@ -557,7 +559,11 @@ Public Class frmMain
 
         If Not blnLink Then
             If lbxFiles.SelectedItem <> strPath Then
+                'If Not blnChooseOne Then 'TODO Rewrite this so that we can get a random file in the box when blnChooseONe is selected
                 HighlightListboxSelected(strPath, lbxFiles) 'Highlight the current file in lbxFiles
+                'Else
+                '    strPath = lbxFiles.SelectedItem
+                'End If
             End If
         End If
         If Not MasterContainer.Panel2Collapsed Then
@@ -1193,7 +1199,9 @@ Public Class frmMain
         Dim m As New FolderSelect
         m.Left = button.Left - m.Width / 2
         m.Top = button.Top - m.Height + 50
+        m.Folder = strVisibleButtons(i)
         m.Show()
+        ' m.fst1.Expand(m.Folder)
     End Sub
 
     Private Sub ButtonListToolStripMenuItem_Click(sender As Object, e As EventArgs)
@@ -1289,7 +1297,6 @@ Public Class frmMain
             If lbxShowList.Items.Count = 0 Then
                 CollapseShowlist(False)
                 Showlist = MakeSubList(FileboxContents, s)
-
             Else
                 Oldlist = Showlist
                 lbxShowList.Items.Clear()
@@ -1299,6 +1306,7 @@ Public Class frmMain
         End If
         LastSelection = s
         Return s
+        CancelDisplay()
     End Function
 
     Private Sub ToolStripButton14_Click_1(sender As Object, e As EventArgs) Handles ToolStripButton14.Click
@@ -1384,7 +1392,10 @@ Public Class frmMain
 
     Private Sub DuplicatesToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles DuplicatesToolStripMenuItem.Click
         FindDuplicates.Show()
-
+        'With Duplicates2
+        '.Flist = Showlist
+        '.Show()
+        'end With
     End Sub
 
     Private Sub lbxShowList_TextChanged(sender As Object, e As EventArgs) Handles lbxShowList.TextChanged
@@ -1503,5 +1514,13 @@ Public Class frmMain
 
     Private Sub tsbOnlyOne_Click(sender As Object, e As EventArgs) Handles tsbOnlyOne.Click
         blnChooseOne = Not blnChooseOne
+    End Sub
+
+    Private Sub btn1_Click(sender As Object, e As EventArgs) Handles btn1.Click
+
+    End Sub
+
+    Private Sub AlphabeticToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AlphabeticToolStripMenuItem.Click
+        AssignAlphabetic()
     End Sub
 End Class

@@ -4,12 +4,12 @@ Public Class FolderSelect
     Private newFolder As String
     Public Property Folder() As String
         Get
-            newFolder = FileSystemTree1.SelectedFolder
+            newFolder = fst1.SelectedFolder
             Return newFolder
         End Get
         Set(ByVal value As String)
             newFolder = value
-            FileSystemTree1.SelectedFolder = value
+
             Label1.Text = value
         End Set
     End Property
@@ -38,5 +38,14 @@ Public Class FolderSelect
     Private Sub btnAssign_Click(sender As Object, e As EventArgs) Handles btnAssign.Click
 
         Me.Close()
+    End Sub
+
+    Private Sub FolderSelect_Shown(sender As Object, e As EventArgs) Handles Me.Shown
+        With fst1
+            .CreateControl()
+            ' .Expand(Label1.Text)
+            '.SelectedFolder = Label1.Text
+        End With
+
     End Sub
 End Class

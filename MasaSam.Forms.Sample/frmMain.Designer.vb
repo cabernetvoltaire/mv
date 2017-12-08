@@ -37,6 +37,7 @@ Partial Class frmMain
         Me.AddCurrentFileListToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.AddCurrentAndSubfoldersToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ClearCurrentListToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.SingleFilePerFolderToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SlideshowToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.SlowToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.NormalToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -47,6 +48,7 @@ Partial Class frmMain
         Me.NormalToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.FastToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.RandomStartToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ChooseRandomToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.FullScreenToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.Screen2ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.AssignButtonsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -142,6 +144,7 @@ Partial Class frmMain
         Me.SelectGroup = New System.Windows.Forms.ToolStripButton()
         Me.TnButton = New System.Windows.Forms.ToolStripButton()
         Me.toggleMove = New System.Windows.Forms.ToolStripButton()
+        Me.tsbOnlyOne = New System.Windows.Forms.ToolStripButton()
         Me.tmrUpdateFileList = New System.Windows.Forms.Timer(Me.components)
         Me.tmrPicLoad = New System.Windows.Forms.Timer(Me.components)
         Me.tmrJumpVideo = New System.Windows.Forms.Timer(Me.components)
@@ -158,9 +161,8 @@ Partial Class frmMain
         Me.tmrSlowMo = New System.Windows.Forms.Timer(Me.components)
         Me.tmrListbox = New System.Windows.Forms.Timer(Me.components)
         Me.tmrUpdateFolderSelection = New System.Windows.Forms.Timer(Me.components)
-        Me.ChooseRandomToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.SingleFilePerFolderToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.tsbOnlyOne = New System.Windows.Forms.ToolStripButton()
+        Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
+        Me.AlphabeticToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip1.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
         Me.TableLayoutPanel2.SuspendLayout()
@@ -217,7 +219,7 @@ Partial Class frmMain
         '
         Me.ButtonFilesToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.NewListToolStripMenuItem, Me.LoadListToolStripMenuItem, Me.SaveListasToolStripMenuItem})
         Me.ButtonFilesToolStripMenuItem.Name = "ButtonFilesToolStripMenuItem"
-        Me.ButtonFilesToolStripMenuItem.Size = New System.Drawing.Size(239, 34)
+        Me.ButtonFilesToolStripMenuItem.Size = New System.Drawing.Size(223, 34)
         Me.ButtonFilesToolStripMenuItem.Text = "&Button files"
         '
         'NewListToolStripMenuItem
@@ -248,7 +250,7 @@ Partial Class frmMain
         '
         Me.ShowlistFilesToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.LoadListToolStripMenuItem1, Me.SaveListToolStripMenuItem1})
         Me.ShowlistFilesToolStripMenuItem.Name = "ShowlistFilesToolStripMenuItem"
-        Me.ShowlistFilesToolStripMenuItem.Size = New System.Drawing.Size(239, 34)
+        Me.ShowlistFilesToolStripMenuItem.Size = New System.Drawing.Size(223, 34)
         Me.ShowlistFilesToolStripMenuItem.Text = "S&howlist files"
         '
         'LoadListToolStripMenuItem1
@@ -295,6 +297,16 @@ Partial Class frmMain
         Me.ClearCurrentListToolStripMenuItem.Size = New System.Drawing.Size(486, 34)
         Me.ClearCurrentListToolStripMenuItem.Text = "Clear current list"
         '
+        'SingleFilePerFolderToolStripMenuItem
+        '
+        Me.SingleFilePerFolderToolStripMenuItem.Checked = True
+        Me.SingleFilePerFolderToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.SingleFilePerFolderToolStripMenuItem.Name = "SingleFilePerFolderToolStripMenuItem"
+        Me.SingleFilePerFolderToolStripMenuItem.ShortcutKeys = CType(((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.Shift) _
+            Or System.Windows.Forms.Keys.S), System.Windows.Forms.Keys)
+        Me.SingleFilePerFolderToolStripMenuItem.Size = New System.Drawing.Size(486, 34)
+        Me.SingleFilePerFolderToolStripMenuItem.Text = "Single file per folder"
+        '
         'SlideshowToolStripMenuItem1
         '
         Me.SlideshowToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SlowToolStripMenuItem, Me.NormalToolStripMenuItem, Me.FastToolStripMenuItem})
@@ -305,19 +317,19 @@ Partial Class frmMain
         'SlowToolStripMenuItem
         '
         Me.SlowToolStripMenuItem.Name = "SlowToolStripMenuItem"
-        Me.SlowToolStripMenuItem.Size = New System.Drawing.Size(239, 34)
+        Me.SlowToolStripMenuItem.Size = New System.Drawing.Size(173, 34)
         Me.SlowToolStripMenuItem.Text = "Slow"
         '
         'NormalToolStripMenuItem
         '
         Me.NormalToolStripMenuItem.Name = "NormalToolStripMenuItem"
-        Me.NormalToolStripMenuItem.Size = New System.Drawing.Size(239, 34)
+        Me.NormalToolStripMenuItem.Size = New System.Drawing.Size(173, 34)
         Me.NormalToolStripMenuItem.Text = "Normal"
         '
         'FastToolStripMenuItem
         '
         Me.FastToolStripMenuItem.Name = "FastToolStripMenuItem"
-        Me.FastToolStripMenuItem.Size = New System.Drawing.Size(239, 34)
+        Me.FastToolStripMenuItem.Size = New System.Drawing.Size(173, 34)
         Me.FastToolStripMenuItem.Text = "Fast"
         '
         'VideoToolStripMenuItem1
@@ -360,6 +372,14 @@ Partial Class frmMain
         Me.RandomStartToolStripMenuItem.Size = New System.Drawing.Size(257, 34)
         Me.RandomStartToolStripMenuItem.Text = "Random Start"
         '
+        'ChooseRandomToolStripMenuItem
+        '
+        Me.ChooseRandomToolStripMenuItem.Checked = True
+        Me.ChooseRandomToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.ChooseRandomToolStripMenuItem.Name = "ChooseRandomToolStripMenuItem"
+        Me.ChooseRandomToolStripMenuItem.Size = New System.Drawing.Size(257, 34)
+        Me.ChooseRandomToolStripMenuItem.Text = "Choose Random"
+        '
         'FullScreenToolStripMenuItem1
         '
         Me.FullScreenToolStripMenuItem1.CheckOnClick = True
@@ -378,7 +398,7 @@ Partial Class frmMain
         '
         'AssignButtonsToolStripMenuItem
         '
-        Me.AssignButtonsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.LinearToolStripMenuItem})
+        Me.AssignButtonsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.LinearToolStripMenuItem, Me.AlphabeticToolStripMenuItem})
         Me.AssignButtonsToolStripMenuItem.Name = "AssignButtonsToolStripMenuItem"
         Me.AssignButtonsToolStripMenuItem.Size = New System.Drawing.Size(160, 34)
         Me.AssignButtonsToolStripMenuItem.Text = "assign buttons"
@@ -1215,6 +1235,15 @@ Partial Class frmMain
         Me.toggleMove.Size = New System.Drawing.Size(130, 87)
         Me.toggleMove.Text = "ToggleMove"
         '
+        'tsbOnlyOne
+        '
+        Me.tsbOnlyOne.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text
+        Me.tsbOnlyOne.Image = CType(resources.GetObject("tsbOnlyOne.Image"), System.Drawing.Image)
+        Me.tsbOnlyOne.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.tsbOnlyOne.Name = "tsbOnlyOne"
+        Me.tsbOnlyOne.Size = New System.Drawing.Size(105, 87)
+        Me.tsbOnlyOne.Text = "Only One"
+        '
         'tmrUpdateFileList
         '
         Me.tmrUpdateFileList.Enabled = True
@@ -1228,7 +1257,6 @@ Partial Class frmMain
         '
         'tmrInitialise
         '
-        Me.tmrInitialise.Enabled = False
         Me.tmrInitialise.Interval = 500
         '
         'OpenFileDialog1
@@ -1276,32 +1304,13 @@ Partial Class frmMain
         'tmrUpdateFolderSelection
         '
         '
-        'ChooseRandomToolStripMenuItem
+        'AlphabeticToolStripMenuItem
         '
-        Me.ChooseRandomToolStripMenuItem.Checked = True
-        Me.ChooseRandomToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.ChooseRandomToolStripMenuItem.Name = "ChooseRandomToolStripMenuItem"
-        Me.ChooseRandomToolStripMenuItem.Size = New System.Drawing.Size(257, 34)
-        Me.ChooseRandomToolStripMenuItem.Text = "Choose Random"
-        '
-        'SingleFilePerFolderToolStripMenuItem
-        '
-        Me.SingleFilePerFolderToolStripMenuItem.Checked = True
-        Me.SingleFilePerFolderToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.SingleFilePerFolderToolStripMenuItem.Name = "SingleFilePerFolderToolStripMenuItem"
-        Me.SingleFilePerFolderToolStripMenuItem.ShortcutKeys = CType(((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.Shift) _
-            Or System.Windows.Forms.Keys.S), System.Windows.Forms.Keys)
-        Me.SingleFilePerFolderToolStripMenuItem.Size = New System.Drawing.Size(486, 34)
-        Me.SingleFilePerFolderToolStripMenuItem.Text = "Single file per folder"
-        '
-        'tsbOnlyOne
-        '
-        Me.tsbOnlyOne.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text
-        Me.tsbOnlyOne.Image = CType(resources.GetObject("tsbOnlyOne.Image"), System.Drawing.Image)
-        Me.tsbOnlyOne.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.tsbOnlyOne.Name = "tsbOnlyOne"
-        Me.tsbOnlyOne.Size = New System.Drawing.Size(105, 87)
-        Me.tsbOnlyOne.Text = "Only One"
+        Me.AlphabeticToolStripMenuItem.Name = "AlphabeticToolStripMenuItem"
+        Me.AlphabeticToolStripMenuItem.ShortcutKeys = CType(((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.Alt) _
+            Or System.Windows.Forms.Keys.A), System.Windows.Forms.Keys)
+        Me.AlphabeticToolStripMenuItem.Size = New System.Drawing.Size(313, 34)
+        Me.AlphabeticToolStripMenuItem.Text = "alphabetic"
         '
         'frmMain
         '
@@ -1507,4 +1516,6 @@ Partial Class frmMain
     Friend WithEvents ChooseRandomToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents SingleFilePerFolderToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents tsbOnlyOne As ToolStripButton
+    Friend WithEvents ToolTip1 As ToolTip
+    Friend WithEvents AlphabeticToolStripMenuItem As ToolStripMenuItem
 End Class
