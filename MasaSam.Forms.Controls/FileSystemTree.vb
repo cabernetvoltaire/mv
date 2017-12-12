@@ -348,31 +348,33 @@ Public Class FileSystemTree
     Private Sub ExpandDriveNode(ByVal dn As DriveNode, ByVal driveName As String, ByVal directoryNames As List(Of String))
         If (dn.Drive.Name.ToLower() = driveName.ToLower()) Then
             dn.Expand()
-            Expand(dn.DirectoryNodes, directoryNames, 1)
+            Expand(dn.DirectoryNodes, directoryNames, 1, directoryNames.Count - 1)
         End If
+
     End Sub
 
-    Private Sub Expand(ByVal directories As IEnumerable(Of DirectoryNode), ByVal directoryNames As List(Of String), ByVal index As Int32)
+    Private Sub Expand(ByVal directories As IEnumerable(Of DirectoryNode), ByVal directoryNames As List(Of String), ByVal index As Int32, count As Int32)
+        'directories is the list of just expanded directories, and directoryNames is the components of the sought path
         If (directories Is Nothing Or index > directoryNames.Count - 1) Then
             Return
         End If
 
-        For Each d In directories
+        For Each d In directories 'This seeks the path to expand, of the ones just epanded
             If (directoryNames(index).ToLower() = d.Directory.Name.ToLower()) Then
                 d.Expand()
-                Expand(d.DirectoryNodes, directoryNames, index + 1)
-                If index = directoryNames.Count - 1 Then
+                Expand(d.DirectoryNodes, directoryNames, index + 1, count) 'iterate the expansion
+                'if we've finished expanding, then select the node, and highlight it
+                If index = count Then 'This is triggered far too frequently, and causes problems.  
                     Dim k As New TreeNode
                     k = CType(d, TreeNode)
                     tvFiles.SelectedNode = k
+                    OnDirectorySelected(New DirectoryInfo(d.FullName))
                     k.BackColor = SystemColors.HighlightText
+                    Exit Sub
                 End If
             End If
 
         Next
-        If Not tvFiles.SelectedNode Is Nothing Then
-
-        End If
     End Sub
 
     Public Sub Collapse(ByVal fullPath As String)
@@ -785,7 +787,7 @@ Public Class FileSystemTree
                 OnDriveSelected(drive)
             Case FileSystemNodeType.Directory
                 Dim directory As DirectoryInfo = CType(node, DirectoryNode).Directory
-                OnDirectorySelected(directory)
+                'OnDirectorySelected(directory)
             Case FileSystemNodeType.File
                 Dim file As FileInfo = CType(node, FileNode).File
                 OnFileSelected(file)
@@ -984,6 +986,7 @@ Public Class FileSystemTree
 
 
     Private Sub tvFiles_BeforeExpand(sender As Object, e As TreeViewCancelEventArgs) Handles tvFiles.BeforeExpand
+        'MsgBox("tvFiles_BeforeExpand")
         Dim node As FileSystemNode = CType(e.Node, FileSystemNode)
         OnNodeExpanding(node)
     End Sub
@@ -1012,17 +1015,16 @@ Public Class FileSystemTree
 
     End Sub
 
-    Private Sub FileSystemTree_ParentChanged(sender As Object, e As EventArgs) Handles Me.ParentChanged
 
-    End Sub
 
     Private Sub tvFiles_BeforeSelect(sender As Object, e As TreeViewCancelEventArgs) Handles tvFiles.BeforeSelect
-        ' MsgBox("YEs")
+        'MsgBox("tvFiles_BeforeSelect") 'Repeatedly called
         ClearSelectedNodes()
 
     End Sub
 
     Public Sub tvFiles_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles tvFiles.AfterSelect
+        'MsgBox("tvFiles_AfterSelect")
         HighlightSelectedNodes()
         RaiseEvent DirectorySelected(Me, New DirectoryInfoEventArgs(New DirectoryInfo(NodePath(e))))
 

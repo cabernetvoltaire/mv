@@ -2,8 +2,10 @@
 Module FileHandling
     Public blnSuppressCreate As Boolean = False
     Public blnChooseOne As Boolean = False
-    Public strVideoExtensions = ".webm.avi.flv.mov.mpeg.mpg.m4v.mkv.mp4.wmv.wav.mp3.3gp"
+    Public strVideoExtensions = ".vob .webm.avi.flv.mov.mpeg.mpg.m4v.mkv.mp4.wmv.wav.mp3.3gp"
     Public strPicExtensions = ".jpeg.png.jpg.bmp.gif"
+
+    Public FilePumpList As New List(Of String)
 
     Dim strFilterExtensions(6) As String
     Public Sub AssignExtensionFilters()
@@ -14,7 +16,6 @@ Module FileHandling
         strFilterExtensions(FilterState.Vidonly) = strVideoExtensions
         strFilterExtensions(FilterState.NoPicVid) = strPicExtensions & strVideoExtensions & "NOT"
     End Sub
-
     Public Sub SaveButtonlist()
         Dim path As String
         With frmMain.SaveFileDialog1
@@ -29,7 +30,6 @@ Module FileHandling
         End With
         KeyAssignmentsStore(path)
     End Sub
-
     ''' <summary>
     ''' Fills the listbox with files from a given folder, in a given filter state
     ''' </summary>
@@ -45,8 +45,9 @@ Module FileHandling
         End If
 
         lbx.Items.Clear()
-        '   flist.Clear()
+        'flist.Clear()
 
+        If e.EnumerateFiles.Count = 0 Then Exit Sub
         Try
             For Each f In e.EnumerateFiles
                 Dim s As String = LCase(f.Extension)
@@ -99,7 +100,7 @@ Module FileHandling
             End If
 
             lbx.Tag = e
-                If lbx.Items.Count <> 0 Then
+            If lbx.Items.Count <> 0 Then
                 If blnRandom Then
                     Dim s As Long = lbx.Items.Count - 1
                     lbx.SelectedIndex = Rnd() * s
@@ -122,6 +123,13 @@ Module FileHandling
 
         Next
     End Sub
+    Public Function FilePump(strFileDest As String, lbx1 As ListBox)
+        FilePumpList.Add(strFileDest)
+        If FilePumpList.Count = 5 Then
+            MoveFiles(FilePumpList, lbx1)
+            FilePumpList.Clear()
+        End If
+    End Function
 
     ''' <summary>
     ''' Actually saves the store list
@@ -205,13 +213,16 @@ Module FileHandling
         Return s
     End Function
     Public Sub MoveFolder(strDir As String, strDest As String, tvw As MasaSam.Forms.Controls.FileSystemTree, blnOverride As Boolean)
+        If strDest Is Nothing Then Exit Sub
+
         If Not blnOverride Then
             If MsgBox("This will move current folder to " & strDest & ". Are you sure?", MsgBoxStyle.OkCancel) <> MsgBoxResult.Ok Then Exit Sub
         End If
         Try
             With My.Computer.FileSystem
-                .MoveDirectory(strDir, strDest & "\" & .GetDirectoryInfo(strDir).Name)
-                UpdateButton(strDir, strDest & "\" & .GetDirectoryInfo(strDir).Name)
+                Dim s As String = .GetDirectoryInfo(strDir).Name
+                .MoveDirectory(strDir, strDest & "\" & s, FileIO.UIOption.AllDialogs)
+                UpdateButton(strDir, strDest & "\" & s)
                 tvw.RemoveNode(strDir)
             End With
 
@@ -221,7 +232,6 @@ Module FileHandling
                 End Try
 
     End Sub
-
     Private Sub UpdateButton(strPath As String, strDest As String)
         For i = 0 To 25
             For j = 0 To 7
@@ -235,7 +245,6 @@ Module FileHandling
         Next
 
     End Sub
-
     ''' <summary>
     ''' Moves files to strDest, and removes them from lbx1 asking for a subfolder in destination if more than one file. If strDest is empty, files are deleted.
     ''' </summary>
@@ -243,9 +252,18 @@ Module FileHandling
     ''' <param name="strDest"></param>
     ''' <param name="lbx1"></param>
     Public Sub MoveFiles(files As List(Of String), strDest As String, lbx1 As ListBox)
-
         Dim ind As Long = lbx1.SelectedIndex
+        If files.Count = 1 Then
+            lbx1.Items.Remove(files(0))
+
+            FilePump(files.Item(0) & "|" & strDest, lbx1)
+            lbx1.SelectionMode = SelectionMode.One
+            If lbx1.Items.Count <> 0 Then lbx1.SetSelected(Math.Max(Math.Min(ind, lbx1.Items.Count - 1), 0), True)
+
+            Exit Sub
+        End If
         Dim s As String = strDest 'if strDest is empty then delete
+
         If files.Count > 1 And strDest <> "" Then
             If Not blnSuppressCreate Then s = CreateNewDirectory(strDest)
         End If
@@ -293,8 +311,82 @@ Module FileHandling
                             Deletefile(m.FullName)
                         Else
                             'MsgBox("Start")
+                            Try
+                                .MoveFile(m.FullName, spath, FileIO.UIOption.AllDialogs, FileIO.UICancelOption.ThrowException)
+                            Catch ex As Exception
+                                Exit For
+                            End Try
+                            '.DeleteFile(m.FullName)
+                            'MsgBox("Finish")
+                        End If
 
-                            .MoveFile(m.FullName, spath)
+
+                    Catch ex As IOException
+                        Continue For
+                        'MsgBox(ex.Message)
+                    End Try
+                End If
+            End With
+        Next
+        lbx1.SelectionMode = SelectionMode.One
+        If lbx1.Items.Count <> 0 Then lbx1.SetSelected(Math.Max(Math.Min(ind, lbx1.Items.Count - 1), 0), True)
+
+    End Sub
+    Public Sub MoveFiles(filendest As List(Of String), lbx1 As ListBox)
+
+        Dim ind As Long = lbx1.SelectedIndex
+
+        Dim fd As String
+        For Each fd In filendest
+            Dim fds() As String
+            fds = fd.Split("|")
+            Dim file As String = fds(0)
+            Dim s As String = fds(1)
+            Dim m As New FileInfo(file)
+            With My.Computer.FileSystem
+                Dim i As Long = 0
+                Dim spath As String
+                If InStr(s, "\") = s.Length - 1 Or s = "" Then
+                    spath = s & m.Name
+
+                Else
+                    spath = s & "\" & m.Name
+
+                End If
+                While .FileExists(spath) 'Existing path
+                    Dim x = m.Extension
+                    Dim b = InStr(spath, "(")
+                    If b = 0 Then
+                        spath = Replace(spath, x, "(" & i & ")" & x)
+                    Else
+                        spath = Left(spath, b - 1) & "(" & i & ")" & x
+                    End If
+
+                    i += 1
+                End While
+
+                'Exit For
+                If blnCopyMode Then
+                    .CopyFile(m.FullName, spath)
+                Else
+                    'Deal with existing files
+                    Try
+                        ' m = Nothing
+                        ' currentPicBox.Image = Nothing
+
+                        If Not currentPicBox.Image Is Nothing Then DisposePic(currentPicBox)
+                        lbx1.Items.Remove(m.FullName)
+
+                        If s = "" Then
+
+                            Deletefile(m.FullName)
+                        Else
+                            'MsgBox("Start")
+                            Try
+                                .MoveFile(m.FullName, spath, FileIO.UIOption.AllDialogs, FileIO.UICancelOption.ThrowException)
+                            Catch ex As Exception
+                                Exit For
+                            End Try
                             '.DeleteFile(m.FullName)
                             'MsgBox("Finish")
                         End If
@@ -322,19 +414,15 @@ Module FileHandling
 
         Return s
     End Function
-
-
     Public Sub AddCurrentType(blnRecurse As Boolean)
         AddFilesToCollection(Showlist, FBCShown, strFilterExtensions(CurrentFilterState), blnRecurse)
         FillShowbox(frmMain.lbxShowList, FilterState.All, Showlist)
 
     End Sub
-
     Public Sub Addpics(blnRecurse As Boolean)
         AddFilesToCollection(Showlist, FBCShown, strPicExtensions, blnRecurse)
         FillShowbox(frmMain.lbxShowList, CurrentFilterState, Showlist)
     End Sub
-
     Public Sub AddFilesToCollection(ByVal list As List(Of String), dontinclude As List(Of Boolean), extensions As String, blnRecurse As Boolean)
         Dim s As String
         Dim d As New DirectoryInfo(CurrentFolderPath)
@@ -360,7 +448,6 @@ Module FileHandling
             ProgressBarOn(l)
         End If
     End Sub
-
     Public Sub Deletefile(s As String)
 
         With My.Computer.FileSystem
@@ -456,13 +543,14 @@ Module FileHandling
             Next
         End If
     End Sub
-    Public Sub FindAllFoldersBelow(d As DirectoryInfo, list As List(Of String), blnRecurse As Boolean)
+    Public Sub FindAllFoldersBelow(d As DirectoryInfo, list As List(Of String), blnRecurse As Boolean, blnNonEmptyOnly As Boolean)
 
 
         For Each di In d.EnumerateDirectories
             Try
-
-                list.Add(di.FullName)
+                If blnNonEmptyOnly AndAlso di.EnumerateFiles.Count > 0 Or Not blnNonEmptyOnly Then
+                    list.Add(di.FullName)
+                End If
 
             Catch ex As PathTooLongException
                 MsgBox(ex.Message)
@@ -474,7 +562,7 @@ Module FileHandling
             For Each di In d.EnumerateDirectories
                 Try
 
-                    FindAllFoldersBelow(di, list, blnRecurse)
+                    FindAllFoldersBelow(di, list, blnRecurse, blnNonEmptyOnly)
                 Catch ex As UnauthorizedAccessException
                     Continue For
                 Catch ex As DirectoryNotFoundException
@@ -506,7 +594,6 @@ Module FileHandling
 
         Return True
     End Function
-
     Public Function DeleteEmptyFolders(d As DirectoryInfo, blnRecurse As Boolean) As Boolean
 
 
@@ -516,6 +603,7 @@ Module FileHandling
             If blnRecurse Then DeleteEmptyFolders(di, True)
             If di.EnumerateDirectories.Count = 0 And di.EnumerateFiles.Count = 0 Then
                 di.Delete()
+                'TODO What to do if node doesn't exist?
                 frmMain.tvMain2.RemoveNode(di.FullName)
                 ProgressIncrement(1)
             End If
@@ -524,6 +612,7 @@ Module FileHandling
 
         Return True
     End Function
+
     Public Function FolderCount(d As DirectoryInfo, count As Integer, blnRecurse As Boolean) As Long
         Try
             count = count + d.EnumerateDirectories.Count
@@ -580,10 +669,9 @@ Module FileHandling
         blnSuppressCreate = False
         DeleteEmptyFolders(d, True)
     End Sub
-
     Public Sub BurstFolder(d As DirectoryInfo)
         HarvestFolder(d, d.Parent, True)
-        DeleteEmptyFolders(d, True)
+        DeleteEmptyFolders(d.Parent, True)
     End Sub
 
 End Module

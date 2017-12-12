@@ -189,6 +189,7 @@ Public Module General
             End If
 
         End If
+        frmMain.SetControlColours(blnMoveMode)
     End Sub
 
     Public Sub ChangeFolder(strPath As String, blnSHow As Boolean)
@@ -230,7 +231,7 @@ Public Module General
             lbx.Items.Add(s)
             ProgressIncrement(1)
         Next
-        lbx.TabStop = True
+        '        lbx.TabStop = True
         ProgressBarOff()
         frmMain.UpdateFileInfo(New FileInfo(strCurrentFilePath))
     End Sub

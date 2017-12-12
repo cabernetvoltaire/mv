@@ -12,17 +12,30 @@ Module ButtonHandling
     Public Sub AssignLinear()
         Dim d As New DirectoryInfo(CurrentFolderPath)
         Dim i As Byte
-        For Each di In d.EnumerateDirectories
-            AssignButton(i, iCurrentAlpha, di.FullName)
-            i += 1
-            If i = 8 Then Exit Sub
+        Dim di() As DirectoryInfo
+        di = d.Parent.GetDirectories
+        Dim n = d.Parent.GetDirectories.Count - 1
+        For i = 0 To n
+            If di(i).FullName = CurrentFolderPath Then
+                Dim k As Byte
+                While k <= 7 And i + k < n
+                    AssignButton(k, iCurrentAlpha, di(i + k).FullName)
+                    k += 1
+                End While
+
+            End If
         Next
+        'For Each di In d.Parent.EnumerateDirectories
+        '    AssignButton(i, iCurrentAlpha, di.FullName)
+        '    i += 1
+        '    If i = 8 Then Exit Sub
+        'Next
     End Sub
     Public Sub AssignAlphabetic()
 
         Dim dlist As New List(Of String)
         Dim d As New DirectoryInfo(CurrentFolderPath)
-        FindAllFoldersBelow(d, dlist, True)
+        FindAllFoldersBelow(d, dlist, True, True)
         ' dlist = SetPlayOrder(PlayOrder.Name, dlist)
         dlist.Sort()
         Dim n(26) As Integer
@@ -76,6 +89,8 @@ Module ButtonHandling
 
         lblDest(i).Text = f.Name
         strButtonCaptions(i, j, 1) = f.Name
+        LoadCurrentButtonSet()
+
     End Sub
     Public Sub ChangeButtonLetter(e As KeyEventArgs)
         frmMain.lblAlpha.Text = e.KeyCode.ToString
