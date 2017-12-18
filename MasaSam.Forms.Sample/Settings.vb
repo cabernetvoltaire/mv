@@ -29,7 +29,8 @@
     Public blnRandomStartAlways As Boolean = True
     Public blnRestartSlideShowFlag As Boolean = False
     Public blnCopyMode As Boolean = False
-    Public blnChooseRandomFile As Boolean = True
+    Public blnChooseRandomFile As Boolean = False
+
     Public blnTVCurrent As Boolean
 
     Public strButtonFile As String
@@ -38,8 +39,8 @@
     Public Sub PreferencesSave()
 
         With My.Computer.Registry.CurrentUser
-            .SetValue("VertSplit", frmMain.ctrTreeandFiles.SplitterDistance)
-            .SetValue("HorSplit", frmMain.ctrFilesandPics.SplitterDistance)
+            .SetValue("VertSplit", frmMain.ctrFileBoxes.SplitterDistance)
+            .SetValue("HorSplit", frmMain.ctrMainFrame.SplitterDistance)
             .SetValue("Folder", CurrentFolderPath)
             .SetValue("File", strCurrentFilePath)
             .SetValue("Filter", CurrentFilterState)
@@ -51,8 +52,8 @@
     End Sub
     Public Sub PreferencesGet()
         With My.Computer.Registry.CurrentUser
-            frmMain.ctrTreeandFiles.SplitterDistance = .GetValue("VertSplit", frmMain.ctrTreeandFiles.Height / 4)
-            frmMain.ctrFilesandPics.SplitterDistance = .GetValue("HorSplit", frmMain.ctrTreeandFiles.Width / 2)
+            frmMain.ctrFileBoxes.SplitterDistance = .GetValue("VertSplit", frmMain.ctrFileBoxes.Height / 4)
+            frmMain.ctrMainFrame.SplitterDistance = .GetValue("HorSplit", frmMain.ctrFileBoxes.Width / 2)
             'CurrentFolderPath = .GetValue("Folder", "C:\")
             ChangeFolder(.GetValue("Folder", "C:\"), False)
             strCurrentFilePath = .GetValue("File")

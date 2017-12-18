@@ -23,10 +23,13 @@ Public Module General
         End With
 
     End Sub
+    Public Function LinkTarget(str As String) As String
+        Return CreateObject("WScript.Shell").CreateShortcut(str).TargetPath
+    End Function
     Public Sub ProgressIncrement(st As Integer)
         With frmMain.TSPB
             '   .Maximum = max
-            .Value = (.Value + st) Mod .Maximum
+            .Value = (.Value + st) Mod .Maximum 'TODO this could be causing the stalling
 
         End With
         frmMain.Update()
@@ -83,7 +86,7 @@ Public Module General
     Public Autozoomrate As Decimal = 0.4
     Public strVisibleButtons(8) As String
 
-    Public blnButtonsLoaded As Boolean
+    Public blnButtonsLoaded As Boolean = False
     Public ssspeed As Integer = 200
 
     Public blnFullScreen As Boolean
@@ -159,6 +162,7 @@ Public Module General
     ''' <param name="e"></param>
     Public Sub HandleFunctionKeyDown(sender As Object, e As KeyEventArgs)
         Dim i As Byte = e.KeyCode - Keys.F5
+        'Move files
         If e.Control Or blnMoveMode Then 'Move files if CTRL held
             frmMain.CancelDisplay()
 
@@ -173,6 +177,7 @@ Public Module General
             End Select
 
         Else
+            'Assign buttons
             If e.Shift Or strVisibleButtons(i) = "" Then
                 AssignButton(i, iCurrentAlpha, CurrentFolderPath) 'Just assign
                 If My.Computer.FileSystem.FileExists(strButtonFile) Then
@@ -181,6 +186,7 @@ Public Module General
                     SaveButtonlist()
                 End If
             Else
+                'SWITCH folder
                 If strVisibleButtons(i) <> CurrentFolderPath Then
                     ChangeFolder(strVisibleButtons(i), True)
 
@@ -195,12 +201,14 @@ Public Module General
     Public Sub ChangeFolder(strPath As String, blnSHow As Boolean)
         If strPath = CurrentFolderPath Then
         Else
+            If Not LastFolder.Contains(CurrentFolderPath) Then
+                LastFolder.Push(CurrentFolderPath)
 
-            LastFolder.Push(CurrentFolderPath)
+                'If blnSHow Then frmMain.tvMain2.SelectedFolder = CurrentFolderPath
+            End If
             CurrentFolderPath = strPath 'Switch to this folder
-
-            'If blnSHow Then frmMain.tvMain2.SelectedFolder = CurrentFolderPath
         End If
+        frmMain.SetControlColours(blnMoveMode)
     End Sub
 
     Public Function ListfromListbox(lbx As ListBox) As List(Of String)
@@ -382,10 +390,38 @@ Public Module General
 
             If InStr(UCase(lbx.Items(i)), UCase(s)) <> 0 Then
                 lbx.SetSelected(i, True)
+                ls.Add(lbx.Items(i))
             End If
         Next
         Return ls
     End Function
+    Public Function HighlightList(lbx As ListBox, ls As List(Of String))
+        lbx.SelectedItems.Clear()
+        lbx.Refresh()
+        lbx.SelectionMode = SelectionMode.MultiExtended
+        For Each f In ls
+            Dim i = lbx.FindString(f)
+            If i >= 0 Then lbx.SetSelected(i, True)
+        Next
+    End Function
+    Public Function SelectDeadLinks(lbx As ListBox)
+        HighlightList(lbx, GetDeadLinks(lbx))
+    End Function
+    Public Function GetDeadLinks(lbx As ListBox) As List(Of String)
+        Dim ls As New List(Of String)
+        ls = SelectFromListbox(lbx, ".lnk")
+        lbx.SelectedItems.Clear()
+        Dim deadlinks As New List(Of String)
+        For Each f In ls
+            Dim Finfo = New FileInfo(CreateObject("WScript.Shell").CreateShortcut(f).TargetPath)
+
+            If Not Finfo.Exists Then
+                deadlinks.Add(f)
+            End If
+        Next
+        Return deadlinks
+    End Function
+
 
     Public Function ReturnListOfDirectories(ByVal list As List(Of String), strPath As String) As List(Of String)
         Dim d As New DirectoryInfo(strPath)

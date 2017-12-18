@@ -369,7 +369,7 @@ Public Class FileSystemTree
                     k = CType(d, TreeNode)
                     tvFiles.SelectedNode = k
                     OnDirectorySelected(New DirectoryInfo(d.FullName))
-                    k.BackColor = SystemColors.HighlightText
+                    '                    k.BackColor = SystemColors.HighlightText
                     Exit Sub
                 End If
             End If

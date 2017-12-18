@@ -5,9 +5,8 @@ Imports AxWMPLib
 Imports MasaSam.Forms.Controls
 Public Class frmMain
 
-    Public defaultcolour As Color = Color.LightSkyBlue
-    Public movecolour As Color = Color.PaleGoldenrod
-    Public focuscontrols() As Control
+    Public defaultcolour As Color = Color.Aqua
+    Public movecolour As Color = Color.Orange
     Public Function SetControlColours(blnMove As Boolean)
         Dim d As Color = defaultcolour
         If blnMove Then d = movecolour
@@ -80,24 +79,27 @@ Public Class frmMain
     Public Sub CancelDisplay()
         currentWMP.Ctlcontrols.pause()
         currentWMP.URL = ""
-        'currentPicBox.Dispose()
+        currentPicBox.Image = Nothing
+        ' currentPicBox.Dispose()
         GC.Collect()
         tmrSlideShow.Enabled = False
-        currentPicBox.Image = Nothing
     End Sub
 
-    Private Sub DeleteFolder(tvw As FileSystemTree)
+    Private Sub DeleteFolder(tvw As FileSystemTree, blnConfirm As Boolean)
         With My.Computer.FileSystem
+            Dim m As MsgBoxResult = MsgBoxResult.No
             If .DirectoryExists(CurrentFolderPath) Then
-                Dim m As MsgBoxResult
-                m = MsgBox("Delete folder " & CurrentFolderPath & "?", MsgBoxStyle.YesNoCancel)
-                If m = MsgBoxResult.Yes Then
+                If blnConfirm Then
+                    m = MsgBox("Delete folder " & CurrentFolderPath & "?", MsgBoxStyle.YesNoCancel)
+                End If
+                If Not blnConfirm OrElse m = MsgBoxResult.Yes Then
                     .DeleteDirectory(CurrentFolderPath, FileIO.UIOption.OnlyErrorDialogs, FileIO.RecycleOption.SendToRecycleBin)
                     tvw.RemoveNode(CurrentFolderPath)
-                ElseIf m = MsgBoxResult.No Or m = MsgBoxResult.Cancel Then
-                    ControlSetFocus(lbxFiles)
-
                 End If
+
+            ElseIf m = MsgBoxResult.No Or m = MsgBoxResult.Cancel Then
+                ControlSetFocus(lbxFiles)
+
             End If
         End With
     End Sub
@@ -118,7 +120,44 @@ Public Class frmMain
     '   SetMotion(e.KeyCode) 'Alternative speed. Doesn't work at the moment. 
     'End Function
     Private Function SpeedChange(e As KeyEventArgs) As KeyEventArgs
-        If e.KeyCode = KeySpeed1 Then
+        TweakSpeed(e)
+        Dim blnPlaying As Boolean = currentWMP.URL <> ""
+        Dim Choice As Byte = e.KeyCode - KeySpeed1 'Set slideshow speed if pic showing, and start slideshow
+        If Not blnPlaying Then
+            tmrSlideShow.Enabled = True
+            tmrSlideShow.Interval = iSSpeeds(Choice)
+        Else
+            PlaybackSpeed = iPlaybackSpeed(Choice) 'Otherwise, set playback speed 'TODO Options
+        End If
+
+
+        If e.KeyCode = KeyToggleSpeed Then
+            If blnPlaying Then
+                PlaybackSpeed = 1
+                currentWMP.settings.rate = PlaybackSpeed
+                currentWMP.Ctlcontrols.play()
+                tmrSlowMo.Enabled = False
+            Else
+                tmrSlideShow.Enabled = Not tmrSlideShow.Enabled
+            End If
+
+        Else
+            '        currentWMP.settings.rate = PlaybackSpeed
+
+            currentWMP.Ctlcontrols.pause()
+            tmrSlowMo.Interval = 1000 / ((PlaybackSpeed) * 30)
+            tmrSlowMo.Enabled = True
+
+        End If
+        'Report
+        blnSpeedRestart = True
+        tbSpeed.Text = "SPEED (" & PlaybackSpeed * 100 & "%)"
+        e.Handled = True
+        Return e
+    End Function
+
+    Private Shared Sub TweakSpeed(e As KeyEventArgs)
+        If e.KeyCode = KeySpeed1 Then 'TODO does this work?
             If e.Control Then 'increase the extremes if Control held TODO Don't know if this works. 
                 If e.Shift Then 'decrease if Shift
                     iSSpeeds(0) = iSSpeeds(0) * 0.9
@@ -138,35 +177,7 @@ Public Class frmMain
             End If
 
         End If
-
-        Dim Choice As Byte = e.KeyCode - KeySpeed1
-        If (Not currentWMP.playState = WMPLib.WMPPlayState.wmppsPlaying) Then
-
-            tmrSlideShow.Interval = iSSpeeds(Choice)
-        End If
-        PlaybackSpeed = iPlaybackSpeed(Choice) 'TODO Options
-
-        'TODO This means you can't change Slideshow speed while watching a movie, which makes sense. This has recently broken though. 
-
-        If Choice = KeyToggleSpeed - KeySpeed1 Then
-            PlaybackSpeed = 1
-            currentWMP.settings.rate = PlaybackSpeed
-            currentWMP.Ctlcontrols.play()
-            tmrSlowMo.Enabled = False
-        Else
-            '        currentWMP.settings.rate = PlaybackSpeed
-
-            currentWMP.Ctlcontrols.pause()
-            tmrSlowMo.Interval = 1000 / ((PlaybackSpeed) * 30)
-            tmrSlowMo.Enabled = True
-
-        End If
-        'Report
-        blnSpeedRestart = True
-        tbSpeed.Text = "SPEED (" & PlaybackSpeed * 100 & "%)"
-        e.Handled = True
-        Return e
-    End Function
+    End Sub
 
     Private Sub ToggleRandomStartPoint()
         blnRandomStartAlways = Not blnRandomStartAlways
@@ -175,25 +186,22 @@ Public Class frmMain
     End Sub
     Public Sub GoFullScreen(blnGo As Boolean)
 
-        'Dim numofMon As Integer = Screen.AllScreens.Length
-        'If numofMon > 1 Then
-        '    FullScreen.Bounds = Screen.AllScreens(0).Bounds
-        'End If
         If blnGo Then
             SetWMP(FullScreen.FSWMP)
             SetPB(FullScreen.fullScreenPicBox)
-            'FullScreen.PictureBox1.Image = FullScreen.fullScreenPicBox.Image
-            ' SetPB(FullScreen.PictureBox1)
             Dim screen As Screen
             If blnSecondScreen Then
                 screen = Screen.AllScreens(1)
             Else
                 screen = Screen.AllScreens(0)
+                SplitterPlace(0.75)
             End If
             FullScreen.StartPosition = FormStartPosition.Manual
             FullScreen.Location = screen.Bounds.Location + New Point(100, 100)
             FullScreen.Show()
+
         Else
+            splitterplace(0.25)
             SetWMP(MainWMP)
             SetPB(PictureBox1)
             FullScreen.Close()
@@ -201,6 +209,9 @@ Public Class frmMain
         blnFullScreen = Not blnFullScreen
         tmrPicLoad.Enabled = True
     End Sub
+    Private Function SplitterPlace(i As Decimal)
+        ctrMainFrame.SplitterDistance = Me.Width * i
+    End Function
     Private Sub ToggleButtons()
         Buttons_Load()
         blnButtonsLoaded = Not blnButtonsLoaded
@@ -248,9 +259,9 @@ Public Class frmMain
                         End If
 
                     Case Else
+                        'Otherwise, advance the playlist. 
                         lbxShowList.SelectionMode = SelectionMode.One
 
-                        'Otherwise, advance the playlist. 
                         If Showlist.Count > 0 Then 'TODO There's a problem with the application of lCurrentDisplayIndex
 
                             If lCurrentDisplayIndex = 0 And Not blnForward Then
@@ -344,7 +355,7 @@ Public Class frmMain
             'If it's a .lnk, find the file
             If LCase(info.Extension) = ".lnk" Then
                 blnLink = True
-                strCurrentFilePath = CreateObject("WScript.Shell").CreateShortcut(info.FullName).TargetPath
+                strCurrentFilePath = LinkTarget(info.FullName) ' CreateObject("WScript.Shell").CreateShortcut(info.FullName).TargetPath
                 Try
                     If My.Computer.FileSystem.FileExists(strCurrentFilePath) Then
 
@@ -374,6 +385,7 @@ Public Class frmMain
         End Try
     End Function
     Public Sub HandleKeys(sender As Object, e As KeyEventArgs)
+        Me.Cursor = Cursors.WaitCursor
         Select Case e.KeyCode
             Case Keys.Enter
                 If e.Control And blnLink Then
@@ -449,17 +461,21 @@ Public Class frmMain
                 'TraverseTree(tvMain2.tvFiles, e.KeyCode = KeyTraverseTree)
             Case KeyToggleSpeed
                 With currentWMP
-                    If .playState = WMPLib.WMPPlayState.wmppsPaused Or PlaybackSpeed <> 1 Then
-                        PlaybackSpeed = 1
-                        tmrSlowMo.Enabled = False
-                        .settings.rate = PlaybackSpeed
-                        .Ctlcontrols.play()
+                    If .URL <> "" Then
+                        If .playState = WMPLib.WMPPlayState.wmppsPaused Or PlaybackSpeed <> 1 Then
+                            PlaybackSpeed = 1
+                            tmrSlowMo.Enabled = False
+                            .settings.rate = PlaybackSpeed
+                            .Ctlcontrols.play()
+                        Else
+                            .Ctlcontrols.pause()
+                        End If
                     Else
-                        .Ctlcontrols.pause()
+                        tmrSlideShow.Enabled = Not tmrSlideShow.Enabled
                     End If
+                    blnSpeedRestart = True
+                    tbSpeed.Text = "SPEED (" & PlaybackSpeed * 100 & "%)"
                 End With
-                blnSpeedRestart = True
-                tbSpeed.Text = "SPEED (" & PlaybackSpeed * 100 & "%)"
             Case KeySpeed1, KeySpeed2, KeySpeed3
                 e = SpeedChange(e)
             Case KeyFilter 'Cycle through listbox filters
@@ -485,7 +501,7 @@ Public Class frmMain
                     Case CtrlFocus.Files
                         MoveFiles(ListfromListbox(lbxFiles), "", lbxFiles)
                     Case CtrlFocus.Tree
-                        DeleteFolder(tvMain2)
+                        DeleteFolder(tvMain2, Not blnMoveMode)
                     Case CtrlFocus.ShowList
                         '                        If MsgBox("This will DELETE ALL the showlist files! Is this what you want?", MsgBoxStyle.YesNoCancel) <> MsgBoxResult.Yes Then Exit Sub
                         MoveFiles(ListfromListbox(lbxShowList), "", lbxShowList)
@@ -503,10 +519,10 @@ Public Class frmMain
 
             Case KeyJumpToPoint
             Case KeyBackUndo
-
-                CurrentFolderPath = LastFolder.Pop
-                tvMain2.SelectedFolder = CurrentFolderPath
-
+                If LastFolder.Count > 0 Then
+                    CurrentFolderPath = LastFolder.Pop
+                    tvMain2.SelectedFolder = CurrentFolderPath
+                End If
                 'strCurrentFilePath = LastPlayed.Pop
                 'tmrPicLoad.Enabled = True
 
@@ -514,7 +530,7 @@ Public Class frmMain
                 tmrSlideShow.Enabled = Not tmrSlideShow.Enabled
 
         End Select
-
+        Me.Cursor = Cursors.Default
         ' e.Handled = True
     End Sub
 
@@ -523,6 +539,7 @@ Public Class frmMain
         'MsgBox(CurrentFilterState.ToString)
         FillListbox(lbxFiles, New DirectoryInfo(CurrentFolderPath), FileboxContents, blnChooseRandomFile)
         tbFilter.Text = UCase(Filterstates(CurrentFilterState))
+        SetControlColours(blnMoveMode)
     End Sub
 
     Private Sub SetWMP(tWMP As AxWindowsMediaPlayer)
@@ -570,30 +587,31 @@ Public Class frmMain
     '    End With
     'End Sub
     Private Sub HighlightCurrent(strPath As String)
-        If strPath = "" Then Exit Sub
-        If Len(strPath) > 247 Then Exit Sub
+        'If strPath is a link, it highlights the link, not the file
+        If strPath = "" Then Exit Sub 'Empty
+        If Len(strPath) > 247 Then Exit Sub 'Too long
         Dim finfo As New FileInfo(strPath)
         UpdateFileInfo(finfo)
-        If InStr(":\", strPath) = Len(strPath) - 2 Then
+        If InStr(":\", strPath) = Len(strPath) - 2 Then 'TODO root folder
 
         Else
-            If Not blnLink Then
+            'If Not blnLink Then
 
-                Dim s As String = Path.GetDirectoryName(strPath)
-                If tvMain2.SelectedFolder <> s Then tvMain2.SelectedFolder = s 'Only change tree if it needs changing
-            End If
+            Dim s As String = Path.GetDirectoryName(strPath)
+            If tvMain2.SelectedFolder <> s Then tvMain2.SelectedFolder = s 'Only change tree if it needs changing
+            'End If
         End If
 
 
-        If Not blnLink Then
-            If lbxFiles.SelectedItem <> strPath Then
-                'If Not blnChooseOne Then 'TODO Rewrite this so that we can get a random file in the box when blnChooseONe is selected
-                HighlightListboxSelected(strPath, lbxFiles) 'Highlight the current file in lbxFiles
-                'Else
-                '    strPath = lbxFiles.SelectedItem
-                'End If
-            End If
+        'If Not blnLink Then
+        If lbxFiles.SelectedItem <> strPath Then
+            'If Not blnChooseOne Then 'TODO Rewrite this so that we can get a random file in the box when blnChooseONe is selected
+            HighlightListboxSelected(strPath, lbxFiles) 'Highlight the current file in lbxFiles
+            'Else
+            '    strPath = lbxFiles.SelectedItem
+            'End If
         End If
+        'End If
         If Not MasterContainer.Panel2Collapsed Then
             'Highlight the file in lbxShowlist, but only if it has the focus
             If PFocus = CtrlFocus.ShowList AndAlso Not CtrlDown Then
@@ -754,6 +772,8 @@ Public Class frmMain
         Dim di = New IO.DirectoryInfo(e.Drive.Name)
         ChangeFolder(di.FullName, True)
         FillListbox(lbxFiles, di, Showlist, blnChooseRandomFile)
+        SetControlColours(blnMoveMode)
+
     End Sub
     'Private Sub lbxFiles_SelectedIndexChanged(sender As Object, e As EventArgs)
     '    'Loads a new media file by triggering the PicLoad Timer
@@ -775,11 +795,11 @@ Public Class frmMain
     End Sub
     Private Sub tmrPicLoad_Tick(sender As Object, e As EventArgs) Handles tmrPicLoad.Tick
 
-        fType = FindType(strCurrentFilePath)
 
         HighlightCurrent(strCurrentFilePath)
         LastPlayed.Push(strCurrentFilePath)
         tbLastFile.Text = strCurrentFilePath
+        fType = FindType(strCurrentFilePath)
         Select Case fType
             Case Filetype.Movie
                 HandleMovie()
@@ -1094,17 +1114,17 @@ Public Class frmMain
 
 
 
-    Private Sub tvMain2_NodeSelected(sender As Object, e As TreeViewEventArgs)
-        ' Exit Sub
-        If e.Node.ToolTipText = "My Computer" Then Exit Sub
+    'Private Sub tvMain2_NodeSelected(sender As Object, e As TreeViewEventArgs)
+    '    ' Exit Sub
+    '    If e.Node.ToolTipText = "My Computer" Then Exit Sub
 
-        If e.Node.ToolTipText = "" Then Exit Sub
-        ' MsgBox(e.Node.ToolTipText)
-        Dim di = New IO.DirectoryInfo(e.Node.ToolTipText)
-        ChangeFolder(di.FullName, True)
-        tmrListbox.Interval = 750
-        tmrListbox.Enabled = True
-    End Sub
+    '    If e.Node.ToolTipText = "" Then Exit Sub
+    '    ' MsgBox(e.Node.ToolTipText)
+    '    Dim di = New IO.DirectoryInfo(e.Node.ToolTipText)
+    '    ChangeFolder(di.FullName, True)
+    '    tmrListbox.Interval = 750
+    '    tmrListbox.Enabled = True
+    'End Sub
 
 
 
@@ -1160,9 +1180,13 @@ Public Class frmMain
 
     Private Sub tvMain2_DirectorySelected(sender As Object, e As DirectoryInfoEventArgs) Handles tvMain2.DirectorySelected
         ChangeFolder(e.Directory.FullName, True)
+
         tmrUpdateFolderSelection.Enabled = False
+        'If e.Directory.FullName <> CurrentFolderPath Then
         tmrUpdateFolderSelection.Interval = 75
-        tmrUpdateFolderSelection.Enabled = True
+            tmrUpdateFolderSelection.Enabled = True
+
+        'End If
     End Sub
 
     Private Sub tvMain2_KeyDown(sender As Object, e As KeyEventArgs) Handles tvMain2.KeyDown
@@ -1346,8 +1370,8 @@ Public Class frmMain
             FillShowbox(lbxShowList, CurrentFilterState, Showlist)
         End If
         lastselection = s
-        Return s
         CancelDisplay()
+        Return s
     End Function
 
     Private Sub ToolStripButton14_Click_1(sender As Object, e As EventArgs) Handles ToolStripButton14.Click
@@ -1397,6 +1421,8 @@ Public Class frmMain
         Dim di As New DirectoryInfo(CurrentFolderPath)
         HarvestFolder(di, di, True)
         FillListbox(lbxFiles, di, FileboxContents, False)
+        SetControlColours(blnMoveMode)
+
     End Sub
 
     Private Sub lbxFiles_KeyDown(sender As Object, e As KeyEventArgs) Handles lbxFiles.KeyDown
@@ -1436,6 +1462,8 @@ Public Class frmMain
             If MsgBox("Revert list?") Then
                 Showlist = Oldlist
                 FillShowbox(lbxShowList, CurrentFilterState, Showlist)
+                SetControlColours(blnMoveMode)
+
             End If
         End If
     End Sub
@@ -1509,6 +1537,8 @@ Public Class frmMain
 
     Private Sub LoadFiles_DoWork(sender As Object, e As DoWorkEventArgs) Handles LoadFiles.DoWork
         LoadShowList()
+        SetControlColours(blnMoveMode)
+
     End Sub
 
     Private Sub tmrUpdateFolderSelection_Tick(sender As Object, e As EventArgs) Handles tmrUpdateFolderSelection.Tick
@@ -1574,6 +1604,37 @@ Public Class frmMain
         blnChooseOne = True
         AddFilesToCollection(Showlist, FBCShown, strPicExtensions & strVideoExtensions, True)
         FillShowbox(lbxShowList, FilterState.All, Showlist)
+    End Sub
+
+    Private Sub BundleFilesToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles BundleFilesToolStripMenuItem.Click
+        BundleFiles(lbxFiles, CurrentFolderPath)
+    End Sub
+
+    Private Sub BundleFiles(lbx1 As ListBox, strFolder As String)
+        SelectSubList()
+        MoveFiles(ListfromListbox(lbx1), CurrentFolderPath, lbx1)
+    End Sub
+
+    Private Sub ToolStripButton1_Click_1(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
+        AssignTree(CurrentFolderPath)
+    End Sub
+
+    Private Sub ToolStripButton2_Click(sender As Object, e As EventArgs) Handles ToolStripButton2.Click
+        If PFocus = CtrlFocus.Files Then
+            SelectDeadLinks(lbxFiles)
+        ElseIf PFocus = CtrlFocus.ShowList Then
+            SelectDeadLinks(lbxShowList)
+
+        End If
+    End Sub
+
+    Private Sub btn1_MouseEnter(sender As Object, e As EventArgs) Handles btn1.MouseEnter
+
+
+    End Sub
+
+    Private Sub ToolTip1_Popup(sender As Object, e As PopupEventArgs) Handles ToolTip1.Popup
+
     End Sub
 
     'Private Sub tmrPumpFiles_Tick(sender As Object, e As EventArgs) Handles tmrPumpFiles.Tick

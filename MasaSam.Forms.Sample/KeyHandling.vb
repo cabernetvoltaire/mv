@@ -11,8 +11,6 @@
     Public KeyLoopToggle = Keys.Insert
     Public KeyFolderJump = Keys.Multiply
     Public KeyZoomIn = Keys.OemPeriod
-
-    'Development: Put the rest in here
     Public KeyTrueSize = Keys.Scroll
     Public KeyCycleScope = Keys.Oem7
     Public KeyCycleRandom = Keys.Pause
@@ -49,6 +47,7 @@
     Public KeySelect = Keys.F3
     Public KeyDelete = Keys.Delete
 
+
     Public Enum FilterState
         All
         Piconly
@@ -58,8 +57,10 @@
         NoPicVid
     End Enum
     Public Filterstates As String() = {"All", "Picture only", "Videos only", "Pictures and videos", "Links only", "Not pictures or videos"}
-    Public FilterColours As Color() = {Color.LightGray, Color.LightPink, Color.LightSeaGreen, Color.LightSteelBlue, Color.Lime, Color.LightCyan}
+    Public FilterColours As Color() = {Color.LightGray, Color.LightGreen, Color.LightYellow, Color.PeachPuff, Color.LightPink, Color.PaleVioletRed}
     Public CurrentFilterState As Integer = FilterState.All
+
+
     'Public CurrentFolder As New IO.DirectoryInfo(C:\)
     Public Sub ControlSetFocus(control As Control)
         ' Set focus to the control, if it can receive focus.

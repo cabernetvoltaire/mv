@@ -38,11 +38,8 @@ Module FileHandling
     ''' <param name="flist"></param>
     ''' <param name="blnRandom"></param>
     Public Sub FillListbox(lbx As ListBox, e As IO.DirectoryInfo, ByVal flist As List(Of String), blnRandom As Boolean)
-        If IsNothing(e) Then Exit Sub
+        If Not e.Exists Then Exit Sub
         If e.Name = "My Computer" Then Exit Sub
-        If lbx.Name = "lbxFiles" Then
-            lbx.BackColor = FilterColours(CurrentFilterState)
-        End If
 
         lbx.Items.Clear()
         'flist.Clear()
@@ -253,15 +250,20 @@ Module FileHandling
     ''' <param name="lbx1"></param>
     Public Sub MoveFiles(files As List(Of String), strDest As String, lbx1 As ListBox)
         Dim ind As Long = lbx1.SelectedIndex
-        If files.Count = 1 Then
-            lbx1.Items.Remove(files(0))
+        'If files.Count = 1 Then
+        '    'Try
+        '    '    FileIO.FileSystem.CopyFile(files(0), strDest & "\" & FileIO.FileSystem.GetName(files(0)), FileIO.UIOption.OnlyErrorDialogs)
+        '    '    FileIO.FileSystem.DeleteFile(files(0))
+        '    'Catch ex As Exception
+        '    'End Try
 
-            FilePump(files.Item(0) & "|" & strDest, lbx1)
-            lbx1.SelectionMode = SelectionMode.One
-            If lbx1.Items.Count <> 0 Then lbx1.SetSelected(Math.Max(Math.Min(ind, lbx1.Items.Count - 1), 0), True)
+        '    lbx1.Items.Remove(files(0))
+        '    FilePump(files.Item(0) & "|" & strDest, lbx1)
+        '    lbx1.SelectionMode = SelectionMode.One
+        '    If lbx1.Items.Count <> 0 Then lbx1.SetSelected(Math.Max(Math.Min(ind, lbx1.Items.Count - 1), 0), True)
 
-            Exit Sub
-        End If
+        '    Exit Sub
+        'End If
         Dim s As String = strDest 'if strDest is empty then delete
 
         If files.Count > 1 And strDest <> "" Then
@@ -657,7 +659,7 @@ Module FileHandling
         Next
         If blnRecurse Then
             For Each di In d.EnumerateDirectories
-                HarvestFolder(di, target, True)
+                HarvestFolder(di, target, True) 'TODO look at this. I'm not sure it works.
                 For Each file In di.EnumerateFiles
 
                     s.Add(file.FullName)
@@ -671,7 +673,6 @@ Module FileHandling
     End Sub
     Public Sub BurstFolder(d As DirectoryInfo)
         HarvestFolder(d, d.Parent, True)
-        DeleteEmptyFolders(d.Parent, True)
     End Sub
 
 End Module

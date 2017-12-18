@@ -22,12 +22,10 @@ Partial Class FullScreen
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(FullScreen))
         Me.FSWMP = New AxWMPLib.AxWindowsMediaPlayer()
         Me.fullScreenPicBox = New System.Windows.Forms.PictureBox()
         Me.FSBlanker = New System.Windows.Forms.PictureBox()
-        Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
         CType(Me.FSWMP, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.fullScreenPicBox, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.FSBlanker, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -66,9 +64,6 @@ Partial Class FullScreen
         Me.FSBlanker.TabStop = False
         Me.FSBlanker.Visible = False
         '
-        'Timer1
-        '
-        '
         'FullScreen
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(11.0!, 24.0!)
@@ -93,5 +88,4 @@ Partial Class FullScreen
     Friend WithEvents FSWMP As AxWMPLib.AxWindowsMediaPlayer
     Friend WithEvents fullScreenPicBox As PictureBox
     Friend WithEvents FSBlanker As PictureBox
-    Friend WithEvents Timer1 As Timer
 End Class

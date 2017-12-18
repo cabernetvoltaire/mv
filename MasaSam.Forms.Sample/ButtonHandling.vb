@@ -56,6 +56,32 @@ Module ButtonHandling
         Next
 
     End Sub
+    Public Sub AssignTree(strStart As String)
+
+        Dim dlist As New List(Of String)
+        Dim d As New DirectoryInfo(strStart)
+        FindAllFoldersBelow(d, dlist, True, False)
+
+        '        dlist.Sort()
+
+        Dim n(26) As Integer
+        For i = 0 To dlist.Count - 1
+            Dim s As String = dlist.Item(i)
+            Dim sht As String = New DirectoryInfo(s).Name
+            Dim l As String = UCase(sht(0))
+            Dim k As Int16 = Asc(l) - Asc("A")
+            If k >= 0 AndAlso k < 26 Then
+                If n(k) < 8 Then
+
+                    AssignButton(n(k), k, s)
+                    '                   strButtonFilePath(n(k), k, 1) = s
+                    n(k) += 1
+                End If
+            End If
+
+        Next
+
+    End Sub
 
 
     Private Sub AssignButton(Index As Integer, Path As String)
