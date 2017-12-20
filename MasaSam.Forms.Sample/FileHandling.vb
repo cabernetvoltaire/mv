@@ -121,6 +121,7 @@ Module FileHandling
         Next
     End Sub
     Public Function FilePump(strFileDest As String, lbx1 As ListBox)
+
         FilePumpList.Add(strFileDest)
         If FilePumpList.Count = 5 Then
             MoveFiles(FilePumpList, lbx1)
@@ -250,20 +251,21 @@ Module FileHandling
     ''' <param name="lbx1"></param>
     Public Sub MoveFiles(files As List(Of String), strDest As String, lbx1 As ListBox)
         Dim ind As Long = lbx1.SelectedIndex
-        'If files.Count = 1 Then
-        '    'Try
-        '    '    FileIO.FileSystem.CopyFile(files(0), strDest & "\" & FileIO.FileSystem.GetName(files(0)), FileIO.UIOption.OnlyErrorDialogs)
-        '    '    FileIO.FileSystem.DeleteFile(files(0))
-        '    'Catch ex As Exception
-        '    'End Try
+        If files.Count = 1 Then
+            'Try
+            '    FileIO.FileSystem.CopyFile(files(0), strDest & "\" & FileIO.FileSystem.GetName(files(0)), FileIO.UIOption.OnlyErrorDialogs)
+            '    FileIO.FileSystem.DeleteFile(files(0))
+            'Catch ex As Exception
+            'End Try
 
-        '    lbx1.Items.Remove(files(0))
-        '    FilePump(files.Item(0) & "|" & strDest, lbx1)
-        '    lbx1.SelectionMode = SelectionMode.One
-        '    If lbx1.Items.Count <> 0 Then lbx1.SetSelected(Math.Max(Math.Min(ind, lbx1.Items.Count - 1), 0), True)
+            lbx1.Items.Remove(files(0))
+            frmMain.tmrPumpFiles.Enabled = True
+            FilePump(files.Item(0) & "|" & strDest, lbx1)
+            lbx1.SelectionMode = SelectionMode.One
+            If lbx1.Items.Count <> 0 Then lbx1.SetSelected(Math.Max(Math.Min(ind, lbx1.Items.Count - 1), 0), True)
 
-        '    Exit Sub
-        'End If
+            Exit Sub
+        End If
         Dim s As String = strDest 'if strDest is empty then delete
 
         If files.Count > 1 And strDest <> "" Then
@@ -314,7 +316,7 @@ Module FileHandling
                         Else
                             'MsgBox("Start")
                             Try
-                                .MoveFile(m.FullName, spath, FileIO.UIOption.AllDialogs, FileIO.UICancelOption.ThrowException)
+                                .MoveFile(m.FullName, spath, FileIO.UIOption.AllDialogs)
                             Catch ex As Exception
                                 Exit For
                             End Try

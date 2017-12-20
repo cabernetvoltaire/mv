@@ -7,6 +7,7 @@ Public Module General
     Public Property blnLink As Boolean
     Public Property blnMoveMode As Boolean = False
     Public Property lastselection As String
+    Public Property blnJumpToMark As Boolean = True
 
 
     Public Sub ProgressBarOn(max As Long)
@@ -163,7 +164,7 @@ Public Module General
     Public Sub HandleFunctionKeyDown(sender As Object, e As KeyEventArgs)
         Dim i As Byte = e.KeyCode - Keys.F5
         'Move files
-        If e.Control Or blnMoveMode Then 'Move files if CTRL held
+        If e.Control Xor blnMoveMode Then 'Move files if CTRL held
             frmMain.CancelDisplay()
 
             Select Case PFocus
@@ -189,7 +190,7 @@ Public Module General
                 'SWITCH folder
                 If strVisibleButtons(i) <> CurrentFolderPath Then
                     ChangeFolder(strVisibleButtons(i), True)
-
+                    frmMain.CancelDisplay()
                     frmMain.tvMain2.SelectedFolder = CurrentFolderPath
                 End If
             End If
@@ -208,6 +209,7 @@ Public Module General
             End If
             CurrentFolderPath = strPath 'Switch to this folder
         End If
+
         frmMain.SetControlColours(blnMoveMode)
     End Sub
 
@@ -241,7 +243,16 @@ Public Module General
         Next
         '        lbx.TabStop = True
         ProgressBarOff()
-        frmMain.UpdateFileInfo(New FileInfo(strCurrentFilePath))
+        frmMain.UpdateFileInfo()
+    End Sub
+    Public Sub MouseHoverInfo(lbx As ListBox, tt As ToolTip)
+        Dim cc, sc As Point
+        cc = New Point
+        sc = New Point
+        sc = lbx.MousePosition()
+        cc = lbx.PointToClient(sc)
+        Dim i As Int32 = lbx.IndexFromPoint(cc)
+        If i >= 0 AndAlso i < lbx.Items.Count - 1 Then tt.SetToolTip(lbx, New FileInfo(lbx.Items(i)).Length)
     End Sub
     Public Function SetPlayOrder(Order As Byte, ByVal List As List(Of String)) As List(Of String)
         Dim NewListS As New SortedList(Of String, String)

@@ -80,7 +80,7 @@ Module ButtonHandling
             End If
 
         Next
-
+        KeyAssignmentsStore(strButtonFile)
     End Sub
 
 

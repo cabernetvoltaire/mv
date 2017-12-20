@@ -9,7 +9,8 @@ Public Class FindDuplicates
     Dim DeleteArray(1000, 100) As String
     Dim blnDelete(1000, 100) As Boolean
 
-    Public PreviewWMP() As AxWMPLib.AxWindowsMediaPlayer
+    Dim PreviewWMP(12) As AxWMPLib.AxWindowsMediaPlayer
+
 
     Private Sub FindDuplicates_Shown(sender As Object, e As EventArgs) Handles Me.Shown
 
@@ -75,19 +76,19 @@ Public Class FindDuplicates
     ''' Finds duplicates of the given file within the current Showlist and adds them to duplist, which is then written to lbxDuplicates. The appropriate controls then show the files in lbxDuplicates
     ''' </summary>
     ''' <param name="strFilePath"></param>
-    Private Sub finddups(strFilePath As String)
-
+    Private Sub finddups(strFilePath As String, Verbose As Boolean)
+        'Need to split the algorith from the control handling.
         duplist.Clear()
         lbxDuplicates.Items.Clear()
         Dim i As Integer = 0
         If Not File.Exists(strFilePath) Then
-            MsgBox("File not found")
+            If Verbose Then MsgBox("File not found")
             Exit Sub
         End If
 
         Dim finfo As New IO.FileInfo(strFilePath)
 
-            Dim length As Long = finfo.Length
+        Dim length As Long = finfo.Length
         For i = 0 To sortedList.Count - 1
             Dim f As New IO.FileInfo(sortedList.Item(i))
             If Not f.Exists Then Continue For
@@ -95,46 +96,53 @@ Public Class FindDuplicates
 
         Next
         'Fill the duplicates box
-        FillShowbox(lbxDuplicates, FilterState.All, duplist)
-        For i = 0 To 11
-            Try
-                'PreviewWMP(i).URL
-                PreviewWMP(i).Visible = False
-                GC.Collect()
-            Catch ex As System.Runtime.InteropServices.InvalidComObjectException
-                MsgBox(ex.Message)
-                Continue For
-            End Try
+        If Verbose Then
+            FillShowbox(lbxDuplicates, FilterState.All, duplist)
+            For i = 0 To 11
+                Try
+                    PreviewWMP(i).URL = Nothing
+                    PreviewWMP(i).Visible = False
+                    GC.Collect()
+                Catch ex As System.Runtime.InteropServices.InvalidComObjectException
+                    MsgBox(ex.Message)
+                    Continue For
+                End Try
 
-        Next
+            Next
+        End If
         'Show and split
         i = 0
-            deletelist.Clear()
+        deletelist.Clear()
+
         For Each row In lbxDuplicates.Items
             Dim strpath As String = row.ToString
             If i <= 11 Then
-                Try
-                    PreviewWMP(i).URL = strpath
-                    PreviewWMP(i).Visible = True
 
-                Catch ex As Exception
-                    MsgBox(ex.Message)
-                    Continue For
+                If Verbose Then
+                    Try
+                        PreviewWMP(i).URL = strpath
+                        PreviewWMP(i).Visible = True
+                        Me.Update()
+                    Catch ex As Exception
+                        MsgBox(ex.Message)
+                        Continue For
 
-                End Try
-
-                If i = 0 Then
-                    If Not lbxSave.Items.Contains(row) Then lbxSave.Items.Add(row)
-                Else
-                    If Not lbxDeleteList.Items.Contains(row) Then lbxDeleteList.Items.Add(row)
+                    End Try
                 End If
-                i += 1
             End If
 
+            If i = 0 Then
+                If Verbose And Not lbxSave.Items.Contains(row) Then lbxSave.Items.Add(row)
+            Else
+                If Not lbxDeleteList.Items.Contains(row) Then
+                    deletelist.Add(row)
+                    If Verbose Then lbxDeleteList.Items.Add(row)
+                End If
+            End If
+            i += 1
         Next
 
     End Sub
-
 
 
 
@@ -172,17 +180,13 @@ Public Class FindDuplicates
 
     Private Sub lbxunique_SelectedIndexChanged_1(sender As Object, e As EventArgs) Handles lbxunique.SelectedIndexChanged, lbxDeleteList.SelectedIndexChanged, lbxSave.SelectedIndexChanged, lbxDuplicates.SelectedIndexChanged, lbxsorted.SelectedIndexChanged
         Dim lbx As ListBox = sender
-        If lbx.SelectedIndex <= 0 Then Exit Sub
+        If lbx.SelectedIndex < 0 Then Exit Sub
         Dim path As String = lbx.Items(lbx.SelectedIndex)
-        finddups(path)
+        finddups(path, True)
     End Sub
 
 
-    Private Sub lbxDeleteList_DoubleClick(sender As Object, e As EventArgs) Handles lbxDeleteList.DoubleClick
-        FillShowbox(lbxDeleteList, FilterState.All, deletelist)
 
-
-    End Sub
 
     Private Sub btnDeleteFiles_Click(sender As Object, e As EventArgs) Handles btnDeleteFiles.Click
         If MsgBox("Are you sure you want to delete all these files?", MsgBoxStyle.Critical, "DELETE FILES?") = MsgBoxResult.Ok Then
@@ -218,17 +222,29 @@ Public Class FindDuplicates
     End Sub
 
     Private Sub lbxDeleteList_MouseDoubleClick(sender As Object, e As MouseEventArgs) Handles lbxDeleteList.MouseDoubleClick
-        lbxDeleteList.Items.Remove(lbxDeleteList.SelectedItem)
         If Not lbxSave.Items.Contains(lbxDeleteList.SelectedItem) Then lbxSave.Items.Add(lbxDeleteList.SelectedItem)
+        lbxDeleteList.Items.Remove(lbxDeleteList.SelectedItem)
 
     End Sub
 
     Private Sub AutoList_Click(sender As Object, e As EventArgs) Handles AutoList.Click
-        With lbxunique
-            While .SelectedIndex < .Items.Count - 1
-                .SelectedItem = .Items(.SelectedIndex + 1)
-                frmMain.Update()
-            End While
-        End With
+        For Each path In lbxunique.Items
+            finddups(path, False)
+        Next
+
     End Sub
+
+    Private Sub lbxDuplicates_MouseEnter(sender As Object, e As EventArgs) Handles lbxDuplicates.MouseEnter
+
+    End Sub
+
+    Private Sub ToolTip1_Popup(sender As Object, e As PopupEventArgs) Handles ToolTipDups.Popup
+
+    End Sub
+
+    Private Sub lbxDuplicates_MouseHover(sender As Object, e As EventArgs) Handles lbxDuplicates.MouseHover
+        MouseHoverInfo(lbxDuplicates, ToolTipDups)
+    End Sub
+
+
 End Class

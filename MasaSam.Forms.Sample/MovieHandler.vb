@@ -17,10 +17,23 @@ Module MovieHandler
         'MsgBox(e.newState)
         Select Case e.newState
             Case WMPLib.WMPPlayState.wmppsMediaEnded
-                Dim KeyEvent As New KeyEventArgs(KeyNextFile)
-                frmMain.HandleKeys(sender, KeyEvent)
+                If Not frmMain.tmrAutoTrail.Enabled Then
+                    Dim KeyEvent As New KeyEventArgs(KeyNextFile)
+                    frmMain.HandleKeys(sender, KeyEvent)
+                End If
+
             Case WMPLib.WMPPlayState.wmppsPlaying
-                If blnRandomStartPoint Then frmMain.JumpRandom(False)
+                MediaDuration = currentWMP.currentMedia.duration
+                If blnJumpToMark Then
+                    MediaJumpToMarker()
+
+                ElseIf blnRandomStartPoint Then
+                If FullScreen.Changing Then
+                Else
+                    frmMain.JumpRandom(False)
+
+                    End If
+                End If
         End Select
     End Sub
 End Module

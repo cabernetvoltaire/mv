@@ -1,11 +1,12 @@
 ﻿Imports AxWMPLib
 
 Public Class FullScreen
-
+    Public Shared Property Changing As Boolean
 
     Private Sub FullScreen_Shown(sender As Object, e As EventArgs) Handles Me.Shown
         FSWMP.uiMode = "None"
         FSWMP.Location = Me.Location
+
     End Sub
 
     Private Sub FullScreen_Keydown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
@@ -13,6 +14,7 @@ Public Class FullScreen
         CtrlDown = e.Control
         If e.KeyCode = Keys.Escape Then
             frmMain.GoFullScreen(False)
+
         End If
 
         frmMain.HandleKeys(Me, e)
@@ -21,6 +23,7 @@ Public Class FullScreen
 
     Public Sub FSWMP_PlayStateChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent) Handles FSWMP.PlayStateChange
         PlaystateChange(sender, e)
+
     End Sub
 
 
@@ -44,15 +47,15 @@ Public Class FullScreen
         PictureFunctions.MouseMove(fullScreenPicBox, sender, e)
     End Sub
 
-    Private Sub fullScreenPicBox_KeyDown(sender As Object, e As KeyEventArgs) Handles fullScreenPicBox.KeyDown
+    Private Sub fullScreenPicBox_KeyDown(sender As Object, e As KeyEventArgs) Handles fullScreenPicBox.KeyDown, Me.KeyUp
         ShiftDown = e.Shift
         CtrlDown = e.Control
     End Sub
 
-    Private Sub FullScreen_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
-        ShiftDown = e.Shift
-        CtrlDown = e.Control
-    End Sub
+    'Private Sub FullScreen_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
+    '    ShiftDown = e.Shift
+    '    CtrlDown = e.Control
+    'End Sub
 
     Private Sub FullScreen_Load(sender As Object, e As EventArgs) Handles Me.Load
         Me.WindowState = FormWindowState.Maximized

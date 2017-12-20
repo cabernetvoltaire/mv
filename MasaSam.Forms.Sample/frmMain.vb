@@ -1,5 +1,6 @@
 ﻿Option Explicit On
 Imports System.ComponentModel
+Imports System.Reflection
 Imports System.IO
 Imports AxWMPLib
 Imports MasaSam.Forms.Controls
@@ -19,7 +20,55 @@ Public Class frmMain
         If PFocus = CtrlFocus.ShowList Then lbxShowList.BackColor = d
 
     End Function
+    Private Sub MovietoPic(img As Image)
+        currentWMP.Visible = False
+        currentWMP.URL = ""
+        PreparePic(currentPicBox, pbxBlanker, img)
+        currentPicBox.Visible = True
+        currentPicBox.BringToFront()
+        currentWMP.Visible = False
+    End Sub
 
+    Private Sub OrientPic(img As Image)
+        tbZoom.Text = UCase("Orientation -" & Orientation(ImageOrientation(img)))
+        Select Case ImageOrientation(img)
+            Case ExifOrientations.BottomRight
+                img.RotateFlip(RotateFlipType.Rotate180FlipNone)
+            Case ExifOrientations.RightTop
+                img.RotateFlip(RotateFlipType.Rotate90FlipNone)
+            Case ExifOrientations.LeftBottom
+                img.RotateFlip(RotateFlipType.Rotate270FlipNone)
+
+        End Select
+    End Sub
+
+    Private Sub HandleMovie(blnRandom As Boolean)
+        'If it is to jump to a random point, do not show first.
+        If blnRandom Then
+            tbStartpoint.Text = "START:RANDOM"
+            currentWMP.Visible = False
+            '   While tmrJumpVideo.Enabled
+
+            'End While
+        Else
+            tbStartpoint.Text = "START:NORMAL"
+
+        End If
+
+        currentWMP.URL = strCurrentFilePath
+        currentWMP.Visible = True
+        currentWMP.BringToFront()
+        ' AxVLCPlugin21.playlist.add("file///" & strCurrentFilePath & "")
+
+        'AxVLCPlugin21.playlist.togglePause()
+        If PlaybackSpeed <> 1 Then currentWMP.settings.rate = PlaybackSpeed
+        currentPicBox.Visible = False
+
+        If tmrSlideShow.Enabled Then
+            blnRestartSlideShowFlag = True
+            tmrSlideShow.Enabled = False 'Slideshow stops if movie. Create separate timer for movie slideshows. 
+        End If
+    End Sub
     Private Sub SaveShowlist()
         Dim path As String
         With SaveFileDialog1
@@ -73,7 +122,7 @@ Public Class frmMain
             loadrate = size / time.TotalMilliseconds
         End If
         ProgressBarOff()
-        tbShowfile.Text = "SHOWFILE LOADED:" & path
+        'tbShowfile.Text = "SHOWFILE LOADED:" & path
     End Sub
 
     Public Sub CancelDisplay()
@@ -82,6 +131,7 @@ Public Class frmMain
         currentPicBox.Image = Nothing
         ' currentPicBox.Dispose()
         GC.Collect()
+        '        tmrAutoTrail.Enabled = False
         tmrSlideShow.Enabled = False
     End Sub
 
@@ -182,11 +232,13 @@ Public Class frmMain
     Private Sub ToggleRandomStartPoint()
         blnRandomStartAlways = Not blnRandomStartAlways
         blnRandomStartPoint = blnRandomStartAlways
-        RandomStartToolStripMenuItem.Checked = blnRandomStartPoint
+        'StartAlways is when the random start has been selected for all files
+        'StartPoint is just a flag telling the video to jump to 
     End Sub
     Public Sub GoFullScreen(blnGo As Boolean)
-
+        FullScreen.Changing = True
         If blnGo Then
+
             SetWMP(FullScreen.FSWMP)
             SetPB(FullScreen.fullScreenPicBox)
             Dim screen As Screen
@@ -201,7 +253,7 @@ Public Class frmMain
             FullScreen.Show()
 
         Else
-            splitterplace(0.25)
+            SplitterPlace(0.25)
             SetWMP(MainWMP)
             SetPB(PictureBox1)
             FullScreen.Close()
@@ -314,7 +366,7 @@ Public Class frmMain
         Else
             NewPosition = currentWMP.Ctlcontrols.currentPosition + iQuickJump / iJumpFactor
         End If
-        blnRandomStartPoint = False
+        ' blnRandomStartPoint = False
         tmrJumpVideo.Enabled = True
     End Sub
 
@@ -336,13 +388,19 @@ Public Class frmMain
     Public Sub JumpRandom(blnAutoTrail As Boolean)
         If Not blnAutoTrail Then
             blnRandomStartPoint = True
+            If blnRandomStartPoint Then
+                NewPosition = (Rnd(1) * (currentWMP.currentMedia.duration))
+            End If
+            tmrJumpVideo.Interval = 1
             tmrJumpVideo.Enabled = True
             tbStartpoint.Text = "START:RANDOM"
 
 
         Else
-            MsgBox("Autotrail")
+            'MsgBox("Autotrail")
+            tmrAutoTrail.Enabled = Not tmrAutoTrail.Enabled
         End If
+
     End Sub
     Public Function FindType(file As String) As Filetype
         blnLink = False
@@ -412,7 +470,7 @@ Public Class frmMain
                 ToggleButtons()
             Case KeyEscape
                 CancelDisplay()                'currentPicBox.Image.Dispose()
-
+                tmrAutoTrail.Enabled = False
             Case KeyRandomize
                 'Cycle through play orders
                 ChosenPlayOrder = (ChosenPlayOrder + 1) Mod (PlayOrder.Type + 1)
@@ -591,7 +649,7 @@ Public Class frmMain
         If strPath = "" Then Exit Sub 'Empty
         If Len(strPath) > 247 Then Exit Sub 'Too long
         Dim finfo As New FileInfo(strPath)
-        UpdateFileInfo(finfo)
+        UpdateFileInfo()
         If InStr(":\", strPath) = Len(strPath) - 2 Then 'TODO root folder
 
         Else
@@ -632,8 +690,6 @@ Public Class frmMain
         End With
 
     End Sub
-
-
 
 
     Private Sub AddMovies(blnRecurse As Boolean)
@@ -686,14 +742,14 @@ Public Class frmMain
     Public Sub CtrlText(ctl As Control, str As String)
         ctl.Text = str
     End Sub
+    Private Sub LoadDefaultShowList()
+        Dim path As String = "Q:\Camgirls.msl"
 
-    'Form Controls
-    Private Sub Form1_Shown(sender As Object, e As EventArgs) Handles Me.Shown
+        Getlist(Showlist, path, lbxShowList)
+        CollapseShowlist(False)
 
-        GlobalInitialise()
 
     End Sub
-
     Private Sub GlobalInitialise()
         CollapseShowlist(True)
         PreferencesGet()
@@ -708,10 +764,6 @@ Public Class frmMain
         currentWMP.uiMode = "FULL"
         currentWMP.Dock = DockStyle.Fill
         currentPicBox = PictureBox1
-        'For Each c In Me.Controls
-        '    c.tabstop = False
-        '    If c.name = "lbxFiles" Then c.tabstop = True
-        'Next
         tscbFilters.Items.Clear()
 
         For i = 0 To Filterstates.Length - 1
@@ -725,7 +777,10 @@ Public Class frmMain
         'Exit Sub
         Try
             KeyAssignmentsRestore(strButtonFile)
-            If Not blnButtonsLoaded Then ToggleButtons()
+            If Not blnButtonsLoaded Then
+                LoadCurrentButtonSet()
+                ToggleButtons()
+            End If
 
         Catch ex As FileNotFoundException
 
@@ -735,20 +790,23 @@ Public Class frmMain
         End Try
     End Sub
 
-    Private Sub LoadDefaultShowList()
-        Dim path As String = "Q:\Camgirls.msl"
+    'Form Controls
+    Private Sub Form1_Shown(sender As Object, e As EventArgs) Handles Me.Shown
 
-        Getlist(Showlist, path, lbxShowList)
-        CollapseShowlist(False)
-
+        GlobalInitialise()
 
     End Sub
+
+
 
     Private Sub frmMain_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
         ShiftDown = e.Shift
         CtrlDown = e.Control
         'GiveKey(e.KeyCode)
         HandleKeys(sender, e)
+        If e.KeyCode = KeyBackUndo Then
+            e.Handled = True
+        End If
         'e.Handled = True
         '  MsgBox(sender.ToString & " " & e.ToString)
     End Sub
@@ -790,7 +848,7 @@ Public Class frmMain
 
     Private Sub tmrInitialise_Tick(sender As Object, e As EventArgs) Handles tmrInitialise.Tick
         MsgBox("Initialise")
-        ToolStripButton3_Click(Me, e)
+        ' ToolStripButton3_Click(Me, e)
         tmrInitialise.Enabled = False
     End Sub
     Private Sub tmrPicLoad_Tick(sender As Object, e As EventArgs) Handles tmrPicLoad.Tick
@@ -802,7 +860,7 @@ Public Class frmMain
         fType = FindType(strCurrentFilePath)
         Select Case fType
             Case Filetype.Movie
-                HandleMovie()
+                HandleMovie(blnRandomStartPoint)
 
             Case Filetype.Pic
                 Dim img As Image
@@ -836,66 +894,30 @@ Public Class frmMain
         tmrPicLoad.Enabled = False
     End Sub
 
-    Private Sub MovietoPic(img As Image)
-        currentWMP.Visible = False
-        currentWMP.URL = ""
-        PreparePic(currentPicBox, pbxBlanker, img)
-        currentPicBox.Visible = True
-        currentPicBox.BringToFront()
-        currentWMP.Visible = False
-    End Sub
 
-    Private Sub OrientPic(img As Image)
-        tbZoom.Text = UCase("Orientation -" & Orientation(ImageOrientation(img)))
-        Select Case ImageOrientation(img)
-            Case ExifOrientations.BottomRight
-                img.RotateFlip(RotateFlipType.Rotate180FlipNone)
-            Case ExifOrientations.RightTop
-                img.RotateFlip(RotateFlipType.Rotate90FlipNone)
-            Case ExifOrientations.LeftBottom
-                img.RotateFlip(RotateFlipType.Rotate270FlipNone)
-
-        End Select
-    End Sub
-
-    Private Sub HandleMovie()
-        If blnRandomStartPoint Then
-            tbStartpoint.Text = "START:RANDOM"
-        Else
-            tbStartpoint.Text = "START:NORMAL"
-
-        End If
-        currentPicBox.Visible = False
-
-        currentWMP.URL = strCurrentFilePath
-        If PlaybackSpeed <> 1 Then currentWMP.settings.rate = PlaybackSpeed
-        currentWMP.Visible = True
-        currentWMP.BringToFront()
-
-        If tmrSlideShow.Enabled Then
-            blnRestartSlideShowFlag = True
-            tmrSlideShow.Enabled = False 'Slideshow stops if movie. Create separate timer for movie slideshows. 
-        End If
-    End Sub
 
     Private Sub tmrJumpVideo_Tick(sender As Object, e As EventArgs) Handles tmrJumpVideo.Tick
         tmrJumpVideo.Enabled = False
         'ControlSetFocus(currentWMP)
-        MediaDuration = currentWMP.currentMedia.duration
-        If blnRandomStartPoint Then
-            NewPosition = (Rnd(1) * (currentWMP.currentMedia.duration))
-        End If
+        'MediaDuration = currentWMP.currentMedia.duration
+
         currentWMP.Ctlcontrols.currentPosition = NewPosition
+        currentWMP.Visible = True
+        currentWMP.BringToFront()
+
         If Not blnRandomStartAlways Then blnRandomStartPoint = False
     End Sub
 
 
     'Tool strip buttons
+    Private Sub btnToggleMark_Click(sender As Object, e As EventArgs) Handles btnToggleMark.Click
+        blnJumpToMark = Not blnJumpToMark
 
-    Private Sub ToolStripButton3_Click(sender As Object, e As EventArgs)
+    End Sub
+    Private Sub ToolStripButton3_Click(sender As Object, e As EventArgs) Handles btnToggleRandom.Click
         'tvwMain.Expand(strCurrentFilePath)
         'Tvw.SelectNode(strCurrentFilePath, 0, False)
-        ToolStripButton6_Click(sender, e)
+        blnChooseRandomFile = Not blnChooseRandomFile
 
 
 
@@ -1287,14 +1309,16 @@ Public Class frmMain
         Process.Start(lbxFiles.SelectedItem)
     End Sub
 
-    Public Sub UpdateFileInfo(f As FileInfo)
+    Public Sub UpdateFileInfo()
+        Dim f As New FileInfo(strCurrentFilePath)
+        If Not f.Exists Then Exit Sub
         Dim listcount = lbxFiles.Items.Count
         Dim showcount = lbxShowList.Items.Count
         Dim dt As Date
         dt = f.LastAccessTime
         If f.LastWriteTime < dt Then dt = f.LastWriteTime
         If f.CreationTime < dt Then dt = f.CreationTime
-        tbDate.Text = dt.ToShortDateString & " " & dt.ToShortTimeString
+        tbDate.Text = dt.ToShortDateString & " " & dt.ToShortTimeString + " (" + Format(f.Length, "#,0.") + " bytes)"
         tbFiles.Text = "FOLDER:" & listcount & " SHOW:" & showcount
         tbFilter.Text = "FILTER:" & Filterstates(CurrentFilterState)
         tbLastFile.Text = strCurrentFilePath
@@ -1451,10 +1475,10 @@ Public Class frmMain
 
     Private Sub DuplicatesToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles DuplicatesToolStripMenuItem.Click
         FindDuplicates.Show()
-        'With Duplicates2
+        ' With Duplicates2
         '.Flist = Showlist
-        '.Show()
-        'end With
+        '    .Show()
+        'End With
     End Sub
 
     Private Sub lbxShowList_TextChanged(sender As Object, e As EventArgs) Handles lbxShowList.TextChanged
@@ -1606,7 +1630,7 @@ Public Class frmMain
         FillShowbox(lbxShowList, FilterState.All, Showlist)
     End Sub
 
-    Private Sub BundleFilesToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles BundleFilesToolStripMenuItem.Click
+    Private Sub BundleToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles BundleToolStripMenuItem.Click
         BundleFiles(lbxFiles, CurrentFolderPath)
     End Sub
 
@@ -1615,7 +1639,7 @@ Public Class frmMain
         MoveFiles(ListfromListbox(lbx1), CurrentFolderPath, lbx1)
     End Sub
 
-    Private Sub ToolStripButton1_Click_1(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
+    Private Sub ToolStripButton1_Click_1(sender As Object, e As EventArgs) Handles TreeToolStripMenuItem.Click
         AssignTree(CurrentFolderPath)
     End Sub
 
@@ -1637,9 +1661,60 @@ Public Class frmMain
 
     End Sub
 
+    Private Sub lbxFiles_MouseHover(sender As Object, e As EventArgs) Handles lbxFiles.MouseHover
+        MouseHoverInfo(lbxFiles, ToolTip1)
+    End Sub
+
+    Private Sub tmrAutoTrail_Tick(sender As Object, e As EventArgs) Handles tmrAutoTrail.Tick
+        'Change the case statements to weight the speeds differently.
+        'Should probably be made programmable.
+        Select Case Int(Rnd() * 10) + 1
+            Case 1, 2
+                'Very Slow
+                SpeedChange(New KeyEventArgs(KeySpeed1))
+                tmrAutoTrail.Interval = Int(Rnd() * 3) * 1000 + 1000
+            Case 3, 4, 5
+                'Slow
+                SpeedChange(New KeyEventArgs(KeySpeed2))
+                tmrAutoTrail.Interval = Int(Rnd() * 4) * 1000 + 1000
+            Case 6, 7, 8
+                'slightly slow
+                SpeedChange(New KeyEventArgs(KeySpeed3))
+                tmrAutoTrail.Interval = Int(Rnd() * 3) * 1000 + 1000
+
+            Case 9, 10
+                'Normal
+                HandleKeys(sender, New KeyEventArgs(KeyToggleSpeed))
+                tmrAutoTrail.Interval = Int(Rnd() * 2) * 1000 + 750
+        End Select
+
+        If Int(Rnd() * 49) + 1 = 1 Then
+            '    To change the file. 1604
+            HandleKeys(sender, New KeyEventArgs(KeyNextFile)) 'Supposedly changes the file, but not sure it works, 1604
+
+
+        End If
+
+
+        HandleKeys(sender, New KeyEventArgs(KeyJumpAutoT)) 'This actually does the main job
+
+    End Sub
+
+    Private Sub tmrPumpFiles_Tick(sender As Object, e As EventArgs) Handles tmrPumpFiles.Tick
+        If FilePumpList.Count <> 0 Then
+            tmrPumpFiles.Enabled = False
+            MoveFiles(FilePumpList, lbxFiles)
+            FilePumpList.Clear()
+        End If
+    End Sub
+
+
+
+
     'Private Sub tmrPumpFiles_Tick(sender As Object, e As EventArgs) Handles tmrPumpFiles.Tick
     '    If FilePumpList.Count > 0 Then
     '        MoveFiles(FilePumpList, lbxFiles)
     '    End If
     'End Sub
+
 End Class

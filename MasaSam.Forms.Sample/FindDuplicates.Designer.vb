@@ -22,6 +22,7 @@ Partial Class FindDuplicates
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
+        Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(FindDuplicates))
         Me.Label1 = New System.Windows.Forms.Label()
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
@@ -49,6 +50,7 @@ Partial Class FindDuplicates
         Me.lblUnique = New System.Windows.Forms.Label()
         Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
         Me.lblSorted = New System.Windows.Forms.Label()
+        Me.ToolTipDups = New System.Windows.Forms.ToolTip(Me.components)
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -157,8 +159,11 @@ Partial Class FindDuplicates
         Me.lbxDeleteList.ItemHeight = 24
         Me.lbxDeleteList.Location = New System.Drawing.Point(697, 452)
         Me.lbxDeleteList.Name = "lbxDeleteList"
+        Me.lbxDeleteList.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended
         Me.lbxDeleteList.Size = New System.Drawing.Size(688, 277)
         Me.lbxDeleteList.TabIndex = 8
+        Me.lbxDeleteList.TabStop = False
+        Me.ToolTipDups.SetToolTip(Me.lbxDeleteList, "Click here to remove delete items")
         '
         'lbxSave
         '
@@ -172,11 +177,12 @@ Partial Class FindDuplicates
         '
         'lbxDuplicates
         '
+        Me.lbxDuplicates.Dock = System.Windows.Forms.DockStyle.Fill
         Me.lbxDuplicates.FormattingEnabled = True
         Me.lbxDuplicates.ItemHeight = 24
         Me.lbxDuplicates.Location = New System.Drawing.Point(697, 28)
         Me.lbxDuplicates.Name = "lbxDuplicates"
-        Me.lbxDuplicates.Size = New System.Drawing.Size(688, 364)
+        Me.lbxDuplicates.Size = New System.Drawing.Size(688, 378)
         Me.lbxDuplicates.TabIndex = 7
         '
         'Label3
@@ -335,6 +341,9 @@ Partial Class FindDuplicates
         Me.lblSorted.TabIndex = 4
         Me.lblSorted.Text = "SortedList"
         '
+        'ToolTipDups
+        '
+        '
         'FindDuplicates
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(11.0!, 24.0!)
@@ -386,4 +395,5 @@ Partial Class FindDuplicates
     Friend WithEvents RadioButton1 As RadioButton
     Friend WithEvents Panel2 As Panel
     Friend WithEvents AutoList As Button
+    Friend WithEvents ToolTipDups As ToolTip
 End Class

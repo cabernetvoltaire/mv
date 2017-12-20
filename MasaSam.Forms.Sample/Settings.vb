@@ -20,13 +20,13 @@
 
     Public Const OrientationId As Integer = &H112
     Public blnSpeedRestart As Boolean = False
-    Public iSSpeeds() As Integer = {1500, 900, 400}
-    Public iPlaybackSpeed() As Decimal = {0.1, 0.5, 0.75}
+    Public iSSpeeds() As Integer = {1500, 900, 100}
+    Public iPlaybackSpeed() As Decimal = {0.25, 0.6, 0.8}
     Public currentWMP As New AxWMPLib.AxWindowsMediaPlayer
     Public LastPlayed As New Stack(Of String)
     Public LastFolder As New Stack(Of String)
     Public blnAutoAdvanceFolder As Boolean = True
-    Public blnRandomStartAlways As Boolean = True
+    Public blnRandomStartAlways As Boolean = False
     Public blnRestartSlideShowFlag As Boolean = False
     Public blnCopyMode As Boolean = False
     Public blnChooseRandomFile As Boolean = False

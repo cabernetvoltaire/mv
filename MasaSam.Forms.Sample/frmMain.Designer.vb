@@ -54,6 +54,7 @@ Partial Class frmMain
         Me.AssignButtonsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.LinearToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.AlphabeticToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.TreeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.HarvestFolderToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.DeleteEmptyFoldersToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.HarvestFoldersToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -150,6 +151,8 @@ Partial Class frmMain
         Me.tscbFilters = New System.Windows.Forms.ToolStripComboBox()
         Me.ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripButton2 = New System.Windows.Forms.ToolStripButton()
+        Me.btnToggleRandom = New System.Windows.Forms.ToolStripButton()
+        Me.btnToggleMark = New System.Windows.Forms.ToolStripButton()
         Me.tmrUpdateFileList = New System.Windows.Forms.Timer(Me.components)
         Me.tmrPicLoad = New System.Windows.Forms.Timer(Me.components)
         Me.tmrJumpVideo = New System.Windows.Forms.Timer(Me.components)
@@ -168,6 +171,8 @@ Partial Class frmMain
         Me.tmrUpdateFolderSelection = New System.Windows.Forms.Timer(Me.components)
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.tmrPumpFiles = New System.Windows.Forms.Timer(Me.components)
+        Me.tmrAutoTrail = New System.Windows.Forms.Timer(Me.components)
+        Me.AxVLCPlugin21 = New AxAXVLC.AxVLCPlugin2()
         Me.MenuStrip1.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
         Me.TableLayoutPanel2.SuspendLayout()
@@ -201,6 +206,7 @@ Partial Class frmMain
         CType(Me.pbxBlanker, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ToolStrip1.SuspendLayout()
         CType(Me.FileSystemWatcher1, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.AxVLCPlugin21, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'MenuStrip1
@@ -403,7 +409,7 @@ Partial Class frmMain
         '
         'AssignButtonsToolStripMenuItem
         '
-        Me.AssignButtonsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.LinearToolStripMenuItem, Me.AlphabeticToolStripMenuItem})
+        Me.AssignButtonsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.LinearToolStripMenuItem, Me.AlphabeticToolStripMenuItem, Me.TreeToolStripMenuItem})
         Me.AssignButtonsToolStripMenuItem.Name = "AssignButtonsToolStripMenuItem"
         Me.AssignButtonsToolStripMenuItem.Size = New System.Drawing.Size(160, 34)
         Me.AssignButtonsToolStripMenuItem.Text = "assign buttons"
@@ -423,6 +429,14 @@ Partial Class frmMain
             Or System.Windows.Forms.Keys.A), System.Windows.Forms.Keys)
         Me.AlphabeticToolStripMenuItem.Size = New System.Drawing.Size(313, 34)
         Me.AlphabeticToolStripMenuItem.Text = "alphabetic"
+        '
+        'TreeToolStripMenuItem
+        '
+        Me.TreeToolStripMenuItem.Name = "TreeToolStripMenuItem"
+        Me.TreeToolStripMenuItem.ShortcutKeys = CType(((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.Shift) _
+            Or System.Windows.Forms.Keys.T), System.Windows.Forms.Keys)
+        Me.TreeToolStripMenuItem.Size = New System.Drawing.Size(313, 34)
+        Me.TreeToolStripMenuItem.Text = "tree"
         '
         'HarvestFolderToolStripMenuItem
         '
@@ -838,6 +852,7 @@ Partial Class frmMain
         'ctrPicAndButtons.Panel1
         '
         Me.ctrPicAndButtons.Panel1.BackColor = System.Drawing.Color.Black
+        Me.ctrPicAndButtons.Panel1.Controls.Add(Me.AxVLCPlugin21)
         Me.ctrPicAndButtons.Panel1.Controls.Add(Me.MainWMP)
         Me.ctrPicAndButtons.Panel1.Controls.Add(Me.PictureBox1)
         Me.ctrPicAndButtons.Panel1MinSize = 725
@@ -1174,12 +1189,12 @@ Partial Class frmMain
         Me.ToolStrip1.BackColor = System.Drawing.SystemColors.Control
         Me.ToolStrip1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.ToolStrip1.ImageScalingSize = New System.Drawing.Size(28, 28)
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsbClear, Me.tscbPlaySpeeds, Me.toolStripSeparator11, Me.ToolStripButton14, Me.ToolStripButton17, Me.ToolStripButton18, Me.tscbPlayOrders, Me.SelectGroup, Me.TnButton, Me.tsbOnlyOne, Me.tscbFilters, Me.ToolStripButton1, Me.ToolStripButton2})
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsbClear, Me.tscbPlaySpeeds, Me.toolStripSeparator11, Me.ToolStripButton14, Me.ToolStripButton17, Me.ToolStripButton18, Me.tscbPlayOrders, Me.SelectGroup, Me.TnButton, Me.tsbOnlyOne, Me.tscbFilters, Me.ToolStripButton1, Me.ToolStripButton2, Me.btnToggleRandom, Me.btnToggleMark})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 0)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Size = New System.Drawing.Size(2603, 125)
         Me.ToolStrip1.Stretch = True
-        Me.ToolStrip1.TabIndex = 16
+        Me.ToolStrip1.TabIndex = 0
         Me.ToolStrip1.Text = "ToolStrip1"
         '
         'tsbClear
@@ -1285,6 +1300,24 @@ Partial Class frmMain
         Me.ToolStripButton2.Size = New System.Drawing.Size(167, 122)
         Me.ToolStripButton2.Text = "SelectDeadLinks"
         '
+        'btnToggleRandom
+        '
+        Me.btnToggleRandom.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text
+        Me.btnToggleRandom.Image = CType(resources.GetObject("btnToggleRandom.Image"), System.Drawing.Image)
+        Me.btnToggleRandom.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.btnToggleRandom.Name = "btnToggleRandom"
+        Me.btnToggleRandom.Size = New System.Drawing.Size(156, 122)
+        Me.btnToggleRandom.Text = "ToggleRandom"
+        '
+        'btnToggleMark
+        '
+        Me.btnToggleMark.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text
+        Me.btnToggleMark.Image = CType(resources.GetObject("btnToggleMark.Image"), System.Drawing.Image)
+        Me.btnToggleMark.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.btnToggleMark.Name = "btnToggleMark"
+        Me.btnToggleMark.Size = New System.Drawing.Size(196, 122)
+        Me.btnToggleMark.Text = "ToggleJumpToMark"
+        '
         'tmrUpdateFileList
         '
         Me.tmrUpdateFileList.Enabled = True
@@ -1353,6 +1386,19 @@ Partial Class frmMain
         '
         Me.tmrPumpFiles.Interval = 1000
         '
+        'tmrAutoTrail
+        '
+        '
+        'AxVLCPlugin21
+        '
+        Me.AxVLCPlugin21.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.AxVLCPlugin21.Enabled = True
+        Me.AxVLCPlugin21.Location = New System.Drawing.Point(0, 0)
+        Me.AxVLCPlugin21.Name = "AxVLCPlugin21"
+        Me.AxVLCPlugin21.OcxState = CType(resources.GetObject("AxVLCPlugin21.OcxState"), System.Windows.Forms.AxHost.State)
+        Me.AxVLCPlugin21.Size = New System.Drawing.Size(2222, 1171)
+        Me.AxVLCPlugin21.TabIndex = 3
+        '
         'frmMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(11.0!, 24.0!)
@@ -1414,6 +1460,7 @@ Partial Class frmMain
         Me.ToolStrip1.ResumeLayout(False)
         Me.ToolStrip1.PerformLayout()
         CType(Me.FileSystemWatcher1, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.AxVLCPlugin21, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -1564,4 +1611,9 @@ Partial Class frmMain
     Friend WithEvents ToolStripButton1 As ToolStripButton
     Friend WithEvents ToolStripButton2 As ToolStripButton
     Friend WithEvents tsbClear As ToolStripButton
+    Friend WithEvents tmrAutoTrail As Timer
+    Friend WithEvents btnToggleMark As ToolStripButton
+    Friend WithEvents btnToggleRandom As ToolStripButton
+    Friend WithEvents TreeToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents AxVLCPlugin21 As AxAXVLC.AxVLCPlugin2
 End Class
