@@ -2,7 +2,7 @@
 
 Module ButtonHandling
     Public strButtonFilePath(8, 26, 1) As String
-    Public fButtonDests(8, 26, 1) As IO.DirectoryInfo
+    Public fButtonDests(8, 26, 3) As IO.DirectoryInfo
     Private iAlphaCount = 26
     Public strButtonCaptions(8, 26, 1)
 
@@ -19,7 +19,7 @@ Module ButtonHandling
             If di(i).FullName = CurrentFolderPath Then
                 Dim k As Byte
                 While k <= 7 And i + k < n
-                    AssignButton(k, iCurrentAlpha, di(i + k).FullName)
+                    AssignButton(k, iCurrentAlpha, 1, di(i + k).FullName)
                     k += 1
                 End While
 
@@ -47,7 +47,7 @@ Module ButtonHandling
             If k >= 0 AndAlso k < 26 Then
                 If n(k) < 8 Then
 
-                    AssignButton(n(k), k, s)
+                    AssignButton(n(k), k, 1, s)
                     '                   strButtonFilePath(n(k), k, 1) = s
                     n(k) += 1
                 End If
@@ -69,13 +69,13 @@ Module ButtonHandling
             Dim s As String = dlist.Item(i)
             Dim sht As String = New DirectoryInfo(s).Name
             Dim l As String = UCase(sht(0))
-            Dim k As Int16 = Asc(l) - Asc("A")
-            If k >= 0 AndAlso k < 26 Then
-                If n(k) < 8 Then
+            Dim ButtonNumber As Int16 = Asc(l) - Asc("A")
+            If ButtonNumber >= 0 AndAlso ButtonNumber < 26 Then
+                If n(ButtonNumber) < 8 Then
 
-                    AssignButton(n(k), k, s)
-                    '                   strButtonFilePath(n(k), k, 1) = s
-                    n(k) += 1
+                    AssignButton(n(ButtonNumber), ButtonNumber, 1, s)
+                    '                   strButtonFilePath(n(ButtonNumber), ButtonNumber, 1) = s
+                    n(ButtonNumber) += 1
                 End If
             End If
 
@@ -105,16 +105,16 @@ Module ButtonHandling
         End If
 
     End Sub
-    Public Sub AssignButton(i As Byte, j As Integer, strPath As String)
+    Public Sub AssignButton(i As Byte, j As Integer, k As Byte, strPath As String)
         If strVisibleButtons(i) <> "" And Not blnMoveMode Then
             If Not MsgBox("Replace button assignment for F" & i + 4 & "?", MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then Exit Sub
         End If
         strVisibleButtons(i) = strPath
         Dim f As New DirectoryInfo(strPath)
-        strButtonFilePath(i, j, 1) = strPath
+        strButtonFilePath(i, j, k) = strPath
 
         lblDest(i).Text = f.Name
-        strButtonCaptions(i, j, 1) = f.Name
+        strButtonCaptions(i, j, k) = f.Name
         LoadCurrentButtonSet()
 
     End Sub
@@ -140,7 +140,11 @@ Module ButtonHandling
             If s <> "" Then
                 lblDest(i).Text = s
                 If My.Computer.FileSystem.DirectoryExists(f) Then
-                    lblDest(i).ForeColor = Color.Black
+                    If blnMoveMode Xor CtrlDown Then
+                        lblDest(i).ForeColor = Color.Red
+                    Else
+                        lblDest(i).ForeColor = Color.Black
+                    End If
 
                 Else
                     lblDest(i).ForeColor = Color.Gray
@@ -196,7 +200,7 @@ Module ButtonHandling
             subs = s.Split("|")
 
             If subs.Length <> 4 Then
-                MsgBox("Not a button file")
+                'MsgBox("Not a button file")
                 Exit Sub
             Else
                 intIndex = Val(subs(0))

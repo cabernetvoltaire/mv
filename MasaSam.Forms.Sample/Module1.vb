@@ -9,7 +9,64 @@ Public Module General
     Public Property lastselection As String
     Public Property blnJumpToMark As Boolean = True
 
+    Public strPlayOrder() As String = {"Original", "Random", "Name", "Path Name", "Date/Time", "Size", "Type"}
+    Public Property lngListSizeBytes As Long
+    Public btnDest() As Button = {frmMain.btn1, frmMain.btn2, frmMain.btn3, frmMain.btn4, frmMain.btn5, frmMain.btn6, frmMain.btn7, frmMain.btn8}
 
+    Public lblDest() As Label = {frmMain.lbl1, frmMain.lbl2, frmMain.lbl3, frmMain.lbl4, frmMain.lbl5, frmMain.lbl6, frmMain.lbl7, frmMain.lbl8}
+    Public Enum PlayOrder As Byte
+        Original
+        Random
+        Name
+        PathName
+        Time
+        Length
+        Type
+    End Enum
+    Public lngShowlistLines As Long = 0
+
+    Public blnRandomStartPoint = False
+    Public iPropjump As Integer = 15
+    Public iQuickJump As Integer = 20
+    Public lCurrentDisplayIndex As Long = 0
+    Public PlaybackSpeed As Double = 1
+    Public lngInterval = 50
+    Public lngMediaDuration As Long
+    Public lngMark As Long
+    Public strCurrentFilePath As String = ""
+    Public strExt As String
+    Public CurrentFolderPath As String = "E:\"
+    Public FileboxContents As New List(Of String)
+    Public FBCShown As Boolean()
+    Public fType As Filetype
+    Public blnRandom As Boolean = False
+    Public Showlist As New List(Of String)
+    Public Oldlist As New List(Of String)
+
+    Public blnDontShowRepeats As Boolean = True
+    Public Sublist As New List(Of String)
+    Public currentPicBox As New PictureBox
+    Public Autozoomrate As Decimal = 0.4
+    Public strVisibleButtons(8) As String
+    Public NofShown As Int16
+    Public blnButtonsLoaded As Boolean = False
+    Public ssspeed As Integer = 200
+    Public CountSelections As Int16
+
+    Public blnFullScreen As Boolean
+
+    Public Orientation() As String = {"Unknown", "TopLeft", "TopRight", "BottomRight", "BottomLeft", "LeftTop", "RightTop", "RightBottom", "LeftBottom"}
+    Public Enum Filetype As Byte
+        Pic
+        Movie
+        Doc
+        Gif
+        Xcel
+        Browsable
+        Unknown
+    End Enum
+    Public SlideShowSpeeds() As Integer = {50, 100, 500, 1000, 2000, 9000}
+    Public VideoSpeeds() As Integer = {10, 20, 50, 75, 100}
     Public Sub ProgressBarOn(max As Long)
         With frmMain.TSPB
             .Value = 0
@@ -47,63 +104,7 @@ Public Module General
         Return DirectCast(img.GetPropertyItem(OrientationId).Value(0), ExifOrientations)
     End Function
 
-    Public strPlayOrder() As String = {"Original", "Random", "Name", "Path Name", "Date/Time", "Size", "Type"}
-    Public Property lngListSizeBytes As Long
-    Public btnDest() As Button = {frmMain.btn1, frmMain.btn2, frmMain.btn3, frmMain.btn4, frmMain.btn5, frmMain.btn6, frmMain.btn7, frmMain.btn8}
 
-    Public lblDest() As Label = {frmMain.lbl1, frmMain.lbl2, frmMain.lbl3, frmMain.lbl4, frmMain.lbl5, frmMain.lbl6, frmMain.lbl7, frmMain.lbl8}
-    Public Enum PlayOrder As Byte
-        Original
-        Random
-        Name
-        PathName
-        Time
-        Length
-        Type
-    End Enum
-    Public lngShowlistLines As Long = 0
-
-    Public blnRandomStartPoint = False
-    Public PlaybackSpeed As Double = 1
-    Public lngInterval = 50
-    Public lngMediaDuration As Long
-    Public lngMark As Long
-    Public iPropjump As Integer = 15
-    Public iQuickJump As Integer = 20
-    Public strCurrentFilePath As String = ""
-    Public strExt As String
-    Public Property CurrentFolderPath As String = "E:\"
-    Public FileboxContents As New List(Of String)
-    Public FBCShown As New List(Of Boolean)
-    Public blnDontShowRepeats As Boolean = True
-    Public lCurrentDisplayIndex As Long = 0
-    Public fType As Filetype
-    Public blnRandom As Boolean = False
-    Public Showlist As New List(Of String)
-    Public Oldlist As New List(Of String)
-
-    Public Sublist As New List(Of String)
-    Public currentPicBox As New PictureBox
-    Public Autozoomrate As Decimal = 0.4
-    Public strVisibleButtons(8) As String
-
-    Public blnButtonsLoaded As Boolean = False
-    Public ssspeed As Integer = 200
-
-    Public blnFullScreen As Boolean
-
-    Public Orientation() As String = {"Unknown", "TopLeft", "TopRight", "BottomRight", "BottomLeft", "LeftTop", "RightTop", "RightBottom", "LeftBottom"}
-    Public Enum Filetype As Byte
-        Pic
-        Movie
-        Doc
-        Gif
-        Xcel
-        Browsable
-        Unknown
-    End Enum
-    Public SlideShowSpeeds() As Integer = {50, 100, 500, 1000, 2000, 9000}
-    Public VideoSpeeds() As Integer = {10, 20, 50, 75, 100}
     Public Function TimeOperation(blnStart As Boolean) As TimeSpan
         Static StartTime As Date
         If blnStart Then
@@ -144,6 +145,46 @@ Public Module General
             list.Add(m.Value)
         Next
     End Sub
+    Public Function FindType(file As String) As Filetype
+        blnLink = False
+        Try
+            Dim info As New FileInfo(file)
+            If info.Extension = "" Then
+                Return Filetype.Unknown
+                Exit Function
+            End If
+            'If it's a .lnk, find the file
+            If LCase(info.Extension) = ".lnk" Then
+                blnLink = True
+                strCurrentFilePath = LinkTarget(info.FullName) ' CreateObject("WScript.Shell").CreateShortcut(info.FullName).TargetPath
+                Try
+                    If My.Computer.FileSystem.FileExists(strCurrentFilePath) Then
+
+                        info = New FileInfo(strCurrentFilePath)
+                    Else
+                        'TODO: Ask whether to delete link, or fix it. 
+                        Return Filetype.Unknown
+                        Exit Function
+                    End If
+
+                Catch ex As Exception
+                End Try
+            End If
+            strExt = LCase(info.Extension)
+            'Select Case LCase(strExt)
+            If InStr(strVideoExtensions, strExt) <> 0 Then
+                Return Filetype.Movie
+            ElseIf InStr(strPicExtensions, strExt) <> 0 Then
+                Return Filetype.Pic
+            Else
+                Return Filetype.Unknown
+
+
+            End If
+        Catch ex As PathTooLongException
+            Return Filetype.Unknown
+        End Try
+    End Function
 
     ''' <summary>
     ''' Only load the labels of the current set. 
@@ -180,7 +221,7 @@ Public Module General
         Else
             'Assign buttons
             If e.Shift Or strVisibleButtons(i) = "" Then
-                AssignButton(i, iCurrentAlpha, CurrentFolderPath) 'Just assign
+                AssignButton(i, iCurrentAlpha, 1, CurrentFolderPath) 'Just assign
                 If My.Computer.FileSystem.FileExists(strButtonFile) Then
                     KeyAssignmentsStore(strButtonFile)
                 Else
@@ -209,7 +250,8 @@ Public Module General
             End If
             CurrentFolderPath = strPath 'Switch to this folder
         End If
-
+        ReDim FBCShown(0)
+        NofShown = 0
         frmMain.SetControlColours(blnMoveMode)
     End Sub
 
@@ -229,13 +271,12 @@ Public Module General
     Public Sub FillShowbox(lbx As ListBox, Filter As Byte, ByVal lst As List(Of String))
         If lst.Count = 0 Then Exit Sub
         ProgressBarOn(lst.Count)
-        If lbx.Equals(frmMain.lbxShowList) Then
+        If lbx.Name = "lbxShowList" Then
             frmMain.CollapseShowlist(False)
-        Else
-            lbx.Items.Clear()
 
         End If
 
+        lbx.Items.Clear()
 
         For Each s In lst
             lbx.Items.Add(s)

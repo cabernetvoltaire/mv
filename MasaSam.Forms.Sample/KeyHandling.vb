@@ -1,36 +1,39 @@
 ﻿Public Module KeyHandling
-
-    Public KeyFullscreen As Integer = Keys.Scroll
-    Public KeyRandomize As Integer = Keys.Pause
+    'Numpad options (not available on Laptop)
+    Public KeyFullscreen = Keys.Scroll
+    Public KeyRandomize = Keys.Pause
     Public KeyTraverseTreeBack = Keys.Subtract
-    Public KeyJumpAutoT = Keys.Divide
-    Public KeyBackUndo = Keys.Back
-    Public KeyMuteToggle = Keys.Decimal
-    Public KeyReStartSS = Keys.Space
-    Public KeyNextFile = Keys.PageDown
-    Public KeyLoopToggle = Keys.Insert
-    Public KeyFolderJump = Keys.Multiply
-    Public KeyZoomIn = Keys.OemPeriod
-    Public KeyTrueSize = Keys.Scroll
-    Public KeyCycleScope = Keys.Oem7
-    Public KeyCycleRandom = Keys.Pause
-    Public KeyCycleMode = Keys.OemOpenBrackets
-    Public KeyRotate = Keys.OemCloseBrackets
-    Public KeyCopyToggle = Keys.OemSemicolon
-    Public KeyFilter = Keys.OemQuestion
-    Public KeyScrollPic = Keys.OemMinus
     Public KeyTraverseTree = Keys.Add
+    Public KeyJumpAutoT = Keys.Divide
+    Public KeyMuteToggle = Keys.Decimal
+    Public KeyNextFile = Keys.PageDown
     Public KeyPreviousFile = Keys.PageUp
+    Public KeyZoomIn = Keys.OemPeriod
+    Public KeyFolderJump = Keys.Multiply
+    Public KeyCycleScope = Keys.Oem7
+    Public KeyCycleMode = Keys.OemOpenBrackets
     Public KeyToggleSpeed = Keys.NumPad0
     Public KeySpeed1 = Keys.NumPad1
     Public KeySpeed2 = Keys.NumPad2
     Public KeySpeed3 = Keys.NumPad3
-    Public KeyMarkPoint = Keys.NumPad4
     Public KeySmallJumpDown = Keys.NumPad5
     Public KeySmallJumpUp = Keys.NumPad6
     Public KeyJumpToPoint = Keys.NumPad7
     Public KeyBigJumpBack = Keys.NumPad8
     Public KeyBigJumpOn = Keys.NumPad9
+    Public KeyMarkPoint = Keys.NumPad4
+
+
+    'Common Keys
+    Public KeyBackUndo = Keys.Back
+    Public KeyReStartSS = Keys.Space
+    Public KeyLoopToggle = Keys.Insert
+    Public KeyTrueSize = Keys.Scroll
+    Public KeyCycleRandom = Keys.Pause
+    Public KeyRotate = Keys.OemCloseBrackets
+    Public KeyCopyToggle = Keys.OemSemicolon
+    Public KeyFilter = Keys.OemQuestion
+    Public KeyScrollPic = Keys.OemMinus
     Public KeySpeed1Alt = Keys.Z
     Public KeySpeed2Alt = Keys.X
     Public KeySpeed3Alt = Keys.C

@@ -90,21 +90,21 @@ Module FileHandling
                 End Select
 
             Next
-            If lbx.Equals(frmMain.lbxFiles) Then
+            If lbx.Name = "lbxFiles" Then
                 CopyList(FileboxContents, lbx)
             Else
                 CopyList(Showlist, lbx)
             End If
 
             lbx.Tag = e
-            If lbx.Items.Count <> 0 Then
-                If blnRandom Then
-                    Dim s As Long = lbx.Items.Count - 1
-                    lbx.SelectedIndex = Rnd() * s
-                Else
-                    lbx.SelectedIndex = 0
-                End If
-            End If
+            'If lbx.Items.Count <> 0 Then
+            '    If blnRandom Then
+            '        Dim s As Long = lbx.Items.Count - 1
+            '        lbx.SelectedIndex = Rnd() * s
+            '    Else
+            '        lbx.SelectedIndex = 0
+            '    End If
+            'End If
 
         Catch ex As ArgumentException
             MsgBox(ex.ToString)
@@ -124,6 +124,7 @@ Module FileHandling
 
         FilePumpList.Add(strFileDest)
         If FilePumpList.Count = 5 Then
+
             MoveFiles(FilePumpList, lbx1)
             FilePumpList.Clear()
         End If
@@ -419,15 +420,15 @@ Module FileHandling
         Return s
     End Function
     Public Sub AddCurrentType(blnRecurse As Boolean)
-        AddFilesToCollection(Showlist, FBCShown, strFilterExtensions(CurrentFilterState), blnRecurse)
+        AddFilesToCollection(Showlist, strFilterExtensions(CurrentFilterState), blnRecurse)
         FillShowbox(frmMain.lbxShowList, FilterState.All, Showlist)
 
     End Sub
     Public Sub Addpics(blnRecurse As Boolean)
-        AddFilesToCollection(Showlist, FBCShown, strPicExtensions, blnRecurse)
+        AddFilesToCollection(Showlist, strPicExtensions, blnRecurse)
         FillShowbox(frmMain.lbxShowList, CurrentFilterState, Showlist)
     End Sub
-    Public Sub AddFilesToCollection(ByVal list As List(Of String), dontinclude As List(Of Boolean), extensions As String, blnRecurse As Boolean)
+    Public Sub AddFilesToCollection(ByVal list As List(Of String), extensions As String, blnRecurse As Boolean)
         Dim s As String
         Dim d As New DirectoryInfo(CurrentFolderPath)
 
@@ -438,7 +439,7 @@ Module FileHandling
         End If
         frmMain.Cursor = Cursors.WaitCursor
 
-        FindAllFilesBelow(d, list, dontinclude, extensions, False, s, blnRecurse, blnChooseOne)
+        FindAllFilesBelow(d, list, extensions, False, s, blnRecurse, blnChooseOne)
 
         frmMain.Cursor = Cursors.Default
 
@@ -477,7 +478,7 @@ Module FileHandling
     ''' <param name="blnRemove"></param>
     ''' <param name="strSearch"></param>
     ''' <param name="blnRecurse"></param>
-    Public Sub FindAllFilesBelow(d As DirectoryInfo, list As List(Of String), ByRef DontInclude As List(Of Boolean), extensions As String, blnRemove As Boolean, strSearch As String, blnRecurse As Boolean, blnOneOnly As Boolean)
+    Public Sub FindAllFilesBelow(d As DirectoryInfo, list As List(Of String), extensions As String, blnRemove As Boolean, strSearch As String, blnRecurse As Boolean, blnOneOnly As Boolean)
 
 
         For Each file In d.EnumerateFiles
@@ -492,7 +493,6 @@ Module FileHandling
 
                                 list.Add(file.FullName)
 
-                                DontInclude.Add(False)
                             End If
 
                         End If
@@ -506,7 +506,6 @@ Module FileHandling
                             Else
                                 list.Add(file.FullName)
 
-                                DontInclude.Add(False)
                             End If
 
                         End If
@@ -518,7 +517,6 @@ Module FileHandling
                                 Else
                                     list.Add(file.FullName)
 
-                                    DontInclude.Add(False)
                                 End If
                             End If
 
@@ -538,7 +536,7 @@ Module FileHandling
             For Each di In d.EnumerateDirectories
                 Try
 
-                    FindAllFilesBelow(di, list, DontInclude, extensions, blnRemove, strSearch, blnRecurse, blnOneOnly)
+                    FindAllFilesBelow(di, list, extensions, blnRemove, strSearch, blnRecurse, blnOneOnly)
                 Catch ex As UnauthorizedAccessException
                     Continue For
                 Catch ex As DirectoryNotFoundException

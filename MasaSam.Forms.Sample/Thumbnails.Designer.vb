@@ -42,7 +42,6 @@ Partial Class Thumbnails
         Me.Controls.Add(Me.FlowLayoutPanel1)
         Me.Name = "Thumbnails"
         Me.Text = "Thumbnails"
-        Me.WindowState = System.Windows.Forms.FormWindowState.Maximized
         Me.ResumeLayout(False)
 
     End Sub

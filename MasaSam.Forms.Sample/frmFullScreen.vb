@@ -12,6 +12,7 @@ Public Class FullScreen
     Private Sub FullScreen_Keydown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
         ShiftDown = e.Shift
         CtrlDown = e.Control
+
         If e.KeyCode = Keys.Escape Then
             frmMain.GoFullScreen(False)
 
