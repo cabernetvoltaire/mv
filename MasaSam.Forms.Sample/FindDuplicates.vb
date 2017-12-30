@@ -60,18 +60,33 @@ Public Class FindDuplicates
     ''' Places 12 Preview controls
     ''' </summary>
     Private Sub ArrangePreviews()
+        Dim size As Integer = 125
         For i = 0 To 11
             PreviewWMP(i) = New AxWMPLib.AxWindowsMediaPlayer
-            FlowLayoutPanel2.Controls.Add(PreviewWMP(i))
-            PreviewWMP(i).Width = 250
-            PreviewWMP(i).Height = 250
-            PreviewWMP(i).Left = 250 * i
-            PreviewWMP(i).Top = 0 + 250 * CInt(i > 6)
 
-            PreviewWMP(i).uiMode = "None"
+            Panel3.Controls.Add(PreviewWMP(i))
+            With PreviewWMP(i)
+                If i = 0 Then
+                    .Width = size
+                    .Height = size
+                    .Left = 0
+                    .Top = 0
+                    .uiMode = "None"
+                Else
+                    .Width = size
+                    .Height = size
+                    .Left = (size + 25) * i + 50
+                    .Top = 0 + size * CInt(i > 6)
+                    .uiMode = "None"
+
+                End If
+                AddHandler .MouseMoveEvent, AddressOf previewover
+            End With
         Next
     End Sub
-
+    Private Sub previewover(sender As Object, e As AxWMPLib._WMPOCXEvents_MouseMoveEvent)
+        ToolTipDups.SetToolTip(sender, sender.url)
+    End Sub
     ''' <summary>
     ''' Finds duplicates of the given file within the current Showlist and adds them to duplist, which is then written to lbxDuplicates. The appropriate controls then show the files in lbxDuplicates
     ''' </summary>
@@ -100,7 +115,7 @@ Public Class FindDuplicates
             FillShowbox(lbxDuplicates, FilterState.All, duplist)
             For i = 0 To 11
                 Try
-                    PreviewWMP(i).URL = Nothing
+                    ' PreviewWMP(i).URL = ""
                     PreviewWMP(i).Visible = False
                     GC.Collect()
                 Catch ex As System.Runtime.InteropServices.InvalidComObjectException

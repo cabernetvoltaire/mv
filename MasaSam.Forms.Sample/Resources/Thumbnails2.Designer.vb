@@ -22,29 +22,16 @@ Partial Class Thumbnails
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
         Me.SuspendLayout()
-        '
-        'FlowLayoutPanel1
-        '
-        Me.FlowLayoutPanel1.AutoScroll = True
-        Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.FlowLayoutPanel1.Location = New System.Drawing.Point(0, 0)
-        Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
-        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(2175, 1077)
-        Me.FlowLayoutPanel1.TabIndex = 0
         '
         'Thumbnails
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(11.0!, 24.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(2175, 1077)
-        Me.Controls.Add(Me.FlowLayoutPanel1)
         Me.Name = "Thumbnails"
         Me.Text = "Thumbnails"
         Me.ResumeLayout(False)
 
     End Sub
-
-    Friend WithEvents FlowLayoutPanel1 As FlowLayoutPanel
 End Class

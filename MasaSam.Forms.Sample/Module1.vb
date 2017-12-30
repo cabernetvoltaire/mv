@@ -2,15 +2,7 @@
 Imports System.IO
 
 Public Module General
-    Public Property blnSecondScreen As Boolean = True
-    Public Property LastShowList As String
-    Public Property blnLink As Boolean
-    Public Property blnMoveMode As Boolean = False
-    Public Property lastselection As String
-    Public Property blnJumpToMark As Boolean = True
 
-    Public strPlayOrder() As String = {"Original", "Random", "Name", "Path Name", "Date/Time", "Size", "Type"}
-    Public Property lngListSizeBytes As Long
     Public btnDest() As Button = {frmMain.btn1, frmMain.btn2, frmMain.btn3, frmMain.btn4, frmMain.btn5, frmMain.btn6, frmMain.btn7, frmMain.btn8}
 
     Public lblDest() As Label = {frmMain.lbl1, frmMain.lbl2, frmMain.lbl3, frmMain.lbl4, frmMain.lbl5, frmMain.lbl6, frmMain.lbl7, frmMain.lbl8}
@@ -25,35 +17,6 @@ Public Module General
     End Enum
     Public lngShowlistLines As Long = 0
 
-    Public blnRandomStartPoint = False
-    Public iPropjump As Integer = 15
-    Public iQuickJump As Integer = 20
-    Public lCurrentDisplayIndex As Long = 0
-    Public PlaybackSpeed As Double = 1
-    Public lngInterval = 50
-    Public lngMediaDuration As Long
-    Public lngMark As Long
-    Public strCurrentFilePath As String = ""
-    Public strExt As String
-    Public CurrentFolderPath As String = "E:\"
-    Public FileboxContents As New List(Of String)
-    Public FBCShown As Boolean()
-    Public fType As Filetype
-    Public blnRandom As Boolean = False
-    Public Showlist As New List(Of String)
-    Public Oldlist As New List(Of String)
-
-    Public blnDontShowRepeats As Boolean = True
-    Public Sublist As New List(Of String)
-    Public currentPicBox As New PictureBox
-    Public Autozoomrate As Decimal = 0.4
-    Public strVisibleButtons(8) As String
-    Public NofShown As Int16
-    Public blnButtonsLoaded As Boolean = False
-    Public ssspeed As Integer = 200
-    Public CountSelections As Int16
-
-    Public blnFullScreen As Boolean
 
     Public Orientation() As String = {"Unknown", "TopLeft", "TopRight", "BottomRight", "BottomLeft", "LeftTop", "RightTop", "RightBottom", "LeftBottom"}
     Public Enum Filetype As Byte
@@ -116,17 +79,21 @@ Public Module General
     End Function
 
     ''' <summary>
-    ''' Copies list from sorted list2
+    ''' Copies list from a lbx
     ''' </summary>
     ''' <param name="list"></param>
-    ''' <param name="list2"></param>
-    Public Sub CopyList(list As List(Of String), list2 As ListBox)
+    ''' <param name="lbx"></param>
+    Public Sub CopyList(list As List(Of String), lbx As ListBox)
         list.Clear()
-        For Each m In list2.Items
+        For Each m In lbx.Items
             list.Add(m)
         Next
     End Sub
-
+    ''' <summary>
+    ''' Copies list from a sorted list2
+    ''' </summary>
+    ''' <param name="list"></param>
+    ''' <param name="list2"></param>
     Private Sub CopyList(list As List(Of String), list2 As SortedList(Of String, String))
         list.Clear()
         For Each m As KeyValuePair(Of String, String) In list2
@@ -176,6 +143,8 @@ Public Module General
                 Return Filetype.Movie
             ElseIf InStr(strPicExtensions, strExt) <> 0 Then
                 Return Filetype.Pic
+            ElseIf InStr(".txt.prn.sty.doc", strExt) <> 0 Then
+                Return Filetype.Doc
             Else
                 Return Filetype.Unknown
 
@@ -233,6 +202,9 @@ Public Module General
                     ChangeFolder(strVisibleButtons(i), True)
                     frmMain.CancelDisplay()
                     frmMain.tvMain2.SelectedFolder = CurrentFolderPath
+                ElseIf blnChooseRandomFile Then
+                    frmMain.AdvanceFile(True, True)
+
                 End If
             End If
 
@@ -242,6 +214,7 @@ Public Module General
 
     Public Sub ChangeFolder(strPath As String, blnSHow As Boolean)
         If strPath = CurrentFolderPath Then
+
         Else
             If Not LastFolder.Contains(CurrentFolderPath) Then
                 LastFolder.Push(CurrentFolderPath)

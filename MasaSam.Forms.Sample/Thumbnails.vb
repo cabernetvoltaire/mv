@@ -22,11 +22,11 @@ Public Class Thumbnails
                         .Image = Example_GetThumb(e, .Height, f)
                     End If
                     .Width = .Image.Width / .Image.Height * .Height
-            .SizeMode = PictureBoxSizeMode.StretchImage
-            .Tag = f
-            AddHandler .MouseEnter, AddressOf pb_Click
-            End With
-            Me.Update()
+                    .SizeMode = PictureBoxSizeMode.StretchImage
+                    .Tag = f
+                    AddHandler .MouseEnter, AddressOf pb_Click
+                End With
+                Me.Update()
             End If
             i += 1
         Next

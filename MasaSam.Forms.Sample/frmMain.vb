@@ -126,8 +126,11 @@ Public Class frmMain
     End Sub
 
     Public Sub CancelDisplay()
-        currentWMP.Ctlcontrols.pause()
-        currentWMP.URL = ""
+        If currentWMP.Visible Then
+            currentWMP.Ctlcontrols.pause()
+            currentWMP.URL = ""
+        End If
+
         currentPicBox.Image = Nothing
         ' currentPicBox.Dispose()
         GC.Collect()
@@ -143,8 +146,10 @@ Public Class frmMain
                     m = MsgBox("Delete folder " & CurrentFolderPath & "?", MsgBoxStyle.YesNoCancel)
                 End If
                 If Not blnConfirm OrElse m = MsgBoxResult.Yes Then
+                    Dim f As New DirectoryInfo(CurrentFolderPath)
                     .DeleteDirectory(CurrentFolderPath, FileIO.UIOption.OnlyErrorDialogs, FileIO.RecycleOption.SendToRecycleBin)
-                    tvw.RemoveNode(CurrentFolderPath)
+                    'tvw.RemoveNode(CurrentFolderPath)
+                    tvw.RefreshTree(f.Parent.FullName)
                 End If
 
             ElseIf m = MsgBoxResult.No Or m = MsgBoxResult.Cancel Then
@@ -297,7 +302,7 @@ Public Class frmMain
         If lbx.SelectedIndex = 0 And Not blnForward Then
             lbx.SelectedIndex = count - 1
         Else
-            If blnRandom Then
+            If blnRandomAdvance AndAlso lbx.Items.Count > 0 Then
                 Dim i As Int32
                 i = Int(Rnd() * (count))
                 While FBCShown(i)
@@ -387,9 +392,13 @@ Public Class frmMain
 
         Else
             'MsgBox("Autotrail")
-            tmrAutoTrail.Enabled = Not tmrAutoTrail.Enabled
+            ToggleAutoTrail()
         End If
 
+    End Sub
+    Public Sub ToggleAutoTrail()
+        tmrAutoTrail.Enabled = Not tmrAutoTrail.Enabled
+        TrailerModeToolStripMenuItem.Checked = tmrAutoTrail.Enabled
     End Sub
     Public Sub HandleKeys(sender As Object, e As KeyEventArgs)
         Me.Cursor = Cursors.WaitCursor
@@ -403,7 +412,7 @@ Public Class frmMain
             Case Keys.F5, Keys.F6, Keys.F7, Keys.F8, Keys.F9, Keys.F10, Keys.F11, Keys.F12
                 HandleFunctionKeyDown(sender, e)
                 e.Handled = True
-            Case Keys.A To Keys.Z
+            Case Keys.A To Keys.Z, Keys.D0 To Keys.D9
                 If Not e.Control Then
                     ChangeButtonLetter(e)
                 Else
@@ -425,13 +434,13 @@ Public Class frmMain
                 ChosenPlayOrder = (ChosenPlayOrder + 1) Mod (PlayOrder.Type + 1)
                 UpdatePlayOrder()
 
-            Case KeyNextFile, KeyPreviousFile
+            Case KeyNextFile, KeyPreviousFile, LKeyNextFile, LKeyPreviousFile
 
                 AdvanceFile(e.KeyCode = KeyNextFile, CtrlDown)
                 e.Handled = True
                 tmrSlideShow.Enabled = False
 
-            Case KeySmallJumpDown, KeySmallJumpUp, KeySmallJumpDownAlt, KeySmallJumpUpAlt
+            Case KeySmallJumpDown, KeySmallJumpUp, LKeySmallJumpDown, LKeySmallJumpUp
                 MediaSmallJump(e)
                 e.Handled = True
 
@@ -445,12 +454,15 @@ Public Class frmMain
                 MediaJumpToMarker()
                 tmrJumpVideo.Enabled = True
                 e.Handled = True
-            Case KeyMarkPoint, KeyMarkPointAlt
+            Case KeyMarkPoint, LKeyMarkPoint
                 MediaMarker = currentWMP.Ctlcontrols.currentPosition
                 e.Handled = True
-
+            Case KeyLoopToggle
+                blnLoopPlay = Not blnLoopPlay
+            Case KeyRotateBack
+                RotatePic(currentPicBox, False)
             Case KeyRotate
-                RotatePic(currentPicBox, e.Shift)
+                RotatePic(currentPicBox, True)
             Case KeyJumpAutoT
                 If e.Control Then
                     ToggleRandomStartPoint()
@@ -540,7 +552,10 @@ Public Class frmMain
         Me.Cursor = Cursors.Default
         ' e.Handled = True
     End Sub
-
+    Private Sub LoopToggle()
+        blnLoopPlay = Not blnLoopPlay
+        'currentWMP.= blnLoopPlay
+    End Sub
     Private Sub SetFilterState()
         tscbFilters.Select(CurrentFilterState, 1)
         'MsgBox(CurrentFilterState.ToString)
@@ -600,6 +615,8 @@ Public Class frmMain
         Dim finfo As New FileInfo(strPath)
         UpdateFileInfo()
         If InStr(":\", strPath) = Len(strPath) - 2 Then 'TODO root folder
+            Dim s As String = Path.GetDirectoryName(strPath)
+            If tvMain2.SelectedFolder <> s Then tvMain2.SelectedFolder = s 'Only change tree if it needs changing
 
         Else
             'If Not blnLink Then
@@ -724,6 +741,7 @@ Public Class frmMain
 
 
     Private Sub frmMain_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
+        'If e.KeyCode = Keys.Tab Then MsgBox("Yes")
         ShiftDown = e.Shift
         CtrlDown = e.Control
         LoadCurrentButtonSet()
@@ -786,6 +804,8 @@ Public Class frmMain
         tbLastFile.Text = strCurrentFilePath
         fType = FindType(strCurrentFilePath)
         Select Case fType
+            Case Filetype.Doc
+                HandleDoc()
             Case Filetype.Movie
                 HandleMovie(blnRandomStartPoint)
 
@@ -821,7 +841,10 @@ Public Class frmMain
         tmrPicLoad.Enabled = False
     End Sub
 
-
+    Private Sub HandleDoc()
+        'PrintPreviewControl1.Document = strCurrentFilePath
+        'Throw New NotImplementedException()
+    End Sub
 
     Private Sub tmrJumpVideo_Tick(sender As Object, e As EventArgs) Handles tmrJumpVideo.Tick
         tmrJumpVideo.Enabled = False
@@ -837,24 +860,17 @@ Public Class frmMain
 
 
     'Tool strip buttons
-    Private Sub btnToggleMark_Click(sender As Object, e As EventArgs) Handles btnToggleMark.Click
-        blnJumpToMark = Not blnJumpToMark
-
-    End Sub
-    Private Sub ToolStripButton3_Click(sender As Object, e As EventArgs) Handles btnToggleRandom.Click
-        'tvwMain.Expand(strCurrentFilePath)
-        'Tvw.SelectNode(strCurrentFilePath, 0, False)
-        blnChooseRandomFile = Not blnChooseRandomFile
-
+    Private Sub btnToggleMark_Click(sender As Object, e As EventArgs)
 
 
     End Sub
+
     Private Sub ToolStripButton4_Click(sender As Object, e As EventArgs)
         GoFullScreen(True)
 
     End Sub
 
-    Private Sub ToolStripButton6_Click(sender As Object, e As EventArgs) Handles tsbClear.Click
+    Private Sub ToolStripButton6_Click(sender As Object, e As EventArgs)
         ClearShowList()
     End Sub
 
@@ -1046,9 +1062,7 @@ Public Class frmMain
         SetControlColours(blnMoveMode)
     End Sub
 
-    Private Sub tvMain2_Leave(sender As Object, e As EventArgs) Handles lbxShowList.Leave, lbxFiles.Leave, tvMain2.Leave
 
-    End Sub
 
 
 
@@ -1074,9 +1088,7 @@ Public Class frmMain
         MyBase.Finalize()
     End Sub
 
-    Private Sub AddAllFilesToolStripMenuItem_Click(sender As Object, e As EventArgs)
 
-    End Sub
 
     Private Sub CurrentOnlyToolStripMenuItem2_Click(sender As Object, e As EventArgs)
         AddFiles(False)
@@ -1125,11 +1137,21 @@ Public Class frmMain
 
         tmrUpdateFolderSelection.Enabled = False
         'If e.Directory.FullName <> CurrentFolderPath Then
-        tmrUpdateFolderSelection.Interval = 75
+        tmrUpdateFolderSelection.Interval = 200
         tmrUpdateFolderSelection.Enabled = True
 
         'End If
     End Sub
+    'Private Sub tvMain2_DriveSelected(sender As Object, e As DriveInfoEventArgs) Handles tvMain2.DriveSelected
+    '    ChangeFolder(e.Drive.Name, True)
+
+    '    tmrUpdateFolderSelection.Enabled = False
+    '    'If e.Directory.FullName <> CurrentFolderPath Then
+    '    tmrUpdateFolderSelection.Interval = 75
+    '    tmrUpdateFolderSelection.Enabled = True
+
+    '    'End If
+    'End Sub
 
     Private Sub tvMain2_KeyDown(sender As Object, e As KeyEventArgs) Handles tvMain2.KeyDown
         'HandleKeys(sender, e)
@@ -1370,21 +1392,17 @@ Public Class frmMain
         SetControlColours(blnMoveMode)
 
     End Sub
-
-    Private Sub lbxFiles_KeyDown(sender As Object, e As KeyEventArgs) Handles lbxFiles.KeyDown
-
+    Private Sub PromoteFolder()
+        Dim di, pa As DirectoryInfo
+        di = New DirectoryInfo(CurrentFolderPath)
+        pa = di.Parent
+        MoveFolder(di.FullName, pa.Parent.FullName, tvMain2, True)
+        ChangeFolder(pa.FullName, True)
     End Sub
 
-    Private Sub ContextMenuStrip1_Opening(sender As Object, e As CancelEventArgs)
-
-    End Sub
 
     Private Sub tmrSlowMo_Tick(sender As Object, e As EventArgs) Handles tmrSlowMo.Tick
         MediaAdvance(currentWMP, 1)
-    End Sub
-
-    Private Sub tvMain2_Load(sender As Object, e As EventArgs) Handles tvMain2.Load
-
     End Sub
 
     Private Sub AddCurrentFileListToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AddCurrentFileListToolStripMenuItem.Click
@@ -1394,6 +1412,7 @@ Public Class frmMain
     Private Sub AddCurrentAndSubfoldersToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AddCurrentAndSubfoldersToolStripMenuItem.Click
         AddCurrentType(True)
     End Sub
+
 
     Private Sub DuplicatesToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles DuplicatesToolStripMenuItem.Click
         FindDuplicates.Show()
@@ -1427,24 +1446,6 @@ Public Class frmMain
         ChosenPlayOrder = tscbPlayOrders.SelectedIndex
         UpdatePlayOrder()
     End Sub
-
-    Private Sub frmMain_Load(sender As Object, e As EventArgs) Handles Me.Load
-        For i = 0 To 5
-            tscbPlayOrders.Items.Add(strPlayOrder(i))
-        Next
-
-    End Sub
-
-    Private Sub tvMain2_DragLeave(sender As Object, e As EventArgs) Handles tvMain2.DragLeave
-
-    End Sub
-
-    Private Sub btn1_MouseClick(sender As Object, e As MouseEventArgs) Handles btn1.MouseClick
-        'If e.Button = MouseButtons.Right Then
-        FolderSelect.Show()
-        'End If
-    End Sub
-
     Private Sub LoadListToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles LoadListToolStripMenuItem1.Click
         'LoadFiles.RunWorkerAsync()
         LoadShowList()
@@ -1468,6 +1469,20 @@ Public Class frmMain
     Private Sub NewListToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles NewListToolStripMenuItem.Click
         NewButtonList()
     End Sub
+
+
+
+    Private Sub frmMain_Load(sender As Object, e As EventArgs) Handles Me.Load
+        For i = 0 To 5
+            tscbPlayOrders.Items.Add(strPlayOrder(i))
+        Next
+        ConstructMenuShortcuts()
+    End Sub
+
+    Private Sub tvMain2_DragLeave(sender As Object, e As EventArgs) Handles tvMain2.DragLeave
+
+    End Sub
+
 
 
     Private Sub ToggleControl()
@@ -1511,9 +1526,15 @@ Public Class frmMain
         Subdividelist(FileboxContents, 10)
     End Sub
 
-    Private Sub TnButton_Click(sender As Object, e As EventArgs) Handles TnButton.Click
+    Private Sub TnButton_Click(sender As Object, e As EventArgs)
+        ThumbnailsStart()
+
+    End Sub
+
+    Private Shared Sub ThumbnailsStart()
         Dim t As New Thumbnails
-        t.ThumbnailHeight = 75
+        t.ThumbnailHeight = 125
+
         If PFocus <> CtrlFocus.ShowList Then
             t.FileList = FileboxContents
         Else
@@ -1522,14 +1543,13 @@ Public Class frmMain
         t.Text = CurrentFolderPath
         t.SetBounds(0, 0, 750, 900)
         t.Show()
-
     End Sub
 
     Private Sub toggleMove_Click(sender As Object, e As EventArgs)
         ToggleControl()
     End Sub
 
-    Private Sub RandomStartToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RandomStartToolStripMenuItem.Click
+    Private Sub RandomStartToolStripMenuItem_Click(sender As Object, e As EventArgs)
         ToggleRandomStartPoint()
     End Sub
 
@@ -1540,7 +1560,7 @@ Public Class frmMain
 
 
     Private Sub AlphabeticToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AlphabeticToolStripMenuItem.Click
-        AssignAlphabetic()
+        AssignAlphabetic(True)
     End Sub
 
     Private Sub ToggleMoveModeToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ToggleMoveModeToolStripMenuItem.Click
@@ -1561,7 +1581,7 @@ Public Class frmMain
         FillShowbox(lbxShowList, FilterState.All, Showlist)
     End Sub
 
-    Private Sub BundleToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles BundleToolStripMenuItem.Click
+    Private Sub BundleToolStripMenuItem_Click(sender As Object, e As EventArgs)
         BundleFiles(lbxFiles, CurrentFolderPath)
     End Sub
 
@@ -1640,11 +1660,127 @@ Public Class frmMain
     End Sub
 
     Private Sub tsbToggleRandomAdvance_Click(sender As Object, e As EventArgs) Handles tsbToggleRandomAdvance.Click
-        blnRandom = Not blnRandom
+        blnRandomAdvance = Not blnRandomAdvance
+    End Sub
+
+
+    Private Sub ConstructMenuShortcuts()
+        Dim prefixkeys As Keys
+        'CTRL+
+        prefixkeys = Keys.Control
+        AddCurrentFileListToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.A
+        DeleteEmptyFoldersToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.E
+        LoadListToolStripMenuItem1.ShortcutKeys = prefixkeys + Keys.L
+        SaveListToolStripMenuItem1.ShortcutKeys = prefixkeys + Keys.S
+        BundleToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.B
+
+
+
+        'Alt+
+        prefixkeys = Keys.Alt
+        ToggleRandomAdvanceToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.A
+        ToggleMoveModeToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.M
+        ToggleJumpToMarkToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.J
+        ToggleRandomSelectToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.R
+        SlowToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.S
+        NormalToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.N
+        FastToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.F
+        TrailerModeToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.T
+        RandomiseNormalToggleToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.Z
+        'CTRL+SHIFT
+        prefixkeys = Keys.Control + Keys.Shift
+        SaveAsToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.S
+        ExitToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.X
+        ClearCurrentListToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.C
+        NewListToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.N
+        LoadListToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.L
+        RefreshToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.R
+        SaveListasToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.S
+        DuplicatesToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.D
+        ThumbnailsToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.T
+        DeleteEmptyFoldersToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.E
+        HarvestFoldersToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.H
+        BurstFolderToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.B
+        AddCurrentAndSubfoldersToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.A
+
+        prefixkeys = Keys.Control + Keys.Alt
+        SingleFilePerFolderToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.S
+
+        SlowToolStripMenuItem1.ShortcutKeys = prefixkeys + Keys.S
+        NormalToolStripMenuItem1.ShortcutKeys = prefixkeys + Keys.N
+        FastToolStripMenuItem1.ShortcutKeys = prefixkeys + Keys.F
+        LinearToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.L
+        AlphabeticToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.A
+        TreeToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.T
+
+
+        'ToggleRandomStartToolStripMenuItem.ShortcutKeys = Keys.Shift + Keys.D
+    End Sub
+
+    Private Sub ToggleJumptoMarkToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ToggleJumpToMarkToolStripMenuItem.Click
+        ToggleJumpToMark()
+    End Sub
+
+    Private Sub ToggleJumpToMark()
+        blnJumpToMark = Not blnJumpToMark
+        ToggleJumpToMarkToolStripMenuItem.Checked = blnJumpToMark
     End Sub
 
 
 
+    Private Sub ToggleRandomSelectToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ToggleRandomSelectToolStripMenuItem.Click
+        ToggleRandomSelect()
+        ToggleRandomSelectToolStripMenuItem.Checked = blnChooseRandomFile
+    End Sub
+    Private Sub ToggleRandomSelect()
+        blnChooseRandomFile = Not blnChooseRandomFile
+        ToggleRandomSelectToolStripMenuItem.Checked = blnChooseRandomFile
+    End Sub
+
+    Private Sub ToggleRandomAdvanceToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ToggleRandomAdvanceToolStripMenuItem.Click
+        ToggleRandomAdvance()
+    End Sub
+
+    Private Sub ToggleRandomAdvance()
+        blnRandomAdvance = Not blnRandomAdvance
+        ToggleRandomAdvanceToolStripMenuItem.Checked = blnRandomAdvance
+    End Sub
+
+    Private Sub ToggleRandomStartToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ToggleRandomStartToolStripMenuItem.Click
+        blnRandomStartPoint = Not blnRandomStartPoint
+        ToggleRandomStartToolStripMenuItem.Checked = blnRandomAdvance
+    End Sub
+
+    Private Sub BundleToolStripMenuItem_Click_1(sender As Object, e As EventArgs) Handles BundleToolStripMenuItem.Click
+        BundleFiles(lbxFiles, CurrentFolderPath)
+    End Sub
+
+    Private Sub ThumbnailsToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ThumbnailsToolStripMenuItem.Click
+        ThumbnailsStart()
+    End Sub
+
+    Private Sub TrailerModeToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles TrailerModeToolStripMenuItem.Click
+        tmrAutoTrail.Enabled = True
+    End Sub
+
+    Private Sub RefreshToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RefreshToolStripMenuItem.Click
+        tvMain2.RefreshTree(CurrentFolderPath)
+    End Sub
+
+    Private Sub RandomiseNormalToggleToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RandomiseNormalToggleToolStripMenuItem.Click
+        Static Randomised As Boolean
+        Randomised = Not Randomised
+        RandomFunctionsToggle(Randomised)
+
+
+    End Sub
+
+    Public Sub RandomFunctionsToggle(blnRandomise As Boolean)
+        blnRandomStartAlways = blnRandomise
+        blnRandomAdvance = blnRandomise
+        blnChooseRandomFile = blnRandomise
+
+    End Sub
 
     'Private Sub tmrPumpFiles_Tick(sender As Object, e As EventArgs) Handles tmrPumpFiles.Tick
     '    If FilePumpList.Count > 0 Then

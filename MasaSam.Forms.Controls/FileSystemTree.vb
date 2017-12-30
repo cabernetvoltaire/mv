@@ -287,12 +287,15 @@ Public Class FileSystemTree
         Set(ByVal value As String)
             If value = "" Then Exit Property
             Dim d As New DirectoryInfo(value)
-            If d.Parent Is Nothing Then Exit Property
+            newSelectedFolder = value
             ClearSelectedNodes()
-            Collapse(d.Parent.FullName)
+            If d.Parent Is Nothing Then
+                Collapse(d.FullName)
+            Else
+                Collapse(d.Parent.FullName)
+            End If
             Expand(d.FullName)
 
-            newSelectedFolder = value
 
         End Set
     End Property
@@ -343,20 +346,29 @@ Public Class FileSystemTree
     End Sub
 
     Public Sub RefreshTree(ByVal path As String)
-
+        Dim nd As New DirectoryNode(New DirectoryInfo(path))
+        Collapse(path)
+        CreateDirectoryTree(nd)
+        Expand(path)
     End Sub
     Private Sub ExpandDriveNode(ByVal dn As DriveNode, ByVal driveName As String, ByVal directoryNames As List(Of String))
         If (dn.Drive.Name.ToLower() = driveName.ToLower()) Then
             dn.Expand()
-            Expand(dn.DirectoryNodes, directoryNames, 1, directoryNames.Count - 1)
+            If directoryNames.Count = 2 Then
+                Dim k As New TreeNode
+                k = CType(dn, TreeNode)
+                tvFiles.SelectedNode = k
+                OnDriveSelected(New DriveInfo(dn.FullName))
+            Else
+                Expand(dn.DirectoryNodes, directoryNames, 1, directoryNames.Count - 1)
+            End If
         End If
-
     End Sub
 
     Private Sub Expand(ByVal directories As IEnumerable(Of DirectoryNode), ByVal directoryNames As List(Of String), ByVal index As Int32, count As Int32)
         'directories is the list of just expanded directories, and directoryNames is the components of the sought path
         If (directories Is Nothing Or index > directoryNames.Count - 1) Then
-            Return
+            Exit Sub
         End If
 
         For Each d In directories 'This seeks the path to expand, of the ones just epanded
@@ -946,13 +958,13 @@ Public Class FileSystemTree
 
     End Sub
     Public Sub RemoveNode(strpath As String)
-        'Expand(strpath)
+        Expand(strpath)
         tvFiles.SelectedNode.Remove()
 
     End Sub
 
     Private Sub Timer_Tick(sender As Object, e As EventArgs)
-        Exit Sub
+        'Exit Sub
         For Each node As FileSystemNode In Me.tvFiles.Nodes(0).Nodes
 
             ' if node is drive node
@@ -1027,7 +1039,7 @@ Public Class FileSystemTree
         'MsgBox("tvFiles_AfterSelect")
         HighlightSelectedNodes()
         RaiseEvent DirectorySelected(Me, New DirectoryInfoEventArgs(New DirectoryInfo(NodePath(e))))
-
+        RaiseEvent DriveSelected(Me, New DriveInfoEventArgs(New DriveInfo(NodePath(e))))
 
     End Sub
     Private Function NodePath(e) As String

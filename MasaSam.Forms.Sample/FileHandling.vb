@@ -97,14 +97,19 @@ Module FileHandling
             End If
 
             lbx.Tag = e
-            'If lbx.Items.Count <> 0 Then
-            '    If blnRandom Then
-            '        Dim s As Long = lbx.Items.Count - 1
-            '        lbx.SelectedIndex = Rnd() * s
-            '    Else
-            '        lbx.SelectedIndex = 0
-            '    End If
-            'End If
+
+            If PFocus = CtrlFocus.ShowList Then
+            Else
+
+                If lbx.Items.Count <> 0 Then
+                    If blnRandom Then
+                        Dim s As Long = lbx.Items.Count - 1
+                        lbx.SelectedIndex = Rnd() * s
+                    Else
+                        lbx.SelectedIndex = 0
+                    End If
+                End If
+            End If
 
         Catch ex As ArgumentException
             MsgBox(ex.ToString)
@@ -117,7 +122,6 @@ Module FileHandling
     Public Sub DisposeLists(list As Object)
         For Each item In list
             item.Dispose()
-
         Next
     End Sub
     Public Function FilePump(strFileDest As String, lbx1 As ListBox)
@@ -220,9 +224,10 @@ Module FileHandling
         Try
             With My.Computer.FileSystem
                 Dim s As String = .GetDirectoryInfo(strDir).Name
-                .MoveDirectory(strDir, strDest & "\" & s, FileIO.UIOption.AllDialogs)
-                UpdateButton(strDir, strDest & "\" & s)
+                .MoveDirectory(strDir, strDest & "\" & s, FileIO.UIOption.OnlyErrorDialogs)
+                UpdateButton(strDir, strDest & "\" & s) 'todo doesnt handle sub-tree
                 tvw.RemoveNode(strDir)
+
             End With
 
 
@@ -231,19 +236,7 @@ Module FileHandling
                 End Try
 
     End Sub
-    Private Sub UpdateButton(strPath As String, strDest As String)
-        For i = 0 To 25
-            For j = 0 To 7
-                Dim s = strButtonFilePath(j, i, 1)
-                If s = strPath Then
-                    strButtonFilePath(j, i, 1) = strDest
-                    Exit For
-                    Exit For
-                End If
-            Next
-        Next
 
-    End Sub
     ''' <summary>
     ''' Moves files to strDest, and removes them from lbx1 asking for a subfolder in destination if more than one file. If strDest is empty, files are deleted.
     ''' </summary>
@@ -347,6 +340,9 @@ Module FileHandling
             fds = fd.Split("|")
             Dim file As String = fds(0)
             Dim s As String = fds(1)
+            If Len(file) > 250 Then
+                'TODO deal with too long file names
+            End If
             Dim m As New FileInfo(file)
             With My.Computer.FileSystem
                 Dim i As Long = 0
@@ -556,6 +552,8 @@ Module FileHandling
 
             Catch ex As PathTooLongException
                 MsgBox(ex.Message)
+            Catch ex As System.UnauthorizedAccessException
+                Continue For
             End Try
 
         Next
@@ -634,7 +632,8 @@ Module FileHandling
         Try
             count = count + d.EnumerateFiles.Count
 
-        Catch ex As UnauthorizedAccessException
+
+        Catch ex As Exception
             Return 0
             Exit Function
         End Try
@@ -652,18 +651,17 @@ Module FileHandling
     ''' <param name="target"></param>
     ''' <param name="blnRecurse"></param>
     Public Sub HarvestFolder(d As DirectoryInfo, target As DirectoryInfo, blnRecurse As Boolean)
-        Dim s As New List(Of String)
-        For Each file In d.EnumerateFiles
+        Dim i
+        i = InputBox("Number of files for subfolder to be harvested?")
+        If i = "" Then Exit Sub
 
-            s.Add(file.FullName)
-        Next
+        Dim s As New List(Of String) '= Nothing
+        ' s.Add("Test")
+        s = Addtolist(s, d, i)
+
         If blnRecurse Then
             For Each di In d.EnumerateDirectories
-                HarvestFolder(di, target, True) 'TODO look at this. I'm not sure it works.
-                For Each file In di.EnumerateFiles
-
-                    s.Add(file.FullName)
-                Next
+                s = Addtolist(s, di, i)
             Next
         End If
         blnSuppressCreate = True 'Prevent request make folder for plural files
@@ -671,6 +669,18 @@ Module FileHandling
         blnSuppressCreate = False
         DeleteEmptyFolders(d, True)
     End Sub
+
+    Private Function Addtolist(ByVal s As List(Of String), d As DirectoryInfo, icount As Short) As List(Of String)
+        Dim l As New List(Of String)
+        l = s
+        For Each file In d.EnumerateFiles
+            If d.EnumerateFiles.Count <= icount Then
+                l.Add(file.FullName)
+            End If
+        Next
+        Return s
+    End Function
+
     Public Sub BurstFolder(d As DirectoryInfo)
         HarvestFolder(d, d.Parent, True)
     End Sub

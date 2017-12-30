@@ -151,10 +151,10 @@
     </Compile>
     <Compile Include="Settings.vb" />
     <Compile Include="Subsets.vb" />
-    <Compile Include="Thumbnails.Designer.vb">
-      <DependentUpon>Thumbnails.vb</DependentUpon>
+    <Compile Include="Thumbnails2.designer.vb">
+      <DependentUpon>Thumbnails2.vb</DependentUpon>
     </Compile>
-    <Compile Include="Thumbnails.vb">
+    <Compile Include="Thumbnails2.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="TreeView.Designer.vb">
@@ -191,8 +191,8 @@
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Thumbnails.resx">
-      <DependentUpon>Thumbnails.vb</DependentUpon>
+    <EmbeddedResource Include="Thumbnails2.resx">
+      <DependentUpon>Thumbnails2.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="TreeView.resx">
       <DependentUpon>TreeView.vb</DependentUpon>

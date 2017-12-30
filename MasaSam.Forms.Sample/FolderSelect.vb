@@ -43,8 +43,8 @@ Public Class FolderSelect
     Private Sub FolderSelect_Shown(sender As Object, e As EventArgs) Handles Me.Shown
         With fst1
             .CreateControl()
-            ' .Expand(Label1.Text)
-            '.SelectedFolder = Label1.Text
+            .Expand(newFolder)
+            .SelectedFolder = newFolder
         End With
 
     End Sub
