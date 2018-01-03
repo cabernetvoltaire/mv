@@ -42,10 +42,13 @@ Public Class FolderSelect
 
     Private Sub FolderSelect_Shown(sender As Object, e As EventArgs) Handles Me.Shown
         With fst1
-            .CreateControl()
-            .Expand(newFolder)
-            .SelectedFolder = newFolder
+            ' .RefreshTree(newFolder)
+            '.SelectedFolder = newFolder
         End With
+
+    End Sub
+
+    Private Sub fst1_Load(sender As Object, e As EventArgs) Handles fst1.Load
 
     End Sub
 End Class

@@ -51,9 +51,6 @@ Public Class Thumbnails
             End Try
         Next
 
-        flp2 = flp
-        flp2.AutoScroll = True
-        flp.AutoScroll = True
 
     End Sub
     Private Sub pb_Click(sender As Object, e As EventArgs)
@@ -93,11 +90,9 @@ Public Class Thumbnails
         Me.Controls.Add(flp2)
         t = New Thread(New ThreadStart(Sub() LoadThumbnails()))
         t.IsBackground = True
-
         t.Start()
 
     End Sub
-
 
 
 

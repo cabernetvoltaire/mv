@@ -258,6 +258,7 @@ Module ButtonHandling
             frmMain.lblAlpha.Text = Chr(AscfromButt(iCurrentAlpha)).ToString
             Dim s As String
             Dim f As String = strButtonFilePath(i, iCurrentAlpha, 1)
+            frmMain.ToolTip1.SetToolTip(btnDest(i), f)
 
             strVisibleButtons(i) = f
             s = strButtonCaptions(i, iCurrentAlpha, 1)
@@ -288,7 +289,8 @@ Module ButtonHandling
         Dim alph As String = "ABCDEFGH"
         For i As Byte = 0 To 7
             With btnDest(i)
-                btnDest(i).Text = "F" & Str(i + 5)
+                .Text = "F" & Str(i + 5)
+
                 AddHandler .Click, AddressOf ButtonClick
                 '  AddHandler .MouseEnter, AddressOf ButtonMouse
             End With
@@ -301,9 +303,7 @@ Module ButtonHandling
         FolderSelect.Show()
         'End If
     End Sub
-    Private Sub ButtonMouse(sender As Object, e As MouseEventArgs)
-        ' frmMain.ToolTip1.SetToolTip(sender, sender.ToString)
-    End Sub
+
     Public Sub NewButtonList()
         ClearCurrentButtons()
         SaveButtonlist()

@@ -24,11 +24,12 @@ Partial Class FullScreen
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(FullScreen))
         Me.FSWMP = New AxWMPLib.AxWindowsMediaPlayer()
-        Me.fullScreenPicBox = New System.Windows.Forms.PictureBox()
         Me.FSBlanker = New System.Windows.Forms.PictureBox()
+        Me.fullScreenPicBox = New System.Windows.Forms.PictureBox()
+        Me.DirectoryEntry1 = New System.DirectoryServices.DirectoryEntry()
         CType(Me.FSWMP, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.fullScreenPicBox, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.FSBlanker, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.fullScreenPicBox, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'FSWMP
@@ -43,26 +44,28 @@ Partial Class FullScreen
         Me.FSWMP.TabStop = False
         Me.FSWMP.UseWaitCursor = True
         '
-        'fullScreenPicBox
-        '
-        Me.fullScreenPicBox.BackColor = System.Drawing.Color.Black
-        Me.fullScreenPicBox.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.fullScreenPicBox.Location = New System.Drawing.Point(0, 0)
-        Me.fullScreenPicBox.Name = "fullScreenPicBox"
-        Me.fullScreenPicBox.Size = New System.Drawing.Size(2492, 1144)
-        Me.fullScreenPicBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
-        Me.fullScreenPicBox.TabIndex = 18
-        Me.fullScreenPicBox.TabStop = False
-        Me.fullScreenPicBox.Visible = False
-        '
         'FSBlanker
         '
+        Me.FSBlanker.BackColor = System.Drawing.Color.Maroon
         Me.FSBlanker.Location = New System.Drawing.Point(688, 457)
         Me.FSBlanker.Name = "FSBlanker"
         Me.FSBlanker.Size = New System.Drawing.Size(1193, 660)
         Me.FSBlanker.TabIndex = 19
         Me.FSBlanker.TabStop = False
         Me.FSBlanker.Visible = False
+        '
+        'fullScreenPicBox
+        '
+        Me.fullScreenPicBox.BackColor = System.Drawing.Color.Black
+        Me.fullScreenPicBox.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.fullScreenPicBox.Location = New System.Drawing.Point(0, 0)
+        Me.fullScreenPicBox.Margin = New System.Windows.Forms.Padding(0)
+        Me.fullScreenPicBox.Name = "fullScreenPicBox"
+        Me.fullScreenPicBox.Size = New System.Drawing.Size(2492, 1144)
+        Me.fullScreenPicBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
+        Me.fullScreenPicBox.TabIndex = 18
+        Me.fullScreenPicBox.TabStop = False
+        Me.fullScreenPicBox.Visible = False
         '
         'FullScreen
         '
@@ -79,8 +82,8 @@ Partial Class FullScreen
         Me.StartPosition = System.Windows.Forms.FormStartPosition.Manual
         Me.Text = "Form1"
         CType(Me.FSWMP, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.fullScreenPicBox, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.FSBlanker, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.fullScreenPicBox, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
@@ -88,4 +91,5 @@ Partial Class FullScreen
     Friend WithEvents FSWMP As AxWMPLib.AxWindowsMediaPlayer
     Friend WithEvents fullScreenPicBox As PictureBox
     Friend WithEvents FSBlanker As PictureBox
+    Friend WithEvents DirectoryEntry1 As DirectoryServices.DirectoryEntry
 End Class

@@ -70,6 +70,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
+    <Reference Include="System.DirectoryServices" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
@@ -163,6 +164,12 @@
     <Compile Include="TreeView.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="MediaControl.Designer.vb">
+      <DependentUpon>MediaControl.vb</DependentUpon>
+    </Compile>
+    <Compile Include="MediaControl.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Duplicates2.resx">
@@ -197,6 +204,9 @@
     <EmbeddedResource Include="TreeView.resx">
       <DependentUpon>TreeView.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="MediaControl.resx">
+      <DependentUpon>MediaControl.vb</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="My Project\Application.myapp">
@@ -212,14 +222,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <COMReference Include="AxAXVLC">
-      <Guid>{DF2BBE39-40A8-433B-A279-073F48DA94B6}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>aximp</WrapperTool>
-      <Isolated>False</Isolated>
-    </COMReference>
     <COMReference Include="AxFolderViewControl">
       <Guid>{53BA5BA6-78E7-4837-AAFB-7F52822D8A9E}</Guid>
       <VersionMajor>12</VersionMajor>
@@ -263,6 +265,15 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
+    <COMReference Include="WMPDXMLib">
+      <Guid>{73F0DD5C-D071-46B6-A8BF-897C84EAAC49}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
     <COMReference Include="WMPLib">
       <Guid>{6BF52A50-394A-11D3-B153-00C04F79FAA6}</Guid>
       <VersionMajor>1</VersionMajor>
@@ -281,7 +292,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Resources\" />
+    <None Include="Resources\Untitled-1 copy1.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

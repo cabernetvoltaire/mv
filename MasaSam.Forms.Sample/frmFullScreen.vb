@@ -34,7 +34,8 @@ Public Class FullScreen
         End If
     End Sub
 
-    Private Sub fullScreenPicBox_Click(sender As Object, e As EventArgs) Handles fullScreenPicBox.Click
+    Private Sub fullScreenPicBox_Click(sender As Object, e As EventArgs) Handles fullScreenPicBox.MouseClick
+
         picBlanker = FSBlanker
         PicClick(fullScreenPicBox)
     End Sub
@@ -53,12 +54,9 @@ Public Class FullScreen
         CtrlDown = e.Control
     End Sub
 
-    'Private Sub FullScreen_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
-    '    ShiftDown = e.Shift
-    '    CtrlDown = e.Control
-    'End Sub
 
     Private Sub FullScreen_Load(sender As Object, e As EventArgs) Handles Me.Load
         Me.WindowState = FormWindowState.Maximized
     End Sub
+
 End Class

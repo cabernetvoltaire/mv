@@ -347,8 +347,8 @@ Public Class FileSystemTree
 
     Public Sub RefreshTree(ByVal path As String)
         Dim nd As New DirectoryNode(New DirectoryInfo(path))
-        Collapse(path)
         CreateDirectoryTree(nd)
+        Collapse(path)
         Expand(path)
     End Sub
     Private Sub ExpandDriveNode(ByVal dn As DriveNode, ByVal driveName As String, ByVal directoryNames As List(Of String))
@@ -964,7 +964,8 @@ Public Class FileSystemTree
     End Sub
 
     Private Sub Timer_Tick(sender As Object, e As EventArgs)
-        'Exit Sub
+        Exit Sub
+
         For Each node As FileSystemNode In Me.tvFiles.Nodes(0).Nodes
 
             ' if node is drive node
@@ -1173,6 +1174,32 @@ Public Class FileSystemTree
         End If
         Return e
     End Function
+
+    'Private Sub tvFiles_KeyDown(sender As Object, e As KeyEventArgs) Handles tvFiles.KeyDown
+    '    'Enables traversing of the filetree
+    '    If e.KeyCode = TraverseKey Then
+    '        Traverse(False)
+    '    End If
+    '    If e.KeyCode = TraverseKeyBack Then
+    '        Traverse(True)
+    '    End If
+    '    If e.KeyCode = Keys.F2 Then
+    '        tvFiles.LabelEdit = True
+    '        Dim nd As TreeNode = tvFiles.SelectedNode
+    '        If Not (nd Is Nothing) And Not (nd.Parent Is Nothing) Then
+    '            tvFiles.SelectedNode = nd
+    '            tvFiles.LabelEdit = True
+    '            If Not nd.IsEditing Then
+    '                nd.BeginEdit()
+    '            End If
+    '        Else
+    '            MessageBox.Show("No tree node selected or selected node is a root node." &
+    '              Microsoft.VisualBasic.ControlChars.Cr &
+    '              "Editing of root nodes is not allowed.", "Invalid selection")
+    '        End If
+
+    '    End If
+    'End Sub
 
 
 

@@ -23,11 +23,11 @@ Partial Class FolderSelect
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
-        Me.fst1 = New MasaSam.Forms.Controls.FileSystemTree()
         Me.Panel1 = New System.Windows.Forms.Panel()
+        Me.btnAssign = New System.Windows.Forms.Button()
         Me.TextBox1 = New System.Windows.Forms.TextBox()
         Me.Label1 = New System.Windows.Forms.Label()
-        Me.btnAssign = New System.Windows.Forms.Button()
+        Me.fst1 = New MasaSam.Forms.Controls.FileSystemTree()
         Me.TableLayoutPanel1.SuspendLayout()
         Me.Panel1.SuspendLayout()
         Me.SuspendLayout()
@@ -47,18 +47,6 @@ Partial Class FolderSelect
         Me.TableLayoutPanel1.Size = New System.Drawing.Size(706, 840)
         Me.TableLayoutPanel1.TabIndex = 0
         '
-        'FileSystemTree1
-        '
-        Me.fst1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.fst1.FileExtensions = "*"
-        Me.fst1.Location = New System.Drawing.Point(6, 6)
-        Me.fst1.Margin = New System.Windows.Forms.Padding(6)
-        Me.fst1.Name = "FileSystemTree1"
-        Me.fst1.RootDrive = Nothing
-        Me.fst1.SelectedFolder = Nothing
-        Me.fst1.Size = New System.Drawing.Size(694, 681)
-        Me.fst1.TabIndex = 0
-        '
         'Panel1
         '
         Me.Panel1.Controls.Add(Me.btnAssign)
@@ -69,6 +57,15 @@ Partial Class FolderSelect
         Me.Panel1.Name = "Panel1"
         Me.Panel1.Size = New System.Drawing.Size(700, 141)
         Me.Panel1.TabIndex = 1
+        '
+        'btnAssign
+        '
+        Me.btnAssign.Location = New System.Drawing.Point(485, 34)
+        Me.btnAssign.Name = "btnAssign"
+        Me.btnAssign.Size = New System.Drawing.Size(168, 65)
+        Me.btnAssign.TabIndex = 2
+        Me.btnAssign.Text = "A&ssign"
+        Me.btnAssign.UseVisualStyleBackColor = True
         '
         'TextBox1
         '
@@ -86,14 +83,18 @@ Partial Class FolderSelect
         Me.Label1.TabIndex = 0
         Me.Label1.Text = "Label1"
         '
-        'btnAssign
+        'fst1
         '
-        Me.btnAssign.Location = New System.Drawing.Point(485, 34)
-        Me.btnAssign.Name = "btnAssign"
-        Me.btnAssign.Size = New System.Drawing.Size(168, 65)
-        Me.btnAssign.TabIndex = 2
-        Me.btnAssign.Text = "A&ssign"
-        Me.btnAssign.UseVisualStyleBackColor = True
+        Me.fst1.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.fst1.FileExtensions = "*"
+        Me.fst1.Location = New System.Drawing.Point(6, 6)
+        Me.fst1.Margin = New System.Windows.Forms.Padding(6)
+        Me.fst1.Name = "fst1"
+        Me.fst1.RootDrive = Nothing
+        Me.fst1.SelectedFolder = Nothing
+        Me.fst1.Size = New System.Drawing.Size(694, 681)
+        Me.fst1.TabIndex = 0
+        Me.fst1.TrackDriveState = True
         '
         'FolderSelect
         '

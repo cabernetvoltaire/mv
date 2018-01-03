@@ -17,7 +17,7 @@
         ShowList = 2
     End Enum
     Public PFocus As Byte = CtrlFocus.Tree
-
+    Public Property ZoneSize As Decimal = 0.4
     Public Const OrientationId As Integer = &H112
     Public blnSpeedRestart As Boolean = False
     Public iSSpeeds() As Integer = {1500, 900, 200}
@@ -96,8 +96,8 @@
         With My.Computer.Registry.CurrentUser
             frmMain.ctrFileBoxes.SplitterDistance = .GetValue("VertSplit", frmMain.ctrFileBoxes.Height / 4)
             frmMain.ctrMainFrame.SplitterDistance = .GetValue("HorSplit", frmMain.ctrFileBoxes.Width / 2)
-            'CurrentFolderPath = .GetValue("Folder", "C:\")
-            ChangeFolder(.GetValue("Folder", "C:\"), False)
+            CurrentFolderPath = .GetValue("Folder", "C:\")
+            'ChangeFolder(.GetValue("Folder", "C:\"), False)
             strCurrentFilePath = .GetValue("File")
             CurrentFilterState = .GetValue("Filter", 0)
             strButtonFile = .GetValue("LastButtonFolder", "")

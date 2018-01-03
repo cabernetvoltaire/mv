@@ -225,6 +225,7 @@ Public Module General
         End If
         ReDim FBCShown(0)
         NofShown = 0
+        frmMain.CancelDisplay() 'TODO Make this an option.
         frmMain.SetControlColours(blnMoveMode)
     End Sub
 
