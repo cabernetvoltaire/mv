@@ -181,6 +181,7 @@ Partial Class frmMain
         Me.tmrPumpFiles = New System.Windows.Forms.Timer(Me.components)
         Me.tmrAutoTrail = New System.Windows.Forms.Timer(Me.components)
         Me.ColorDialog1 = New System.Windows.Forms.ColorDialog()
+        Me.ToolStripSplitButton1 = New System.Windows.Forms.ToolStripSplitButton()
         Me.MenuStrip1.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
         Me.TableLayoutPanel2.SuspendLayout()
@@ -738,7 +739,7 @@ Partial Class frmMain
         '
         Me.StatusStrip1.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.StatusStrip1.ImageScalingSize = New System.Drawing.Size(28, 28)
-        Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tbFiles, Me.tbFilter, Me.tbRandom, Me.tsslPicState, Me.tbZoom, Me.tbSpeed, Me.tbStartpoint, Me.tbShowfile, Me.tbButton, Me.tbLastFile, Me.tbDate, Me.TSPB})
+        Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.TSPB, Me.tbFiles, Me.tbFilter, Me.tbRandom, Me.tsslPicState, Me.tbZoom, Me.tbSpeed, Me.tbStartpoint, Me.tbShowfile, Me.tbButton, Me.tbLastFile, Me.tbDate, Me.ToolStripSplitButton1})
         Me.StatusStrip1.Location = New System.Drawing.Point(0, 1558)
         Me.StatusStrip1.Name = "StatusStrip1"
         Me.StatusStrip1.Size = New System.Drawing.Size(2603, 35)
@@ -805,9 +806,8 @@ Partial Class frmMain
         '
         'tbLastFile
         '
-        Me.tbLastFile.AutoSize = False
         Me.tbLastFile.Name = "tbLastFile"
-        Me.tbLastFile.Size = New System.Drawing.Size(1627, 30)
+        Me.tbLastFile.Size = New System.Drawing.Size(97, 30)
         Me.tbLastFile.Text = "LASTFILE"
         '
         'tbDate
@@ -819,6 +819,7 @@ Partial Class frmMain
         'TSPB
         '
         Me.TSPB.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
+        Me.TSPB.AutoSize = False
         Me.TSPB.Name = "TSPB"
         Me.TSPB.Size = New System.Drawing.Size(500, 29)
         Me.TSPB.Step = 1
@@ -1476,6 +1477,15 @@ Partial Class frmMain
         'tmrAutoTrail
         '
         '
+        'ToolStripSplitButton1
+        '
+        Me.ToolStripSplitButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ToolStripSplitButton1.Image = CType(resources.GetObject("ToolStripSplitButton1.Image"), System.Drawing.Image)
+        Me.ToolStripSplitButton1.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripSplitButton1.Name = "ToolStripSplitButton1"
+        Me.ToolStripSplitButton1.Size = New System.Drawing.Size(52, 33)
+        Me.ToolStripSplitButton1.Text = "ToolStripSplitButton1"
+        '
         'frmMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(11.0!, 24.0!)
@@ -1701,4 +1711,5 @@ Partial Class frmMain
     Friend WithEvents RegexSearchToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents AddCurrentFileToListToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents UndoToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripSplitButton1 As ToolStripSplitButton
 End Class

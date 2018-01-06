@@ -278,7 +278,7 @@
 
 
         End If
-        inside.Refresh()
+        'inside.Refresh()
 
     End Sub
 

@@ -1,7 +1,5 @@
 ﻿Imports System.ComponentModel
-Imports System.Diagnostics
 Imports System.IO
-Imports MasaSam.Forms.Controls
 
 Public Class FileSystemTree
 
@@ -289,11 +287,11 @@ Public Class FileSystemTree
             Dim d As New DirectoryInfo(value)
             newSelectedFolder = value
             ClearSelectedNodes()
-            If d.Parent Is Nothing Then
-                Collapse(d.Root.Name)
-            Else
-                Collapse(d.Parent.FullName)
-            End If
+            'If d.Parent Is Nothing Then
+            '    Collapse(d.Root.Name)
+            'Else
+            '    Collapse(d.Parent.FullName)
+            'End If
             Expand(d.FullName)
 
 

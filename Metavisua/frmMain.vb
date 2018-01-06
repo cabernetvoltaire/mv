@@ -1284,7 +1284,8 @@ Public Class frmMain
         If c > 1 Then
             tbFiles.Text = "FOLDER:" & listcount & "(" & c & " selected)" & " SHOW:" & showcount
         Else
-            tbFiles.Text = "FOLDER:" & listcount & " SHOW:" & showcount
+            Dim m As Int16 = lbxFiles.SelectedIndex
+            tbFiles.Text = "FOLDER:" & m + 1 & " of " & listcount & " SHOW:" & showcount
         End If
         If FilePumpList.Count <> 0 Then tbFiles.Text = tbFiles.Text & " (" & FilePumpList.Count & " files waiting to be moved.)"
         tbFilter.Text = "FILTER:" & Filterstates(CurrentFilterState)
@@ -1516,7 +1517,7 @@ Public Class frmMain
         PreferencesSave()
 
         FillListbox(lbxFiles, New DirectoryInfo(CurrentFolderPath), FileboxContents, blnChooseRandomFile)
-        If lbxFiles.Items.Count = 0 Then tbFiles.Text = "0/" & Str(Showlist.Count)
+        '  If lbxFiles.Items.Count = 0 Then tbFiles.Text = "0/" & Str(Showlist.Count)
         'tvMain2.SelectedFolder = CurrentFolderPath 'TODO Dodgy?
         tmrUpdateFolderSelection.Enabled = False
     End Sub
