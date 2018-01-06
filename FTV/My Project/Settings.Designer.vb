@@ -64,9 +64,9 @@ Namespace My
     Friend Module MySettingsProperty
         
         <Global.System.ComponentModel.Design.HelpKeywordAttribute("My.Settings")>  _
-        Friend ReadOnly Property Settings() As Global.MasaSam.Forms.Controls.My.MySettings
+        Friend ReadOnly Property Settings() As Global.Metavisua.My.MySettings
             Get
-                Return Global.MasaSam.Forms.Controls.My.MySettings.Default
+                Return Global.Metavisua.My.MySettings.Default
             End Get
         End Property
     End Module
