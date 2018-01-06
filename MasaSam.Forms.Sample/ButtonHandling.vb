@@ -42,6 +42,7 @@ Module ButtonHandling
 
             End If
         Next
+        KeyAssignmentsStore(strButtonFile)
         'For Each di In d.Parent.EnumerateDirectories
         '    AssignButton(i, iCurrentAlpha, di.FullName)
         '    i += 1
@@ -71,7 +72,7 @@ Module ButtonHandling
             End If
 
         Next
-
+        KeyAssignmentsStore(strButtonFile)
     End Sub
     Public Sub AssignAlphabetic(blntest As Boolean)
 
@@ -99,7 +100,7 @@ Module ButtonHandling
             End If
 
         Next
-
+        KeyAssignmentsStore(strButtonFile)
     End Sub
     Public Sub AssignTree(strStart As String)
 
@@ -181,7 +182,7 @@ Module ButtonHandling
         End If
 
     End Sub
-    Public Sub AssignButton(i As Byte, j As Integer, k As Byte, strPath As String)
+    Public Sub AssignButton(i As Byte, j As Integer, k As Byte, strPath As String, Optional blnStore As Boolean = False)
         Dim f As New DirectoryInfo(strPath)
         If strVisibleButtons(i) <> "" And Not blnMoveMode Then
             If Not MsgBox("Replace button assignment for F" & i + 5 & " with " & f.Name & "?", MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then Exit Sub
@@ -192,7 +193,9 @@ Module ButtonHandling
         lblDest(i).Text = f.Name
         strButtonCaptions(i, j, k) = f.Name
         LoadCurrentButtonSet()
-
+        If blnStore Then
+            KeyAssignmentsStore(strButtonFile)
+        End If
     End Sub
     Public Sub ChangeButtonLetter(e As KeyEventArgs)
         frmMain.lblAlpha.Text = e.KeyCode.ToString
@@ -360,7 +363,18 @@ Module ButtonHandling
         Dim intLoop As Integer
         Dim iLetter As Integer
         Dim strEncrypted As String
+        If path = "" Then
+            With frmMain.SaveFileDialog1
+                .DefaultExt = "msb"
+                .Filter = "Metavisua button files|*.msb|All files|*.*"
+                If .ShowDialog() = System.Windows.Forms.DialogResult.OK Then
+                    path = .FileName
+                Else
+                    Exit Sub
 
+                End If
+            End With
+        End If
 
         Dim fs As New StreamWriter(New FileStream(path, FileMode.OpenOrCreate, FileAccess.Write))
         For iLetter = 0 To iAlphaCount - 1

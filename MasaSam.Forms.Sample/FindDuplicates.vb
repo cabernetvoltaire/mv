@@ -1,5 +1,6 @@
 ﻿Imports System.IO
 Public Class FindDuplicates
+    Public initiallist As New List(Of String)
     Public deletelist As New List(Of String)
     Public uniquelist As New List(Of String)
     Public sortedList As New List(Of String)
@@ -16,8 +17,13 @@ Public Class FindDuplicates
 
 
         ArrangePreviews()
+        If Showlist.Count = 0 Then
+            initiallist = FileboxContents
+        Else
+            initiallist = Showlist
+        End If
         'Add current showlist, in size sorted order, to lbxSorted
-        sortedList = SetPlayOrder(PlayOrder.Length, Showlist)
+        sortedList = SetPlayOrder(PlayOrder.Length, initiallist)
         FillShowbox(lbxsorted, FilterState.All, sortedList)
         uniquelist = ExtractDups(sortedList)
         MsgBox("There are " & uniquelist.Count & " unique files having duplicates, out of " & Showlist.Count)

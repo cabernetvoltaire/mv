@@ -8,7 +8,7 @@
     Private ZoomJustStarted As Boolean = True
     Public mediaLoopSize As Integer = 50
     Public picBlanker As PictureBox
-
+    Dim strScreenState = {"Fitted", "True Size", "Zoomed"}
 
 
     'Enums and structures
@@ -83,7 +83,6 @@
             PreparePic(pbx1, picBlanker, img)
         Else
 
-            '   SetState(pbx1, Screenstate.Zoomed)
 
             If CtrlDown Then
                 ZoomPicture(pbx1, e.Delta > 0, 2) 'TODO Options
@@ -185,19 +184,20 @@
                 'then
                 'reset the size mode
                 'And undock
-                If iScreenstate = Screenstate.Fitted Then
+
+                'If iScreenstate = Screenstate.Fitted Then
+                If iScreenstate <> Screenstate.Zoomed Then
                     ' If ZoomJustStarted Then
                     Dim x As Control = pbx.Parent
                     pbx.Dock = DockStyle.None 'TODO It's how we prepare for this which is the problem 
                     pbx.Width = x.Width
                     pbx.Height = x.Height
-                    'ZoomJustStarted = False
-                    '  iZoomFactor = 100 * pbx.Width / pbx.Image.Width
                 End If
                 pbx.SizeMode = PictureBoxSizeMode.Zoom
                 'PlacePic(pbx)
         End Select
         iScreenstate = Sstate
+        frmMain.tsslPicState.Text = "Picture State:" & strScreenState(iScreenstate)
     End Sub
     Public Sub FadeInLabel(lbl As Label)
         lbl.Visible = True

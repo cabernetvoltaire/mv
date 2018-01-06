@@ -1,5 +1,6 @@
 ﻿Option Explicit On
 Imports System.IO
+Imports System.Runtime.CompilerServices
 
 Public Module General
 
@@ -16,6 +17,7 @@ Public Module General
         Type
     End Enum
     Public lngShowlistLines As Long = 0
+    Public CurrentFilterState As Integer = FilterState.All
 
 
     Public Orientation() As String = {"Unknown", "TopLeft", "TopRight", "BottomRight", "BottomLeft", "LeftTop", "RightTop", "RightBottom", "LeftBottom"}
@@ -28,8 +30,6 @@ Public Module General
         Browsable
         Unknown
     End Enum
-    Public SlideShowSpeeds() As Integer = {50, 100, 500, 1000, 2000, 9000}
-    Public VideoSpeeds() As Integer = {10, 20, 50, 75, 100}
     Public Sub ProgressBarOn(max As Long)
         With frmMain.TSPB
             .Value = 0
@@ -44,8 +44,18 @@ Public Module General
         End With
 
     End Sub
+    ''' <summary>
+    ''' Returns the path of the link defined in str
+    ''' </summary>
+    ''' <param name="str"></param>
+    ''' <returns></returns>
     Public Function LinkTarget(str As String) As String
-        Return CreateObject("WScript.Shell").CreateShortcut(str).TargetPath
+        Try
+            Return CreateObject("WScript.Shell").CreateShortcut(str).TargetPath
+        Catch ex As Exception
+            Return str
+        End Try
+
     End Function
     Public Sub ProgressIncrement(st As Integer)
         With frmMain.TSPB
@@ -190,7 +200,7 @@ Public Module General
         Else
             'Assign buttons
             If e.Shift Or strVisibleButtons(i) = "" Then
-                AssignButton(i, iCurrentAlpha, 1, CurrentFolderPath) 'Just assign
+                AssignButton(i, iCurrentAlpha, 1, CurrentFolderPath, True) 'Just assign
                 If My.Computer.FileSystem.FileExists(strButtonFile) Then
                     KeyAssignmentsStore(strButtonFile)
                 Else
@@ -200,7 +210,7 @@ Public Module General
                 'SWITCH folder
                 If strVisibleButtons(i) <> CurrentFolderPath Then
                     ChangeFolder(strVisibleButtons(i), True)
-                    frmMain.CancelDisplay()
+                    'frmMain.CancelDisplay()
                     frmMain.tvMain2.SelectedFolder = CurrentFolderPath
                 ElseIf blnChooseRandomFile Then
                     frmMain.AdvanceFile(True, True)
@@ -237,11 +247,12 @@ Public Module General
         Return s
     End Function
     ''' <summary>
-    ''' Fill a listbox with a list, according to a filter
+    ''' Fill a listbox with a list, ignores the filter - dunno why
     ''' </summary>
     ''' <param name="lbx"></param>
     ''' <param name="Filter"></param>
     ''' <param name="lst"></param>
+    '''
     Public Sub FillShowbox(lbx As ListBox, Filter As Byte, ByVal lst As List(Of String))
         If lst.Count = 0 Then Exit Sub
         ProgressBarOn(lst.Count)
@@ -258,7 +269,7 @@ Public Module General
         Next
         '        lbx.TabStop = True
         ProgressBarOff()
-        frmMain.UpdateFileInfo()
+        'frmMain.UpdateFileInfo()
     End Sub
     Public Sub MouseHoverInfo(lbx As ListBox, tt As ToolTip)
         Dim cc, sc As Point
@@ -407,21 +418,28 @@ Public Module General
 
 
     End Function
-    Public Function SelectFromListbox(lbx As ListBox, s As String) As List(Of String)
+    Public Function SelectFromListbox(lbx As ListBox, s As String, blnRegex As Boolean) As List(Of String)
         Dim ls As New List(Of String)
         Dim i As Long
         lbx.SelectedItem = Nothing
         lbx.SelectionMode = SelectionMode.MultiExtended
         For i = 0 To lbx.Items.Count - 1
-
-            If InStr(UCase(lbx.Items(i)), UCase(s)) <> 0 Then
-                lbx.SetSelected(i, True)
-                ls.Add(lbx.Items(i))
+            If blnRegex Then
+                Dim r As New System.Text.RegularExpressions.Regex(s)
+                If r.Matches(lbx.Items(i)).Count > 0 Then
+                    lbx.SetSelected(i, True)
+                    ls.Add(lbx.Items(i))
+                End If
+            Else
+                If InStr(UCase(lbx.Items(i)), UCase(s)) <> 0 Then
+                    lbx.SetSelected(i, True)
+                    ls.Add(lbx.Items(i))
+                End If
             End If
         Next
         Return ls
     End Function
-    Public Function HighlightList(lbx As ListBox, ls As List(Of String))
+    Public Sub HighlightList(lbx As ListBox, ls As List(Of String))
         lbx.SelectedItems.Clear()
         lbx.Refresh()
         lbx.SelectionMode = SelectionMode.MultiExtended
@@ -429,13 +447,13 @@ Public Module General
             Dim i = lbx.FindString(f)
             If i >= 0 Then lbx.SetSelected(i, True)
         Next
-    End Function
-    Public Function SelectDeadLinks(lbx As ListBox)
+    End Sub
+    Public Sub SelectDeadLinks(lbx As ListBox)
         HighlightList(lbx, GetDeadLinks(lbx))
-    End Function
+    End Sub
     Public Function GetDeadLinks(lbx As ListBox) As List(Of String)
         Dim ls As New List(Of String)
-        ls = SelectFromListbox(lbx, ".lnk")
+        ls = SelectFromListbox(lbx, ".lnk", False)
         lbx.SelectedItems.Clear()
         Dim deadlinks As New List(Of String)
         For Each f In ls

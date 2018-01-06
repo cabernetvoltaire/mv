@@ -30,6 +30,7 @@ Partial Class FileSystemTree
         '
         'tvFiles
         '
+        Me.tvFiles.AllowDrop = True
         Me.tvFiles.BackColor = System.Drawing.SystemColors.ControlLightLight
         Me.tvFiles.Dock = System.Windows.Forms.DockStyle.Fill
         Me.tvFiles.ImageIndex = 0

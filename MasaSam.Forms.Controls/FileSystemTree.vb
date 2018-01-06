@@ -290,7 +290,7 @@ Public Class FileSystemTree
             newSelectedFolder = value
             ClearSelectedNodes()
             If d.Parent Is Nothing Then
-                Collapse(d.FullName)
+                Collapse(d.Root.Name)
             Else
                 Collapse(d.Parent.FullName)
             End If
@@ -964,32 +964,34 @@ Public Class FileSystemTree
     End Sub
 
     Private Sub Timer_Tick(sender As Object, e As EventArgs)
-        Exit Sub
+        'Exit Sub
+        Try
+            For Each node As FileSystemNode In Me.tvFiles.Nodes(0).Nodes
 
-        For Each node As FileSystemNode In Me.tvFiles.Nodes(0).Nodes
+                ' if node is drive node
+                If (node.NodeType = FileSystemNodeType.Drive) Then
 
-            ' if node is drive node
-            If (node.NodeType = FileSystemNodeType.Drive) Then
+                    Dim drvNode As DriveNode = CType(node, DriveNode)
 
-                Dim drvNode As DriveNode = CType(node, DriveNode)
-
-                ' check if drive has become ready or changed to not-ready
-                If (drvNode.Drive.IsReady And Me.m_inactiveDrives.Contains(drvNode.Drive.Name)) Then
-                    ' when ready remove from inactive, create initial tree and raise event
-                    Me.m_inactiveDrives.Remove(drvNode.Drive.Name)
-                    CreateInitialDriveTree(drvNode)
-                    OnDriveActivated(drvNode.Drive)
-                ElseIf (drvNode.Drive.IsReady = False And Not Me.m_inactiveDrives.Contains(drvNode.Drive.Name)) Then
-                    ' when not ready add to inactive, clear content and raise event
-                    Me.m_inactiveDrives.Add(drvNode.Drive.Name)
-                    If (node.Nodes.Count > 0) Then
-                        node.Nodes.Clear()
+                    ' check if drive has become ready or changed to not-ready
+                    If (drvNode.Drive.IsReady And Me.m_inactiveDrives.Contains(drvNode.Drive.Name)) Then
+                        ' when ready remove from inactive, create initial tree and raise event
+                        Me.m_inactiveDrives.Remove(drvNode.Drive.Name)
+                        CreateInitialDriveTree(drvNode)
+                        OnDriveActivated(drvNode.Drive)
+                    ElseIf (drvNode.Drive.IsReady = False And Not Me.m_inactiveDrives.Contains(drvNode.Drive.Name)) Then
+                        ' when not ready add to inactive, clear content and raise event
+                        Me.m_inactiveDrives.Add(drvNode.Drive.Name)
+                        If (node.Nodes.Count > 0) Then
+                            node.Nodes.Clear()
+                        End If
+                        OnDriveUnactivated(drvNode.Drive)
                     End If
-                    OnDriveUnactivated(drvNode.Drive)
                 End If
-            End If
 
-        Next
+            Next
+        Catch ex As Exception
+        End Try
 
     End Sub
 
@@ -1077,7 +1079,7 @@ Public Class FileSystemTree
         End If
     End Sub
 
-    Private Sub Traverse(blnBack As Boolean)
+    Public Sub Traverse(blnBack As Boolean)
         Dim node As TreeNode
         Dim newnode As TreeNode
         node = tvFiles.SelectedNode
@@ -1117,7 +1119,9 @@ Public Class FileSystemTree
                 newnode = node.Parent
             End If
         End If
+        ClearSelectedNodes()
         tvFiles.SelectedNode = newnode
+        HighlightSelectedNodes()
     End Sub
 
     Private Sub FileSystemTree_DirectorySelected(sender As Object, e As DirectoryInfoEventArgs) Handles Me.DirectorySelected
@@ -1174,33 +1178,6 @@ Public Class FileSystemTree
         End If
         Return e
     End Function
-
-    'Private Sub tvFiles_KeyDown(sender As Object, e As KeyEventArgs) Handles tvFiles.KeyDown
-    '    'Enables traversing of the filetree
-    '    If e.KeyCode = TraverseKey Then
-    '        Traverse(False)
-    '    End If
-    '    If e.KeyCode = TraverseKeyBack Then
-    '        Traverse(True)
-    '    End If
-    '    If e.KeyCode = Keys.F2 Then
-    '        tvFiles.LabelEdit = True
-    '        Dim nd As TreeNode = tvFiles.SelectedNode
-    '        If Not (nd Is Nothing) And Not (nd.Parent Is Nothing) Then
-    '            tvFiles.SelectedNode = nd
-    '            tvFiles.LabelEdit = True
-    '            If Not nd.IsEditing Then
-    '                nd.BeginEdit()
-    '            End If
-    '        Else
-    '            MessageBox.Show("No tree node selected or selected node is a root node." &
-    '              Microsoft.VisualBasic.ControlChars.Cr &
-    '              "Editing of root nodes is not allowed.", "Invalid selection")
-    '        End If
-
-    '    End If
-    'End Sub
-
 
 
 #End Region

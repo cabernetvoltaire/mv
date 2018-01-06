@@ -4,6 +4,7 @@ Module MovieHandler
     Public Property MediaDuration As Long = lngMediaDuration
     Public Property NewPosition As Long
     Public Property FromFinish As Long = 65
+    Public Property FrameRate As Int16
     Public Sub MediaJumpToMarker()
         'Jumps to lMediaMarker unless not set, in which case, jumps to 65s before end.
         If MediaMarker <> 0 Then

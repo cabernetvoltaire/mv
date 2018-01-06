@@ -18,16 +18,7 @@ Module FileHandling
     End Sub
     Public Sub SaveButtonlist()
         Dim path As String
-        With frmMain.SaveFileDialog1
-            .DefaultExt = "msb"
-            .Filter = "Metavisua button files|*.msb|All files|*.*"
-            If .ShowDialog() = System.Windows.Forms.DialogResult.OK Then
-                path = .FileName
-            Else
-                Exit Sub
 
-            End If
-        End With
         KeyAssignmentsStore(path)
     End Sub
     ''' <summary>
@@ -42,60 +33,26 @@ Module FileHandling
         If e.Name = "My Computer" Then Exit Sub
 
         lbx.Items.Clear()
-        'flist.Clear()
+        flist.Clear()
 
-        If e.EnumerateFiles.Count = 0 Then Exit Sub
+        If e.EnumerateFiles.Count = 0 Then
+            lbx.Items.Add("If there is nothing showing here, check your filters")
+
+            Exit Sub
+        End If
         Try
-            For Each f In e.EnumerateFiles
-                Dim s As String = LCase(f.Extension)
+            FilterListBox(lbx, e, flist)
+            flist = SetPlayOrder(ChosenPlayOrder, flist)
+            FillShowbox(lbx, CurrentFilterState, flist)
+            'If lbx.Name = "lbxFiles" Then
+            '    CopyList(SetPlayOrder(ChosenPlayOrder, FileboxContents), lbx)
+            'Else
+            '    CopyList(SetPlayOrder(ChosenPlayOrder, Showlist), lbx)
+            'End If
 
-                Select Case CurrentFilterState
-                    Case FilterState.All
-
-                        lbx.Items.Add(f.FullName)
-                        'FileboxContents.Add(f.FullName)
-                    Case FilterState.NoPicVid
-
-                        If InStr(strVideoExtensions & strPicExtensions, s) <> 0 And Len(s) > 0 Then
-                        Else
-                            lbx.Items.Add(f.FullName)
-                            'FileboxContents.Add(f.FullName)
-
-                        End If
-
-                    Case FilterState.Piconly
-                        If InStr(strPicExtensions, s) <> 0 And Len(s) > 0 Then
-
-                            lbx.Items.Add(f.FullName)
-                            'FileboxContents.Add(f.FullName)
-                        Else
-                        End If
-                    Case FilterState.LinkOnly
-                        If s = ".lnk" Then
-                            lbx.Items.Add(f.FullName)
-                            'FileboxContents.Add(f.FullName)
-                        End If
-
-                    Case FilterState.Vidonly
-                        If InStr(strVideoExtensions, s) <> 0 And Len(s) > 0 Then
-                            lbx.Items.Add(f.FullName)
-                            'FileboxContents.Add(f.FullName)
-                        End If
-
-                    Case FilterState.PicVid
-                        If InStr(strVideoExtensions & strPicExtensions, s) <> 0 And Len(s) > 0 Then
-                            lbx.Items.Add(f.FullName)
-                            'FileboxContents.Add(f.FullName)
-                        End If
-                End Select
-
-            Next
-            If lbx.Name = "lbxFiles" Then
-                CopyList(FileboxContents, lbx)
-            Else
-                CopyList(Showlist, lbx)
-            End If
-
+            '            frmMain.UpdatePlayOrder(Showlist.Count > 0)
+            '  frmMain.UpdatePlayOrder()
+            frmMain.ReportFilterandOrder()
             lbx.Tag = e
 
             If PFocus = CtrlFocus.ShowList Then
@@ -119,12 +76,54 @@ Module FileHandling
 
 
     End Sub
+
+    Private Function FilterListBox(lbx As ListBox, e As DirectoryInfo, ByVal lst As List(Of String))
+        For Each f In e.EnumerateFiles
+            Dim s As String = LCase(f.Extension)
+
+            Select Case CurrentFilterState
+                Case FilterState.All
+
+                    lst.Add(f.FullName)
+                Case FilterState.NoPicVid
+
+                    If InStr(strVideoExtensions & strPicExtensions, s) <> 0 And Len(s) > 0 Then
+                    Else
+                        lst.Add(f.FullName)
+
+                    End If
+
+                Case FilterState.Piconly
+                    If InStr(strPicExtensions, s) <> 0 And Len(s) > 0 Then
+
+                        lst.Add(f.FullName)
+                    Else
+                    End If
+                Case FilterState.LinkOnly
+                    If s = ".lnk" Then
+                        lst.Add(f.FullName)
+                    End If
+
+                Case FilterState.Vidonly
+                    If InStr(strVideoExtensions, s) <> 0 And Len(s) > 0 Then
+                        lst.Add(f.FullName)
+                    End If
+
+                Case FilterState.PicVid
+                    If InStr(strVideoExtensions & strPicExtensions, s) <> 0 And Len(s) > 0 Then
+                        lst.Add(f.FullName)
+                    End If
+            End Select
+
+        Next
+    End Function
+
     Public Sub DisposeLists(list As Object)
         For Each item In list
             item.Dispose()
         Next
     End Sub
-    Public Function FilePump(strFileDest As String, lbx1 As ListBox)
+    Public Sub FilePump(strFileDest As String, lbx1 As ListBox)
 
         FilePumpList.Add(strFileDest)
         If FilePumpList.Count = 5 Then
@@ -132,7 +131,7 @@ Module FileHandling
             MoveFiles(FilePumpList, lbx1)
             FilePumpList.Clear()
         End If
-    End Function
+    End Sub
 
     ''' <summary>
     ''' Actually saves the store list
@@ -217,17 +216,18 @@ Module FileHandling
     End Function
     Public Sub MoveFolder(strDir As String, strDest As String, tvw As MasaSam.Forms.Controls.FileSystemTree, blnOverride As Boolean)
         If strDest Is Nothing Then Exit Sub
-
         If Not blnOverride Then
             If MsgBox("This will move current folder to " & strDest & ". Are you sure?", MsgBoxStyle.OkCancel) <> MsgBoxResult.Ok Then Exit Sub
         End If
         Try
             With My.Computer.FileSystem
-                Dim s As String = .GetDirectoryInfo(strDir).Name
+                Dim dir = New DirectoryInfo(strDir)
+
+                Dim s As String = dir.Name
                 .MoveDirectory(strDir, strDest & "\" & s, FileIO.UIOption.OnlyErrorDialogs)
                 UpdateButton(strDir, strDest & "\" & s) 'todo doesnt handle sub-tree
+                tvw.Traverse(False)
                 tvw.RemoveNode(strDir)
-
             End With
 
 
@@ -410,6 +410,7 @@ Module FileHandling
         s = strDest & "\" & s
         Try
             IO.Directory.CreateDirectory(s)
+            frmMain.tvMain2.RefreshTree(strDest)
         Catch ex As IO.DirectoryNotFoundException
         End Try
 
@@ -440,6 +441,9 @@ Module FileHandling
         frmMain.Cursor = Cursors.Default
 
     End Sub
+    Public Sub AddSingleFileToList(ByVal list As List(Of String), strPath As String)
+        list.Add(strPath)
+    End Sub
     Private Sub PreFindAllFiles(blnRecurse As Boolean, d As DirectoryInfo)
         If blnChooseOne Then
             Dim l As Long = FolderCount(d, 0, blnRecurse)
@@ -469,7 +473,6 @@ Module FileHandling
     ''' </summary>
     ''' <param name="d"></param>
     ''' <param name="list"></param>
-    ''' <param name="DontInclude"></param>
     ''' <param name="extensions"></param>
     ''' <param name="blnRemove"></param>
     ''' <param name="strSearch"></param>
@@ -477,7 +480,9 @@ Module FileHandling
     Public Sub FindAllFilesBelow(d As DirectoryInfo, list As List(Of String), extensions As String, blnRemove As Boolean, strSearch As String, blnRecurse As Boolean, blnOneOnly As Boolean)
 
 
+        ProgressBarOn(1000)
         For Each file In d.EnumerateFiles
+            ProgressIncrement(1)
             Try
                 If InStr(LCase(extensions), LCase("NOT")) <> 0 Then
                     If InStr(extensions, LCase(file.Extension)) = 0 And file.Extension <> "" Then
@@ -652,7 +657,7 @@ Module FileHandling
     ''' <param name="blnRecurse"></param>
     Public Sub HarvestFolder(d As DirectoryInfo, target As DirectoryInfo, blnRecurse As Boolean)
         Dim i
-        i = InputBox("Number of files for subfolder to be harvested?")
+        i = InputBox("Harvest folders with no more than how many files in?")
         If i = "" Then Exit Sub
 
         Dim s As New List(Of String) '= Nothing

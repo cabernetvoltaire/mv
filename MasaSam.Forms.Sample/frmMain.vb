@@ -1,17 +1,36 @@
 ﻿Option Explicit On
 Imports System.ComponentModel
-Imports System.Reflection
+Imports System.Drawing.Color
 Imports System.IO
 Imports AxWMPLib
 Imports MasaSam.Forms.Controls
 Public Class frmMain
-
+    Public Filterstates As String() = {"All", "Picture only", "Videos only", "Pictures and videos", "Links only", "Not pictures or videos"}
+    Public FilterColours As New List(Of Color)
     Public defaultcolour As Color = Color.Aqua
     Public movecolour As Color = Color.Orange
-    Public Function SetControlColours(blnMove As Boolean)
+
+    Private Sub InitialiseColours()
+        FilterColours.Add(Color.MintCream)
+        FilterColours.Add(Color.LightCyan)
+        FilterColours.Add(Color.LightPink)
+        FilterColours.Add(Color.LightSeaGreen)
+        FilterColours.Add(Color.LightBlue)
+        FilterColours.Add(Color.PaleTurquoise)
+        'Dim m As New colors.RGB
+        'Dim h As New colors.HSV
+        'For i = 0 To 5
+        '    h.H = i * 0.2
+        '    h.V = 1
+        '    h.S = 1
+        '    m = colors.HSVToRGB(h)
+        '    FilterColours.Add(Color.FromArgb(m.R, m.G, m.B))
+        'Next
+    End Sub
+    Public Sub SetControlColours(blnMove As Boolean)
         Dim d As Color = defaultcolour
         If blnMove Then d = movecolour
-        Dim s As Color = FilterColours(CurrentFilterState)
+        Dim s As Color = FilterColours.Item(CurrentFilterState)
         tvMain2.BackColor = s
         lbxFiles.BackColor = s
         lbxShowList.BackColor = s
@@ -19,7 +38,7 @@ Public Class frmMain
         If PFocus = CtrlFocus.Tree Then tvMain2.BackColor = d
         If PFocus = CtrlFocus.ShowList Then lbxShowList.BackColor = d
 
-    End Function
+    End Sub
     Private Sub MovietoPic(img As Image)
         currentWMP.Visible = False
         currentWMP.URL = ""
@@ -44,7 +63,7 @@ Public Class frmMain
 
     Private Sub HandleMovie(blnRandom As Boolean)
         'If it is to jump to a random point, do not show first.
-        If blnRandomStartAlways Then
+        If tmrJumpVideo.Enabled Then
             tbStartpoint.Text = "START:RANDOM"
             currentWMP.Visible = False
             '   While tmrJumpVideo.Enabled
@@ -61,7 +80,7 @@ Public Class frmMain
         ' AxVLCPlugin21.MRL = "file:///" & strCurrentFilePath & ""
         'AxVLCPlugin21.BringToFront()
         'AxVLCPlugin21.playlist.togglePause()
-        If PlaybackSpeed <> 1 Then currentWMP.settings.rate = PlaybackSpeed
+        '  If PlaybackSpeed <> 1 Then currentWMP.settings.rate = PlaybackSpeed
         currentPicBox.Visible = False
 
         If tmrSlideShow.Enabled Then
@@ -150,8 +169,10 @@ Public Class frmMain
                 If Not blnConfirm OrElse m = MsgBoxResult.Yes Then
                     Dim f As New DirectoryInfo(CurrentFolderPath)
                     .DeleteDirectory(CurrentFolderPath, FileIO.UIOption.OnlyErrorDialogs, FileIO.RecycleOption.SendToRecycleBin)
-                    'tvw.RemoveNode(CurrentFolderPath)
-                    tvw.RefreshTree(f.Parent.FullName)
+
+                    tvw.Traverse(False)
+                    tvw.RemoveNode(f.FullName)
+                    ' tvw.RefreshTree(f.Parent.FullName)
                 End If
 
             ElseIf m = MsgBoxResult.No Or m = MsgBoxResult.Cancel Then
@@ -162,14 +183,25 @@ Public Class frmMain
     End Sub
 
 
-    Private Sub UpdatePlayOrder()
-        tbRandom.Text = "ORDER:" & UCase(strPlayOrder(ChosenPlayOrder))
-        Showlist = SetPlayOrder(ChosenPlayOrder, Showlist)
-        lbxShowList.Items.Clear()
-        FillShowbox(lbxShowList, CurrentFilterState, Showlist)
-        lbxFiles.Items.Clear()
-        FileboxContents = SetPlayOrder(ChosenPlayOrder, FileboxContents)
-        FillShowbox(lbxFiles, CurrentFilterState, FileboxContents)
+    Public Sub UpdatePlayOrder(blnShowBoxShown As Boolean)
+        If blnShowBoxShown Then
+
+            tbRandom.Text = "ORDER:" & UCase(strPlayOrder(ChosenPlayOrder))
+            Showlist = SetPlayOrder(ChosenPlayOrder, Showlist)
+            lbxShowList.Items.Clear()
+            FillShowbox(lbxShowList, CurrentFilterState, Showlist)
+        End If
+        '        lbxFiles.Items.Clear()
+        'FileboxContents = SetPlayOrder(ChosenPlayOrder, FileboxContents)
+        Dim e = New DirectoryInfo(CurrentFolderPath)
+        FillListbox(lbxFiles, e, FileboxContents, False)
+        '       FillShowbox(lbxFiles, CurrentFilterState, FileboxContents)
+        ReportFilterandOrder()
+    End Sub
+
+    Public Sub ReportFilterandOrder()
+        cbxOrder.SelectedIndex = ChosenPlayOrder
+        cbxFilter.SelectedIndex = CurrentFilterState
     End Sub
 
 
@@ -190,8 +222,8 @@ Public Class frmMain
 
         If e.KeyCode = KeyToggleSpeed Then
             If blnPlaying Then
-                PlaybackSpeed = 1
-                currentWMP.settings.rate = PlaybackSpeed
+
+                currentWMP.settings.rate = 1
                 currentWMP.Ctlcontrols.play()
                 tmrSlowMo.Enabled = False
             Else
@@ -202,13 +234,13 @@ Public Class frmMain
             '        currentWMP.settings.rate = PlaybackSpeed
 
             currentWMP.Ctlcontrols.pause()
-            tmrSlowMo.Interval = 1000 / ((PlaybackSpeed) * 30)
+            tmrSlowMo.Interval = 1000 / (PlaybackSpeed)
             tmrSlowMo.Enabled = True
 
         End If
         'Report
         blnSpeedRestart = True
-        tbSpeed.Text = "SPEED (" & PlaybackSpeed * 100 & "%)"
+        ' tbSpeed.Text = "SPEED (" & PlaybackSpeed * 100 & "%)"
         e.Handled = True
         Return e
     End Function
@@ -268,9 +300,9 @@ Public Class frmMain
         blnFullScreen = Not blnFullScreen
         tmrPicLoad.Enabled = True
     End Sub
-    Private Function SplitterPlace(i As Decimal)
+    Private Sub SplitterPlace(i As Decimal)
         ctrMainFrame.SplitterDistance = Me.Width * i
-    End Function
+    End Sub
     Private Sub ToggleButtons()
         Buttons_Load()
         blnButtonsLoaded = Not blnButtonsLoaded
@@ -304,7 +336,7 @@ Public Class frmMain
         If lbx.SelectedIndex = 0 And Not blnForward Then
             lbx.SelectedIndex = count - 1
         Else
-            If blnRandomAdvance AndAlso lbx.Items.Count > 0 Then
+            If blnRandomAdvance(PFocus) AndAlso lbx.Items.Count > 0 Then
                 Dim i As Int32
                 i = Int(Rnd() * (count))
                 While FBCShown(i)
@@ -434,7 +466,7 @@ Public Class frmMain
             Case KeyRandomize
                 'Cycle through play orders
                 ChosenPlayOrder = (ChosenPlayOrder + 1) Mod (PlayOrder.Type + 1)
-                UpdatePlayOrder()
+                UpdatePlayOrder(Showlist.Count > 0)
 
             Case KeyNextFile, KeyPreviousFile, LKeyNextFile, LKeyPreviousFile
 
@@ -483,10 +515,9 @@ Public Class frmMain
             Case KeyToggleSpeed
                 With currentWMP
                     If .URL <> "" Then
-                        If .playState = WMPLib.WMPPlayState.wmppsPaused Or PlaybackSpeed <> 1 Then
-                            PlaybackSpeed = 1
+                        If .playState = WMPLib.WMPPlayState.wmppsPaused Then
                             tmrSlowMo.Enabled = False
-                            .settings.rate = PlaybackSpeed
+                            .settings.rate = 1
                             .Ctlcontrols.play()
                         Else
                             .Ctlcontrols.pause()
@@ -495,7 +526,7 @@ Public Class frmMain
                         tmrSlideShow.Enabled = Not tmrSlideShow.Enabled
                     End If
                     blnSpeedRestart = True
-                    tbSpeed.Text = "SPEED (" & PlaybackSpeed * 100 & "%)"
+                    '  tbSpeed.Text = "SPEED (" & PlaybackSpeed * 100 & "%)"
                 End With
             Case KeySpeed1, KeySpeed2, KeySpeed3
                 e = SpeedChange(e)
@@ -504,7 +535,7 @@ Public Class frmMain
                 SetFilterState()
                 e.Handled = True
             Case KeySelect
-                SelectSubList()
+                SelectSubList(False)
 
             Case KeyFullscreen
                 If ShiftDown Then
@@ -559,9 +590,10 @@ Public Class frmMain
         'currentWMP.= blnLoopPlay
     End Sub
     Private Sub SetFilterState()
-        ComboBox1.Select(CurrentFilterState, 1)
+        cbxFilter.Select(CurrentFilterState, 1)
         'MsgBox(CurrentFilterState.ToString)
-        FillListbox(lbxFiles, New DirectoryInfo(CurrentFolderPath), FileboxContents, blnChooseRandomFile)
+        'FillListbox(lbxFiles, New DirectoryInfo(CurrentFolderPath), FileboxContents, blnChooseRandomFile)
+        UpdatePlayOrder(Showlist.Count > 0)
         tbFilter.Text = UCase(Filterstates(CurrentFilterState))
         SetControlColours(blnMoveMode)
     End Sub
@@ -697,6 +729,7 @@ Public Class frmMain
     End Sub
 
     Private Sub GlobalInitialise()
+        '  InitialiseColours()
         CollapseShowlist(True)
         PreferencesGet()
         Randomize()
@@ -710,15 +743,15 @@ Public Class frmMain
         currentWMP.uiMode = "FULL"
         currentWMP.Dock = DockStyle.Fill
         currentPicBox = PictureBox1
-        ComboBox1.Items.Clear()
+        cbxFilter.Items.Clear()
 
         For i = 0 To Filterstates.Length - 1
-            ComboBox1.Items.Add(Filterstates(i))
+            cbxFilter.Items.Add(Filterstates(i))
         Next
-        ComboBox2.Items.Clear()
+        cbxOrder.Items.Clear()
 
         For i = 0 To strPlayOrder.Length - 1
-            ComboBox2.Items.Add(strPlayOrder(i))
+            cbxOrder.Items.Add(strPlayOrder(i))
         Next
         'Exit Sub
         Try
@@ -728,9 +761,11 @@ Public Class frmMain
             End If
 
         Catch ex As FileNotFoundException
-
+            ctrPicAndButtons.Panel2Collapsed = True
             Exit Try
         Catch ex As DirectoryNotFoundException
+            ctrPicAndButtons.Panel2Collapsed = True
+
             Exit Try
         End Try
         Dim c As Control
@@ -873,10 +908,10 @@ Public Class frmMain
         tmrSlideShow.Enabled = Not tmrSlideShow.Enabled
         If tmrSlideShow.Enabled = False Then blnRestartSlideShowFlag = False
     End Sub
-    Private Sub ToolStripComboBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBox3.SelectedIndexChanged
+    Private Sub ToolStripComboBox1_SelectedIndexChanged(sender As Object, e As EventArgs)
         Dim i As Integer
-        i = ComboBox3.SelectedIndex
-        ssspeed = CInt(ComboBox3.Items(i))
+        i = cbxSpeeds.SelectedIndex
+        ssspeed = CInt(cbxSpeeds.Items(i))
         tmrSlideShow.Interval = ssspeed
 
     End Sub
@@ -945,31 +980,6 @@ Public Class frmMain
         Next
         Return Newlist
     End Function
-
-    Private Sub ToolStripTextBox1_Click(sender As Object, e As EventArgs)
-
-    End Sub
-
-    Private Sub ToolStripTextBox1_LostFocus(sender As Object, e As EventArgs)
-        'Dim str = ToolStripTextBox1.Text 'TODO fix this
-        'If str = "" Then
-        '    Showlist = Sublist
-        'Else
-        '    Sublist = Showlist
-        '    Showlist = StringList(Showlist, ToolStripTextBox1.Text)
-        'End If
-
-        'Showlist = SetPlayOrder(0, Showlist)
-        'FillShowbox(lbxShowList, CurrentFilterState, Showlist)
-
-    End Sub
-
-    Private Sub tsbTestShow_Click(sender As Object, e As EventArgs)
-        'Test.Show()
-    End Sub
-
-
-
     Private Sub SaveListToolStripMenuItem_Click(sender As Object, e As EventArgs)
         SaveShowlist()
     End Sub
@@ -980,15 +990,15 @@ Public Class frmMain
     End Sub
 
     Private Sub IncludingSubsetsToolStripMenuItem_Click(sender As Object, e As EventArgs)
-        AddMovies(True)
+        AddFiles(True)
     End Sub
 
     Private Sub CurrentOnlyToolStripMenuItem1_Click(sender As Object, e As EventArgs)
-        AddMovies(False)
+        AddFiles(False)
     End Sub
 
     Private Sub CurrentOnlyToolStripMenuItem_Click(sender As Object, e As EventArgs)
-        Addpics(False)
+        AddFiles(False)
     End Sub
 
 
@@ -1049,11 +1059,11 @@ Public Class frmMain
     End Sub
 
     Private Sub CurrentOnlyToolStripMenuItem3_Click(sender As Object, e As EventArgs)
-        AddPicVids(False)
+        AddFiles(False)
     End Sub
 
     Private Sub AllSubfoldersToolStripMenuItem1_Click(sender As Object, e As EventArgs)
-        AddPicVids(True)
+        AddFiles(True)
     End Sub
 
     Private Sub AddPicVids(blnRecurse As Boolean)
@@ -1083,27 +1093,21 @@ Public Class frmMain
         ChangeFolder(e.Directory.FullName, True)
 
         tmrUpdateFolderSelection.Enabled = False
-        'If e.Directory.FullName <> CurrentFolderPath Then
         tmrUpdateFolderSelection.Interval = 200
         tmrUpdateFolderSelection.Enabled = True
 
-        'End If
     End Sub
-    'Private Sub tvMain2_DriveSelected(sender As Object, e As DriveInfoEventArgs) Handles tvMain2.DriveSelected
-    '    ChangeFolder(e.Drive.Name, True)
 
-    '    tmrUpdateFolderSelection.Enabled = False
-    '    'If e.Directory.FullName <> CurrentFolderPath Then
-    '    tmrUpdateFolderSelection.Interval = 75
-    '    tmrUpdateFolderSelection.Enabled = True
-
-    '    'End If
-    'End Sub
 
     Private Sub tvMain2_KeyDown(sender As Object, e As KeyEventArgs) Handles tvMain2.KeyDown
         Select Case e.KeyCode
-            Case Keys.Down, Keys.Left, Keys.Right, Keys.Up, tvMain2.TraverseKey, tvMain2.TraverseKeyBack
+            Case Keys.Down, Keys.Left, Keys.Right, Keys.Up
+
+            Case tvMain2.TraverseKey, tvMain2.TraverseKeyBack
+                tvMain2.Traverse(e.KeyCode = tvMain2.TraverseKeyBack)
+
                 'MsgBox("Pressed")
+                e.Handled = True
             Case Else
                 If PFocus = CtrlFocus.Tree Then e.Handled = True
         End Select
@@ -1233,11 +1237,17 @@ Public Class frmMain
         Dim i As Integer = Val(button.Name(3)) - 1
 
         Dim m As New FolderSelect
+
         m.Left = button.Left - m.Width / 2
         m.Top = button.Top - m.Height + 50
-        m.Folder = strVisibleButtons(i)
+        m.ButtonNumber = i
+        m.Alpha = iCurrentAlpha
         m.Show()
-        ' m.fst1.Expand(m.Folder)
+        If strVisibleButtons(i) = "" Then
+            m.Folder = CurrentFolderPath
+        Else
+            m.Folder = strVisibleButtons(i)
+        End If
     End Sub
 
     Private Sub ButtonListToolStripMenuItem_Click(sender As Object, e As EventArgs)
@@ -1281,7 +1291,7 @@ Public Class frmMain
         tbLastFile.Text = strCurrentFilePath
         tbRandom.Text = "ORDER:" & UCase(strPlayOrder(ChosenPlayOrder))
         tbShowfile.Text = "SHOWFILE: " & LastShowList
-        tbSpeed.Text = tbSpeed.Text = "SPEED (" & PlaybackSpeed * 100 & "%)"
+        tbSpeed.Text = tbSpeed.Text = "SPEED (" & PlaybackSpeed & "fps)"
         tbButton.Text = "BUTTONFILE: " & strButtonFile
         tbZoom.Text = iZoomFactor
         If blnRandomStartPoint Then
@@ -1293,7 +1303,7 @@ Public Class frmMain
     End Sub
 
     Private Sub ToolStripButton7_Click_1(sender As Object, e As EventArgs)
-        SelectSubList()
+        SelectSubList(False)
     End Sub
     Private Function Subdividelist(list As List(Of String), iGroups As Int16)
         'On the current sort parameter
@@ -1327,29 +1337,33 @@ Public Class frmMain
 
     End Function
 
-    Private Function SelectSubList() As String
-
-        Dim s As String = InputBox("Enter selection string")
-        If s = "" Then Exit Function
-        If PFocus = CtrlFocus.Tree Then
-            ControlSetFocus(lbxFiles)
+    Private Function SelectSubList(blnRegex As Boolean) As String
+        Dim s As String
+        If blnRegex Then
+            s = InputBox("Enter regex search string")
+        Else
+            s = InputBox("Enter selection string")
         End If
-        If PFocus = CtrlFocus.Files Then
-            SelectFromListbox(lbxFiles, s)
-        ElseIf PFocus = CtrlFocus.ShowList Then
-            SelectFromListbox(lbxShowList, s)
-
+        If s = "" Then
+            Return s
             Exit Function
-            If lbxShowList.Items.Count = 0 Then
-                CollapseShowlist(False)
-                Showlist = MakeSubList(FileboxContents, s)
-            Else
-                Oldlist = Showlist
-                lbxShowList.Items.Clear()
-                Showlist = MakeSubList(Showlist, s)
-            End If
-            FillShowbox(lbxShowList, CurrentFilterState, Showlist)
         End If
+        If PFocus = CtrlFocus.Files Or PFocus = CtrlFocus.Tree Then
+            SelectFromListbox(lbxFiles, s, blnRegex)
+        ElseIf PFocus = CtrlFocus.ShowList Then
+            SelectFromListbox(lbxShowList, s, blnRegex)
+            'Return s
+            'Exit Function
+        End If
+        If lbxShowList.Items.Count = 0 Then
+            CollapseShowlist(False)
+            Showlist = MakeSubList(FileboxContents, s)
+        Else
+            Oldlist = Showlist
+            lbxShowList.Items.Clear()
+            Showlist = MakeSubList(Showlist, s)
+        End If
+        FillShowbox(lbxShowList, CurrentFilterState, Showlist)
         lastselection = s
 
         CancelDisplay()
@@ -1416,7 +1430,9 @@ Public Class frmMain
 
 
     Private Sub AddCurrentAndSubfoldersToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AddCurrentAndSubfoldersToolStripMenuItem.Click
+        ProgressBarOn(1000)
         AddCurrentType(True)
+        ProgressBarOff()
     End Sub
     Private Sub AddCurrentFileListToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AddCurrentFileListToolStripMenuItem.Click
         AddCurrentType(False)
@@ -1424,13 +1440,6 @@ Public Class frmMain
 
 
 
-    Private Sub DuplicatesToolStripMenuItem_Click(sender As Object, e As EventArgs)
-
-        ' With Duplicates2
-        '.Flist = Showlist
-        '    .Show()
-        'End With
-    End Sub
 
     Private Sub lbxShowList_TextChanged(sender As Object, e As EventArgs) Handles lbxShowList.TextChanged
         If Oldlist.Count <> 0 Then
@@ -1444,16 +1453,12 @@ Public Class frmMain
     End Sub
 
 
-    Private Sub ToolStripComboBox2_Click(sender As Object, e As EventArgs)
-
-    End Sub
 
     Private Sub ComboBox2_SelectedIndexChanged(sender As Object, e As EventArgs)
-        ChosenPlayOrder = ComboBox2.SelectedIndex
-        UpdatePlayOrder()
+        ChosenPlayOrder = cbxOrder.SelectedIndex
+        UpdatePlayOrder(Showlist.Count > 0)
     End Sub
     Private Sub LoadListToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles LoadListToolStripMenuItem1.Click
-        'LoadFiles.RunWorkerAsync()
         LoadShowList()
 
     End Sub
@@ -1479,16 +1484,15 @@ Public Class frmMain
 
 
     Private Sub frmMain_Load(sender As Object, e As EventArgs) Handles Me.Load
+        InitialiseColours()
+
         For i = 0 To 5
-            ComboBox2.Items.Add(strPlayOrder(i))
+            cbxOrder.Items.Add(strPlayOrder(i))
         Next
         ConstructMenuShortcuts()
         ConstructMenutooltips()
     End Sub
 
-    Private Sub tvMain2_DragLeave(sender As Object, e As EventArgs) Handles tvMain2.DragLeave
-
-    End Sub
 
 
 
@@ -1517,10 +1521,7 @@ Public Class frmMain
         tmrUpdateFolderSelection.Enabled = False
     End Sub
 
-    Private Sub tmrListbox_Tick(sender As Object, e As EventArgs) Handles tmrListbox.Tick
-        tmrListbox.Enabled = False
-        FillListbox(lbxFiles, New DirectoryInfo(CurrentFolderPath), FileboxContents, blnChooseRandomFile)
-    End Sub
+
     Private Sub tmrSlowMo_Tick(sender As Object, e As EventArgs) Handles tmrSlowMo.Tick
         MediaAdvance(currentWMP, 1)
     End Sub
@@ -1585,7 +1586,7 @@ Public Class frmMain
 
 
     Private Sub ComboBox1_SelectedIndexChanged(sender As Object, e As EventArgs)
-        CurrentFilterState = ComboBox1.SelectedIndex
+        CurrentFilterState = cbxFilter.SelectedIndex
         SetFilterState()
 
     End Sub
@@ -1601,7 +1602,9 @@ Public Class frmMain
     End Sub
 
     Private Sub BundleFiles(lbx1 As ListBox, strFolder As String)
-        SelectSubList()
+        If lbx1.SelectedItems.Count <= 1 Then
+            SelectSubList(False)
+        End If
         MoveFiles(ListfromListbox(lbx1), CurrentFolderPath, lbx1)
     End Sub
 
@@ -1632,25 +1635,25 @@ Public Class frmMain
     End Sub
 
     Private Sub lbxFiles_MouseHover(sender As Object, e As EventArgs) Handles lbxFiles.MouseHover
-        MouseHoverInfo(lbxFiles, ToolTip1)
+        'MouseHoverInfo(lbxFiles, ToolTip1)
     End Sub
 
     Private Sub tmrAutoTrail_Tick(sender As Object, e As EventArgs) Handles tmrAutoTrail.Tick
         'Change the case statements to weight the speeds differently.
         'Should probably be made programmable.
         Select Case Int(Rnd() * 10) + 1
-            Case 1, 2
+            Case 1
                 'Very Slow
                 SpeedChange(New KeyEventArgs(KeySpeed1))
-                tmrAutoTrail.Interval = Int(Rnd() * 3) * 1000 + 1000
-            Case 3, 4, 5
+                tmrAutoTrail.Interval = Int(Rnd() * 1) * 1000 + 1000
+            Case 4, 5
                 'Slow
                 SpeedChange(New KeyEventArgs(KeySpeed2))
-                tmrAutoTrail.Interval = Int(Rnd() * 4) * 1000 + 1000
-            Case 6, 7, 8
+                tmrAutoTrail.Interval = Int(Rnd() * 2) * 1000 + 1000
+            Case 2, 3, 6, 7, 8
                 'slightly slow
                 SpeedChange(New KeyEventArgs(KeySpeed3))
-                tmrAutoTrail.Interval = Int(Rnd() * 3) * 1000 + 1000
+                tmrAutoTrail.Interval = Int(Rnd() * 5) * 1000 + 1000
 
             Case 9, 10
                 'Normal
@@ -1658,13 +1661,13 @@ Public Class frmMain
                 tmrAutoTrail.Interval = Int(Rnd() * 2) * 1000 + 750
         End Select
 
-        If Int(Rnd() * 49) + 1 = 1 Then
+        If Int(Rnd() * 7) + 1 = 1 Then
             '    To change the file. 1604
             HandleKeys(sender, New KeyEventArgs(KeyNextFile)) 'Supposedly changes the file, but not sure it works, 1604
 
 
         End If
-
+        ' tmrAutoTrail.Interval = tmrAutoTrail.Interval / MediaDuration * 100
 
         HandleKeys(sender, New KeyEventArgs(KeyJumpAutoT)) 'This actually does the main job
 
@@ -1679,7 +1682,7 @@ Public Class frmMain
     End Sub
 
     Private Sub tsbToggleRandomAdvance_Click(sender As Object, e As EventArgs)
-        blnRandomAdvance = Not blnRandomAdvance
+        blnRandomAdvance(PFocus) = Not blnRandomAdvance(PFocus)
     End Sub
 
 
@@ -1691,7 +1694,7 @@ Public Class frmMain
         LoadListToolStripMenuItem1.ShortcutKeys = prefixkeys + Keys.L
         SaveListToolStripMenuItem1.ShortcutKeys = prefixkeys + Keys.S
         BundleToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.B
-
+        AddCurrentFileToListToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.F
         'Alt+
         prefixkeys = Keys.Alt
         ToggleRandomAdvanceToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.A
@@ -1798,13 +1801,13 @@ Public Class frmMain
     End Sub
 
     Private Sub ToggleRandomAdvance()
-        blnRandomAdvance = Not blnRandomAdvance
-        ToggleRandomAdvanceToolStripMenuItem.Checked = blnRandomAdvance
+        blnRandomAdvance(PFocus) = Not blnRandomAdvance(PFocus)
+        ToggleRandomAdvanceToolStripMenuItem.Checked = blnRandomAdvance(PFocus)
     End Sub
 
     Private Sub ToggleRandomStartToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ToggleRandomStartToolStripMenuItem.Click
         blnRandomStartPoint = Not blnRandomStartPoint
-        ToggleRandomStartToolStripMenuItem.Checked = blnRandomAdvance
+        ToggleRandomStartToolStripMenuItem.Checked = blnRandomAdvance(PFocus)
     End Sub
 
     Private Sub BundleToolStripMenuItem_Click_1(sender As Object, e As EventArgs) Handles BundleToolStripMenuItem.Click
@@ -1832,7 +1835,7 @@ Public Class frmMain
     Public Sub RandomFunctionsToggle(blnRandomise As Boolean)
         blnRandomStartPoint = blnRandomise
         blnRandomStartAlways = blnRandomise
-        blnRandomAdvance = blnRandomise
+        blnRandomAdvance(PFocus) = blnRandomise
         blnChooseRandomFile = blnRandomise
 
 
@@ -1849,21 +1852,10 @@ Public Class frmMain
 
     End Sub
 
-    Private Sub PicFullScreen(sender As Object, e As EventArgs) Handles PictureBox1.DoubleClick
-
-    End Sub
-
-    Private Sub frmMain_MouseWheel(sender As Object, e As MouseEventArgs) Handles Me.MouseWheel
-
-    End Sub
-
     Private Sub PictureBox1_MouseWheel(sender As Object, e As MouseEventArgs) Handles PictureBox1.MouseWheel
         PictureFunctions.Mousewheel(PictureBox1, sender, e)
     End Sub
 
-    Private Sub PictureBox1_Click(sender As Object, e As EventArgs) Handles PictureBox1.Click
-
-    End Sub
 
     Private Sub PictureBox1_MouseMove(sender As Object, e As MouseEventArgs) Handles PictureBox1.MouseMove
         picBlanker = pbxBlanker
@@ -1881,10 +1873,36 @@ Public Class frmMain
 
     End Sub
 
-    'Private Sub tmrPumpFiles_Tick(sender As Object, e As EventArgs) Handles tmrPumpFiles.Tick
-    '    If FilePumpList.Count > 0 Then
-    '        MoveFiles(FilePumpList, lbxFiles)
-    '    End If
-    'End Sub
+    Private Sub cbxFilter_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbxFilter.SelectedIndexChanged
+        CurrentFilterState = cbxFilter.SelectedIndex
+        If cbxFilter.Focused Then
+
+            SetFilterState()
+        End If
+    End Sub
+
+    Private Sub cbxOrder_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbxOrder.SelectedIndexChanged
+        ChosenPlayOrder = cbxOrder.SelectedIndex
+        If cbxOrder.Focused Then
+            UpdatePlayOrder(Showlist.Count > 0)
+        End If
+    End Sub
+
+    Private Sub PicFullScreen(sender As Object, e As EventArgs) Handles PictureBox1.DoubleClick
+
+    End Sub
+
+    Private Sub SearchToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SearchToolStripMenuItem.Click
+        SelectSubList(True)
+    End Sub
+
+    Private Sub RegexSearchToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RegexSearchToolStripMenuItem.Click
+        SelectSubList(True)
+    End Sub
+
+    Private Sub lbxFiles_MouseMove(sender As Object, e As MouseEventArgs) Handles lbxFiles.MouseMove
+        'MouseHoverInfo(lbxFiles, ToolTip1)
+    End Sub
+
 
 End Class

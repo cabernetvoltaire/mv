@@ -96,6 +96,7 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Colors.vb" />
     <Compile Include="Duplicates2.Designer.vb">
       <DependentUpon>Duplicates2.vb</DependentUpon>
     </Compile>
@@ -293,6 +294,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Untitled-1 copy1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\FileAccess_Alpha_frmMain_Icon1.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

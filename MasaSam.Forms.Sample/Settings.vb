@@ -21,7 +21,7 @@
     Public Const OrientationId As Integer = &H112
     Public blnSpeedRestart As Boolean = False
     Public iSSpeeds() As Integer = {1500, 900, 200}
-    Public iPlaybackSpeed() As Decimal = {0.25, 0.6, 0.8}
+    Public iPlaybackSpeed() As Integer = {3, 10, 20}
     Public currentWMP As New AxWMPLib.AxWindowsMediaPlayer
     Public LastPlayed As New Stack(Of String)
     Public LastFolder As New Stack(Of String)
@@ -36,7 +36,7 @@
     Public Property blnJumpToMark As Boolean = False
     Public blnRandomStartPoint = True
     Public blnRandomStartAlways As Boolean = True
-    Public blnRandomAdvance As Boolean = True
+    Public blnRandomAdvance(3) As Boolean
     Public blnLoopPlay As Boolean = True
     Public blnChooseRandomFile As Boolean = True
 
@@ -105,7 +105,7 @@
             iCurrentAlpha = .GetValue("LastAlpha", 0)
 
         End With
-        If Not IO.Directory.Exists(CurrentFolderPath) Then ChangeFolder("C:\", True)
+        If Not IO.Directory.Exists(CurrentFolderPath) Then CurrentFolderPath = "C:\"
         If Not IO.File.Exists(strCurrentFilePath) Then strCurrentFilePath = ""
         frmMain.tssMoveCopy.Text = CurrentFolderPath
         frmMain.RandomFunctionsToggle(False)

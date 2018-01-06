@@ -45,7 +45,7 @@ Public Class MediaControl
         wmp.Visible = True
         wmp.URL = strCurrentFilePath
         wmp.BringToFront()
-        If PlaybackSpeed <> 1 Then wmp.settings.rate = PlaybackSpeed
+        '   If PlaybackSpeed <> 1 Then wmp.settings.rate = PlaybackSpeed
         currentPicBox.Visible = False
 
     End Sub

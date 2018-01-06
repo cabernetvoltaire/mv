@@ -23,11 +23,11 @@ Partial Class FolderSelect
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
+        Me.fst1 = New MasaSam.Forms.Controls.FileSystemTree()
         Me.Panel1 = New System.Windows.Forms.Panel()
         Me.btnAssign = New System.Windows.Forms.Button()
         Me.TextBox1 = New System.Windows.Forms.TextBox()
         Me.Label1 = New System.Windows.Forms.Label()
-        Me.fst1 = New MasaSam.Forms.Controls.FileSystemTree()
         Me.TableLayoutPanel1.SuspendLayout()
         Me.Panel1.SuspendLayout()
         Me.SuspendLayout()
@@ -46,6 +46,19 @@ Partial Class FolderSelect
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 17.5!))
         Me.TableLayoutPanel1.Size = New System.Drawing.Size(706, 840)
         Me.TableLayoutPanel1.TabIndex = 0
+        '
+        'fst1
+        '
+        Me.fst1.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.fst1.FileExtensions = "*"
+        Me.fst1.Location = New System.Drawing.Point(6, 6)
+        Me.fst1.Margin = New System.Windows.Forms.Padding(6)
+        Me.fst1.Name = "fst1"
+        Me.fst1.RootDrive = Nothing
+        Me.fst1.SelectedFolder = Nothing
+        Me.fst1.Size = New System.Drawing.Size(694, 681)
+        Me.fst1.TabIndex = 0
+        Me.fst1.TrackDriveState = True
         '
         'Panel1
         '
@@ -82,19 +95,6 @@ Partial Class FolderSelect
         Me.Label1.Size = New System.Drawing.Size(71, 25)
         Me.Label1.TabIndex = 0
         Me.Label1.Text = "Label1"
-        '
-        'fst1
-        '
-        Me.fst1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.fst1.FileExtensions = "*"
-        Me.fst1.Location = New System.Drawing.Point(6, 6)
-        Me.fst1.Margin = New System.Windows.Forms.Padding(6)
-        Me.fst1.Name = "fst1"
-        Me.fst1.RootDrive = Nothing
-        Me.fst1.SelectedFolder = Nothing
-        Me.fst1.Size = New System.Drawing.Size(694, 681)
-        Me.fst1.TabIndex = 0
-        Me.fst1.TrackDriveState = True
         '
         'FolderSelect
         '
