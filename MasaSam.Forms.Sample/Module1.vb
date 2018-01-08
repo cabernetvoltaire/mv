@@ -110,6 +110,13 @@ Public Module General
             list.Add(m.Value)
         Next
     End Sub
+    Public Function Duplicatelist(ByVal inList As List(Of String)) As List(Of String)
+        Dim out As New List(Of String)
+        For Each i In inList
+            out.Add(i)
+        Next
+        Return out
+    End Function
     Private Sub CopyList(list As List(Of String), list2 As SortedList(Of Long, String))
         list.Clear()
         For Each m As KeyValuePair(Of Long, String) In list2

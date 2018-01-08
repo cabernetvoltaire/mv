@@ -22,7 +22,12 @@ Partial Class Thumbnails
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
+        Me.components = New System.ComponentModel.Container()
+        Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
         Me.SuspendLayout()
+        '
+        'Timer1
+        '
         '
         'Thumbnails
         '
@@ -36,4 +41,6 @@ Partial Class Thumbnails
         Me.ResumeLayout(False)
 
     End Sub
+
+    Friend WithEvents Timer1 As Timer
 End Class

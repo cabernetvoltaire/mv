@@ -249,15 +249,15 @@ Public Class FindDuplicates
     End Sub
 
     Private Sub AutoList_Click(sender As Object, e As EventArgs) Handles AutoList.Click
+
         For Each path In lbxunique.Items
             finddups(path, False)
+
         Next
 
     End Sub
 
-    Private Sub lbxDuplicates_MouseEnter(sender As Object, e As EventArgs) Handles lbxDuplicates.MouseEnter
 
-    End Sub
 
     Private Sub ToolTip1_Popup(sender As Object, e As PopupEventArgs) Handles ToolTipDups.Popup
 

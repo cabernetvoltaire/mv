@@ -443,6 +443,7 @@ Module FileHandling
     End Sub
     Public Sub AddSingleFileToList(ByVal list As List(Of String), strPath As String)
         list.Add(strPath)
+
     End Sub
     Private Sub PreFindAllFiles(blnRecurse As Boolean, d As DirectoryInfo)
         If blnChooseOne Then
@@ -480,7 +481,6 @@ Module FileHandling
     Public Sub FindAllFilesBelow(d As DirectoryInfo, list As List(Of String), extensions As String, blnRemove As Boolean, strSearch As String, blnRecurse As Boolean, blnOneOnly As Boolean)
 
 
-        ProgressBarOn(1000)
         For Each file In d.EnumerateFiles
             ProgressIncrement(1)
             Try
@@ -531,7 +531,6 @@ Module FileHandling
 
             ProgressIncrement(1)
         Next
-        ProgressBarOff()
         If blnRecurse Then
 
             For Each di In d.EnumerateDirectories

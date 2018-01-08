@@ -13,6 +13,7 @@ Public Class Thumbnails
         flp.Dock = DockStyle.Fill
         flp.BringToFront()
         flp.Visible = True
+        flp.AutoScroll = True
 
         Dim pics(flist.Count) As PictureBox
         Dim i As Int16 = 0
@@ -40,7 +41,7 @@ Public Class Thumbnails
                         .SizeMode = PictureBoxSizeMode.StretchImage
                         .Tag = f
                         AddHandler .MouseEnter, AddressOf pb_Click
-                        '.Image.Dispose()
+                        .Image.Dispose()
 
                     End With
                     'Me.Update()
@@ -50,8 +51,10 @@ Public Class Thumbnails
                 Continue For
             End Try
         Next
-
-
+        flp2 = flp
+        '  flp.Visible = False
+        '       flp2.Show()
+        '        flp.Hide()
     End Sub
     Private Sub pb_Click(sender As Object, e As EventArgs)
         Dim pb = DirectCast(sender, PictureBox)
@@ -67,13 +70,18 @@ Public Class Thumbnails
     End Function
 
     Public Function GetThumb(ByVal e As PaintEventArgs, h As Long, f As String) As Image
-        Dim myCallback As New Image.GetThumbnailImageAbort(AddressOf ThumbnailCallback)
-        Dim myBitmap As New Bitmap(f)
-        Dim ratio As Single = myBitmap.Height / myBitmap.Width
-        Dim myThumbnail As Image = myBitmap.GetThumbnailImage(h, h * ratio, myCallback, IntPtr.Zero)
-        myBitmap.Dispose()
-        Return myThumbnail
-        'e.Graphics.DrawImage(myThumbnail, 150, 75)
+        Try
+
+            Dim myCallback As New Image.GetThumbnailImageAbort(AddressOf ThumbnailCallback)
+            Dim myBitmap As New Bitmap(f)
+            Dim ratio As Single = myBitmap.Height / myBitmap.Width
+            Dim myThumbnail As Image = myBitmap.GetThumbnailImage(h, h * ratio, myCallback, IntPtr.Zero)
+            myBitmap.Dispose()
+            Return myThumbnail
+            'e.Graphics.DrawImage(myThumbnail, 150, 75)
+        Catch ex As Exception
+
+        End Try
     End Function
 
     Private p As PaintEventArgs
@@ -91,7 +99,7 @@ Public Class Thumbnails
         t = New Thread(New ThreadStart(Sub() LoadThumbnails()))
         t.IsBackground = True
         t.Start()
-
+        Timer1.Enabled = True
     End Sub
 
 
@@ -113,4 +121,15 @@ Public Class Thumbnails
             mSize = value
         End Set
     End Property
+
+    Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
+        If t.IsAlive Then
+            Exit Sub
+        ElseIf Not t.IsAlive Then
+            Me.Refresh()
+            Timer1.Enabled = False
+
+        End If
+
+    End Sub
 End Class

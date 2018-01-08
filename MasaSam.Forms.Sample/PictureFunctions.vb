@@ -3,7 +3,7 @@
     Public imgList As New List(Of Image)
     'Properties - to put and get from in registry
     Public Property iScreenstate As Byte = Screenstate.Fitted
-    Public Property lSpeedfactor As Long = 10 'Larger is slower
+    Public Property lSpeedfactor As Long = 1000 'Larger is slower
     Public Property iZoomFactor As Integer = 100
     Private ZoomJustStarted As Boolean = True
     Public mediaLoopSize As Integer = 50
@@ -278,7 +278,12 @@
 
 
         End If
-        inside.Refresh()
+        Try
+
+            inside.Refresh()
+        Catch ex As Exception
+
+        End Try
 
     End Sub
 

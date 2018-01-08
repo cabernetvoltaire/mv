@@ -39,7 +39,6 @@ Partial Class frmMain
         Me.AddCurrentAndSubfoldersToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ClearCurrentListToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SingleFilePerFolderToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.AddCurrentFileToListToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SlideshowToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.SlowToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.NormalToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -181,6 +180,7 @@ Partial Class frmMain
         Me.tmrPumpFiles = New System.Windows.Forms.Timer(Me.components)
         Me.tmrAutoTrail = New System.Windows.Forms.Timer(Me.components)
         Me.ColorDialog1 = New System.Windows.Forms.ColorDialog()
+        Me.AddCurrentFileToShowlistToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip1.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
         Me.TableLayoutPanel2.SuspendLayout()
@@ -239,7 +239,7 @@ Partial Class frmMain
         '
         Me.ButtonFilesToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.NewButtonFileStripMenuItem, Me.LoadButtonFileToolstripMenuItem, Me.SaveButtonfileasToolStripMenuItem})
         Me.ButtonFilesToolStripMenuItem.Name = "ButtonFilesToolStripMenuItem"
-        Me.ButtonFilesToolStripMenuItem.Size = New System.Drawing.Size(225, 34)
+        Me.ButtonFilesToolStripMenuItem.Size = New System.Drawing.Size(239, 34)
         Me.ButtonFilesToolStripMenuItem.Text = "&Button files"
         '
         'NewButtonFileStripMenuItem
@@ -273,7 +273,7 @@ Partial Class frmMain
         '
         Me.ShowlistFilesToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.LoadListToolStripMenuItem1, Me.SaveListToolStripMenuItem1})
         Me.ShowlistFilesToolStripMenuItem.Name = "ShowlistFilesToolStripMenuItem"
-        Me.ShowlistFilesToolStripMenuItem.Size = New System.Drawing.Size(225, 34)
+        Me.ShowlistFilesToolStripMenuItem.Size = New System.Drawing.Size(239, 34)
         Me.ShowlistFilesToolStripMenuItem.Text = "S&howlist files"
         '
         'LoadListToolStripMenuItem1
@@ -294,12 +294,12 @@ Partial Class frmMain
         '
         Me.UndoToolStripMenuItem.Name = "UndoToolStripMenuItem"
         Me.UndoToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.Z), System.Windows.Forms.Keys)
-        Me.UndoToolStripMenuItem.Size = New System.Drawing.Size(225, 34)
+        Me.UndoToolStripMenuItem.Size = New System.Drawing.Size(239, 34)
         Me.UndoToolStripMenuItem.Text = "Undo"
         '
         'ListsToolStripMenuItem
         '
-        Me.ListsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddCurrentFileListToolStripMenuItem, Me.AddCurrentAndSubfoldersToolStripMenuItem, Me.ClearCurrentListToolStripMenuItem, Me.SingleFilePerFolderToolStripMenuItem, Me.AddCurrentFileToListToolStripMenuItem})
+        Me.ListsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddCurrentFileListToolStripMenuItem, Me.AddCurrentAndSubfoldersToolStripMenuItem, Me.ClearCurrentListToolStripMenuItem, Me.SingleFilePerFolderToolStripMenuItem, Me.AddCurrentFileToShowlistToolStripMenuItem})
         Me.ListsToolStripMenuItem.Name = "ListsToolStripMenuItem"
         Me.ListsToolStripMenuItem.Size = New System.Drawing.Size(65, 34)
         Me.ListsToolStripMenuItem.Text = "&Lists"
@@ -336,12 +336,6 @@ Partial Class frmMain
             Or System.Windows.Forms.Keys.S), System.Windows.Forms.Keys)
         Me.SingleFilePerFolderToolStripMenuItem.Size = New System.Drawing.Size(486, 34)
         Me.SingleFilePerFolderToolStripMenuItem.Text = "Single file per folder"
-        '
-        'AddCurrentFileToListToolStripMenuItem
-        '
-        Me.AddCurrentFileToListToolStripMenuItem.Name = "AddCurrentFileToListToolStripMenuItem"
-        Me.AddCurrentFileToListToolStripMenuItem.Size = New System.Drawing.Size(486, 34)
-        Me.AddCurrentFileToListToolStripMenuItem.Text = "Add current file to list"
         '
         'SlideshowToolStripMenuItem1
         '
@@ -738,7 +732,7 @@ Partial Class frmMain
         '
         Me.StatusStrip1.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.StatusStrip1.ImageScalingSize = New System.Drawing.Size(28, 28)
-        Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tbFiles, Me.tbFilter, Me.tbRandom, Me.tsslPicState, Me.tbZoom, Me.tbSpeed, Me.tbStartpoint, Me.tbShowfile, Me.tbButton, Me.tbLastFile, Me.tbDate, Me.TSPB})
+        Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.TSPB, Me.tbFiles, Me.tbFilter, Me.tbRandom, Me.tsslPicState, Me.tbZoom, Me.tbSpeed, Me.tbStartpoint, Me.tbShowfile, Me.tbButton, Me.tbLastFile, Me.tbDate})
         Me.StatusStrip1.Location = New System.Drawing.Point(0, 1558)
         Me.StatusStrip1.Name = "StatusStrip1"
         Me.StatusStrip1.Size = New System.Drawing.Size(2603, 35)
@@ -805,9 +799,8 @@ Partial Class frmMain
         '
         'tbLastFile
         '
-        Me.tbLastFile.AutoSize = False
         Me.tbLastFile.Name = "tbLastFile"
-        Me.tbLastFile.Size = New System.Drawing.Size(1627, 30)
+        Me.tbLastFile.Size = New System.Drawing.Size(97, 30)
         Me.tbLastFile.Text = "LASTFILE"
         '
         'tbDate
@@ -818,7 +811,6 @@ Partial Class frmMain
         '
         'TSPB
         '
-        Me.TSPB.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
         Me.TSPB.Name = "TSPB"
         Me.TSPB.Size = New System.Drawing.Size(500, 29)
         Me.TSPB.Step = 1
@@ -1476,6 +1468,13 @@ Partial Class frmMain
         'tmrAutoTrail
         '
         '
+        'AddCurrentFileToShowlistToolStripMenuItem
+        '
+        Me.AddCurrentFileToShowlistToolStripMenuItem.Name = "AddCurrentFileToShowlistToolStripMenuItem"
+        Me.AddCurrentFileToShowlistToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.F), System.Windows.Forms.Keys)
+        Me.AddCurrentFileToShowlistToolStripMenuItem.Size = New System.Drawing.Size(486, 34)
+        Me.AddCurrentFileToShowlistToolStripMenuItem.Text = "Add current file to showlist"
+        '
         'frmMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(11.0!, 24.0!)
@@ -1699,6 +1698,6 @@ Partial Class frmMain
     Friend WithEvents SearchFunctionsToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents SearchToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents RegexSearchToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents AddCurrentFileToListToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents UndoToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents AddCurrentFileToShowlistToolStripMenuItem As ToolStripMenuItem
 End Class

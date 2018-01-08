@@ -703,8 +703,11 @@ Public Class frmMain
         FillShowbox(lbxShowList, FilterState.All, Showlist)
     End Sub
     Private Sub AddFiles(blnRecurse As Boolean)
+        ProgressBarOn(1000)
+
         AddFilesToCollection(Showlist, "", blnRecurse)
         FillShowbox(lbxShowList, CurrentFilterState, Showlist)
+        ProgressBarOff()
     End Sub
 
 
@@ -1550,11 +1553,11 @@ Public Class frmMain
     Private Shared Sub ThumbnailsStart()
         Dim t As New Thumbnails
         t.ThumbnailHeight = 125
-
         If PFocus <> CtrlFocus.ShowList Then
-            t.FileList = FileboxContents
+            t.FileList = Duplicatelist(FileboxContents)
         Else
-            t.FileList = Showlist
+            t.FileList = Duplicatelist(Showlist)
+
         End If
         t.Text = CurrentFolderPath
         t.SetBounds(0, 0, 750, 900)
@@ -1694,7 +1697,7 @@ Public Class frmMain
         LoadListToolStripMenuItem1.ShortcutKeys = prefixkeys + Keys.L
         SaveListToolStripMenuItem1.ShortcutKeys = prefixkeys + Keys.S
         BundleToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.B
-        AddCurrentFileToListToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.F
+        AddCurrentFileToShowlistToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.F
         'Alt+
         prefixkeys = Keys.Alt
         ToggleRandomAdvanceToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.A
@@ -1904,5 +1907,9 @@ Public Class frmMain
         'MouseHoverInfo(lbxFiles, ToolTip1)
     End Sub
 
-
+    Private Sub AddCurrentFileToShowlistToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AddCurrentFileToShowlistToolStripMenuItem.Click
+        AddSingleFileToList(Showlist, strCurrentFilePath)
+        FillShowbox(lbxShowList, CurrentFilterState, Showlist)
+        CollapseShowlist(False)
+    End Sub
 End Class
