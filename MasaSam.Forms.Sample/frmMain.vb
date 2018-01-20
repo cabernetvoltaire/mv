@@ -4,7 +4,9 @@ Imports System.Drawing.Color
 Imports System.IO
 Imports AxWMPLib
 Imports MasaSam.Forms.Controls
+
 Public Class frmMain
+    Public Shared ReadOnly Property MyPictures As String
     Public Filterstates As String() = {"All", "Picture only", "Videos only", "Pictures and videos", "Links only", "Not pictures or videos"}
     Public FilterColours As New List(Of Color)
     Public defaultcolour As Color = Color.Aqua
@@ -32,6 +34,7 @@ Public Class frmMain
         If blnMove Then d = movecolour
         Dim s As Color = FilterColours.Item(CurrentFilterState)
         tvMain2.BackColor = s
+        tvMain2.HighlightSelectedNodes()
         lbxFiles.BackColor = s
         lbxShowList.BackColor = s
         If PFocus = CtrlFocus.Files Then lbxFiles.BackColor = d
@@ -76,6 +79,9 @@ Public Class frmMain
         End If
 
         currentWMP.URL = strCurrentFilePath
+        'Dim f As Int16
+        'f = currentWMP.currentMedia.getItemInfo(FrameRate)
+        '  MsgBox(f)
         currentWMP.BringToFront()
         ' AxVLCPlugin21.MRL = "file:///" & strCurrentFilePath & ""
         'AxVLCPlugin21.BringToFront()
@@ -143,7 +149,10 @@ Public Class frmMain
         ProgressBarOff()
         'tbShowfile.Text = "SHOWFILE LOADED:" & path
     End Sub
-
+    Private Sub AxWindowsMediaPlayer1_MediaError(ByVal sender As Object,
+    ByVal e As _WMPOCXEvents_MediaErrorEvent) Handles MainWMP.MediaError
+        MsgBox("Error")
+    End Sub
     Public Sub CancelDisplay()
         If currentWMP.Visible Then
             currentWMP.Ctlcontrols.pause()
@@ -231,7 +240,7 @@ Public Class frmMain
             End If
 
         Else
-            '        currentWMP.settings.rate = PlaybackSpeed
+            ' currentWMP.settings.rate = PlaybackSpeed / 30
 
             currentWMP.Ctlcontrols.pause()
             tmrSlowMo.Interval = 1000 / (PlaybackSpeed)
@@ -419,7 +428,7 @@ Public Class frmMain
             If blnRandomStartPoint Then
                 NewPosition = (Rnd(1) * (currentWMP.currentMedia.duration))
             End If
-            tmrJumpVideo.Interval = 1
+            tmrJumpVideo.Interval = lngInterval
             tmrJumpVideo.Enabled = True
             tbStartpoint.Text = "START:RANDOM"
 
@@ -506,11 +515,12 @@ Public Class frmMain
             Case KeyTraverseTree, KeyTraverseTreeBack
                 'Handled by Treeview behaviour unless focus is elsewhere. 
                 'We want the traverse keys always to work. 
-                If PFocus <> CtrlFocus.Tree Then
-                    ControlSetFocus(tvMain2)
-                    tvMain2_KeyDown(sender, e)
+
+                ' If PFocus <> CtrlFocus.Tree Then
+                'ControlSetFocus(tvMain2)
+                tvMain2_KeyDown(sender, e)
                     'e.Handled = True
-                End If
+                'End If
                 'TraverseTree(tvMain2.tvFiles, e.KeyCode = KeyTraverseTree)
             Case KeyToggleSpeed
                 With currentWMP
@@ -567,7 +577,8 @@ Public Class frmMain
             Case KeyLoopToggle
                 currentWMP.settings.setMode("loop", Not currentWMP.settings.getMode("loop"))
                 e.Handled = True
-
+            Case KeyTrueSize
+                ToggleTrueSize(currentPicBox)
 
             Case KeyJumpToPoint
             Case KeyBackUndo
@@ -740,7 +751,7 @@ Public Class frmMain
         tmrLoadLastFolder.Enabled = True
 
         tmrPicLoad.Interval = lngInterval
-        tmrJumpVideo.Interval = lngInterval / 50
+        tmrJumpVideo.Interval = lngInterval
         currentWMP = MainWMP
         currentWMP.stretchToFit = True
         currentWMP.uiMode = "FULL"
@@ -813,20 +824,7 @@ Public Class frmMain
         Settings.PreferencesSave()
     End Sub
 
-    Private Sub tvMain2_DriveSelected(sender As Object, e As DriveInfoEventArgs)
-        If e.Drive.Name = "" Then Exit Sub
-        Try
-            If e.Drive.DriveFormat = "" Then Exit Sub
-        Catch ex As System.IO.IOException
-            Exit Sub
-        End Try
-        '  MsgBox(e.Node.ToolTipText)
-        Dim di = New IO.DirectoryInfo(e.Drive.Name)
-        ChangeFolder(di.FullName, True)
-        FillListbox(lbxFiles, di, Showlist, blnChooseRandomFile)
-        SetControlColours(blnMoveMode)
 
-    End Sub
     'Private Sub lbxFiles_SelectedIndexChanged(sender As Object, e As EventArgs)
     '    'Loads a new media file by triggering the PicLoad Timer
 
@@ -1093,10 +1091,11 @@ Public Class frmMain
 
 
     Private Sub tvMain2_DirectorySelected(sender As Object, e As DirectoryInfoEventArgs) Handles tvMain2.DirectorySelected
+
         ChangeFolder(e.Directory.FullName, True)
 
         tmrUpdateFolderSelection.Enabled = False
-        tmrUpdateFolderSelection.Interval = 200
+        tmrUpdateFolderSelection.Interval = lngInterval * 5
         tmrUpdateFolderSelection.Enabled = True
 
     End Sub
@@ -1193,6 +1192,7 @@ Public Class frmMain
                 If Not My.Computer.FileSystem.FileExists(strCurrentFilePath) Then Exit Select
 
                 img = GetImage(strCurrentFilePath)
+                Dim e1 As New PaintEventArgs(currentPicBox.CreateGraphics, New Rectangle(New Point(0, 0), currentPicBox.Size))
                 If img Is Nothing Then
                     tmrPicLoad.Enabled = False
                     Exit Sub
@@ -1206,6 +1206,7 @@ Public Class frmMain
                 End If
 
                 MovietoPic(img)
+
             Case Filetype.Unknown
                 tbLastFile.Text = "Unhandled file " & strCurrentFilePath
                 tmrPicLoad.Enabled = False
@@ -1359,14 +1360,14 @@ Public Class frmMain
             'Exit Function
         End If
         If lbxShowList.Items.Count = 0 Then
-            CollapseShowlist(False)
-            Showlist = MakeSubList(FileboxContents, s)
+            '            CollapseShowlist(False)
+            '           Showlist = MakeSubList(FileboxContents, s)
         Else
-            Oldlist = Showlist
-            lbxShowList.Items.Clear()
-            Showlist = MakeSubList(Showlist, s)
+            '          Oldlist = Showlist
+            '         lbxShowList.Items.Clear()
+            '        Showlist = MakeSubList(Showlist, s)
         End If
-        FillShowbox(lbxShowList, CurrentFilterState, Showlist)
+        '   FillShowbox(lbxShowList, CurrentFilterState, Showlist)
         lastselection = s
 
         CancelDisplay()
@@ -1527,6 +1528,8 @@ Public Class frmMain
 
     Private Sub tmrSlowMo_Tick(sender As Object, e As EventArgs) Handles tmrSlowMo.Tick
         MediaAdvance(currentWMP, 1)
+        'Throw New Exception
+
     End Sub
 
     Private Sub ClearCurrentListToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ClearCurrentListToolStripMenuItem.Click
@@ -1644,30 +1647,28 @@ Public Class frmMain
     Private Sub tmrAutoTrail_Tick(sender As Object, e As EventArgs) Handles tmrAutoTrail.Tick
         'Change the case statements to weight the speeds differently.
         'Should probably be made programmable.
-        Select Case Int(Rnd() * 10) + 1
-            Case 1
-                'Very Slow
-                SpeedChange(New KeyEventArgs(KeySpeed1))
-                tmrAutoTrail.Interval = Int(Rnd() * 1) * 1000 + 1000
-            Case 4, 5
-                'Slow
-                SpeedChange(New KeyEventArgs(KeySpeed2))
-                tmrAutoTrail.Interval = Int(Rnd() * 2) * 1000 + 1000
-            Case 2, 3, 6, 7, 8
-                'slightly slow
-                SpeedChange(New KeyEventArgs(KeySpeed3))
-                tmrAutoTrail.Interval = Int(Rnd() * 5) * 1000 + 1000
+        Dim x As Single = Rnd()
+        If x < 0.1 Then
+            'Very Slow
+            SpeedChange(New KeyEventArgs(KeySpeed1))
+            tmrAutoTrail.Interval = Int(Rnd() * 4 * 1000) + 1000
+        ElseIf x < 0.3 Then
+            'Slow
+            SpeedChange(New KeyEventArgs(KeySpeed2))
+            tmrAutoTrail.Interval = Int(Rnd() * 6 * 1000) + 1000
+        ElseIf x < 0.8 Then
+            'slightly slow
+            SpeedChange(New KeyEventArgs(KeySpeed3))
+            tmrAutoTrail.Interval = Int(Rnd() * 8 * 1000) + 1000
+        Else
+            'Normal
+            HandleKeys(sender, New KeyEventArgs(KeyToggleSpeed))
+            tmrAutoTrail.Interval = Int(Rnd() * 2 * 1000) + 750
+        End If
 
-            Case 9, 10
-                'Normal
-                HandleKeys(sender, New KeyEventArgs(KeyToggleSpeed))
-                tmrAutoTrail.Interval = Int(Rnd() * 2) * 1000 + 750
-        End Select
-
-        If Int(Rnd() * 7) + 1 = 1 Then
+        If Int(Rnd() * 12) + 1 = 1 Then
             '    To change the file. 1604
-            HandleKeys(sender, New KeyEventArgs(KeyNextFile)) 'Supposedly changes the file, but not sure it works, 1604
-
+            HandleKeys(sender, New KeyEventArgs(KeyNextFile))
 
         End If
         ' tmrAutoTrail.Interval = tmrAutoTrail.Interval / MediaDuration * 100
@@ -1911,5 +1912,9 @@ Public Class frmMain
         AddSingleFileToList(Showlist, strCurrentFilePath)
         FillShowbox(lbxShowList, CurrentFilterState, Showlist)
         CollapseShowlist(False)
+    End Sub
+
+    Private Sub PictureBox1_Click(sender As Object, e As EventArgs) Handles PictureBox1.Click
+        '   ExtractMetaData(PictureBox1.Image)
     End Sub
 End Class

@@ -19,22 +19,44 @@ Module MovieHandler
         Select Case e.newState
             Case WMPLib.WMPPlayState.wmppsMediaEnded
                 If Not frmMain.tmrAutoTrail.Enabled Then
-                    Dim KeyEvent As New KeyEventArgs(KeyNextFile)
-                    frmMain.HandleKeys(sender, KeyEvent)
+                    frmMain.AdvanceFile(True, True)
+                    '                   Dim KeyEvent As New KeyEventArgs(KeyNextFile)
+                    '                  frmMain.HandleKeys(sender, KeyEvent)
                 End If
 
             Case WMPLib.WMPPlayState.wmppsPlaying
+
                 MediaDuration = currentWMP.currentMedia.duration
                 If blnJumpToMark Then
                     MediaJumpToMarker()
 
                 ElseIf blnRandomStartPoint Then
-                If FullScreen.Changing Then
-                Else
-                    frmMain.JumpRandom(False)
+                    If FullScreen.Changing Then
+                    Else
+                        frmMain.JumpRandom(False)
 
                     End If
                 End If
         End Select
+    End Sub
+
+    Private Sub GetAttributes(sender As Object)
+        Dim AttributeName As String = ""
+        'This routine returns each of the attributes within the Media File
+        For i As Integer = 0 To sender.currentMedia.attributeCount - 1
+            AttributeName += sender.currentMedia.getAttributeName(i) & vbCrLf
+        Next
+        MsgBox(AttributeName)
+        'The Attributes returned are:
+        ' Duration
+        ' FileType
+        ' Is_Trusted
+        ' MediaType
+        ' SourceURL
+        ' Streams
+        ' Title
+        ' WMServerVersion
+
+        AttributeName = ""
     End Sub
 End Module

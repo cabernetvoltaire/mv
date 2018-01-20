@@ -33,6 +33,7 @@ Partial Class FileSystemTree
         Me.tvFiles.AllowDrop = True
         Me.tvFiles.BackColor = System.Drawing.SystemColors.ControlLightLight
         Me.tvFiles.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.tvFiles.HideSelection = False
         Me.tvFiles.ImageIndex = 0
         Me.tvFiles.ImageList = Me.imageListIcons
         Me.tvFiles.Location = New System.Drawing.Point(0, 0)

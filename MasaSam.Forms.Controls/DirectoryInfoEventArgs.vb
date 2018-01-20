@@ -1,5 +1,4 @@
 ﻿Imports System.IO
-Imports MasaSam.Forms.Controls
 
 Public NotInheritable Class DirectoryInfoEventArgs
     Inherits EventArgs

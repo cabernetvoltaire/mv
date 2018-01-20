@@ -17,7 +17,7 @@ Module FileHandling
         strFilterExtensions(FilterState.NoPicVid) = strPicExtensions & strVideoExtensions & "NOT"
     End Sub
     Public Sub SaveButtonlist()
-        Dim path As String
+        Dim path As String = ""
 
         KeyAssignmentsStore(path)
     End Sub
@@ -222,18 +222,17 @@ Module FileHandling
         Try
             With My.Computer.FileSystem
                 Dim dir = New DirectoryInfo(strDir)
-
                 Dim s As String = dir.Name
                 .MoveDirectory(strDir, strDest & "\" & s, FileIO.UIOption.OnlyErrorDialogs)
                 UpdateButton(strDir, strDest & "\" & s) 'todo doesnt handle sub-tree
-                tvw.Traverse(False)
+                'tvw.Traverse(False)
+                'tvw.RefreshTree(dir.Parent.FullName)
+                'tvw.Addnode(strDest & "\" & s)
                 tvw.RemoveNode(strDir)
             End With
-
-
         Catch ex As Exception
             MsgBox(ex.Message)
-                End Try
+        End Try
 
     End Sub
 
@@ -266,6 +265,17 @@ Module FileHandling
             If Not blnSuppressCreate Then s = CreateNewDirectory(strDest)
         End If
         Dim file As String
+
+        file = MovingFiles(files, strDest, lbx1, s)
+        lbx1.SelectionMode = SelectionMode.One
+        FillListbox(lbx1, New DirectoryInfo(CurrentFolderPath), FileboxContents, False)
+
+        If lbx1.Items.Count <> 0 Then lbx1.SetSelected(Math.Max(Math.Min(ind, lbx1.Items.Count - 1), 0), True)
+
+    End Sub
+
+    Private Function MovingFiles(files As List(Of String), strDest As String, lbx1 As ListBox, s As String) As String
+        Dim file As String = ""
 
         For Each file In files
             Dim m As New FileInfo(file)
@@ -302,7 +312,7 @@ Module FileHandling
 
                         If Not currentPicBox.Image Is Nothing Then DisposePic(currentPicBox)
 
-                        lbx1.Items.Remove(m.FullName)
+                        '         lbx1.Items.Remove(m.FullName) 'TODO Remove this and add a refresh later. 
 
                         If strDest = "" Then
 
@@ -326,10 +336,10 @@ Module FileHandling
                 End If
             End With
         Next
-        lbx1.SelectionMode = SelectionMode.One
-        If lbx1.Items.Count <> 0 Then lbx1.SetSelected(Math.Max(Math.Min(ind, lbx1.Items.Count - 1), 0), True)
 
-    End Sub
+        Return file
+    End Function
+
     Public Sub MoveFiles(filendest As List(Of String), lbx1 As ListBox)
 
         Dim ind As Long = lbx1.SelectedIndex
@@ -413,7 +423,13 @@ Module FileHandling
             frmMain.tvMain2.RefreshTree(strDest)
         Catch ex As IO.DirectoryNotFoundException
         End Try
-
+        If MsgBox("Assign new folder to button?", MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
+            Dim i As Byte = "1"
+            While i > 8 Or i < 1
+                i = InputBox("Number?")
+            End While
+            AssignButton(i, iCurrentAlpha, 1, s, True)
+        End If
         Return s
     End Function
     Public Sub AddCurrentType(blnRecurse As Boolean)

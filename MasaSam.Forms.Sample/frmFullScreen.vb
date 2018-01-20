@@ -36,8 +36,6 @@ Public Class FullScreen
 
     Private Sub fullScreenPicBox_Click(sender As Object, e As EventArgs) Handles fullScreenPicBox.MouseClick
 
-        picBlanker = FSBlanker
-        PicClick(fullScreenPicBox)
     End Sub
 
     Private Sub fullScreenPicBox_MouseWheel(sender As Object, e As MouseEventArgs) Handles fullScreenPicBox.MouseWheel, Me.MouseWheel
@@ -59,4 +57,14 @@ Public Class FullScreen
         Me.WindowState = FormWindowState.Maximized
     End Sub
 
+    Private Sub fullScreenPicBox_MouseDown(sender As Object, e As MouseEventArgs) Handles fullScreenPicBox.MouseDown
+        Select Case e.Button
+            Case MouseButtons.XButton1, MouseButtons.XButton2
+                frmMain.AdvanceFile(e.Button = MouseButtons.XButton2, True)
+                e = Nothing
+
+            Case Else
+                PicClick(fullScreenPicBox)
+        End Select
+    End Sub
 End Class

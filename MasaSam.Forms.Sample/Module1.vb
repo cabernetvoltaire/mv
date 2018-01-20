@@ -1,7 +1,6 @@
 ﻿Option Explicit On
 Imports System.IO
-Imports System.Runtime.CompilerServices
-
+Imports System.Drawing.Imaging
 Public Module General
 
     Public btnDest() As Button = {frmMain.btn1, frmMain.btn2, frmMain.btn3, frmMain.btn4, frmMain.btn5, frmMain.btn6, frmMain.btn7, frmMain.btn8}
@@ -76,7 +75,65 @@ Public Module General
         ' Return the orientation value.
         Return DirectCast(img.GetPropertyItem(OrientationId).Value(0), ExifOrientations)
     End Function
+    Public Function PropertyItems(ByVal img As Image) As Dictionary(Of Integer, String)
 
+        For i = 0 To 320
+            PropertyItems.Add(i, img.GetPropertyItem(i).ToString)
+
+        Next
+        Return PropertyItems
+    End Function
+
+    Public Sub ExtractMetaData(theImage As Image)
+
+        ' Try
+        'Create an Image object. 
+
+        'Get the PropertyItems property from image.
+        Dim propItems As PropertyItem() = theImage.PropertyItems
+
+            'Set up the display.
+            Dim font As New Font("Arial", 10)
+            Dim blackBrush As New SolidBrush(Color.Black)
+            Dim X As Integer = 0
+            Dim Y As Integer = 0
+
+            'For each PropertyItem in the array, display the id, type, and length.
+            Dim count As Integer = 0
+            Dim propItem As PropertyItem
+            Dim des As String = ""
+
+            For Each propItem In propItems
+                des = des + vbCrLf & "Property Item " + count.ToString()
+                des = des & vbTab & "iD: 0x" & propItem.Id.ToString("x")
+                des = des & vbTab & "  type" & propItem.Type.ToString()
+                des = des & vbTab & "Length" & propItem.Len.ToString()
+
+                ' e.Graphics.DrawString("Property Item " + count.ToString(),
+                'font, blackBrush, X, Y)
+                ' Y += font.Height
+
+                ' e.Graphics.DrawString("   iD: 0x" & propItem.Id.ToString("x"),
+                'font, blackBrush, X, Y)
+                ' Y += font.Height
+
+                ' e.Graphics.DrawString("   type: " & propItem.Type.ToString(),
+                'font, blackBrush, X, Y)
+                ' Y += font.Height
+
+                ' e.Graphics.DrawString("   length: " & propItem.Len.ToString() &
+                ' " bytes", font, blackBrush, X, Y)
+                ' Y += font.Height
+
+                count += 1
+            Next propItem
+            MsgBox(des)
+        'MsgBox(PropertyItems(theImage))
+        'Catch ex As ArgumentException
+        'MessageBox.Show("There was an error. Make sure the path to the image file is valid.")
+        'End Try
+
+    End Sub
 
     Public Function TimeOperation(blnStart As Boolean) As TimeSpan
         Static StartTime As Date
@@ -242,7 +299,7 @@ Public Module General
         End If
         ReDim FBCShown(0)
         NofShown = 0
-        frmMain.CancelDisplay() 'TODO Make this an option.
+        'frmMain.CancelDisplay() 'TODO Make this an option.
         frmMain.SetControlColours(blnMoveMode)
     End Sub
 
@@ -262,7 +319,10 @@ Public Module General
     '''
     Public Sub FillShowbox(lbx As ListBox, Filter As Byte, ByVal lst As List(Of String))
         If lst.Count = 0 Then Exit Sub
-        ProgressBarOn(lst.Count)
+        If lst.Count > 1000 Then
+            ProgressBarOn(lst.Count)
+        End If
+
         If lbx.Name = "lbxShowList" Then
             frmMain.CollapseShowlist(False)
 

@@ -97,12 +97,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Colors.vb" />
-    <Compile Include="Duplicates2.Designer.vb">
-      <DependentUpon>Duplicates2.vb</DependentUpon>
-    </Compile>
-    <Compile Include="Duplicates2.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="FindDuplicates.Designer.vb">
       <DependentUpon>FindDuplicates.vb</DependentUpon>
     </Compile>
@@ -173,9 +167,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Duplicates2.resx">
-      <DependentUpon>Duplicates2.vb</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="FindDuplicates.resx">
       <DependentUpon>FindDuplicates.vb</DependentUpon>
       <SubType>Designer</SubType>

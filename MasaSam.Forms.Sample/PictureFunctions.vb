@@ -1,31 +1,54 @@
 ﻿Module PictureFunctions
 
-    Public imgList As New List(Of Image)
-    'Properties - to put and get from in registry
+#Region "Properties"
     Public Property iScreenstate As Byte = Screenstate.Fitted
-    Public Property lSpeedfactor As Long = 1000 'Larger is slower
+    Public Property lSpeedfactor As Long = 10 'Larger is slower
     Public Property iZoomFactor As Integer = 100
     Private ZoomJustStarted As Boolean = True
     Public mediaLoopSize As Integer = 50
     Public picBlanker As PictureBox
     Dim strScreenState = {"Fitted", "True Size", "Zoomed"}
 
-
-    'Enums and structures
-    Public Enum Screenstate As Byte
-        Fitted
-        TrueSize
-        Zoomed
-    End Enum
-
-
-    'Misc. globals
     Public ePicMousePoint As Point
     Public Property bImageDimensionState As Byte
     Public Property ShiftDown As Boolean
     Public Property CtrlDown As Boolean
 
+#End Region
 
+#Region "Enums and structures"
+    Public Enum Screenstate As Byte
+        Fitted
+        TrueSize
+        Zoomed
+    End Enum
+    Private Enum PicState As Byte
+        Overscan
+        Underscan
+        TooWide
+        TooTall
+
+    End Enum
+
+#End Region
+#Region "Functions"
+    Public Function GetImage(strPath As String) As Image
+        If strPath = "" Then Return Nothing
+        If InStr(strPath, ".gif") = 0 Then
+            Return LoadImage(strPath)
+
+            Exit Function 'This Causes problems if extension is .gif
+        Else
+            Try
+                Dim img As Image = Image.FromFile(strPath)
+                Return img
+            Catch ex As Exception
+                'MsgBox(ex.Message)
+                Return Nothing
+
+            End Try
+        End If
+    End Function
     Private Function ClassifyImage(lvpw As Long, lvph As Long, liw As Long, lih As Long) As Byte
         Dim s As String
         If lvpw > liw Then 'Viewport wider than pic
@@ -47,25 +70,14 @@
         End If
 
     End Function
-    Private Enum PicState As Byte
-        Overscan
-        Underscan
-        TooWide
-        TooTall
 
-    End Enum
+#End Region
+#Region "Events"
     Public Sub PicClick(pic As PictureBox)
         iScreenstate = (iScreenstate + 1) Mod 3
         DisposePic(pic)
         Dim img As Image = GetImage(strCurrentFilePath)
         PreparePic(pic, picBlanker, img)
-    End Sub
-    Public Sub DisposePic(box As PictureBox)
-
-        box.Image.Dispose()
-
-        GC.SuppressFinalize(box)
-        box.Image = Nothing
     End Sub
     Public Sub Mousewheel(pbx1 As PictureBox, sender As Object, e As MouseEventArgs)
         ePicMousePoint.X = e.X
@@ -93,69 +105,6 @@
 
     End Sub
 
-    Public Function GetImage(strPath As String) As Image
-        If strPath = "" Then Return Nothing
-        If InStr(strPath, ".gif") = 0 Then
-            Return LoadImage(strPath)
-
-            Exit Function 'This Causes problems if extension is .gif
-        Else
-            Try
-                Dim img As Image = Image.FromFile(strPath)
-                Return img
-            Catch ex As Exception
-                'MsgBox(ex.Message)
-                Return Nothing
-
-            End Try
-        End If
-    End Function
-
-    Public Sub PreparePic(pbx As PictureBox, pbxBlanker As PictureBox, img As Image)
-        If img Is Nothing Then Exit Sub
-        If pbxBlanker Is Nothing Then Exit Sub
-        If Not pbx.Image Is Nothing Then
-            pbx.Image.Dispose()
-        End If
-        pbx.Image = img
-        CentralCtrl(pbxBlanker, ZoneSize) 'insert central zone
-
-        iZoomFactor = 100 * pbx.Width / pbx.Image.Width 'How much is image zoomed currently?
-
-        'Make pic box same size as image (still within container)
-        pbx.Width = pbx.Image.Width
-        pbx.Height = pbx.Image.Height
-        'How does it exceeed the container, if at all?
-        If Not iScreenstate = Screenstate.Fitted Then
-            ' bImageDimensionState = ClassifyImage(pnlFS.Width, pnlFS.Height, pbx1.Width, pbx1.Height)
-        End If
-
-        SetState(pbx, iScreenstate)
-
-        PlacePic(pbx)
-
-    End Sub
-    Private Sub CentralCtrl(pbx As Control, proportion As Decimal)
-        Dim ctr As Control = pbx.Parent
-        With pbx
-            .Width = ctr.Width * proportion
-            .Height = ctr.Height * proportion
-            .Left = (ctr.Width - .Width) / 2
-            .Top = (ctr.Height - .Height) / 2
-
-        End With
-    End Sub
-    Public Sub MouseMove(pbx1 As PictureBox, sender As Object, e As MouseEventArgs)
-        Dim mouse As Point
-        mouse.X = e.X
-        mouse.Y = e.Y
-        If sender.Equals(pbx1) Then
-            mouse.X = mouse.X + pbx1.Left
-            mouse.Y = mouse.Y + pbx1.Top
-        End If
-        If Not ShiftDown Then MovePic(mouse, picBlanker, pbx1, pbx1.Parent)
-        '        MovePic(mouse, pbx1, pnlFS) 'Todo OPTION zoom prevents move.
-    End Sub
     Public Sub PlacePic(ByRef pbx As PictureBox)
         Dim outside As Control = pbx.Parent
 
@@ -164,43 +113,32 @@
 
     End Sub
 
-    Public Sub SetState(pbx As PictureBox, Sstate As Byte)
-        'Sets the screenstate, docking style. Changes the sizemode of pbx
-        'If iScreenstate = Sstate Then Exit Sub
-        Select Case Sstate
-            Case Screenstate.Fitted
-                pbx.Dock = DockStyle.Fill
-                pbx.SizeMode = PictureBoxSizeMode.Zoom
-            Case Screenstate.TrueSize
-                ' Exit Select
-                pbx.Dock = DockStyle.None
-                pbx.SizeMode = PictureBoxSizeMode.Normal
-                'Expand or shrink the picture box accordingly
-                pbx.Width = pbx.Image.Width
-                pbx.Height = pbx.Image.Height
-            Case Screenstate.Zoomed
-                'If zooming from fitted
-                'Resize the picture box
-                'then
-                'reset the size mode
-                'And undock
-
-                'If iScreenstate = Screenstate.Fitted Then
-                If iScreenstate <> Screenstate.Zoomed Then
-                    ' If ZoomJustStarted Then
-                    Dim x As Control = pbx.Parent
-                    pbx.Dock = DockStyle.None 'TODO It's how we prepare for this which is the problem 
-                    pbx.Width = x.Width
-                    pbx.Height = x.Height
-                End If
-                pbx.SizeMode = PictureBoxSizeMode.Zoom
-                'PlacePic(pbx)
-        End Select
-        iScreenstate = Sstate
-        frmMain.tsslPicState.Text = "Picture State:" & strScreenState(iScreenstate)
+#End Region
+#Region "Methods"
+    Public Sub MouseMove(pbx1 As PictureBox, sender As Object, e As MouseEventArgs)
+        Dim mouse As Point
+        mouse.X = e.X
+        mouse.Y = e.Y
+        If sender.Equals(pbx1) Then
+            mouse.X = mouse.X + pbx1.Left
+            mouse.Y = mouse.Y + pbx1.Top
+        End If
+        If Not ShiftDown Then MovePic(mouse, pbx1, pbx1.Parent)
+        '        MovePic(mouse, pbx1, pnlFS) 'Todo OPTION zoom prevents move.
     End Sub
-    Public Sub FadeInLabel(lbl As Label)
-        lbl.Visible = True
+    Public Sub MovePic(mouse As Point, inside As Control, outside As Control)
+        Dim x As Long
+        Dim y As Long
+        x = mouse.X
+        y = mouse.Y
+        Dim xdist As Long
+        Dim ydist As Long
+        If bImageDimensionState = PicState.TooWide Or bImageDimensionState = PicState.Overscan Or bImageDimensionState = PicState.TooTall Then
+            xdist = x * (inside.Width - outside.Width) / outside.Width
+            inside.Left = -xdist
+            ydist = y * (inside.Height - outside.Height) / outside.Height
+            inside.Top = -ydist
+        End If
     End Sub
     Public Sub MovePic(mouse As Point, blanker As PictureBox, inside As Control, outside As Control)
         Dim x As Long
@@ -286,12 +224,106 @@
         End Try
 
     End Sub
+    Public Sub ToggleTrueSize(pic As PictureBox)
+        If iScreenstate = Screenstate.Fitted Then
+            iScreenstate = Screenstate.TrueSize
+        Else
+            iScreenstate = Screenstate.Fitted
+        End If
+        DisposePic(pic)
+        Dim img As Image = GetImage(strCurrentFilePath)
+        PreparePic(pic, picBlanker, img)
+    End Sub
+    Public Sub DisposePic(box As PictureBox)
+
+        box.Image.Dispose()
+
+        GC.SuppressFinalize(box)
+        box.Image = Nothing
+    End Sub
+    Public Sub PreparePic(pbx As PictureBox, pbxBlanker As PictureBox, img As Image)
+        If img Is Nothing Then Exit Sub
+        If pbxBlanker Is Nothing Then Exit Sub
+        If Not pbx.Image Is Nothing Then
+            pbx.Image.Dispose()
+        End If
+        pbx.Image = img
+        CentralCtrl(pbxBlanker, ZoneSize) 'insert central zone
+
+        iZoomFactor = 100 * pbx.Width / pbx.Image.Width 'How much is image zoomed currently?
+
+        'Make pic box same size as image (still within container)
+        pbx.Width = pbx.Image.Width
+        pbx.Height = pbx.Image.Height
+        'How does it exceeed the container, if at all?
+        If Not iScreenstate = Screenstate.Fitted Then
+            ' bImageDimensionState = ClassifyImage(pnlFS.Width, pnlFS.Height, pbx1.Width, pbx1.Height)
+        End If
+
+        SetState(pbx, iScreenstate)
+
+        PlacePic(pbx)
+
+    End Sub
+    Private Sub CentralCtrl(pbx As Control, proportion As Decimal)
+        Dim ctr As Control = pbx.Parent
+        With pbx
+            .Width = ctr.Width * proportion
+            .Height = ctr.Height * proportion
+            .Left = (ctr.Width - .Width) / 2
+            .Top = (ctr.Height - .Height) / 2
+
+        End With
+    End Sub
+
+
+
+    Public Sub SetState(pbx As PictureBox, Sstate As Byte)
+        'Sets the screenstate, docking style. Changes the sizemode of pbx
+        'If iScreenstate = Sstate Then Exit Sub
+        Select Case Sstate
+            Case Screenstate.Fitted
+                pbx.Dock = DockStyle.Fill
+                pbx.SizeMode = PictureBoxSizeMode.Zoom
+            Case Screenstate.TrueSize
+                ' Exit Select
+                pbx.Dock = DockStyle.None
+                pbx.SizeMode = PictureBoxSizeMode.Normal
+                'Expand or shrink the picture box accordingly
+                pbx.Width = pbx.Image.Width
+                pbx.Height = pbx.Image.Height
+            Case Screenstate.Zoomed
+                'If zooming from fitted
+                'Resize the picture box
+                'then
+                'reset the size mode
+                'And undock
+
+                'If iScreenstate = Screenstate.Fitted Then
+                If iScreenstate <> Screenstate.Zoomed Then
+                    ' If ZoomJustStarted Then
+                    Dim x As Control = pbx.Parent
+                    pbx.Dock = DockStyle.None 'TODO It's how we prepare for this which is the problem 
+                    pbx.Width = x.Width
+                    pbx.Height = x.Height
+                    pbx.Left = x.Left
+                    pbx.Top = x.Top
+                End If
+                pbx.SizeMode = PictureBoxSizeMode.Zoom
+                'PlacePic(pbx)
+        End Select
+        iScreenstate = Sstate
+        frmMain.tsslPicState.Text = "Picture State:" & strScreenState(iScreenstate)
+    End Sub
+    Public Sub FadeInLabel(lbl As Label)
+        lbl.Visible = True
+    End Sub
 
     Public Sub ZoomPicture(pbx As PictureBox, blnEnlarge As Boolean, Percentage As Decimal)
         SetState(pbx, Screenstate.Zoomed)
         Dim Enlarge As Decimal = 1 + Percentage / 100
         Dim Reduce As Decimal = 1 - Percentage / 100
-        Dim x As Control = pbx.GetContainerControl
+        Dim x As Control = pbx.Parent
         If blnEnlarge Then
             iZoomFactor = iZoomFactor * Enlarge
             pbx.Width = pbx.Width * Enlarge
@@ -299,7 +331,7 @@
 
             pbx.Top = pbx.Top - (ePicMousePoint.Y - pbx.Top) * Percentage / 100
             pbx.Height = pbx.Height * Enlarge
-
+            '        If pbx.Top < -pbx.Height Then MsgBox("Stop")
         Else
             iZoomFactor = iZoomFactor * Reduce
             If pbx.Width * Reduce >= x.Width Or pbx.Height * Reduce >= x.Height Then
@@ -312,6 +344,7 @@
 
     End Sub
 
+#End Region
 
 End Module
 

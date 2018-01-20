@@ -1,7 +1,5 @@
 ﻿Imports System.ComponentModel
-Imports System.Diagnostics
 Imports System.IO
-Imports MasaSam.Forms.Controls
 
 Public Class FileSystemTree
 
@@ -295,7 +293,7 @@ Public Class FileSystemTree
                 Collapse(d.Parent.FullName)
             End If
             Expand(d.FullName)
-
+            HighlightSelectedNodes()
 
         End Set
     End Property
@@ -329,17 +327,27 @@ Public Class FileSystemTree
         Dim directoryNames As New List(Of String)(fullPath.Split(Path.DirectorySeparatorChar))
         Dim rootNode = CType(tvFiles.Nodes(0), FileSystemNode)
         If (rootNode.NodeType = FileSystemNodeType.Computer Or rootNode.NodeType = FileSystemNodeType.Drive) Then
+            'Root or drive
             Dim driveName = directoryNames(0) + "\"
             If (rootNode.NodeType = FileSystemNodeType.Computer) Then
+                'Root: Expand root, produce all drives.
                 rootNode.Expand()
                 For Each dn As DriveNode In CType(rootNode, ComputerNode).Nodes
                     ExpandDriveNode(dn, driveName, directoryNames)
+                    If directoryNames.Count = 2 And fullPath(Len(fullPath) - 2) = ":" Then
+                        Dim k As New TreeNode
+                        k = CType(dn, TreeNode)
+                        tvFiles.SelectedNode = k
+                        OnDriveSelected(New DriveInfo(dn.FullName))
+                    End If
                 Next
             Else
+                'Only where root is a drive, which I don't use. 
                 Dim dn As DriveNode = CType(rootNode, DriveNode)
                 If (dn.Name.ToLower() = driveName.ToLower()) Then
                     rootNode.Expand()
                     ExpandDriveNode(dn, driveName, directoryNames)
+
                 End If
             End If
         End If
@@ -348,20 +356,21 @@ Public Class FileSystemTree
     Public Sub RefreshTree(ByVal path As String)
         Dim nd As New DirectoryNode(New DirectoryInfo(path))
         CreateDirectoryTree(nd)
-        Collapse(path)
-        Expand(path)
+        'Collapse(path)
+        'Expand(path)
     End Sub
     Private Sub ExpandDriveNode(ByVal dn As DriveNode, ByVal driveName As String, ByVal directoryNames As List(Of String))
+        'Only expand if it's in the path we seek
         If (dn.Drive.Name.ToLower() = driveName.ToLower()) Then
             dn.Expand()
-            If directoryNames.Count = 2 Then
-                Dim k As New TreeNode
-                k = CType(dn, TreeNode)
-                tvFiles.SelectedNode = k
-                OnDriveSelected(New DriveInfo(dn.FullName))
-            Else
-                Expand(dn.DirectoryNodes, directoryNames, 1, directoryNames.Count - 1)
-            End If
+            'If directoryNames.Count = 1 Then 'If we have reached the end of the path select that node
+            '    Dim k As New TreeNode
+            '    k = CType(dn, TreeNode)
+            '    tvFiles.SelectedNode = k
+            '    OnDriveSelected(New DriveInfo(dn.FullName))
+            'Else
+            Expand(dn.DirectoryNodes, directoryNames, 1, directoryNames.Count - 1)
+            'End If
         End If
     End Sub
 
@@ -912,7 +921,7 @@ Public Class FileSystemTree
     ''' <summary>
     ''' Highlights the selected nodes.
     ''' </summary>
-    Private Sub HighlightSelectedNodes()
+    Public Sub HighlightSelectedNodes()
         For Each node In m_selectedNodes.Values
             node.BackColor = SystemColors.Highlight
             node.ForeColor = SystemColors.HighlightText
@@ -964,7 +973,7 @@ Public Class FileSystemTree
     End Sub
 
     Private Sub Timer_Tick(sender As Object, e As EventArgs)
-        'Exit Sub
+        Exit Sub
         Try
             For Each node As FileSystemNode In Me.tvFiles.Nodes(0).Nodes
 
@@ -1030,7 +1039,9 @@ Public Class FileSystemTree
 
     End Sub
 
-
+    Public Sub Addnode(Path As String)
+        tvFiles.Nodes.Add(Path)
+    End Sub
 
     Private Sub tvFiles_BeforeSelect(sender As Object, e As TreeViewCancelEventArgs) Handles tvFiles.BeforeSelect
         'MsgBox("tvFiles_BeforeSelect") 'Repeatedly called
@@ -1042,18 +1053,19 @@ Public Class FileSystemTree
         'MsgBox("tvFiles_AfterSelect")
         HighlightSelectedNodes()
         RaiseEvent DirectorySelected(Me, New DirectoryInfoEventArgs(New DirectoryInfo(NodePath(e))))
-        RaiseEvent DriveSelected(Me, New DriveInfoEventArgs(New DriveInfo(NodePath(e))))
+        'RaiseEvent DriveSelected(Me, New DriveInfoEventArgs(New DriveInfo(NodePath(e))))
 
     End Sub
     Private Function NodePath(e) As String
         Dim s As String
         Dim myc As String = "My Computer\"
-        s = e.node.fullpath
+        s = e.node.fullname
         If InStr(s, myc) <> 0 Then s = s.Remove(0, Len(myc))
         Return s
     End Function
 
     Private Sub tvFiles_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles tvFiles.PreviewKeyDown
+        'Exit Sub
         'Enables traversing of the filetree
         If e.KeyCode = TraverseKey Then
             Traverse(False)
@@ -1134,13 +1146,13 @@ Public Class FileSystemTree
 
 
 
-    Public Sub tvFiles_AfterLabelEdit(sender As Object, e As NodeLabelEditEventArgs) Handles tvFiles.AfterLabelEdit
+    Public Sub AfterLabelEdit(sender As Object, e As NodeLabelEditEventArgs) Handles tvFiles.AfterLabelEdit
         Dim oldlabel As String = e.Label
 
         e = RelabelFolder(e)
         Try
 
-            My.Computer.FileSystem.RenameDirectory(NodePath(e), e.Label)
+            My.Computer.FileSystem.RenameDirectory(e.Node.FullPath, e.Node.Parent.FullPath & "\" & e.Label)
         Catch ex As Exception
             MsgBox(ex.Message)
             '            e = RelabelFolder(e) 'TODO improve this.
@@ -1153,7 +1165,7 @@ Public Class FileSystemTree
     Private Shared Function RelabelFolder(e As NodeLabelEditEventArgs) As NodeLabelEditEventArgs
         If Not (e.Label Is Nothing) Then
             If e.Label.Length > 0 Then
-                If e.Label.IndexOfAny(New Char() {"@"c, "."c, ","c, "!"c}) = -1 Then
+                If e.Label.IndexOfAny(New Char() {"@"c, ","c, "!"c}) = -1 Then
                     ' Stop editing without canceling the label change.
                     e.Node.EndEdit(False)
                 Else
@@ -1162,7 +1174,7 @@ Public Class FileSystemTree
                     e.CancelEdit = True
                     MessageBox.Show("Invalid tree node label." &
               Microsoft.VisualBasic.ControlChars.Cr &
-              "The invalid characters are: '@','.', ',', '!'",
+              "The invalid characters are: '@', ',', '!'",
               "Node Label Edit")
                     e.Node.BeginEdit()
                 End If
@@ -1178,6 +1190,39 @@ Public Class FileSystemTree
         End If
         Return e
     End Function
+
+    Private Sub tvFiles_KeyDown(sender As Object, e As KeyEventArgs) Handles tvFiles.KeyDown
+        ' Exit Sub
+
+        'Enables traversing of the filetree
+        If e.KeyCode = TraverseKey Then
+            Traverse(False)
+        End If
+        If e.KeyCode = TraverseKeyBack Then
+            Traverse(True)
+        End If
+        If e.KeyCode = Keys.F2 Then
+            tvFiles.LabelEdit = True
+            Dim nd As TreeNode = tvFiles.SelectedNode
+            If Not (nd Is Nothing) And Not (nd.Parent Is Nothing) Then
+                tvFiles.SelectedNode = nd
+                tvFiles.LabelEdit = True
+                If Not nd.IsEditing Then
+                    nd.BeginEdit()
+                End If
+            Else
+                MessageBox.Show("No tree node selected or selected node is a root node." &
+                  Microsoft.VisualBasic.ControlChars.Cr &
+                  "Editing of root nodes is not allowed.", "Invalid selection")
+            End If
+
+        End If
+    End Sub
+
+    Private Sub FileSystemTree_SystemColorsChanged(sender As Object, e As EventArgs) Handles Me.SystemColorsChanged
+
+    End Sub
+
 
 
 #End Region

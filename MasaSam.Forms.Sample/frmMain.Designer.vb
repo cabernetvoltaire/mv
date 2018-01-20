@@ -39,6 +39,7 @@ Partial Class frmMain
         Me.AddCurrentAndSubfoldersToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ClearCurrentListToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SingleFilePerFolderToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.AddCurrentFileToShowlistToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SlideshowToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.SlowToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.NormalToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -98,6 +99,7 @@ Partial Class frmMain
         Me.VideoToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
+        Me.TSPB = New System.Windows.Forms.ToolStripProgressBar()
         Me.tbFiles = New System.Windows.Forms.ToolStripStatusLabel()
         Me.tbFilter = New System.Windows.Forms.ToolStripStatusLabel()
         Me.tbRandom = New System.Windows.Forms.ToolStripStatusLabel()
@@ -109,7 +111,6 @@ Partial Class frmMain
         Me.tbButton = New System.Windows.Forms.ToolStripStatusLabel()
         Me.tbLastFile = New System.Windows.Forms.ToolStripStatusLabel()
         Me.tbDate = New System.Windows.Forms.ToolStripStatusLabel()
-        Me.TSPB = New System.Windows.Forms.ToolStripProgressBar()
         Me.tssFolderInfo = New System.Windows.Forms.ToolStripStatusLabel()
         Me.tssMoveCopy = New System.Windows.Forms.ToolStripStatusLabel()
         Me.tssFilter = New System.Windows.Forms.ToolStripStatusLabel()
@@ -180,7 +181,6 @@ Partial Class frmMain
         Me.tmrPumpFiles = New System.Windows.Forms.Timer(Me.components)
         Me.tmrAutoTrail = New System.Windows.Forms.Timer(Me.components)
         Me.ColorDialog1 = New System.Windows.Forms.ColorDialog()
-        Me.AddCurrentFileToShowlistToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip1.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
         Me.TableLayoutPanel2.SuspendLayout()
@@ -239,7 +239,7 @@ Partial Class frmMain
         '
         Me.ButtonFilesToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.NewButtonFileStripMenuItem, Me.LoadButtonFileToolstripMenuItem, Me.SaveButtonfileasToolStripMenuItem})
         Me.ButtonFilesToolStripMenuItem.Name = "ButtonFilesToolStripMenuItem"
-        Me.ButtonFilesToolStripMenuItem.Size = New System.Drawing.Size(239, 34)
+        Me.ButtonFilesToolStripMenuItem.Size = New System.Drawing.Size(225, 34)
         Me.ButtonFilesToolStripMenuItem.Text = "&Button files"
         '
         'NewButtonFileStripMenuItem
@@ -273,7 +273,7 @@ Partial Class frmMain
         '
         Me.ShowlistFilesToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.LoadListToolStripMenuItem1, Me.SaveListToolStripMenuItem1})
         Me.ShowlistFilesToolStripMenuItem.Name = "ShowlistFilesToolStripMenuItem"
-        Me.ShowlistFilesToolStripMenuItem.Size = New System.Drawing.Size(239, 34)
+        Me.ShowlistFilesToolStripMenuItem.Size = New System.Drawing.Size(225, 34)
         Me.ShowlistFilesToolStripMenuItem.Text = "S&howlist files"
         '
         'LoadListToolStripMenuItem1
@@ -294,7 +294,7 @@ Partial Class frmMain
         '
         Me.UndoToolStripMenuItem.Name = "UndoToolStripMenuItem"
         Me.UndoToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.Z), System.Windows.Forms.Keys)
-        Me.UndoToolStripMenuItem.Size = New System.Drawing.Size(239, 34)
+        Me.UndoToolStripMenuItem.Size = New System.Drawing.Size(225, 34)
         Me.UndoToolStripMenuItem.Text = "Undo"
         '
         'ListsToolStripMenuItem
@@ -336,6 +336,13 @@ Partial Class frmMain
             Or System.Windows.Forms.Keys.S), System.Windows.Forms.Keys)
         Me.SingleFilePerFolderToolStripMenuItem.Size = New System.Drawing.Size(486, 34)
         Me.SingleFilePerFolderToolStripMenuItem.Text = "Single file per folder"
+        '
+        'AddCurrentFileToShowlistToolStripMenuItem
+        '
+        Me.AddCurrentFileToShowlistToolStripMenuItem.Name = "AddCurrentFileToShowlistToolStripMenuItem"
+        Me.AddCurrentFileToShowlistToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.F), System.Windows.Forms.Keys)
+        Me.AddCurrentFileToShowlistToolStripMenuItem.Size = New System.Drawing.Size(486, 34)
+        Me.AddCurrentFileToShowlistToolStripMenuItem.Text = "Add current file to showlist"
         '
         'SlideshowToolStripMenuItem1
         '
@@ -740,6 +747,14 @@ Partial Class frmMain
         Me.StatusStrip1.TabIndex = 16
         Me.StatusStrip1.Text = "StatusStrip1"
         '
+        'TSPB
+        '
+        Me.TSPB.Name = "TSPB"
+        Me.TSPB.Size = New System.Drawing.Size(500, 29)
+        Me.TSPB.Step = 1
+        Me.TSPB.Style = System.Windows.Forms.ProgressBarStyle.Continuous
+        Me.TSPB.Visible = False
+        '
         'tbFiles
         '
         Me.tbFiles.BorderStyle = System.Windows.Forms.Border3DStyle.SunkenOuter
@@ -808,14 +823,6 @@ Partial Class frmMain
         Me.tbDate.Name = "tbDate"
         Me.tbDate.Size = New System.Drawing.Size(61, 30)
         Me.tbDate.Text = "DATE"
-        '
-        'TSPB
-        '
-        Me.TSPB.Name = "TSPB"
-        Me.TSPB.Size = New System.Drawing.Size(500, 29)
-        Me.TSPB.Step = 1
-        Me.TSPB.Style = System.Windows.Forms.ProgressBarStyle.Continuous
-        Me.TSPB.Visible = False
         '
         'tssFolderInfo
         '
@@ -1345,7 +1352,6 @@ Partial Class frmMain
         Me.cbxSpeeds.Name = "cbxSpeeds"
         Me.cbxSpeeds.Size = New System.Drawing.Size(158, 32)
         Me.cbxSpeeds.TabIndex = 29
-        Me.cbxSpeeds.TabStop = False
         '
         'Label2
         '
@@ -1367,7 +1373,6 @@ Partial Class frmMain
         Me.cbxOrder.Name = "cbxOrder"
         Me.cbxOrder.Size = New System.Drawing.Size(158, 32)
         Me.cbxOrder.TabIndex = 27
-        Me.cbxOrder.TabStop = False
         '
         'Label1
         '
@@ -1389,7 +1394,6 @@ Partial Class frmMain
         Me.cbxFilter.Name = "cbxFilter"
         Me.cbxFilter.Size = New System.Drawing.Size(158, 32)
         Me.cbxFilter.TabIndex = 25
-        Me.cbxFilter.TabStop = False
         '
         'Label3
         '
@@ -1404,7 +1408,6 @@ Partial Class frmMain
         'tmrUpdateFileList
         '
         Me.tmrUpdateFileList.Enabled = True
-        Me.tmrUpdateFileList.Interval = 10
         '
         'tmrPicLoad
         '
@@ -1449,7 +1452,7 @@ Partial Class frmMain
         '
         'tmrUpdateForm
         '
-        Me.tmrUpdateForm.Interval = 10000
+        Me.tmrUpdateForm.Interval = 1000
         '
         'tmrSlowMo
         '
@@ -1463,17 +1466,10 @@ Partial Class frmMain
         '
         'tmrPumpFiles
         '
-        Me.tmrPumpFiles.Interval = 60000
+        Me.tmrPumpFiles.Interval = 10000
         '
         'tmrAutoTrail
         '
-        '
-        'AddCurrentFileToShowlistToolStripMenuItem
-        '
-        Me.AddCurrentFileToShowlistToolStripMenuItem.Name = "AddCurrentFileToShowlistToolStripMenuItem"
-        Me.AddCurrentFileToShowlistToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.F), System.Windows.Forms.Keys)
-        Me.AddCurrentFileToShowlistToolStripMenuItem.Size = New System.Drawing.Size(486, 34)
-        Me.AddCurrentFileToShowlistToolStripMenuItem.Text = "Add current file to showlist"
         '
         'frmMain
         '

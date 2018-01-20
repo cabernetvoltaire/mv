@@ -1,16 +1,14 @@
 ﻿Imports System.IO
 Public Class FindDuplicates
-    Public initiallist As New List(Of String)
-    Public deletelist As New List(Of String)
-    Public uniquelist As New List(Of String)
-    Public sortedList As New List(Of String)
-    Public uniqueduplist As New List(Of String)
-    Public duplist As New List(Of String)
+    Private initiallist As New List(Of String)
+    Private deletelist As New List(Of String)
+    Private uniquelist As New List(Of String)
+    Private sortedList As New List(Of String)
+    Private uniqueduplist As New List(Of String)
+    Private duplist As New List(Of String)
     Public blnClicktoSave As Boolean = True
-    Dim DeleteArray(1000, 100) As String
-    Dim blnDelete(1000, 100) As Boolean
 
-    Dim PreviewWMP(12) As AxWMPLib.AxWindowsMediaPlayer
+    Private PreviewWMP(12) As AxWMPLib.AxWindowsMediaPlayer
 
 
     Private Sub FindDuplicates_Shown(sender As Object, e As EventArgs) Handles Me.Shown
@@ -24,43 +22,18 @@ Public Class FindDuplicates
         End If
         'Add current showlist, in size sorted order, to lbxSorted
         sortedList = SetPlayOrder(PlayOrder.Length, initiallist)
-        FillShowbox(lbxsorted, FilterState.All, sortedList)
+        '    FillShowbox(lbxsorted, FilterState.All, sortedList)
         uniquelist = ExtractDups(sortedList)
         MsgBox("There are " & uniquelist.Count & " unique files having duplicates, out of " & Showlist.Count)
 
         FillShowbox(lbxunique, FilterState.All, uniquelist)
-        'Create a list of unique files, by ignoring any which have the same length as the previous one.
-        '        HighlightPossDups()
 
 
     End Sub
 
+#Region "Methods"
 
 
-    ''' <summary>
-    ''' Takes 'sortedlist' and creates deletelist and uniquelist, based on filesize
-    ''' </summary>
-    Private Sub DeletesandUniques()
-        Dim blnDontIncludeLast = True
-        Dim lastlength As Long
-        Dim lastinfo As FileInfo = Nothing
-        Dim finfo3 As FileInfo = Nothing
-        For Each file In sortedList
-            'Get a file
-            finfo3 = My.Computer.FileSystem.GetFileInfo(file)
-            Dim currlength As Long
-            currlength = finfo3.Length
-            If currlength = lastlength Then
-                'Same as before - delete
-                deletelist.Add(finfo3.FullName)
-            Else
-                'Otherwise add it the uniques
-                uniquelist.Add(finfo3.FullName)
-            End If
-            lastinfo = finfo3
-            lastlength = lastinfo.Length
-        Next
-    End Sub
 
     ''' <summary>
     ''' Places 12 Preview controls
@@ -87,11 +60,9 @@ Public Class FindDuplicates
 
                 End If
                 AddHandler .MouseMoveEvent, AddressOf previewover
+                AddHandler .DoubleClickEvent, AddressOf picdoubleclick
             End With
         Next
-    End Sub
-    Private Sub previewover(sender As Object, e As AxWMPLib._WMPOCXEvents_MouseMoveEvent)
-        ToolTipDups.SetToolTip(sender, sender.url)
     End Sub
     ''' <summary>
     ''' Finds duplicates of the given file within the current Showlist and adds them to duplist, which is then written to lbxDuplicates. The appropriate controls then show the files in lbxDuplicates
@@ -198,8 +169,16 @@ Public Class FindDuplicates
         Next
         Return uniquedups
     End Function
+#End Region
+#Region "Events"
+    Private Sub previewover(sender As Object, e As AxWMPLib._WMPOCXEvents_MouseMoveEvent)
+        ToolTipDups.SetToolTip(sender, sender.url)
+    End Sub
 
-    Private Sub lbxunique_SelectedIndexChanged_1(sender As Object, e As EventArgs) Handles lbxunique.SelectedIndexChanged, lbxDeleteList.SelectedIndexChanged, lbxSave.SelectedIndexChanged, lbxDuplicates.SelectedIndexChanged, lbxsorted.SelectedIndexChanged
+    Private Sub picdoubleclick(sender As Object, e As AxWMPLib._WMPOCXEvents_DoubleClickEvent)
+        sender.visible = False
+    End Sub
+    Private Sub lbxunique_SelectedIndexChanged_1(sender As Object, e As EventArgs) Handles lbxunique.SelectedIndexChanged, lbxDeleteList.SelectedIndexChanged, lbxSave.SelectedIndexChanged, lbxDuplicates.SelectedIndexChanged
         Dim lbx As ListBox = sender
         If lbx.SelectedIndex < 0 Then Exit Sub
         Dim path As String = lbx.Items(lbx.SelectedIndex)
@@ -259,13 +238,10 @@ Public Class FindDuplicates
 
 
 
-    Private Sub ToolTip1_Popup(sender As Object, e As PopupEventArgs) Handles ToolTipDups.Popup
-
-    End Sub
 
     Private Sub lbxDuplicates_MouseHover(sender As Object, e As EventArgs) Handles lbxDuplicates.MouseHover
         MouseHoverInfo(lbxDuplicates, ToolTipDups)
     End Sub
 
-
+#End Region
 End Class

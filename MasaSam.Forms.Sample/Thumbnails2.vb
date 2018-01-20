@@ -11,9 +11,10 @@ Public Class Thumbnails
 
         flp.BackColor = Color.Azure
         flp.Dock = DockStyle.Fill
-        flp.BringToFront()
+        flp.SendToBack()
         flp.Visible = True
         flp.AutoScroll = True
+        AddHandler flp.MouseMove, AddressOf flp_Mouseover
 
         Dim pics(flist.Count) As PictureBox
         Dim i As Int16 = 0
@@ -41,7 +42,7 @@ Public Class Thumbnails
                         .SizeMode = PictureBoxSizeMode.StretchImage
                         .Tag = f
                         AddHandler .MouseEnter, AddressOf pb_Click
-                        .Image.Dispose()
+                        ' .Image.Dispose()
 
                     End With
                     'Me.Update()
@@ -52,14 +53,17 @@ Public Class Thumbnails
             End Try
         Next
         flp2 = flp
+        flp2.BringToFront()
         '  flp.Visible = False
-        '       flp2.Show()
-        '        flp.Hide()
+
+    End Sub
+    Private Sub flp_Mouseover(sender As Object, e As EventArgs)
+        ToolTip1.SetToolTip(sender, sender.name)
     End Sub
     Private Sub pb_Click(sender As Object, e As EventArgs)
         Dim pb = DirectCast(sender, PictureBox)
         strCurrentFilePath = pb.Tag
-
+        ToolTip1.SetToolTip(pb, pb.Tag)
         frmMain.lbxFiles.SelectionMode = SelectionMode.One
         frmMain.tmrPicLoad.Enabled = True
 
@@ -126,9 +130,9 @@ Public Class Thumbnails
         If t.IsAlive Then
             Exit Sub
         ElseIf Not t.IsAlive Then
-            Me.Refresh()
-            Timer1.Enabled = False
 
+            Timer1.Enabled = False
+            Me.Refresh()
         End If
 
     End Sub
