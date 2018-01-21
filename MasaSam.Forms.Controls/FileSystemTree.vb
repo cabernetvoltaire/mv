@@ -967,9 +967,14 @@ Public Class FileSystemTree
 
     End Sub
     Public Sub RemoveNode(strpath As String)
-        Expand(strpath)
+        ' Expand(strpath)
         tvFiles.SelectedNode.Remove()
 
+    End Sub
+    Public Sub MoveNode(strDir As String, StrDest As String)
+        tvFiles.Nodes.RemoveByKey(strDir)
+        Dim nd As New DirectoryNode(New DirectoryInfo(StrDest))
+        Expand(StrDest)
     End Sub
 
     Private Sub Timer_Tick(sender As Object, e As EventArgs)
@@ -1040,7 +1045,11 @@ Public Class FileSystemTree
     End Sub
 
     Public Sub Addnode(Path As String)
-        tvFiles.Nodes.Add(Path)
+        Dim dirnd As New DirectoryNode(New DirectoryInfo(Path))
+        dirnd = dirnd.Parent
+
+        CreateDirectoryTree(dirnd)
+        ' tvFiles.Nodes.Add(Path)
     End Sub
 
     Private Sub tvFiles_BeforeSelect(sender As Object, e As TreeViewCancelEventArgs) Handles tvFiles.BeforeSelect
@@ -1065,7 +1074,7 @@ Public Class FileSystemTree
     End Function
 
     Private Sub tvFiles_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles tvFiles.PreviewKeyDown
-        'Exit Sub
+        Exit Sub
         'Enables traversing of the filetree
         If e.KeyCode = TraverseKey Then
             Traverse(False)
@@ -1195,7 +1204,7 @@ Public Class FileSystemTree
         ' Exit Sub
 
         'Enables traversing of the filetree
-        If e.KeyCode = TraverseKey Then
+        If e.KeyCode = refKey Then
             Traverse(False)
         End If
         If e.KeyCode = TraverseKeyBack Then

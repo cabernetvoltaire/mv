@@ -226,8 +226,9 @@ Module FileHandling
                 .MoveDirectory(strDir, strDest & "\" & s, FileIO.UIOption.OnlyErrorDialogs)
                 UpdateButton(strDir, strDest & "\" & s) 'todo doesnt handle sub-tree
                 'tvw.Traverse(False)
-                'tvw.RefreshTree(dir.Parent.FullName)
-                'tvw.Addnode(strDest & "\" & s)
+                tvw.RefreshTree(dir.Parent.FullName)
+
+                'tvw.Addnode(strDest)
                 tvw.RemoveNode(strDir)
             End With
         Catch ex As Exception

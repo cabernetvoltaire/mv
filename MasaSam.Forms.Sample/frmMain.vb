@@ -518,7 +518,7 @@ Public Class frmMain
 
                 ' If PFocus <> CtrlFocus.Tree Then
                 'ControlSetFocus(tvMain2)
-                tvMain2_KeyDown(sender, e)
+                'tvMain2_KeyDown(sender, e)
                     'e.Handled = True
                 'End If
                 'TraverseTree(tvMain2.tvFiles, e.KeyCode = KeyTraverseTree)
@@ -1101,7 +1101,7 @@ Public Class frmMain
     End Sub
 
 
-    Private Sub tvMain2_KeyDown(sender As Object, e As KeyEventArgs) Handles tvMain2.KeyDown
+    Private Sub tvMain2_KeyDown(sender As Object, e As KeyEventArgs) Handles tvMain2.KeyDown, lbxFiles.KeyDown, lbxShowList.KeyDown
         Select Case e.KeyCode
             Case Keys.Down, Keys.Left, Keys.Right, Keys.Up
 
@@ -1109,9 +1109,9 @@ Public Class frmMain
                 tvMain2.Traverse(e.KeyCode = tvMain2.TraverseKeyBack)
 
                 'MsgBox("Pressed")
-                e.Handled = True
+                ' e.Handled = True
             Case Else
-                If PFocus = CtrlFocus.Tree Then e.Handled = True
+                'If PFocus = CtrlFocus.Tree Then e.Handled = True
         End Select
 
     End Sub
