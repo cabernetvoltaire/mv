@@ -54,6 +54,7 @@
     Public KeyRotate = Keys.OemCloseBrackets
     Public KeyRotateBack = Keys.OemOpenBrackets
     Public KeyFilter = Keys.OemQuestion
+    Public KeyAddFile = Keys.Oemtilde
 
     Public KeyZoomOut = Keys.Oemcomma
     Public KeyToggleThumbs = Keys.Oem3
@@ -61,6 +62,7 @@
     Public KeyEscape = Keys.Escape
     Public KeySelect = Keys.F3
     Public KeyDelete = Keys.Delete
+    Public KeyMoveToggle = Keys.Oem7
 
 
     Public Enum FilterState

@@ -1351,7 +1351,7 @@ Partial Class frmMain
         Me.cbxSpeeds.Location = New System.Drawing.Point(0, 139)
         Me.cbxSpeeds.Name = "cbxSpeeds"
         Me.cbxSpeeds.Size = New System.Drawing.Size(158, 32)
-        Me.cbxSpeeds.TabIndex = 29
+        Me.cbxSpeeds.TabIndex = 2
         '
         'Label2
         '
@@ -1372,7 +1372,7 @@ Partial Class frmMain
         Me.cbxOrder.Location = New System.Drawing.Point(0, 82)
         Me.cbxOrder.Name = "cbxOrder"
         Me.cbxOrder.Size = New System.Drawing.Size(158, 32)
-        Me.cbxOrder.TabIndex = 27
+        Me.cbxOrder.TabIndex = 1
         '
         'Label1
         '
@@ -1393,7 +1393,7 @@ Partial Class frmMain
         Me.cbxFilter.Location = New System.Drawing.Point(0, 25)
         Me.cbxFilter.Name = "cbxFilter"
         Me.cbxFilter.Size = New System.Drawing.Size(158, 32)
-        Me.cbxFilter.TabIndex = 25
+        Me.cbxFilter.TabIndex = 0
         '
         'Label3
         '
@@ -1466,7 +1466,7 @@ Partial Class frmMain
         '
         'tmrPumpFiles
         '
-        Me.tmrPumpFiles.Interval = 10000
+        Me.tmrPumpFiles.Interval = 500
         '
         'tmrAutoTrail
         '

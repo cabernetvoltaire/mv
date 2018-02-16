@@ -1,4 +1,5 @@
-﻿Option Explicit On
+﻿
+Option Explicit On
 Imports System.ComponentModel
 Imports System.Drawing.Color
 Imports System.IO
@@ -14,7 +15,7 @@ Public Class frmMain
 
     Private Sub InitialiseColours()
         FilterColours.Add(Color.MintCream)
-        FilterColours.Add(Color.LightCyan)
+        FilterColours.Add(Color.LemonChiffon)
         FilterColours.Add(Color.LightPink)
         FilterColours.Add(Color.LightSeaGreen)
         FilterColours.Add(Color.LightBlue)
@@ -50,7 +51,8 @@ Public Class frmMain
         currentPicBox.BringToFront()
         currentWMP.Visible = False
     End Sub
-
+    Private Sub GetMetadata(spath As String)
+    End Sub
     Private Sub OrientPic(img As Image)
         tbZoom.Text = UCase("Orientation -" & Orientation(ImageOrientation(img)))
         Select Case ImageOrientation(img)
@@ -66,6 +68,7 @@ Public Class frmMain
 
     Private Sub HandleMovie(blnRandom As Boolean)
         'If it is to jump to a random point, do not show first.
+
         If tmrJumpVideo.Enabled Then
             tbStartpoint.Text = "START:RANDOM"
             currentWMP.Visible = False
@@ -151,7 +154,7 @@ Public Class frmMain
     End Sub
     Private Sub AxWindowsMediaPlayer1_MediaError(ByVal sender As Object,
     ByVal e As _WMPOCXEvents_MediaErrorEvent) Handles MainWMP.MediaError
-        MsgBox("Error")
+        MsgBox(e.pMediaObject.ToString)
     End Sub
     Public Sub CancelDisplay()
         If currentWMP.Visible Then
@@ -218,13 +221,20 @@ Public Class frmMain
     '   SetMotion(e.KeyCode) 'Alternative speed. Doesn't work at the moment. 
     'End Function
     Private Function SpeedChange(e As KeyEventArgs) As KeyEventArgs
-        TweakSpeed(e)
+        If e.KeyData = KeySpeed1 + Keys.Control Or e.KeyData = KeySpeed3 + Keys.Control Then
+
+            TweakSpeed(e)
+            e.Handled = True
+            Exit Function
+        End If
         Dim blnPlaying As Boolean = currentWMP.URL <> ""
         Dim Choice As Byte = e.KeyCode - KeySpeed1 'Set slideshow speed if pic showing, and start slideshow
         If Not blnPlaying Then
+            'PlaybackSpeed = 30
             tmrSlideShow.Enabled = True
             tmrSlideShow.Interval = iSSpeeds(Choice)
         Else
+
             PlaybackSpeed = iPlaybackSpeed(Choice) 'Otherwise, set playback speed 'TODO Options
         End If
 
@@ -243,10 +253,17 @@ Public Class frmMain
             ' currentWMP.settings.rate = PlaybackSpeed / 30
 
             currentWMP.Ctlcontrols.pause()
-            tmrSlowMo.Interval = 1000 / (PlaybackSpeed)
-            tmrSlowMo.Enabled = True
+            'If PlaybackSpeed = 30 Then
+            '    currentWMP.settings.rate = 1
+            '    currentWMP.Ctlcontrols.play()
+            '    tmrSlowMo.Enabled = False
+            'Else
 
-        End If
+            tmrSlowMo.Interval = 1000 / (PlaybackSpeed)
+                tmrSlowMo.Enabled = True
+            End If
+
+        'End If
         'Report
         blnSpeedRestart = True
         ' tbSpeed.Text = "SPEED (" & PlaybackSpeed * 100 & "%)"
@@ -262,6 +279,8 @@ Public Class frmMain
                 Else
                     iSSpeeds(0) = iSSpeeds(0) / 0.9
                 End If
+                e.Handled = True
+
             End If
 
         End If
@@ -272,9 +291,11 @@ Public Class frmMain
                 Else
                     iSSpeeds(2) = iSSpeeds(2) / 0.9
                 End If
+                e.Handled = True
             End If
 
         End If
+
     End Sub
 
     Private Sub ToggleRandomStartPoint()
@@ -445,12 +466,12 @@ Public Class frmMain
     End Sub
     Public Sub HandleKeys(sender As Object, e As KeyEventArgs)
         Me.Cursor = Cursors.WaitCursor
+        'MsgBox(e.KeyCode.ToString)
         Select Case e.KeyCode
-            Case Keys.Enter
-                If e.Control And blnLink Then
+            Case Keys.Enter + Keys.Control
+                If blnLink Then
                     blnLink = False
                     HighlightCurrent(strCurrentFilePath)
-
                 End If
             Case Keys.F5, Keys.F6, Keys.F7, Keys.F8, Keys.F9, Keys.F10, Keys.F11, Keys.F12
                 HandleFunctionKeyDown(sender, e)
@@ -462,11 +483,13 @@ Public Class frmMain
                     Select Case e.KeyCode
                         Case Keys.I
                             CreateNewDirectory(CurrentFolderPath)
-                            tvMain2.SelectedFolder = CurrentFolderPath
+                            '                            CreateNewDirectory(tvMain2, CurrentFolderPath, True)
+                            'tvMain2.SelectedFolder = CurrentFolderPath
 
                     End Select
 
                 End If
+
             Case KeyToggleButtons
                 ToggleButtons()
             Case KeyEscape
@@ -474,12 +497,17 @@ Public Class frmMain
                 tmrAutoTrail.Enabled = False
             Case KeyRandomize
                 'Cycle through play orders
+                ChosenPlayOrder = (ChosenPlayOrder + 1) Mod (PlayOrder.Name + 1)
+                UpdatePlayOrder(Showlist.Count > 0)
+            Case KeyRandomize + Keys.Control
                 ChosenPlayOrder = (ChosenPlayOrder + 1) Mod (PlayOrder.Type + 1)
                 UpdatePlayOrder(Showlist.Count > 0)
+            Case KeyAddFile
+                AddCurrentFileToShowlistToolStripMenuItem_Click(Nothing, Nothing)
 
             Case KeyNextFile, KeyPreviousFile, LKeyNextFile, LKeyPreviousFile
 
-                AdvanceFile(e.KeyCode = KeyNextFile, CtrlDown)
+                AdvanceFile(e.KeyCode = KeyNextFile, e.Control)
                 e.Handled = True
                 tmrSlideShow.Enabled = False
 
@@ -498,7 +526,12 @@ Public Class frmMain
                 tmrJumpVideo.Enabled = True
                 e.Handled = True
             Case KeyMarkPoint, LKeyMarkPoint
-                MediaMarker = currentWMP.Ctlcontrols.currentPosition
+                'Addmarker(strCurrentFilePath)
+                If MediaMarker = 0 Then
+                    MediaMarker = currentWMP.Ctlcontrols.currentPosition
+                Else
+                    MediaMarker = 0
+                End If
                 e.Handled = True
             Case KeyLoopToggle
                 blnLoopPlay = Not blnLoopPlay
@@ -516,11 +549,11 @@ Public Class frmMain
                 'Handled by Treeview behaviour unless focus is elsewhere. 
                 'We want the traverse keys always to work. 
 
-                ' If PFocus <> CtrlFocus.Tree Then
-                'ControlSetFocus(tvMain2)
-                'tvMain2_KeyDown(sender, e)
+                If PFocus <> CtrlFocus.Tree Then
+                    ControlSetFocus(tvMain2)
+                    tvMain2_KeyDown(sender, e)
                     'e.Handled = True
-                'End If
+                End If
                 'TraverseTree(tvMain2.tvFiles, e.KeyCode = KeyTraverseTree)
             Case KeyToggleSpeed
                 With currentWMP
@@ -538,8 +571,8 @@ Public Class frmMain
                     blnSpeedRestart = True
                     '  tbSpeed.Text = "SPEED (" & PlaybackSpeed * 100 & "%)"
                 End With
-            Case KeySpeed1, KeySpeed2, KeySpeed3
-                e = SpeedChange(e)
+            Case KeySpeed1, KeySpeed2, KeySpeed3, KeySpeed3 + Keys.Control
+                SpeedChange(e)
             Case KeyFilter 'Cycle through listbox filters
                 CurrentFilterState = (CurrentFilterState + 1) Mod FilterState.LinkOnly '(GetMaxValue(Of FilterState)() + 1)
                 SetFilterState()
@@ -572,7 +605,8 @@ Public Class frmMain
                 'Deletefile(strCurrentFilePath)
                 'UpdateBoxes(strCurrentFilePath, "")
 
-
+            Case KeyMoveToggle
+                ToggleMove()
 
             Case KeyLoopToggle
                 currentWMP.settings.setMode("loop", Not currentWMP.settings.getMode("loop"))
@@ -782,13 +816,8 @@ Public Class frmMain
 
             Exit Try
         End Try
-        Dim c As Control
-        For Each c In Me.Controls
-            c.TabStop = False
-        Next
-        tvMain2.TabStop = True
-        lbxFiles.TabStop = True
-        lbxShowList.TabStop = True
+
+
     End Sub
 
     'Form Controls
@@ -1095,7 +1124,7 @@ Public Class frmMain
         ChangeFolder(e.Directory.FullName, True)
 
         tmrUpdateFolderSelection.Enabled = False
-        tmrUpdateFolderSelection.Interval = lngInterval * 5
+        tmrUpdateFolderSelection.Interval = lngInterval * 8
         tmrUpdateFolderSelection.Enabled = True
 
     End Sub
@@ -1117,7 +1146,7 @@ Public Class frmMain
     End Sub
 
     Private Sub tvMain2_KeyPress(sender As Object, e As KeyPressEventArgs) Handles tvMain2.KeyPress
-        e.Handled = True
+        ' e.Handled = True
     End Sub
 
     Private Sub btnChooseRandom_Click(sender As Object, e As EventArgs)
@@ -1283,6 +1312,7 @@ Public Class frmMain
         dt = f.LastAccessTime
         If f.LastWriteTime < dt Then dt = f.LastWriteTime
         If f.CreationTime < dt Then dt = f.CreationTime
+
         tbDate.Text = dt.ToShortDateString & " " & dt.ToShortTimeString + " (" + Format(f.Length, "#,0.") + " bytes)"
         Dim c As Int16 = lbxFiles.SelectedItems.Count
         If c > 1 Then
@@ -1500,7 +1530,7 @@ Public Class frmMain
 
 
 
-    Private Sub ToggleControl()
+    Private Sub ToggleMove()
         blnMoveMode = Not blnMoveMode
         LoadCurrentButtonSet()
         SetControlColours(blnMoveMode)
@@ -1517,7 +1547,7 @@ Public Class frmMain
     End Sub
 
     Private Sub tmrUpdateFolderSelection_Tick(sender As Object, e As EventArgs) Handles tmrUpdateFolderSelection.Tick
-        PreferencesSave()
+        'PreferencesSave()
 
         FillListbox(lbxFiles, New DirectoryInfo(CurrentFolderPath), FileboxContents, blnChooseRandomFile)
         If lbxFiles.Items.Count = 0 Then tbFiles.Text = "0/" & Str(Showlist.Count)
@@ -1568,7 +1598,7 @@ Public Class frmMain
     End Sub
 
     Private Sub toggleMove_Click(sender As Object, e As EventArgs)
-        ToggleControl()
+        ToggleMove()
     End Sub
 
     Private Sub RandomStartToolStripMenuItem_Click(sender As Object, e As EventArgs)
@@ -1586,7 +1616,7 @@ Public Class frmMain
     End Sub
 
     Private Sub ToggleMoveModeToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ToggleMoveModeToolStripMenuItem.Click
-        ToggleControl()
+        ToggleMove()
 
     End Sub
 
@@ -1662,6 +1692,7 @@ Public Class frmMain
             tmrAutoTrail.Interval = Int(Rnd() * 8 * 1000) + 1000
         Else
             'Normal
+
             HandleKeys(sender, New KeyEventArgs(KeyToggleSpeed))
             tmrAutoTrail.Interval = Int(Rnd() * 2 * 1000) + 750
         End If
@@ -1694,7 +1725,7 @@ Public Class frmMain
         Dim prefixkeys As Keys
         'CTRL+
         prefixkeys = Keys.Control
-        AddCurrentFileListToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.A
+        'AddCurrentFileListToolStripMenuItem.ShortcutKeys = KeyAddFile
         LoadListToolStripMenuItem1.ShortcutKeys = prefixkeys + Keys.L
         SaveListToolStripMenuItem1.ShortcutKeys = prefixkeys + Keys.S
         BundleToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.B

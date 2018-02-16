@@ -44,9 +44,7 @@ Public Class FolderSelect
                 s = Folder
 
             End If
-            If Not My.Computer.FileSystem.DirectoryExists(s) Then
-                My.Computer.FileSystem.CreateDirectory(s)
-            End If
+
             newChosenFolder = s
             Return newChosenFolder
         End Get
@@ -60,6 +58,9 @@ Public Class FolderSelect
     End Sub
 
     Private Sub FolderSelect_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
+        If Not My.Computer.FileSystem.DirectoryExists(Folder) Then
+            CreateNewDirectory(fst1, Folder, False)
+        End If
         If Folder <> strButtonFilePath(ButtonNumber, Alpha, 1) Then
             AssignButton(ButtonNumber, Alpha, 1, Folder, True)
         End If

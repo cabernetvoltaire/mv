@@ -87,12 +87,12 @@
             ePicMousePoint.Y = ePicMousePoint.Y + pbx1.Top
 
         End If
-        If ShiftDown Then 'And iScreenstate <> Screenstate.Fitted Then
+        If iScreenstate = Screenstate.Fitted Then 'And iScreenstate <> Screenstate.Fitted Then
             'Wheel advances file if nothing else held
             frmMain.AdvanceFile(e.Delta < 0, False)
             frmMain.tmrSlideShow.Enabled = False 'Break slideshow if scrolled
             Dim img As Image = GetImage(strCurrentFilePath)
-            PreparePic(pbx1, picBlanker, img)
+            ' PreparePic(pbx1, picBlanker, img)
         Else
 
 

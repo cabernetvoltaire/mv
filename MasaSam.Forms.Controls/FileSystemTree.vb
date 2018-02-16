@@ -354,8 +354,8 @@ Public Class FileSystemTree
     End Sub
 
     Public Sub RefreshTree(ByVal path As String)
-        Dim nd As New DirectoryNode(New DirectoryInfo(path))
-        CreateDirectoryTree(nd)
+        'Dim nd As New DirectoryNode(New DirectoryInfo(path))
+        'CreateDirectoryTree(nd)
         'Collapse(path)
         'Expand(path)
     End Sub
@@ -967,9 +967,9 @@ Public Class FileSystemTree
 
     End Sub
     Public Sub RemoveNode(strpath As String)
-        ' Expand(strpath)
+        Expand(strpath)
         tvFiles.SelectedNode.Remove()
-
+        Expand(tvFiles.SelectedNode.FullPath)
     End Sub
     Public Sub MoveNode(strDir As String, StrDest As String)
         tvFiles.Nodes.RemoveByKey(strDir)
@@ -978,7 +978,7 @@ Public Class FileSystemTree
     End Sub
 
     Private Sub Timer_Tick(sender As Object, e As EventArgs)
-        Exit Sub
+        'Exit Sub
         Try
             For Each node As FileSystemNode In Me.tvFiles.Nodes(0).Nodes
 
@@ -1045,11 +1045,11 @@ Public Class FileSystemTree
     End Sub
 
     Public Sub Addnode(Path As String)
-        Dim dirnd As New DirectoryNode(New DirectoryInfo(Path))
-        dirnd = dirnd.Parent
+        Dim dinfo As New DirectoryInfo(Path)
+        Dim parent As DirectoryTreeNode
 
-        CreateDirectoryTree(dirnd)
-        ' tvFiles.Nodes.Add(Path)
+
+
     End Sub
 
     Private Sub tvFiles_BeforeSelect(sender As Object, e As TreeViewCancelEventArgs) Handles tvFiles.BeforeSelect
@@ -1159,14 +1159,14 @@ Public Class FileSystemTree
         Dim oldlabel As String = e.Label
 
         e = RelabelFolder(e)
-        Try
-
-            My.Computer.FileSystem.RenameDirectory(e.Node.FullPath, e.Node.Parent.FullPath & "\" & e.Label)
-        Catch ex As Exception
-            MsgBox(ex.Message)
-            '            e = RelabelFolder(e) 'TODO improve this.
-        End Try
+        Dim node As FileSystemNode = CType(e.Node, FileSystemNode)
+        Dim pnode As FileSystemNode = CType(e.Node.Parent, FileSystemNode)
+        'Try
         Replace(e.Node.FullPath, oldlabel, e.Label)
+        'Catch ex As Exception
+        'MsgBox(ex.ToString & vbCrLf & ex.Message)
+        '            e = RelabelFolder(e) 'TODO improve this.
+        'End Try
 
 
     End Sub
@@ -1204,7 +1204,7 @@ Public Class FileSystemTree
         ' Exit Sub
 
         'Enables traversing of the filetree
-        If e.KeyCode = refKey Then
+        If e.KeyCode = TraverseKey Then
             Traverse(False)
         End If
         If e.KeyCode = TraverseKeyBack Then

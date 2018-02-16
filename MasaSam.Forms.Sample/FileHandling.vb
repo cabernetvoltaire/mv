@@ -1,4 +1,5 @@
 ﻿Imports System.IO
+Imports MasaSam.Forms.Controls
 Module FileHandling
     Public blnSuppressCreate As Boolean = False
     Public blnChooseOne As Boolean = False
@@ -223,13 +224,16 @@ Module FileHandling
             With My.Computer.FileSystem
                 Dim dir = New DirectoryInfo(strDir)
                 Dim s As String = dir.Name
+                Dim destdir = New DirectoryInfo(strDest)
                 .MoveDirectory(strDir, strDest & "\" & s, FileIO.UIOption.OnlyErrorDialogs)
                 UpdateButton(strDir, strDest & "\" & s) 'todo doesnt handle sub-tree
-                'tvw.Traverse(False)
-                tvw.RefreshTree(dir.Parent.FullName)
-
-                'tvw.Addnode(strDest)
+                'tvw.Expand(strDest)
+                ' tvw.Traverse(False)
                 tvw.RemoveNode(strDir)
+                'tvw.RefreshTree(dir.Parent.FullName)
+                'tvw.RefreshTree(destdir.FullName)
+
+
             End With
         Catch ex As Exception
             MsgBox(ex.Message)
@@ -263,7 +267,7 @@ Module FileHandling
         Dim s As String = strDest 'if strDest is empty then delete
 
         If files.Count > 1 And strDest <> "" Then
-            If Not blnSuppressCreate Then s = CreateNewDirectory(strDest)
+            If Not blnSuppressCreate Then s = CreateNewDirectory(frmMain.tvMain2, strDest, True)
         End If
         Dim file As String
 
@@ -416,19 +420,30 @@ Module FileHandling
 
     End Sub
 
-    Public Function CreateNewDirectory(strDest As String) As String
-        Dim s As String = InputBox("Name of folder to create? (Blank means none)", "Create sub-folder", lastselection)
-        s = strDest & "\" & s
+    Public Sub CreateNewDirectory(strDir As String)
+        AddFolders.Show()
+        AddFolders.Folder = strDir
+
+    End Sub
+    Public Function CreateNewDirectory(tv As FileSystemTree, strDest As String, blnAsk As Boolean) As String
+
+        Dim s As String
+        If blnAsk Then
+            s = InputBox("Name of folder to create? (Blank means none)", "Create sub-folder", lastselection)
+            s = strDest & "\" & s
+
+        End If
         Try
             IO.Directory.CreateDirectory(s)
-            frmMain.tvMain2.RefreshTree(strDest)
+            tv.RefreshTree(strDest)
         Catch ex As IO.DirectoryNotFoundException
         End Try
         If MsgBox("Assign new folder to button?", MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
-            Dim i As Byte = "1"
-            While i > 8 Or i < 1
-                i = InputBox("Number?")
+            Dim i As Integer = "-1"
+            While i > 4 + 8 Or i < 5
+                i = InputBox("Number?",, "f")
             End While
+            i = i - 4
             AssignButton(i, iCurrentAlpha, 1, s, True)
         End If
         Return s
@@ -452,7 +467,7 @@ Module FileHandling
             PreFindAllFiles(blnRecurse, d)
         End If
         frmMain.Cursor = Cursors.WaitCursor
-
+        ProgressBarOn(1000)
         FindAllFilesBelow(d, list, extensions, False, s, blnRecurse, blnChooseOne)
 
         frmMain.Cursor = Cursors.Default
@@ -674,7 +689,7 @@ Module FileHandling
     Public Sub HarvestFolder(d As DirectoryInfo, target As DirectoryInfo, blnRecurse As Boolean)
         Dim i
         i = InputBox("Harvest folders with no more than how many files in?")
-        If i = "" Then Exit Sub
+        If i = "" Then i = 0
 
         Dim s As New List(Of String) '= Nothing
         ' s.Add("Test")
@@ -694,11 +709,11 @@ Module FileHandling
     Private Function Addtolist(ByVal s As List(Of String), d As DirectoryInfo, icount As Short) As List(Of String)
         Dim l As New List(Of String)
         l = s
-        For Each file In d.EnumerateFiles
-            If d.EnumerateFiles.Count <= icount Then
+        If d.EnumerateFiles.Count <= icount Or icount = 0 Then
+            For Each file In d.EnumerateFiles
                 l.Add(file.FullName)
-            End If
-        Next
+            Next
+        End If
         Return s
     End Function
 

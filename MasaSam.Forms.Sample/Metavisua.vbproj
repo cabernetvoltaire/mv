@@ -61,6 +61,10 @@
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Interop.Dsofile">
+      <HintPath>C:\DsoFile\Demo\Interop.Dsofile.dll</HintPath>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
     <Reference Include="MasaSam.Forms.Controls, Version=1.0.6487.35861, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\MasaSam.Forms.Controls\bin\Debug\MasaSam.Forms.Controls.dll</HintPath>
@@ -96,6 +100,12 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AddFolders.Designer.vb">
+      <DependentUpon>AddFolders.vb</DependentUpon>
+    </Compile>
+    <Compile Include="AddFolders.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Colors.vb" />
     <Compile Include="FindDuplicates.Designer.vb">
       <DependentUpon>FindDuplicates.vb</DependentUpon>
@@ -109,6 +119,7 @@
     <Compile Include="FolderSelect.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Group.vb" />
     <Compile Include="Sublists.Designer.vb">
       <DependentUpon>Sublists.vb</DependentUpon>
     </Compile>
@@ -167,6 +178,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="AddFolders.resx">
+      <DependentUpon>AddFolders.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FindDuplicates.resx">
       <DependentUpon>FindDuplicates.vb</DependentUpon>
       <SubType>Designer</SubType>
@@ -241,6 +255,15 @@
     </COMReference>
     <COMReference Include="MediaPlayer">
       <Guid>{22D6F304-B0F6-11D0-94AB-0080C74C7E95}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="Shell32">
+      <Guid>{50A7E9B0-70EF-11D1-B75A-00A0C90564FE}</Guid>
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>

@@ -185,7 +185,7 @@ Partial Class FindDuplicates
         Me.RadioButton2.Name = "RadioButton2"
         Me.RadioButton2.Size = New System.Drawing.Size(154, 29)
         Me.RadioButton2.TabIndex = 1
-        Me.RadioButton2.TabStop = True
+        Me.RadioButton2.TabStop = False
         Me.RadioButton2.Text = "RadioButton2"
         Me.RadioButton2.UseVisualStyleBackColor = True
         '
@@ -196,7 +196,7 @@ Partial Class FindDuplicates
         Me.RadioButton1.Name = "RadioButton1"
         Me.RadioButton1.Size = New System.Drawing.Size(154, 29)
         Me.RadioButton1.TabIndex = 0
-        Me.RadioButton1.TabStop = True
+        Me.RadioButton1.TabStop = False
         Me.RadioButton1.Text = "RadioButton1"
         Me.RadioButton1.UseVisualStyleBackColor = True
         '

@@ -75,13 +75,23 @@ Public Module General
         ' Return the orientation value.
         Return DirectCast(img.GetPropertyItem(OrientationId).Value(0), ExifOrientations)
     End Function
+    Public Function Addmarker(ByVal fpath As String)
+        'Dim fil As New DSOFile.OleDocumentPropertiesClass
+        'fil.Open(fpath, False)
+
+        'fil.SummaryProperties.Comments = InputBox("Enter comment")
+        'fil.Save()
+
+
+    End Function
+
     Public Function PropertyItems(ByVal img As Image) As Dictionary(Of Integer, String)
 
-        For i = 0 To 320
-            PropertyItems.Add(i, img.GetPropertyItem(i).ToString)
+        'For i = 0 To 320
+        '    PropertyItems.Add(i, img.GetPropertyItem(i).ToString)
 
-        Next
-        Return PropertyItems
+        'Next
+        'Return PropertyItems
     End Function
 
     Public Sub ExtractMetaData(theImage As Image)
@@ -150,7 +160,7 @@ Public Module General
     ''' </summary>
     ''' <param name="list"></param>
     ''' <param name="lbx"></param>
-    Public Sub CopyList(list As List(Of String), lbx As ListBox)
+    Public Sub CopyList(ByVal list As List(Of String), lbx As ListBox)
         list.Clear()
         For Each m In lbx.Items
             list.Add(m)
@@ -161,7 +171,7 @@ Public Module General
     ''' </summary>
     ''' <param name="list"></param>
     ''' <param name="list2"></param>
-    Private Sub CopyList(list As List(Of String), list2 As SortedList(Of String, String))
+    Private Sub CopyList(ByVal list As List(Of String), ByVal list2 As SortedList(Of String, String))
         list.Clear()
         For Each m As KeyValuePair(Of String, String) In list2
             list.Add(m.Value)
