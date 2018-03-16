@@ -22,4 +22,18 @@ Public Class AddFolders
     Private Sub AddFolders_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         CreateFolders()
     End Sub
+
+    Private Sub AddFolders_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
+
+    End Sub
+
+    Private Sub AddFolders_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles MyBase.PreviewKeyDown
+
+    End Sub
+
+    Private Sub TextBox1_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox1.KeyDown
+        If e.KeyCode = KeyEscape Then
+            Me.Close()
+        End If
+    End Sub
 End Class

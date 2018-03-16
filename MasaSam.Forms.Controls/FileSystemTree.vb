@@ -1070,6 +1070,7 @@ Public Class FileSystemTree
         Dim myc As String = "My Computer\"
         s = e.node.fullname
         If InStr(s, myc) <> 0 Then s = s.Remove(0, Len(myc))
+        If InStr(s, "\\") <> 0 Then s = s.Replace("\\", "\")
         Return s
     End Function
 
@@ -1230,6 +1231,10 @@ Public Class FileSystemTree
 
     Private Sub FileSystemTree_SystemColorsChanged(sender As Object, e As EventArgs) Handles Me.SystemColorsChanged
 
+    End Sub
+
+    Private Sub tvFiles_NodeMouseDoubleClick(sender As Object, e As TreeNodeMouseClickEventArgs) Handles tvFiles.NodeMouseDoubleClick
+        Process.Start(NodePath(e))
     End Sub
 
 
