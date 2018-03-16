@@ -66,8 +66,6 @@ Public Module General
     End Sub
 
     Public Function ImageOrientation(ByVal img As Image) As ExifOrientations
-        '   Exit Function
-
         ' Get the index of the orientation property.
         Dim orientation_index As Integer = Array.IndexOf(img.PropertyIdList, OrientationId)
 

@@ -154,7 +154,7 @@ Public Class frmMain
     End Sub
     Private Sub AxWindowsMediaPlayer1_MediaError(ByVal sender As Object,
     ByVal e As _WMPOCXEvents_MediaErrorEvent) Handles MainWMP.MediaError
-        'MsgBox(e.pMediaObject.ToString)
+        MsgBox(e.pMediaObject.ToString)
     End Sub
     Public Sub CancelDisplay()
         If currentWMP.Visible Then
@@ -551,7 +551,7 @@ Public Class frmMain
 
                 If PFocus <> CtrlFocus.Tree Then
                     ControlSetFocus(tvMain2)
-                    'tvMain2_KeyDown(sender, e)
+                    tvMain2_KeyDown(sender, e)
                     'e.Handled = True
                 End If
                 'TraverseTree(tvMain2.tvFiles, e.KeyCode = KeyTraverseTree)
@@ -624,13 +624,8 @@ Public Class frmMain
                 'tmrPicLoad.Enabled = True
 
             Case KeyReStartSS
-
                 tmrSlideShow.Enabled = Not tmrSlideShow.Enabled
-                If tmrSlideShow.Enabled Then
-                    tmrPicLoad.Interval = lngInterval
-                Else
-                    tmrPicLoad.Interval = 3 * lngInterval
-                End If
+
         End Select
         Me.Cursor = Cursors.Default
         ' e.Handled = True
@@ -789,7 +784,7 @@ Public Class frmMain
         AssignExtensionFilters()
         tmrLoadLastFolder.Enabled = True
 
-        tmrPicLoad.Interval = lngInterval * 3
+        tmrPicLoad.Interval = lngInterval
         tmrJumpVideo.Interval = lngInterval
         currentWMP = MainWMP
         currentWMP.stretchToFit = True
@@ -1952,17 +1947,5 @@ Public Class frmMain
 
     Private Sub PictureBox1_Click(sender As Object, e As EventArgs) Handles PictureBox1.Click
         '   ExtractMetaData(PictureBox1.Image)
-    End Sub
-
-    Private Sub tvMain2_Load(sender As Object, e As EventArgs) Handles tvMain2.Load
-
-    End Sub
-
-    Private Sub tvMain2_DoubleClick(sender As Object, e As EventArgs) Handles tvMain2.DoubleClick
-
-    End Sub
-
-    Private Sub tvMain2_BindingContextChanged(sender As Object, e As EventArgs) Handles tvMain2.BindingContextChanged
-
     End Sub
 End Class
