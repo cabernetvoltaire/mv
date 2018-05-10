@@ -33,7 +33,7 @@ Public Module Settings
     Public LastPlayed As New Stack(Of String)
     Public LastFolder As New Stack(Of String)
     Public Property blnCopyMode As Boolean = False
-    Public Property blnMoveMode As Boolean = False
+    Public Property blnMoveMode As Boolean = True
     Public Property LastShowList As String
     Public Property blnJumpToMark As Boolean = False
     Public blnRandomStartAlways As Boolean = True
@@ -99,6 +99,7 @@ Public Module Settings
 
     End Sub
     Public Sub PreferencesGet()
+        frmMain.ctrPicAndButtons.SplitterDistance = 9 * frmMain.ctrPicAndButtons.Height / 10
         With My.Computer.Registry.CurrentUser
             frmMain.ctrFileBoxes.SplitterDistance = .GetValue("VertSplit", frmMain.ctrFileBoxes.Height / 4)
             frmMain.ctrMainFrame.SplitterDistance = .GetValue("HorSplit", frmMain.ctrFileBoxes.Width / 2)

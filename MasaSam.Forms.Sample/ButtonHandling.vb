@@ -23,25 +23,40 @@ Module ButtonHandling
         Next
 
     End Sub
+
+    Public Sub AssignNumberButtons()
+        Dim iAlph As Integer
+
+    End Sub
     ''' <summary>
-    ''' Assigns all the buttons in a generation, beginning with strCurrentFilePath
+    ''' Assigns all the buttons in a generation, beneath sPath, to the letter iAlpha
     ''' </summary>
-    Public Sub AssignLinear()
-        Dim d As New DirectoryInfo(CurrentFolderPath)
+    Public Sub AssignLinear(sPath As String, iAlpha As Integer, blnNext As Boolean)
+        Dim d As New DirectoryInfo(sPath)
         Dim i As Byte
         Dim di() As DirectoryInfo
-        di = d.Parent.GetDirectories
-        Dim n = d.Parent.GetDirectories.Count - 1
+        di = d.GetDirectories
+        Dim n = d.GetDirectories.Count - 1
         For i = 0 To n
-            If di(i).FullName = CurrentFolderPath Then
-                Dim k As Byte
-                While k <= 7 And i + k < n
-                    AssignButton(k, iCurrentAlpha, 1, di(i + k).FullName)
-                    k += 1
-                End While
+            Dim k As Byte
+            k = i Mod 8
 
-            End If
+            AssignButton(k, iAlpha + Int(i / 8), 1, di(i).FullName)
         Next
+
+        'If di(i).Parent.FullName = sPath Then
+        '        Dim k As Byte
+        '        While k <= 7 And i + k < n
+        '            AssignButton(k, iAlpha, 1, di(i + k).FullName)
+        '            k += 1
+        '            If k >= 8 And blnNext Then
+        '                iAlpha += 1
+        '                k = 0
+        '            End If
+        '        End While
+
+        '    End If
+        'Next
         KeyAssignmentsStore(strButtonFile)
         'For Each di In d.Parent.EnumerateDirectories
         '    AssignButton(i, iCurrentAlpha, di.FullName)
@@ -182,7 +197,7 @@ Module ButtonHandling
         End If
 
     End Sub
-    Public Sub AssignButton(i As Byte, j As Integer, k As Byte, strPath As String, Optional blnStore As Boolean = False)
+    Public Sub AssignButton(ByVal i As Byte, ByVal j As Integer, ByVal k As Byte, ByVal strPath As String, Optional blnStore As Boolean = False)
         Dim f As New DirectoryInfo(strPath)
         If strVisibleButtons(i) <> "" And Not blnMoveMode Then
             If Not MsgBox("Replace button assignment for F" & i + 5 & " with " & f.Name & "?", MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then Exit Sub
@@ -192,7 +207,7 @@ Module ButtonHandling
 
         lblDest(i).Text = f.Name
         strButtonCaptions(i, j, k) = f.Name
-        LoadCurrentButtonSet()
+        UpdateButtonAppearance()
         If blnStore Then
             KeyAssignmentsStore(strButtonFile)
         End If
@@ -200,7 +215,7 @@ Module ButtonHandling
     Public Sub ChangeButtonLetter(e As KeyEventArgs)
         frmMain.lblAlpha.Text = e.KeyCode.ToString
         iCurrentAlpha = ButtfromAsc(e.KeyCode)
-        LoadCurrentButtonSet()
+        UpdateButtonAppearance()
 
     End Sub
     Public Function ButtfromAsc(asc As Integer) As Integer
@@ -256,7 +271,10 @@ Module ButtonHandling
             End If
         Next
     End Sub
-    Public Sub LoadCurrentButtonSet()
+    ''' <summary>
+    ''' This is for when we hold down CTRL or SHIFT and the appearance of the buttons schanges. 
+    ''' </summary>
+    Public Sub UpdateButtonAppearance()
         For i = 0 To 7
             frmMain.lblAlpha.Text = Chr(AscfromButt(iCurrentAlpha)).ToString
             Dim s As String
@@ -352,7 +370,7 @@ Module ButtonHandling
             End If
         Loop
 
-        LoadCurrentButtonSet()
+        UpdateButtonAppearance()
 
         fs.Close()
         Exit Sub

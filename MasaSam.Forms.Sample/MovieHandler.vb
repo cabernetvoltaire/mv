@@ -1,5 +1,7 @@
 ﻿Imports AxWMPLib
 Module MovieHandler
+    Public Event MediaEnded()
+
     Public Property MediaMarker As Long = 0
     Public Property MediaDuration As Long = lngMediaDuration
     Public Property NewPosition As Long
@@ -10,8 +12,17 @@ Module MovieHandler
         If MediaMarker <> 0 Then
             NewPosition = MediaMarker
         Else
-            NewPosition = Math.Max(0, MediaDuration - FromFinish)
+            Select Case frmMain.StartType
+                Case StartTypes.NearBeginning
+                    NewPosition = FromFinish
+                Case StartTypes.NearEnd
+                    NewPosition = Math.Max(0, MediaDuration - FromFinish)
+
+                Case StartTypes.Particular
+                    NewPosition = MediaDuration * frmMain.StartPointPercentage / 100
+            End Select
         End If
+
         frmMain.tmrJumpVideo.Enabled = True
     End Sub
     Public Sub PlaystateChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent)
@@ -20,15 +31,13 @@ Module MovieHandler
             Case WMPLib.WMPPlayState.wmppsMediaEnded
                 If Not frmMain.tmrAutoTrail.Enabled Then
                     frmMain.AdvanceFile(True, True)
-                    '                   Dim KeyEvent As New KeyEventArgs(KeyNextFile)
-                    '                  frmMain.HandleKeys(sender, KeyEvent)
                 End If
 
             Case WMPLib.WMPPlayState.wmppsPlaying
 
                 MediaDuration = currentWMP.currentMedia.duration
                 If blnJumpToMark Then
-                    MediaJumpToMarker()
+                    MediaJumpToMarker(False)
 
                 ElseIf blnRandomStartPoint Then
                     If FullScreen.Changing Then

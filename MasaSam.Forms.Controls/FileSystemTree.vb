@@ -356,8 +356,8 @@ Public Class FileSystemTree
     Public Sub RefreshTree(ByVal path As String)
         'Dim nd As New DirectoryNode(New DirectoryInfo(path))
         'CreateDirectoryTree(nd)
-        'Collapse(path)
-        'Expand(path)
+        Collapse(path)
+        Expand(path)
     End Sub
     Private Sub ExpandDriveNode(ByVal dn As DriveNode, ByVal driveName As String, ByVal directoryNames As List(Of String))
         'Only expand if it's in the path we seek
@@ -1044,13 +1044,7 @@ Public Class FileSystemTree
 
     End Sub
 
-    Public Sub Addnode(Path As String)
-        Dim dinfo As New DirectoryInfo(Path)
-        Dim parent As DirectoryTreeNode
 
-
-
-    End Sub
 
     Private Sub tvFiles_BeforeSelect(sender As Object, e As TreeViewCancelEventArgs) Handles tvFiles.BeforeSelect
         'MsgBox("tvFiles_BeforeSelect") 'Repeatedly called
@@ -1204,10 +1198,10 @@ Public Class FileSystemTree
         ' Exit Sub
 
         'Enables traversing of the filetree
-        If e.KeyCode = TraverseKey Then
+        If e.KeyCode = TraverseKey Or e.KeyCode = Keys.Right Then
             Traverse(False)
         End If
-        If e.KeyCode = TraverseKeyBack Then
+        If e.KeyCode = TraverseKeyBack Or e.KeyCode = Keys.Left Then
             Traverse(True)
         End If
         If e.KeyCode = Keys.F2 Then

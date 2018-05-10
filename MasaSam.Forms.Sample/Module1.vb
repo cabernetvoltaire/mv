@@ -15,6 +15,14 @@ Public Module General
         Length
         Type
     End Enum
+
+    Public Enum StartTypes As Byte
+        Beginning
+        NearBeginning
+        NearEnd
+        Random
+        Particular
+    End Enum
     Public lngShowlistLines As Long = 0
     Public CurrentFilterState As Integer = FilterState.All
 
@@ -255,46 +263,6 @@ Public Module General
     ''' </summary>
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
-    Public Sub HandleFunctionKeyDown(sender As Object, e As KeyEventArgs)
-        Dim i As Byte = e.KeyCode - Keys.F5
-        'Move files
-        If e.Control Xor blnMoveMode Then 'Move files if CTRL held
-            frmMain.CancelDisplay()
-
-            Select Case PFocus
-                Case CtrlFocus.Files
-                    MoveFiles(ListfromListbox(frmMain.lbxFiles), strVisibleButtons(i), frmMain.lbxFiles)
-                Case CtrlFocus.Tree
-                    MoveFolder(CurrentFolderPath, strVisibleButtons(i), frmMain.tvMain2, blnMoveMode)
-                Case CtrlFocus.ShowList
-                    ' If MsgBox("This will move all the showlist files to the folder " & strVisibleButtons(i) & ". Is this what you want?", MsgBoxStyle.YesNoCancel) <> MsgBoxResult.Yes Then Exit Sub
-                    MoveFiles(ListfromListbox(frmMain.lbxShowList), strVisibleButtons(i), frmMain.lbxShowList)
-            End Select
-
-        Else
-            'Assign buttons
-            If e.Shift Or strVisibleButtons(i) = "" Then
-                AssignButton(i, iCurrentAlpha, 1, CurrentFolderPath, True) 'Just assign
-                If My.Computer.FileSystem.FileExists(strButtonFile) Then
-                    KeyAssignmentsStore(strButtonFile)
-                Else
-                    SaveButtonlist()
-                End If
-            Else
-                'SWITCH folder
-                If strVisibleButtons(i) <> CurrentFolderPath Then
-                    ChangeFolder(strVisibleButtons(i), True)
-                    'frmMain.CancelDisplay()
-                    frmMain.tvMain2.SelectedFolder = CurrentFolderPath
-                ElseIf blnChooseRandomFile Then
-                    frmMain.AdvanceFile(True, True)
-
-                End If
-            End If
-
-        End If
-        frmMain.SetControlColours(blnMoveMode)
-    End Sub
 
     Public Sub ChangeFolder(strPath As String, blnSHow As Boolean)
         If strPath = CurrentFolderPath Then
@@ -307,10 +275,21 @@ Public Module General
             End If
             CurrentFolderPath = strPath 'Switch to this folder
         End If
+        ChangeWatcherPath(CurrentFolderPath)
         ReDim FBCShown(0)
         NofShown = 0
         'frmMain.CancelDisplay() 'TODO Make this an option.
         frmMain.SetControlColours(blnMoveMode)
+    End Sub
+    Public Sub ChangeWatcherPath(path As String)
+        Dim d As New DirectoryInfo(path)
+        If d.Parent Is Nothing Then
+        Else
+
+            frmMain.WatchStart(d.Parent.FullName)
+        End If
+
+
     End Sub
 
     Public Function ListfromListbox(lbx As ListBox) As List(Of String)

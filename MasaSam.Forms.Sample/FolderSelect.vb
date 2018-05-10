@@ -68,4 +68,6 @@ Public Class FolderSelect
     Private Sub fst1_Paint(sender As Object, e As PaintEventArgs) Handles fst1.Paint
         fst1.SelectedFolder = newFolder
     End Sub
+
+
 End Class

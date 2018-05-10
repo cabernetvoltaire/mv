@@ -3,8 +3,8 @@ Imports MasaSam.Forms.Controls
 Module FileHandling
     Public blnSuppressCreate As Boolean = False
     Public blnChooseOne As Boolean = False
-    Public strVideoExtensions = ".vob .webm.avi.flv.mov.mpeg.mpg.m4v.mkv.mp4.wmv.wav.mp3.3gp"
-    Public strPicExtensions = ".jpeg.png.jpg.bmp.gif"
+    Public strVideoExtensions = ".vob.avi.flv.mov.m4p.mpeg.mpg.m4a.m4v.mkv.mp4.wmv.wav.mp3.3gp"
+    Public strPicExtensions = ".jpeg.webm.png.jpg.bmp.gif"
 
     Public FilePumpList As New List(Of String)
 
@@ -56,10 +56,11 @@ Module FileHandling
             frmMain.ReportFilterandOrder()
             lbx.Tag = e
 
-            If PFocus = CtrlFocus.ShowList Then
-            Else
+            'If PFocus = CtrlFocus.ShowList Then
 
-                If lbx.Items.Count <> 0 Then
+            'Else
+
+            If lbx.Items.Count <> 0 Then
                     If blnRandom Then
                         Dim s As Long = lbx.Items.Count - 1
                         lbx.SelectedIndex = Rnd() * s
@@ -67,7 +68,7 @@ Module FileHandling
                         lbx.SelectedIndex = 0
                     End If
                 End If
-            End If
+            'End If
 
         Catch ex As ArgumentException
             MsgBox(ex.ToString)
@@ -127,7 +128,7 @@ Module FileHandling
     Public Sub FilePump(strFileDest As String, lbx1 As ListBox)
 
         FilePumpList.Add(strFileDest)
-        If FilePumpList.Count = 5 Then
+        If FilePumpList.Count = 35 Then
 
             MoveFiles(FilePumpList, lbx1)
             FilePumpList.Clear()
@@ -225,7 +226,13 @@ Module FileHandling
                 Dim dir = New DirectoryInfo(strDir)
                 Dim s As String = dir.Name
                 Dim destdir = New DirectoryInfo(strDest)
-                .MoveDirectory(strDir, strDest & "\" & s, FileIO.UIOption.OnlyErrorDialogs)
+                If blnCopyMode Then
+                    .CopyDirectory(strDir, strDest & "\" & s, FileIO.UIOption.OnlyErrorDialogs)
+
+                Else
+
+                    .MoveDirectory(strDir, strDest & "\" & s, FileIO.UIOption.OnlyErrorDialogs)
+                End If
                 UpdateButton(strDir, strDest & "\" & s) 'todo doesnt handle sub-tree
                 'tvw.Expand(strDest)
                 ' tvw.Traverse(False)
@@ -325,7 +332,7 @@ Module FileHandling
                         Else
                             'MsgBox("Start")
                             Try
-                                .MoveFile(m.FullName, spath, FileIO.UIOption.AllDialogs)
+                                .MoveFile(m.FullName, spath, FileIO.UIOption.OnlyErrorDialogs)
                             Catch ex As Exception
                                 Exit For
                             End Try
@@ -416,7 +423,7 @@ Module FileHandling
             End With
         Next
         lbx1.SelectionMode = SelectionMode.One
-        If lbx1.Items.Count <> 0 Then lbx1.SetSelected(Math.Max(Math.Min(ind, lbx1.Items.Count - 1), 0), True)
+        'If lbx1.Items.Count <> 0 Then lbx1.SetSelected(Math.Max(Math.Min(ind, lbx1.Items.Count - 1), 0), True)
 
     End Sub
 
@@ -426,25 +433,28 @@ Module FileHandling
 
     End Sub
     Public Function CreateNewDirectory(tv As FileSystemTree, strDest As String, blnAsk As Boolean) As String
-
+        Dim blnCreate As Boolean = True
+        Dim blnAssign As Boolean = False
         Dim s As String
         If blnAsk Then
             s = InputBox("Name of folder to create? (Blank means none)", "Create sub-folder", lastselection)
+            If s = "" Then blnCreate = False
             s = strDest & "\" & s
-
         End If
-        Try
-            IO.Directory.CreateDirectory(s)
-            tv.RefreshTree(strDest)
-        Catch ex As IO.DirectoryNotFoundException
-        End Try
-        If MsgBox("Assign new folder to button?", MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
-            Dim i As Integer = "-1"
-            While i > 4 + 8 Or i < 5
-                i = InputBox("Number?",, "f")
-            End While
-            i = i - 4
-            AssignButton(i, iCurrentAlpha, 1, s, True)
+        If blnCreate Then
+            Try
+                IO.Directory.CreateDirectory(s)
+                tv.RefreshTree(strDest)
+            Catch ex As IO.DirectoryNotFoundException
+            End Try
+            If MsgBox("Assign new folder to button?", MsgBoxStyle.YesNo, "Assign folder") = MsgBoxResult.Yes Then '
+                Dim i As Integer = -1
+                While i > 4 + 8 Or i < 5
+                    i = InputBox("Number?",, "f")
+                End While
+                i = i - 5
+                AssignButton(i, iCurrentAlpha, 1, s, True)
+            End If
         End If
         Return s
     End Function
