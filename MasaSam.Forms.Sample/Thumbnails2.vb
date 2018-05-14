@@ -6,11 +6,10 @@ Public Class Thumbnails
     Private flist As List(Of String)
     Private mSize As Int16 = 100
     Private Sub LoadThumbnails()
-        Dim flp As New FlowLayoutPanel
-
-
-        flp.BackColor = Color.Azure
-        flp.Dock = DockStyle.Fill
+        Dim flp As New FlowLayoutPanel With {
+            .BackColor = Color.Azure,
+            .Dock = DockStyle.Fill
+        }
         flp.SendToBack()
         flp.Visible = True
         flp.AutoScroll = True
@@ -84,7 +83,7 @@ Public Class Thumbnails
             Return myThumbnail
             'e.Graphics.DrawImage(myThumbnail, 150, 75)
         Catch ex As Exception
-
+            Return Nothing
         End Try
     End Function
 

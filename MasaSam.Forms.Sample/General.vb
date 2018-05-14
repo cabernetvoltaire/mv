@@ -2,10 +2,23 @@
 Imports System.IO
 Imports System.Drawing.Imaging
 Public Module General
+    Public Enum ExifOrientations As Byte
+        Unknown = 0
+        TopLeft = 1
+        TopRight = 2
+        BottomRight = 3
+        BottomLeft = 4
+        LeftTop = 5
+        RightTop = 6
+        RightBottom = 7
+        LeftBottom = 8
+    End Enum
 
-    Public btnDest() As Button = {frmMain.btn1, frmMain.btn2, frmMain.btn3, frmMain.btn4, frmMain.btn5, frmMain.btn6, frmMain.btn7, frmMain.btn8}
-
-    Public lblDest() As Label = {frmMain.lbl1, frmMain.lbl2, frmMain.lbl3, frmMain.lbl4, frmMain.lbl5, frmMain.lbl6, frmMain.lbl7, frmMain.lbl8}
+    Public Enum CtrlFocus As Byte
+        Tree = 0
+        Files = 1
+        ShowList = 2
+    End Enum
     Public Enum PlayOrder As Byte
         Original
         Random
@@ -26,7 +39,6 @@ Public Module General
     Public lngShowlistLines As Long = 0
     Public CurrentFilterState As Integer = FilterState.All
 
-
     Public Orientation() As String = {"Unknown", "TopLeft", "TopRight", "BottomRight", "BottomLeft", "LeftTop", "RightTop", "RightBottom", "LeftBottom"}
     Public Enum Filetype As Byte
         Pic
@@ -37,6 +49,10 @@ Public Module General
         Browsable
         Unknown
     End Enum
+
+
+#Region "Controls"
+
     Public Sub ProgressBarOn(max As Long)
         With frmMain.TSPB
             .Value = 0
@@ -45,12 +61,41 @@ Public Module General
         End With
 
     End Sub
+    Public Sub ProgressIncrement(st As Integer)
+        With frmMain.TSPB
+            '   .Maximum = max
+            .Value = (.Value + st) Mod .Maximum 'TODO this could be causing the stalling
+
+        End With
+        frmMain.Update()
+    End Sub
     Public Sub ProgressBarOff()
         With frmMain.TSPB
             .Visible = False
         End With
 
     End Sub
+#End Region
+
+#Region "Links"
+    Public Sub SelectDeadLinks(lbx As ListBox)
+        HighlightList(lbx, GetDeadLinks(lbx))
+    End Sub
+    Public Function GetDeadLinks(lbx As ListBox) As List(Of String)
+        Dim ls As New List(Of String)
+        ls = SelectFromListbox(lbx, ".lnk", False)
+        lbx.SelectedItems.Clear()
+        Dim deadlinks As New List(Of String)
+        For Each f In ls
+            Dim Finfo = New FileInfo(CreateObject("WScript.Shell").CreateShortcut(f).TargetPath)
+
+            If Not Finfo.Exists Then
+                deadlinks.Add(f)
+            End If
+        Next
+        Return deadlinks
+    End Function
+
     ''' <summary>
     ''' Returns the path of the link defined in str
     ''' </summary>
@@ -64,14 +109,10 @@ Public Module General
         End Try
 
     End Function
-    Public Sub ProgressIncrement(st As Integer)
-        With frmMain.TSPB
-            '   .Maximum = max
-            .Value = (.Value + st) Mod .Maximum 'TODO this could be causing the stalling
+#End Region
 
-        End With
-        frmMain.Update()
-    End Sub
+
+#Region "Rotation Functions"
 
     Public Function ImageOrientation(ByVal img As Image) As ExifOrientations
         ' Get the index of the orientation property.
@@ -83,24 +124,10 @@ Public Module General
         ' Return the orientation value.
         Return DirectCast(img.GetPropertyItem(OrientationId).Value(0), ExifOrientations)
     End Function
-    Public Function Addmarker(ByVal fpath As String)
-        'Dim fil As New DSOFile.OleDocumentPropertiesClass
-        'fil.Open(fpath, False)
-
-        'fil.SummaryProperties.Comments = InputBox("Enter comment")
-        'fil.Save()
+#End Region
 
 
-    End Function
 
-    Public Function PropertyItems(ByVal img As Image) As Dictionary(Of Integer, String)
-
-        'For i = 0 To 320
-        '    PropertyItems.Add(i, img.GetPropertyItem(i).ToString)
-
-        'Next
-        'Return PropertyItems
-    End Function
 
     Public Sub ExtractMetaData(theImage As Image)
 
@@ -162,6 +189,7 @@ Public Module General
             Return Now - StartTime
         End If
     End Function
+#Region "List functions"
 
     ''' <summary>
     ''' Copies list from a lbx
@@ -198,12 +226,48 @@ Public Module General
             list.Add(m.Value)
         Next
     End Sub
+    Public Function ListfromListbox(lbx As ListBox) As List(Of String)
+        Dim s As New List(Of String)
+        For Each l In lbx.SelectedItems
+            s.Add(l)
+        Next
+        Return s
+    End Function
+    ''' <summary>
+    ''' Fill a listbox with a list, ignores the filter - dunno why
+    ''' </summary>
+    ''' <param name="lbx"></param>
+    ''' <param name="Filter"></param>
+    ''' <param name="lst"></param>
+    '''
+    Public Sub FillShowbox(lbx As ListBox, Filter As Byte, ByVal lst As List(Of String))
+        If lst.Count = 0 Then Exit Sub
+        If lst.Count > 1000 Then
+            ProgressBarOn(lst.Count)
+        End If
+
+        If lbx.Name = "lbxShowList" Then
+            frmMain.CollapseShowlist(False)
+
+        End If
+
+        lbx.Items.Clear()
+
+        For Each s In lst
+            lbx.Items.Add(s)
+            ProgressIncrement(1)
+        Next
+        '        lbx.TabStop = True
+        ProgressBarOff()
+        'frmMain.UpdateFileInfo()
+    End Sub
     Private Sub CopyList(list As List(Of String), list2 As SortedList(Of Date, String))
         list.Clear()
         For Each m As KeyValuePair(Of Date, String) In list2
             list.Add(m.Value)
         Next
     End Sub
+#End Region
     Public Function FindType(file As String) As Filetype
         blnLink = False
         Try
@@ -247,22 +311,8 @@ Public Module General
         End Try
     End Function
 
-    ''' <summary>
-    ''' Only load the labels of the current set. 
-    ''' </summary>
-    Public Sub Buttons_Load()
-        For i As Byte = 0 To 7
-            lblDest(i).Font = New Font(lblDest(i).Font, FontStyle.Bold)
-        Next
-        ' blnButtonsLoaded = True
-        InitialiseButtons()
-    End Sub
 
-    ''' <summary>
-    ''' Assigns paths to buttons, moves files, or switches to folders
-    ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
+
 
     Public Sub ChangeFolder(strPath As String, blnSHow As Boolean)
         If strPath = CurrentFolderPath Then
@@ -271,15 +321,13 @@ Public Module General
             If Not LastFolder.Contains(CurrentFolderPath) Then
                 LastFolder.Push(CurrentFolderPath)
 
-                'If blnSHow Then frmMain.tvMain2.SelectedFolder = CurrentFolderPath
             End If
             CurrentFolderPath = strPath 'Switch to this folder
         End If
         ChangeWatcherPath(CurrentFolderPath)
         ReDim FBCShown(0)
         NofShown = 0
-        'frmMain.CancelDisplay() 'TODO Make this an option.
-        frmMain.SetControlColours(blnMoveMode)
+        'frmMain.SetControlColours(blnMoveMode)
     End Sub
     Public Sub ChangeWatcherPath(path As String)
         Dim d As New DirectoryInfo(path)
@@ -292,41 +340,7 @@ Public Module General
 
     End Sub
 
-    Public Function ListfromListbox(lbx As ListBox) As List(Of String)
-        Dim s As New List(Of String)
-        For Each l In lbx.SelectedItems
-            s.Add(l)
-        Next
-        Return s
-    End Function
-    ''' <summary>
-    ''' Fill a listbox with a list, ignores the filter - dunno why
-    ''' </summary>
-    ''' <param name="lbx"></param>
-    ''' <param name="Filter"></param>
-    ''' <param name="lst"></param>
-    '''
-    Public Sub FillShowbox(lbx As ListBox, Filter As Byte, ByVal lst As List(Of String))
-        If lst.Count = 0 Then Exit Sub
-        If lst.Count > 1000 Then
-            ProgressBarOn(lst.Count)
-        End If
 
-        If lbx.Name = "lbxShowList" Then
-            frmMain.CollapseShowlist(False)
-
-        End If
-
-        lbx.Items.Clear()
-
-        For Each s In lst
-            lbx.Items.Add(s)
-            ProgressIncrement(1)
-        Next
-        '        lbx.TabStop = True
-        ProgressBarOff()
-        'frmMain.UpdateFileInfo()
-    End Sub
     Public Sub MouseHoverInfo(lbx As ListBox, tt As ToolTip)
         Dim cc, sc As Point
         cc = New Point
@@ -504,23 +518,6 @@ Public Module General
             If i >= 0 Then lbx.SetSelected(i, True)
         Next
     End Sub
-    Public Sub SelectDeadLinks(lbx As ListBox)
-        HighlightList(lbx, GetDeadLinks(lbx))
-    End Sub
-    Public Function GetDeadLinks(lbx As ListBox) As List(Of String)
-        Dim ls As New List(Of String)
-        ls = SelectFromListbox(lbx, ".lnk", False)
-        lbx.SelectedItems.Clear()
-        Dim deadlinks As New List(Of String)
-        For Each f In ls
-            Dim Finfo = New FileInfo(CreateObject("WScript.Shell").CreateShortcut(f).TargetPath)
-
-            If Not Finfo.Exists Then
-                deadlinks.Add(f)
-            End If
-        Next
-        Return deadlinks
-    End Function
 
 
     Public Function ReturnListOfDirectories(ByVal list As List(Of String), strPath As String) As List(Of String)

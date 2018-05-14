@@ -127,6 +127,7 @@
     </Compile>
     <Compile Include="Group.vb" />
     <Compile Include="Shortcuts.vb" />
+    <Compile Include="StateHandler.vb" />
     <Compile Include="Sublists.Designer.vb">
       <DependentUpon>Sublists.vb</DependentUpon>
     </Compile>
@@ -148,7 +149,7 @@
     </Compile>
     <Compile Include="KeyHandling.vb" />
     <Compile Include="FileHandling.vb" />
-    <Compile Include="Module1.vb" />
+    <Compile Include="General.vb" />
     <Compile Include="ButtonHandling.vb" />
     <Compile Include="My Project\Resources.Designer.vb">
       <AutoGen>True</AutoGen>

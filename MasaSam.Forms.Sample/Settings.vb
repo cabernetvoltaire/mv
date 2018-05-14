@@ -1,22 +1,6 @@
 ﻿
 Public Module Settings
-    Public Enum ExifOrientations As Byte
-        Unknown = 0
-        TopLeft = 1
-        TopRight = 2
-        BottomRight = 3
-        BottomLeft = 4
-        LeftTop = 5
-        RightTop = 6
-        RightBottom = 7
-        LeftBottom = 8
-    End Enum
 
-    Public Enum CtrlFocus As Byte
-        Tree = 0
-        Files = 1
-        ShowList = 2
-    End Enum
     Public PFocus As Byte = CtrlFocus.Tree
     Public Property ZoneSize As Decimal = 0.4
     Public Const OrientationId As Integer = &H112
@@ -43,6 +27,7 @@ Public Module Settings
     Public PlaybackSpeed As Double = 30
     Public strCurrentFilePath As String = ""
     Public CurrentFolderPath As String = "E:\"
+    Public FavesFolderPath As String = "Q:\Favourites"
     Public strButtonFile As String
 
     Public Autozoomrate As Decimal = 0.4

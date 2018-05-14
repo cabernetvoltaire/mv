@@ -14,13 +14,17 @@ Module MovieHandler
         Else
             Select Case frmMain.StartType
                 Case StartTypes.NearBeginning
-                    NewPosition = FromFinish
+                    NewPosition = Math.Min(FromFinish, MediaDuration / 2)
                 Case StartTypes.NearEnd
                     NewPosition = Math.Max(0, MediaDuration - FromFinish)
 
                 Case StartTypes.Particular
                     NewPosition = MediaDuration * frmMain.StartPointPercentage / 100
+                Case StartTypes.Random
+                    NewPosition = (Rnd(1) * (currentWMP.currentMedia.duration))
+
             End Select
+            Console.WriteLine(frmMain.StartType & ":New position is " & NewPosition & " of " & MediaDuration)
         End If
 
         frmMain.tmrJumpVideo.Enabled = True
@@ -37,7 +41,7 @@ Module MovieHandler
 
                 MediaDuration = currentWMP.currentMedia.duration
                 If blnJumpToMark Then
-                    MediaJumpToMarker(False)
+                    MediaJumpToMarker()
 
                 ElseIf blnRandomStartPoint Then
                     If FullScreen.Changing Then

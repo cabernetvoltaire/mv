@@ -3,8 +3,8 @@ Imports MasaSam.Forms.Controls
 Module FileHandling
     Public blnSuppressCreate As Boolean = False
     Public blnChooseOne As Boolean = False
-    Public strVideoExtensions = ".vob.avi.flv.mov.m4p.mpeg.mpg.m4a.m4v.mkv.mp4.wmv.wav.mp3.3gp"
-    Public strPicExtensions = ".jpeg.webm.png.jpg.bmp.gif"
+    Public strVideoExtensions = ".vob.webm.avi.flv.mov.m4p.mpeg.mpg.m4a.m4v.mkv.mp4.rm.wmv.wav.mp3.3gp"
+    Public strPicExtensions = ".jpeg.png.jpg.bmp.gif"
 
     Public FilePumpList As New List(Of String)
 
@@ -226,6 +226,7 @@ Module FileHandling
                 Dim dir = New DirectoryInfo(strDir)
                 Dim s As String = dir.Name
                 Dim destdir = New DirectoryInfo(strDest)
+
                 If blnCopyMode Then
                     .CopyDirectory(strDir, strDest & "\" & s, FileIO.UIOption.OnlyErrorDialogs)
 
@@ -255,14 +256,16 @@ Module FileHandling
     ''' <param name="strDest"></param>
     ''' <param name="lbx1"></param>
     Public Sub MoveFiles(files As List(Of String), strDest As String, lbx1 As ListBox)
+
         Dim ind As Long = lbx1.SelectedIndex
+        'If only one file, then use the filepump
         If files.Count = 1 Then
             'Try
             '    FileIO.FileSystem.CopyFile(files(0), strDest & "\" & FileIO.FileSystem.GetName(files(0)), FileIO.UIOption.OnlyErrorDialogs)
             '    FileIO.FileSystem.DeleteFile(files(0))
             'Catch ex As Exception
             'End Try
-
+            'Build a single filepump
             lbx1.Items.Remove(files(0))
             frmMain.tmrPumpFiles.Enabled = True
             FilePump(files.Item(0) & "|" & strDest, lbx1)
@@ -285,7 +288,14 @@ Module FileHandling
         If lbx1.Items.Count <> 0 Then lbx1.SetSelected(Math.Max(Math.Min(ind, lbx1.Items.Count - 1), 0), True)
 
     End Sub
-
+    ''' <summary>
+    ''' Moves files to strDest, creating a subfolder s if specified, unless strDest is empty in which case, they are deleted. Updates lbx1. 
+    ''' </summary>
+    ''' <param name="files"></param>
+    ''' <param name="strDest"></param>
+    ''' <param name="lbx1"></param>
+    ''' <param name="s"></param>
+    ''' <returns></returns>
     Private Function MovingFiles(files As List(Of String), strDest As String, lbx1 As ListBox, s As String) As String
         Dim file As String = ""
 
@@ -319,27 +329,16 @@ Module FileHandling
                 Else
                     'Deal with existing files
                     Try
-                        ' m = Nothing
-                        ' currentPicBox.Image = Nothing
-
                         If Not currentPicBox.Image Is Nothing Then DisposePic(currentPicBox)
-
-                        '         lbx1.Items.Remove(m.FullName) 'TODO Remove this and add a refresh later. 
-
                         If strDest = "" Then
-
                             Deletefile(m.FullName)
                         Else
-                            'MsgBox("Start")
                             Try
                                 .MoveFile(m.FullName, spath, FileIO.UIOption.OnlyErrorDialogs)
                             Catch ex As Exception
                                 Exit For
                             End Try
-                            '.DeleteFile(m.FullName)
-                            'MsgBox("Finish")
                         End If
-
 
                     Catch ex As IOException
                         Continue For
@@ -435,7 +434,7 @@ Module FileHandling
     Public Function CreateNewDirectory(tv As FileSystemTree, strDest As String, blnAsk As Boolean) As String
         Dim blnCreate As Boolean = True
         Dim blnAssign As Boolean = False
-        Dim s As String
+        Dim s As String = ""
         If blnAsk Then
             s = InputBox("Name of folder to create? (Blank means none)", "Create sub-folder", lastselection)
             If s = "" Then blnCreate = False
@@ -524,6 +523,7 @@ Module FileHandling
 
 
         For Each file In d.EnumerateFiles
+            Application.DoEvents()
             ProgressIncrement(1)
             Try
                 If InStr(LCase(extensions), LCase("NOT")) <> 0 Then

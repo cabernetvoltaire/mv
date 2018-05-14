@@ -8,6 +8,17 @@ Module ButtonHandling
     ' Public fButtonDests(8, nletts, 3) As IO.DirectoryInfo
     Private iAlphaCount = nletts
     Public strButtonCaptions(8, nletts, 1)
+
+    Public btnDest() As Button = {frmMain.btn1, frmMain.btn2, frmMain.btn3, frmMain.btn4, frmMain.btn5, frmMain.btn6, frmMain.btn7, frmMain.btn8}
+
+    Public lblDest() As Label = {frmMain.lbl1, frmMain.lbl2, frmMain.lbl3, frmMain.lbl4, frmMain.lbl5, frmMain.lbl6, frmMain.lbl7, frmMain.lbl8}
+    Public Sub Buttons_Load()
+        For i As Byte = 0 To 7
+            lblDest(i).Font = New Font(lblDest(i).Font, FontStyle.Bold)
+        Next
+        ' blnButtonsLoaded = True
+        InitialiseButtons()
+    End Sub
     Public Sub UpdateButton(strPath As String, strDest As String)
         For i = 0 To nletts - 1
             For j = 0 To 7
@@ -24,10 +35,7 @@ Module ButtonHandling
 
     End Sub
 
-    Public Sub AssignNumberButtons()
-        Dim iAlph As Integer
 
-    End Sub
     ''' <summary>
     ''' Assigns all the buttons in a generation, beneath sPath, to the letter iAlpha
     ''' </summary>

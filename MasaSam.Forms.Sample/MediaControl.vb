@@ -73,7 +73,7 @@ Public Class MediaControl
         CtrlDown = e.Control
 
         'frmMain.HandleKeys(Me, e)
-        e.Handled = True
+        e.suppresskeypress = True
     End Sub
 
     Public Sub wmp_PlayStateChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent) Handles wmp.PlayStateChange

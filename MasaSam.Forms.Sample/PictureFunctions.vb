@@ -50,22 +50,17 @@
         End If
     End Function
     Private Function ClassifyImage(lvpw As Long, lvph As Long, liw As Long, lih As Long) As Byte
-        Dim s As String
         If lvpw > liw Then 'Viewport wider than pic
             If lvph > lih Then
                 ClassifyImage = PicState.Underscan
-                s = "underscan"
             Else
                 ClassifyImage = PicState.TooTall
-                s = "tootall"
             End If
         Else 'Viewport narrower than pic
             If lvph > lih Then
                 ClassifyImage = PicState.TooWide
-                s = "toowide"
             Else 'Viewport shorter than pic
                 ClassifyImage = PicState.Overscan
-                s = "overscan"
             End If
         End If
 
@@ -87,12 +82,10 @@
             ePicMousePoint.Y = ePicMousePoint.Y + pbx1.Top
 
         End If
-        If iScreenstate = Screenstate.Fitted Then 'And iScreenstate <> Screenstate.Fitted Then
-            'Wheel advances file if nothing else held
+        If iScreenstate = Screenstate.Fitted Then
             frmMain.AdvanceFile(e.Delta < 0, False)
             frmMain.tmrSlideShow.Enabled = False 'Break slideshow if scrolled
             Dim img As Image = GetImage(strCurrentFilePath)
-            ' PreparePic(pbx1, picBlanker, img)
         Else
 
 

@@ -19,7 +19,7 @@ Public Class FullScreen
         End If
 
         frmMain.HandleKeys(Me, e)
-        e.Handled = True
+        e.SuppressKeyPress = True
     End Sub
 
     Public Sub FSWMP_PlayStateChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent) Handles FSWMP.PlayStateChange

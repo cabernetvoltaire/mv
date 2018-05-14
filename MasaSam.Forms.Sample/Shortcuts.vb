@@ -1,15 +1,43 @@
 ﻿Module Shortcuts
     Public Class ShortcutHandler
         Public Sub New()
+            Dim TargetPath As String = ""
+            Dim ShortCutPath As String = ""
+            Dim ShortCutName As String = ""
 
         End Sub
+        Private sTargetPath As String
+        Private sShortcutPath As String
+        Private sShortcutName As String
+        Public Property TargetPath() As String
+            Get
+                Return sTargetPath
+            End Get
+            Set(ByVal value As String)
+                sTargetPath = value
+            End Set
+        End Property
+        Public Property ShortcutPath() As String
+            Get
+                Return sShortcutPath
+            End Get
+            Set(ByVal value As String)
+                sShortcutPath = value
+            End Set
+        End Property
+        Public Property ShortcutName() As String
+            Get
+                Return sShortcutName
+            End Get
+            Set(ByVal value As String)
+                sShortcutName = value
+            End Set
+        End Property
         ''' <summary>
         ''' Creates a shortcut to sTargetPath, places it in sSHortCutPath, with a short name of sShortcutName
         ''' </summary>
-        ''' <param name="sTargetPath"></param>
-        ''' <param name="sShortCutPath"></param>
-        ''' <param name="sShortCutName"></param>
-        Public Sub Create_ShortCut(ByVal sTargetPath As String, sShortCutPath As String, ByVal sShortCutName As String)
+
+        Public Sub Create_ShortCut()
 
 
             ' Requires reference to Windows Script Host Object Model
@@ -19,11 +47,11 @@
             Dim sName As String
             oShell = New IWshRuntimeLibrary.WshShell
             Dim f As IO.FileInfo
-            f = New IO.FileInfo(sShortCutPath)
+            f = New IO.FileInfo(sShortcutPath)
             If f.Extension <> "lnk" Then
-                sName = sShortCutPath & "\" & sShortCutName & ".lnk"
+                sName = sShortcutPath & "\" & sShortcutName & ".lnk"
             Else
-                sName = sShortCutPath
+                sName = sShortcutPath
 
             End If
             If IO.File.Exists(sName) Then IO.File.Delete(sName)
@@ -31,9 +59,16 @@
             oShortcut = oShell.CreateShortcut(sName)
 
             With oShortcut
-                .TargetPath = sTargetPath
+                Dim d As New IO.DirectoryInfo(sShortcutPath)
+                If d.Exists Then
+                Else
+                    d.Create()
+                End If
 
+                .TargetPath = sTargetPath
                 .Save()
+
+
             End With
 
             oShortcut = Nothing

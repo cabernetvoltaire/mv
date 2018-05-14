@@ -1449,6 +1449,7 @@ Partial Class frmMain
         Me.chbAutoTrail.Name = "chbAutoTrail"
         Me.chbAutoTrail.Size = New System.Drawing.Size(122, 29)
         Me.chbAutoTrail.TabIndex = 3
+        Me.chbAutoTrail.TabStop = False
         Me.chbAutoTrail.Text = "Auto Trail"
         Me.chbAutoTrail.UseVisualStyleBackColor = True
         '
@@ -1459,6 +1460,7 @@ Partial Class frmMain
         Me.chbRand.Name = "chbRand"
         Me.chbRand.Size = New System.Drawing.Size(206, 29)
         Me.chbRand.TabIndex = 2
+        Me.chbRand.TabStop = False
         Me.chbRand.Text = "Random Start Point"
         Me.chbRand.UseVisualStyleBackColor = True
         '
@@ -1469,6 +1471,7 @@ Partial Class frmMain
         Me.chbInDir.Name = "chbInDir"
         Me.chbInDir.Size = New System.Drawing.Size(214, 29)
         Me.chbInDir.TabIndex = 1
+        Me.chbInDir.TabStop = False
         Me.chbInDir.Text = "On directory change"
         Me.chbInDir.UseVisualStyleBackColor = True
         '
@@ -1479,6 +1482,7 @@ Partial Class frmMain
         Me.chbNextFile.Name = "chbNextFile"
         Me.chbNextFile.Size = New System.Drawing.Size(114, 29)
         Me.chbNextFile.TabIndex = 0
+        Me.chbNextFile.TabStop = False
         Me.chbNextFile.Text = "Next File"
         Me.chbNextFile.UseVisualStyleBackColor = True
         '

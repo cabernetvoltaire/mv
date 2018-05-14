@@ -22,6 +22,8 @@
     Public KeyBigJumpBack = Keys.NumPad8
     Public KeyBigJumpOn = Keys.NumPad9
     Public KeyMarkPoint = Keys.NumPad4
+    Public KeyMarkFavourite = Keys.Insert
+
 
     Public LKeyFullscreen = Keys.F + Keys.Alt
     Public LKeyRandomize = Keys.R + Keys.Alt

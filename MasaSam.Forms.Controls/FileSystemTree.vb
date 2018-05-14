@@ -1095,6 +1095,7 @@ Public Class FileSystemTree
     End Sub
 
     Public Sub Traverse(blnBack As Boolean)
+        'Exit Sub
         Dim node As TreeNode
         Dim newnode As TreeNode
         node = tvFiles.SelectedNode
@@ -1194,37 +1195,58 @@ Public Class FileSystemTree
         Return e
     End Function
 
-    Private Sub tvFiles_KeyDown(sender As Object, e As KeyEventArgs) Handles tvFiles.KeyDown
-        ' Exit Sub
+    Public Sub tvFiles_KeyDown(sender As Object, e As KeyEventArgs) Handles tvFiles.KeyDown
+        'Exit Sub
 
         'Enables traversing of the filetree
-        If e.KeyCode = TraverseKey Or e.KeyCode = Keys.Right Then
-            Traverse(False)
-        End If
-        If e.KeyCode = TraverseKeyBack Or e.KeyCode = Keys.Left Then
-            Traverse(True)
-        End If
-        If e.KeyCode = Keys.F2 Then
-            tvFiles.LabelEdit = True
-            Dim nd As TreeNode = tvFiles.SelectedNode
-            If Not (nd Is Nothing) And Not (nd.Parent Is Nothing) Then
-                tvFiles.SelectedNode = nd
+        Select Case e.KeyCode
+            Case TraverseKey, TraverseKeyBack
+                Traverse(e.KeyCode = TraverseKeyBack)
+            Case Keys.F2
                 tvFiles.LabelEdit = True
-                If Not nd.IsEditing Then
-                    nd.BeginEdit()
-                End If
-            Else
-                MessageBox.Show("No tree node selected or selected node is a root node." &
+                Dim nd As TreeNode = tvFiles.SelectedNode
+                If Not (nd Is Nothing) And Not (nd.Parent Is Nothing) Then
+                    tvFiles.SelectedNode = nd
+                    tvFiles.LabelEdit = True
+                    If Not nd.IsEditing Then
+                        nd.BeginEdit()
+                    End If
+                Else
+                    MessageBox.Show("No tree node selected or selected node is a root node." &
                   Microsoft.VisualBasic.ControlChars.Cr &
                   "Editing of root nodes is not allowed.", "Invalid selection")
-            End If
+                End If
+            Case Keys.Left, Keys.Right, Keys.Up, Keys.Down
 
-        End If
+            Case Else
+                e.SuppressKeyPress = True
+        End Select
+        Exit Sub
+        'If e.KeyCode = TraverseKey Then
+        '    Traverse(False)
+        'End If
+        'If e.KeyCode = TraverseKeyBack Then
+        '    Traverse(True)
+        'End If
+        'If e.KeyCode = Keys.F2 Then
+        '    tvFiles.LabelEdit = True
+        '    Dim nd As TreeNode = tvFiles.SelectedNode
+        '    If Not (nd Is Nothing) And Not (nd.Parent Is Nothing) Then
+        '        tvFiles.SelectedNode = nd
+        '        tvFiles.LabelEdit = True
+        '        If Not nd.IsEditing Then
+        '            nd.BeginEdit()
+        '        End If
+        '    Else
+        '        MessageBox.Show("No tree node selected or selected node is a root node." &
+        '          Microsoft.VisualBasic.ControlChars.Cr &
+        '          "Editing of root nodes is not allowed.", "Invalid selection")
+        '    End If
+
+        'End If
+        'e.Handled = True
     End Sub
 
-    Private Sub FileSystemTree_SystemColorsChanged(sender As Object, e As EventArgs) Handles Me.SystemColorsChanged
-
-    End Sub
 
 
 
