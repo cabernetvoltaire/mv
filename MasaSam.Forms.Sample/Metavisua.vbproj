@@ -106,6 +106,7 @@
     <Compile Include="AddFolders.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="FilterHandler.vb" />
     <Compile Include="Colors.vb" />
     <Compile Include="FindDuplicates.Designer.vb">
       <DependentUpon>FindDuplicates.vb</DependentUpon>
@@ -125,8 +126,10 @@
     <Compile Include="Form2.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Group.vb" />
+    <Compile Include="Grouper.vb" />
     <Compile Include="Shortcuts.vb" />
+    <Compile Include="SortHandler.vb" />
+    <Compile Include="StartPointHandler.vb" />
     <Compile Include="StateHandler.vb" />
     <Compile Include="Sublists.Designer.vb">
       <DependentUpon>Sublists.vb</DependentUpon>

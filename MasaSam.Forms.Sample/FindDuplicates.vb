@@ -26,7 +26,7 @@ Public Class FindDuplicates
         uniquelist = ExtractDups(sortedList)
         MsgBox("There are " & uniquelist.Count & " unique files having duplicates, out of " & Showlist.Count)
 
-        FillShowbox(lbxunique, FilterState.All, uniquelist)
+        FillShowbox(lbxunique, FilterHandler.FilterState.All, uniquelist)
 
 
     End Sub
@@ -89,7 +89,7 @@ Public Class FindDuplicates
         Next
         'Fill the duplicates box
         If Verbose Then
-            FillShowbox(lbxDuplicates, FilterState.All, duplist)
+            FillShowbox(lbxDuplicates, FilterHandler.FilterState.All, duplist)
             For i = 0 To 11
                 Try
                     ' PreviewWMP(i).URL = ""

@@ -3,27 +3,15 @@ Module MovieHandler
     Public Event MediaEnded()
 
     Public Property MediaMarker As Long = 0
-    Public Property MediaDuration As Long = lngMediaDuration
+    Public Property MediaDuration As Long ' = lngMediaDuration
     Public Property NewPosition As Long
     Public Property FromFinish As Long = 65
-    Public Property FrameRate As Int16
     Public Sub MediaJumpToMarker()
         'Jumps to lMediaMarker unless not set, in which case, jumps to 65s before end.
         If MediaMarker <> 0 Then
             NewPosition = MediaMarker
         Else
-            Select Case frmMain.StartType
-                Case StartTypes.NearBeginning
-                    NewPosition = Math.Min(FromFinish, MediaDuration / 2)
-                Case StartTypes.NearEnd
-                    NewPosition = Math.Max(0, MediaDuration - FromFinish)
-
-                Case StartTypes.Particular
-                    NewPosition = MediaDuration * frmMain.StartPointPercentage / 100
-                Case StartTypes.Random
-                    NewPosition = (Rnd(1) * (currentWMP.currentMedia.duration))
-
-            End Select
+            NewPosition = frmMain.StartPoint.StartPoint
             Console.WriteLine(frmMain.StartType & ":New position is " & NewPosition & " of " & MediaDuration)
         End If
 
@@ -40,6 +28,7 @@ Module MovieHandler
             Case WMPLib.WMPPlayState.wmppsPlaying
 
                 MediaDuration = currentWMP.currentMedia.duration
+                frmMain.StartPoint.Duration = MediaDuration
                 If blnJumpToMark Then
                     MediaJumpToMarker()
 

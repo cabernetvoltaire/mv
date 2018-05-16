@@ -29,15 +29,8 @@ Public Module General
         Type
     End Enum
 
-    Public Enum StartTypes As Byte
-        Beginning
-        NearBeginning
-        NearEnd
-        Random
-        Particular
-    End Enum
+
     Public lngShowlistLines As Long = 0
-    Public CurrentFilterState As Integer = FilterState.All
 
     Public Orientation() As String = {"Unknown", "TopLeft", "TopRight", "BottomRight", "BottomLeft", "LeftTop", "RightTop", "RightBottom", "LeftBottom"}
     Public Enum Filetype As Byte
@@ -315,6 +308,7 @@ Public Module General
 
 
     Public Sub ChangeFolder(strPath As String, blnSHow As Boolean)
+
         If strPath = CurrentFolderPath Then
 
         Else

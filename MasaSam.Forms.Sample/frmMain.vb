@@ -9,17 +9,18 @@ Imports MasaSam.Forms.Controls
 Public Class frmMain
 
     Public Shared ReadOnly Property MyPictures As String
-    Public Filterstates As String() = {"All", "Picture only", "Videos only", "Pictures and videos", "Links only", "Not pictures or videos"}
-    Public FilterColours As New List(Of Color)({Color.MintCream, Color.LemonChiffon, Color.LightPink, Color.LightSeaGreen, Color.LightBlue, Color.PaleTurquoise})
-    Public DefaultColours As New List(Of Color)({Color.Aqua, Color.Orange, Color.Purple, Color.Gray, Color.AliceBlue})
+
     Public defaultcolour As Color = Color.Aqua
     Public movecolour As Color = Color.Orange
     Public watchfolder As FileSystemWatcher
     Public StartType As Byte
     Public StartPointPercentage As Integer
-
+    Public StartingUpFlag As Boolean = True
 
     Public WithEvents NavigateMoveState As New StateHandler
+    Public WithEvents CurrentFilterState As New FilterHandler
+    Public WithEvents PlayOrder As New SortHandler
+    Public WithEvents StartPoint As New StartPointHandler
 
 
 
@@ -32,20 +33,27 @@ Public Class frmMain
         sh.Create_ShortCut()
     End Sub
 
-    Public Sub OnStateChanged() Handles NavigateMoveState.StateChanged
-        Dim s As StateHandler.StateOptions = NavigateMoveState.State
-        Select Case s
-            Case StateHandler.StateOptions.Copy
-            Case StateHandler.StateOptions.Move
-            Case StateHandler.StateOptions.CopyLink
-            Case StateHandler.StateOptions.MoveLeavingLink
-            Case StateHandler.StateOptions.Navigate
+    Public Sub OnStartChanged() Handles StartPoint.StateChanged
+        blnJumpToMark = True
+        StartPoint.Distance = 65
+        Select Case StartPoint.State
+            Case StartPointHandler.StartTypes.Beginning
+                blnJumpToMark = False
+            Case Else
 
         End Select
-        SetControlColours(DefaultColours.Item(s), FilterColours.Item(CurrentFilterState))
-
+        MediaJumpToMarker()
+        tbStartpoint.Text = "START:" & StartPoint.Description
     End Sub
-
+    Public Sub OnStateChanged() Handles NavigateMoveState.StateChanged, CurrentFilterState.StateChanged, PlayOrder.StateChanged
+        If StartingUpFlag Then Exit Sub
+        UpdatePlayOrder(Showlist.Count > 0)
+        cbxOrder.SelectedIndex = PlayOrder.State
+        cbxFilter.SelectedIndex = CurrentFilterState.State
+        tbRandom.Text = "ORDER:" & UCase(PlayOrder.Description)
+        tbFilter.Text = "FILTER:" & UCase(CurrentFilterState.Description)
+        SetControlColours(NavigateMoveState.Colour, CurrentFilterState.Colour)
+    End Sub
     Public Sub SetControlColours(MainColor As Color, FilterColor As Color)
         tvMain2.BackColor = FilterColor
         tvMain2.HighlightSelectedNodes()
@@ -85,9 +93,6 @@ Public Class frmMain
         If tmrJumpVideo.Enabled Then
             tbStartpoint.Text = "START:RANDOM"
             currentWMP.Visible = False
-            '   While tmrJumpVideo.Enabled
-
-            'End While
         Else
             tbStartpoint.Text = "START:NORMAL"
 
@@ -95,14 +100,9 @@ Public Class frmMain
         End If
 
         currentWMP.URL = strCurrentFilePath
-        'Dim f As Int16
-        'f = currentWMP.currentMedia.getItemInfo(FrameRate)
         '  MsgBox(f)
         currentWMP.BringToFront()
-        ' AxVLCPlugin21.MRL = "file:///" & strCurrentFilePath & ""
-        'AxVLCPlugin21.BringToFront()
-        'AxVLCPlugin21.playlist.togglePause()
-        '  If PlaybackSpeed <> 1 Then currentWMP.settings.rate = PlaybackSpeed
+
         currentPicBox.Visible = False
 
         If tmrSlideShow.Enabled Then
@@ -215,23 +215,14 @@ Public Class frmMain
     Public Sub UpdatePlayOrder(blnShowBoxShown As Boolean)
         If blnShowBoxShown Then
 
-            tbRandom.Text = "ORDER:" & UCase(strPlayOrder(ChosenPlayOrder))
-            Showlist = SetPlayOrder(ChosenPlayOrder, Showlist)
+            Showlist = SetPlayOrder(PlayOrder.State, Showlist)
             lbxShowList.Items.Clear()
-            FillShowbox(lbxShowList, CurrentFilterState, Showlist)
+            FillShowbox(lbxShowList, CurrentFilterState.State, Showlist)
         End If
-        '        lbxFiles.Items.Clear()
-        'FileboxContents = SetPlayOrder(ChosenPlayOrder, FileboxContents)
         Dim e = New DirectoryInfo(CurrentFolderPath)
         FillListbox(lbxFiles, e, FileboxContents, False)
-        '       FillShowbox(lbxFiles, CurrentFilterState, FileboxContents)
-        ReportFilterandOrder()
     End Sub
 
-    Public Sub ReportFilterandOrder()
-        cbxOrder.SelectedIndex = ChosenPlayOrder
-        cbxFilter.SelectedIndex = CurrentFilterState
-    End Sub
 
 
     'Private Function SpeedChange(e As KeyEventArgs, blnTrue As Boolean)
@@ -518,12 +509,12 @@ Public Class frmMain
                 CancelDisplay()                'currentPicBox.Image.Dispose()
                 tmrAutoTrail.Enabled = False
             Case KeyRandomize
-                'Cycle through play orders
-                ChosenPlayOrder = (ChosenPlayOrder + 1) Mod (PlayOrder.Type + 1) 'Change
-                UpdatePlayOrder(Showlist.Count > 0)
-            Case KeyRandomize + Keys.Control
-                ChosenPlayOrder = (ChosenPlayOrder + 1) Mod (PlayOrder.Type + 1)
-                UpdatePlayOrder(Showlist.Count > 0)
+                If e.Control Then
+                Else
+                    PlayOrder.IncrementState()
+                    'PlayOrder.Toggle()
+                End If            'Change
+
             Case KeyAddFile
                 AddCurrentFileToShowlistToolStripMenuItem_Click(Nothing, Nothing)
 
@@ -600,8 +591,8 @@ Public Class frmMain
             Case KeySpeed1, KeySpeed2, KeySpeed3, KeySpeed3 + Keys.Control
                 SpeedChange(e)
             Case KeyFilter 'Cycle through listbox filters
-                CurrentFilterState = (CurrentFilterState + 1) Mod (FilterState.NoPicVid + 1) '(GetMaxValue(Of FilterState)() + 1)
-                SetFilterState(CurrentFilterState)
+                CurrentFilterState.IncrementState()
+
                 e.SuppressKeyPress = True
             Case KeySelect
                 SelectSubList(False)
@@ -665,13 +656,8 @@ Public Class frmMain
         blnLoopPlay = Not blnLoopPlay
         'currentWMP.= blnLoopPlay
     End Sub
-    Private Sub SetFilterState(cfs As FilterState)
-        cbxFilter.Select(cfs, 1)
-        'MsgBox(cfs.ToString)
-        'FillListbox(lbxFiles, New DirectoryInfo(CurrentFolderPath), FileboxContents, blnChooseRandomFile)
-        UpdatePlayOrder(Showlist.Count > 0)
-        tbFilter.Text = UCase(Filterstates(cfs))
-        SetControlColours(DefaultColours.Item(NavigateMoveState.State), FilterColours.Item(cfs))
+    Private Sub SetFilterState()
+
     End Sub
 
     Private Sub SetWMP(tWMP As AxWindowsMediaPlayer)
@@ -777,13 +763,13 @@ Public Class frmMain
 
     Private Sub AddMovies(blnRecurse As Boolean)
         AddFilesToCollection(Showlist, strVideoExtensions, blnRecurse)
-        FillShowbox(lbxShowList, FilterState.All, Showlist)
+        FillShowbox(lbxShowList, FilterHandler.FilterState.All, Showlist)
     End Sub
     Private Sub AddFiles(blnRecurse As Boolean)
         ProgressBarOn(1000)
 
         AddFilesToCollection(Showlist, "", blnRecurse)
-        FillShowbox(lbxShowList, CurrentFilterState, Showlist)
+        FillShowbox(lbxShowList, CurrentFilterState.State, Showlist)
         ProgressBarOff()
     End Sub
 
@@ -811,6 +797,18 @@ Public Class frmMain
     Private Sub GlobalInitialise()
         '  InitialiseColours()
         CollapseShowlist(True)
+        cbxFilter.Items.Clear()
+        cbxOrder.Items.Clear()
+
+        For Each s In CurrentFilterState.Descriptions
+            cbxFilter.Items.Add(s)
+        Next
+        For Each s In PlayOrder.Descriptions
+            cbxOrder.Items.Add(s)
+        Next
+        For Each s In StartPoint.Descriptions
+            StartPointComboBox.Items.Add(s)
+        Next
         PreferencesGet()
         Randomize()
         AssignExtensionFilters()
@@ -824,16 +822,9 @@ Public Class frmMain
         currentWMP.uiMode = "FULL"
         currentWMP.Dock = DockStyle.Fill
         currentPicBox = PictureBox1
-        cbxFilter.Items.Clear()
 
-        For i = 0 To Filterstates.Length - 1
-            cbxFilter.Items.Add(Filterstates(i))
-        Next
-        cbxOrder.Items.Clear()
 
-        For i = 0 To strPlayOrder.Length - 1
-            cbxOrder.Items.Add(strPlayOrder(i))
-        Next
+
         'Exit Sub
         Try
             KeyAssignmentsRestore(strButtonFile)
@@ -850,7 +841,7 @@ Public Class frmMain
             Exit Try
         End Try
         WatchStart(CurrentFolderPath)
-
+        StartingUpFlag = False
     End Sub
     Public Sub WatchStart(path As String)
         Exit Sub
@@ -1095,7 +1086,7 @@ Public Class frmMain
         If sender.Equals(tvMain2) Then
             PFocus = CtrlFocus.Tree
         End If
-        SetControlColours(DefaultColours.Item(NavigateMoveState.State), FilterColours.Item(CurrentFilterState))
+        SetControlColours(NavigateMoveState.Colour, CurrentFilterState.Colour)
 
         ' SetControlColours(blnMoveMode)
     End Sub
@@ -1149,7 +1140,7 @@ Public Class frmMain
 
     Private Sub AddPicVids(blnRecurse As Boolean)
         AddFilesToCollection(Showlist, strPicExtensions & strVideoExtensions, blnRecurse)
-        FillShowbox(lbxShowList, FilterState.All, Showlist)
+        FillShowbox(lbxShowList, FilterHandler.FilterState.All, Showlist)
     End Sub
     Public Sub UpdateBoxes(strold As String, strnew As String)
 
@@ -1354,9 +1345,9 @@ Public Class frmMain
             tbFiles.Text = "FOLDER:" & listcount & " SHOW:" & showcount
         End If
         If FilePumpList.Count <> 0 Then tbFiles.Text = tbFiles.Text & " (" & FilePumpList.Count & " files waiting to be moved.)"
-        tbFilter.Text = "FILTER:" & Filterstates(CurrentFilterState)
+        tbFilter.Text = "FILTER:" & CurrentFilterState.Description
         tbLastFile.Text = strCurrentFilePath
-        tbRandom.Text = "ORDER:" & UCase(strPlayOrder(ChosenPlayOrder))
+        tbRandom.Text = "ORDER:" & UCase(PlayOrder.Description)
         tbShowfile.Text = "SHOWFILE: " & LastShowList
         tbSpeed.Text = tbSpeed.Text = "SPEED (" & PlaybackSpeed & "fps)"
         tbButton.Text = "BUTTONFILE: " & strButtonFile
@@ -1369,9 +1360,6 @@ Public Class frmMain
 
     End Sub
 
-    Private Sub ToolStripButton7_Click_1(sender As Object, e As EventArgs)
-        SelectSubList(False)
-    End Sub
 
 
     Private Function SelectSubList(blnRegex As Boolean) As String
@@ -1454,7 +1442,7 @@ Public Class frmMain
         Dim di As New DirectoryInfo(CurrentFolderPath)
         HarvestFolder(di, di, True)
         FillListbox(lbxFiles, di, FileboxContents, False)
-        SetControlColours(DefaultColours.Item(NavigateMoveState.State), FilterColours.Item(CurrentFilterState))
+        SetControlColours(NavigateMoveState.Colour, CurrentFilterState.Colour)
 
         'SetControlColours(blnMoveMode)
 
@@ -1477,10 +1465,7 @@ Public Class frmMain
 
 
 
-    Private Sub ComboBox2_SelectedIndexChanged(sender As Object, e As EventArgs)
-        ChosenPlayOrder = cbxOrder.SelectedIndex
-        UpdatePlayOrder(Showlist.Count > 0)
-    End Sub
+
     Private Sub LoadListToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles LoadListToolStripMenuItem1.Click
         LoadShowList()
 
@@ -1508,9 +1493,7 @@ Public Class frmMain
 
     Private Sub frmMain_Load(sender As Object, e As EventArgs) Handles Me.Load
 
-        For i = 0 To 5
-            cbxOrder.Items.Add(strPlayOrder(i))
-        Next
+
         ConstructMenuShortcuts()
         ConstructMenutooltips()
     End Sub
@@ -1610,15 +1593,14 @@ Public Class frmMain
 
 
     Private Sub ComboBox1_SelectedIndexChanged(sender As Object, e As EventArgs)
-        CurrentFilterState = cbxFilter.SelectedIndex
-        SetFilterState(CurrentFilterState)
+        CurrentFilterState.State = cbxFilter.SelectedIndex
 
     End Sub
 
     Private Sub SingleFilePerFolderToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SingleFilePerFolderToolStripMenuItem.Click
         blnChooseOne = True
         AddFilesToCollection(Showlist, strPicExtensions & strVideoExtensions, True)
-        FillShowbox(lbxShowList, FilterState.All, Showlist)
+        FillShowbox(lbxShowList, CurrentFilterState.State, Showlist)
     End Sub
 
     Private Sub BundleToolStripMenuItem_Click(sender As Object, e As EventArgs)
@@ -1927,7 +1909,7 @@ Public Class frmMain
         End Select
 
 
-        SetControlColours(DefaultColours.Item(NavigateMoveState.State), FilterColours.Item(CurrentFilterState))
+        SetControlColours(NavigateMoveState.Colour, CurrentFilterState.Colour)
 
         'SetControlColours(blnMoveMode)
     End Sub
@@ -1987,17 +1969,14 @@ Public Class frmMain
     End Sub
 
     Private Sub cbxFilter_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbxFilter.SelectedIndexChanged
-        CurrentFilterState = cbxFilter.SelectedIndex
-        If cbxFilter.Focused Then
-
-            SetFilterState(CurrentFilterState)
+        If CurrentFilterState.State <> cbxFilter.SelectedIndex Then
+            CurrentFilterState.State = cbxFilter.SelectedIndex
         End If
     End Sub
 
     Private Sub cbxOrder_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbxOrder.SelectedIndexChanged
-        ChosenPlayOrder = cbxOrder.SelectedIndex
-        If cbxOrder.Focused Then
-            UpdatePlayOrder(Showlist.Count > 0)
+        If PlayOrder.State <> cbxOrder.SelectedIndex Then
+            PlayOrder.State = cbxOrder.SelectedIndex
         End If
     End Sub
 
@@ -2019,7 +1998,7 @@ Public Class frmMain
 
     Private Sub AddCurrentFileToShowlistToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AddCurrentFileToShowlistToolStripMenuItem.Click
         AddSingleFileToList(Showlist, strCurrentFilePath)
-        FillShowbox(lbxShowList, CurrentFilterState, Showlist)
+        FillShowbox(lbxShowList, CurrentFilterState.State, Showlist)
         CollapseShowlist(False)
     End Sub
 
@@ -2029,29 +2008,13 @@ Public Class frmMain
 
 
     Private Sub StartPointComboBox_SelectedIndexChanged_1(sender As Object, e As EventArgs) Handles StartPointComboBox.SelectedIndexChanged
-        StartType = StartPointComboBox.SelectedIndex
+        StartPoint.State = StartPointComboBox.SelectedIndex
         blnJumpToMark = True
-        Select Case StartType
 
-            Case StartTypes.Particular
-                StartPointTrackBar.Enabled = True
-                StartPointPercentage = StartPointTrackBar.Value
-            Case StartTypes.Beginning
-                blnJumpToMark = False
-                blnRandomStartAlways = False
-            Case StartTypes.NearBeginning
-            Case StartTypes.Random
-                blnRandomStartAlways = True
-
-
-
-            Case Else
-                StartPointTrackBar.Enabled = False
-        End Select
     End Sub
 
     Private Sub StartPointTrackBar_ValueChanged(sender As Object, e As EventArgs) Handles StartPointTrackBar.ValueChanged
-        StartPointPercentage = StartPointTrackBar.Value
+        StartPoint.Percentage = StartPointTrackBar.Value
     End Sub
 
 

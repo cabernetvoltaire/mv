@@ -67,14 +67,7 @@
     Public KeyMoveToggle = Keys.Oem7
 
 
-    Public Enum FilterState
-        All
-        Piconly
-        Vidonly
-        PicVid
-        LinkOnly
-        NoPicVid
-    End Enum
+
 
 
     'Public CurrentFolder As New IO.DirectoryInfo(C:\)

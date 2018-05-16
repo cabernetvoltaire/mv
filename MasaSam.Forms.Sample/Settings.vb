@@ -63,7 +63,6 @@ Public Module Settings
     Public ssspeed As Integer = 200
     'Public CountSelections As Int16
     Public blnFullScreen As Boolean
-    Public strPlayOrder() As String = {"Original", "Random", "Name", "Path Name", "Date/Time", "Size", "Type"}
     Public Property lngListSizeBytes As Long
     'Public blnTVCurrent As Boolean
 
@@ -76,7 +75,7 @@ Public Module Settings
             .SetValue("HorSplit", frmMain.ctrMainFrame.SplitterDistance)
             .SetValue("Folder", CurrentFolderPath)
             .SetValue("File", strCurrentFilePath)
-            .SetValue("Filter", CurrentFilterState)
+            .SetValue("Filter", frmMain.CurrentFilterState.State)
             .SetValue("LastButtonFolder", strButtonFile)
             .SetValue("LastAlpha", iCurrentAlpha)
 
@@ -90,7 +89,7 @@ Public Module Settings
             frmMain.ctrMainFrame.SplitterDistance = .GetValue("HorSplit", frmMain.ctrFileBoxes.Width / 2)
             CurrentFolderPath = .GetValue("Folder", frmMain.MyPictures)
             strCurrentFilePath = .GetValue("File")
-            CurrentFilterState = .GetValue("Filter", 0)
+            frmMain.CurrentFilterState.State = .GetValue("Filter", 0)
             strButtonFile = .GetValue("LastButtonFolder", "")
 
             iCurrentAlpha = .GetValue("LastAlpha", 0)

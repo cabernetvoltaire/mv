@@ -5,17 +5,18 @@ Module FileHandling
     Public blnChooseOne As Boolean = False
     Public strVideoExtensions = ".vob.webm.avi.flv.mov.m4p.mpeg.mpg.m4a.m4v.mkv.mp4.rm.wmv.wav.mp3.3gp"
     Public strPicExtensions = ".jpeg.png.jpg.bmp.gif"
+    Public CurrentfilterState As FilterHandler = frmMain.CurrentFilterState
 
     Public FilePumpList As New List(Of String)
 
     Dim strFilterExtensions(6) As String
     Public Sub AssignExtensionFilters()
-        strFilterExtensions(FilterState.All) = ""
-        strFilterExtensions(FilterState.Piconly) = strPicExtensions
-        strFilterExtensions(FilterState.PicVid) = strPicExtensions & strVideoExtensions
-        strFilterExtensions(FilterState.LinkOnly) = ".lnk"
-        strFilterExtensions(FilterState.Vidonly) = strVideoExtensions
-        strFilterExtensions(FilterState.NoPicVid) = strPicExtensions & strVideoExtensions & "NOT"
+        strFilterExtensions(FilterHandler.FilterState.All) = ""
+        strFilterExtensions(FilterHandler.FilterState.Piconly) = strPicExtensions
+        strFilterExtensions(FilterHandler.FilterState.PicVid) = strPicExtensions & strVideoExtensions
+        strFilterExtensions(FilterHandler.FilterState.LinkOnly) = ".lnk"
+        strFilterExtensions(FilterHandler.FilterState.Vidonly) = strVideoExtensions
+        strFilterExtensions(FilterHandler.FilterState.NoPicVid) = strPicExtensions & strVideoExtensions & "NOT"
     End Sub
     Public Sub SaveButtonlist()
         Dim path As String = ""
@@ -43,22 +44,11 @@ Module FileHandling
         End If
         Try
             FilterListBox(lbx, e, flist)
-            flist = SetPlayOrder(ChosenPlayOrder, flist)
-            FillShowbox(lbx, CurrentFilterState, flist)
-            'If lbx.Name = "lbxFiles" Then
-            '    CopyList(SetPlayOrder(ChosenPlayOrder, FileboxContents), lbx)
-            'Else
-            '    CopyList(SetPlayOrder(ChosenPlayOrder, Showlist), lbx)
-            'End If
+            flist = SetPlayOrder(frmMain.PlayOrder.State, flist)
+            FillShowbox(lbx, frmMain.CurrentFilterState.State, flist)
 
-            '            frmMain.UpdatePlayOrder(Showlist.Count > 0)
-            '  frmMain.UpdatePlayOrder()
-            frmMain.ReportFilterandOrder()
             lbx.Tag = e
 
-            'If PFocus = CtrlFocus.ShowList Then
-
-            'Else
 
             If lbx.Items.Count <> 0 Then
                     If blnRandom Then
@@ -68,7 +58,6 @@ Module FileHandling
                         lbx.SelectedIndex = 0
                     End If
                 End If
-            'End If
 
         Catch ex As ArgumentException
             MsgBox(ex.ToString)
@@ -83,11 +72,11 @@ Module FileHandling
         For Each f In e.EnumerateFiles
             Dim s As String = LCase(f.Extension)
 
-            Select Case CurrentFilterState
-                Case FilterState.All
+            Select Case CurrentfilterState.State
+                Case FilterHandler.FilterState.All
 
                     lst.Add(f.FullName)
-                Case FilterState.NoPicVid
+                Case FilterHandler.FilterState.NoPicVid
 
                     If InStr(strVideoExtensions & strPicExtensions, s) <> 0 And Len(s) > 0 Then
                     Else
@@ -95,23 +84,23 @@ Module FileHandling
 
                     End If
 
-                Case FilterState.Piconly
+                Case FilterHandler.FilterState.Piconly
                     If InStr(strPicExtensions, s) <> 0 And Len(s) > 0 Then
 
                         lst.Add(f.FullName)
                     Else
                     End If
-                Case FilterState.LinkOnly
+                Case FilterHandler.FilterState.LinkOnly
                     If s = ".lnk" Then
                         lst.Add(f.FullName)
                     End If
 
-                Case FilterState.Vidonly
+                Case FilterHandler.FilterState.Vidonly
                     If InStr(strVideoExtensions, s) <> 0 And Len(s) > 0 Then
                         lst.Add(f.FullName)
                     End If
 
-                Case FilterState.PicVid
+                Case FilterHandler.FilterState.PicVid
                     If InStr(strVideoExtensions & strPicExtensions, s) <> 0 And Len(s) > 0 Then
                         lst.Add(f.FullName)
                     End If
@@ -458,13 +447,13 @@ Module FileHandling
         Return s
     End Function
     Public Sub AddCurrentType(blnRecurse As Boolean)
-        AddFilesToCollection(Showlist, strFilterExtensions(CurrentFilterState), blnRecurse)
-        FillShowbox(frmMain.lbxShowList, FilterState.All, Showlist)
+        AddFilesToCollection(Showlist, strFilterExtensions(CurrentfilterState.State), blnRecurse)
+        FillShowbox(frmMain.lbxShowList, FilterHandler.FilterState.All, Showlist)
 
     End Sub
     Public Sub Addpics(blnRecurse As Boolean)
         AddFilesToCollection(Showlist, strPicExtensions, blnRecurse)
-        FillShowbox(frmMain.lbxShowList, CurrentFilterState, Showlist)
+        FillShowbox(frmMain.lbxShowList, CurrentfilterState.State, Showlist)
     End Sub
     Public Sub AddFilesToCollection(ByVal list As List(Of String), extensions As String, blnRecurse As Boolean)
         Dim s As String

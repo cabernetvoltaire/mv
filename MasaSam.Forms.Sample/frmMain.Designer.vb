@@ -1408,7 +1408,6 @@ Partial Class frmMain
         'StartPointTrackBar
         '
         Me.StartPointTrackBar.Dock = System.Windows.Forms.DockStyle.Top
-        Me.StartPointTrackBar.Enabled = False
         Me.StartPointTrackBar.Location = New System.Drawing.Point(3, 57)
         Me.StartPointTrackBar.Maximum = 100
         Me.StartPointTrackBar.Name = "StartPointTrackBar"
@@ -1421,7 +1420,6 @@ Partial Class frmMain
         Me.StartPointComboBox.Dock = System.Windows.Forms.DockStyle.Top
         Me.StartPointComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.StartPointComboBox.FlatStyle = System.Windows.Forms.FlatStyle.Popup
-        Me.StartPointComboBox.Items.AddRange(New Object() {"Beginning", "Near Beginning", "Near End", "Random Point", "Particular Point"})
         Me.StartPointComboBox.Location = New System.Drawing.Point(3, 25)
         Me.StartPointComboBox.Margin = New System.Windows.Forms.Padding(4)
         Me.StartPointComboBox.Name = "StartPointComboBox"
