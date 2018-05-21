@@ -25,26 +25,26 @@
     Public KeyMarkFavourite = Keys.Insert
 
 
-    Public LKeyFullscreen = Keys.F + Keys.Alt
-    Public LKeyRandomize = Keys.R + Keys.Alt
-    Public LKeyTraverseTreeBack = Keys.Alt + Keys.OemMinus
-    Public LKeyTraverseTree = Keys.Alt + Keys.Oemplus
-    Public LKeyJumpAutoT = Keys.Alt + Keys.Divide
-    Public LKeyMuteToggle = Keys.Alt + Keys.Decimal
-    Public LKeyNextFile = Keys.Alt + Keys.N
-    Public LKeyPreviousFile = Keys.Alt + Keys.P
-    Public LKeyZoomIn = Keys.Alt + Keys.Z
-    Public LKeyFolderJump = Keys.Alt + Keys.Multiply
-    Public LKeyToggleSpeed = Keys.Alt + Keys.D0
-    Public LKeySpeed1 = Keys.Alt + Keys.D1
-    Public LKeySpeed2 = Keys.Alt + Keys.D2
-    Public LKeySpeed3 = Keys.Alt + Keys.D3
-    Public LKeySmallJumpDown = Keys.Alt + Keys.D5
-    Public LKeySmallJumpUp = Keys.Alt + Keys.D6
-    Public LKeyJumpToPoint = Keys.Alt + Keys.D7
-    Public LKeyBigJumpBack = Keys.Alt + Keys.D8
-    Public LKeyBigJumpOn = Keys.Alt + Keys.D9
-    Public LKeyMarkPoint = Keys.Alt + Keys.D4
+    Public LKeyFullscreen = Keys.F + Keys.Control
+    Public LKeyRandomize = Keys.R + Keys.Control
+    Public LKeyTraverseTreeBack = Keys.Control + Keys.OemMinus
+    Public LKeyTraverseTree = Keys.Control + Keys.Oemplus
+    Public LKeyJumpAutoT = Keys.Control + Keys.Divide
+    Public LKeyMuteToggle = Keys.Control + Keys.Decimal
+    Public LKeyNextFile = Keys.Control + Keys.N
+    Public LKeyPreviousFile = Keys.Control + Keys.P
+    Public LKeyZoomIn = Keys.Control + Keys.Z
+    Public LKeyFolderJump = Keys.Control + Keys.Multiply
+    Public LKeyToggleSpeed = Keys.Control + Keys.D0
+    Public LKeySpeed1 = Keys.Control + Keys.D1
+    Public LKeySpeed2 = Keys.Control + Keys.D2
+    Public LKeySpeed3 = Keys.Control + Keys.D3
+    Public LKeySmallJumpDown = Keys.Control + Keys.D5
+    Public LKeySmallJumpUp = Keys.Control + Keys.D6
+    Public LKeyJumpToPoint = Keys.Control + Keys.D7
+    Public LKeyBigJumpBack = Keys.Control + Keys.D8
+    Public LKeyBigJumpOn = Keys.Control + Keys.D9
+    Public LKeyMarkPoint = Keys.Control + Keys.D4
 
 
     'Common Keys

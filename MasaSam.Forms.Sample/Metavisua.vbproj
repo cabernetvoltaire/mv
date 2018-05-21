@@ -106,8 +106,11 @@
     <Compile Include="AddFolders.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="ButtonSet.vb" />
+    <Compile Include="ButtonRow.vb" />
     <Compile Include="FilterHandler.vb" />
     <Compile Include="Colors.vb" />
+    <Compile Include="FilterMove.vb" />
     <Compile Include="FindDuplicates.Designer.vb">
       <DependentUpon>FindDuplicates.vb</DependentUpon>
     </Compile>
@@ -127,6 +130,10 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Grouper.vb" />
+    <Compile Include="MediaHandler.vb" />
+    <Compile Include="MVButton.vb" />
+    <Compile Include="RandomHandler.vb" />
+    <Compile Include="Settings1.vb" />
     <Compile Include="Shortcuts.vb" />
     <Compile Include="SortHandler.vb" />
     <Compile Include="StartPointHandler.vb" />
@@ -181,12 +188,7 @@
     <Compile Include="TreeView.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="MediaControl.Designer.vb">
-      <DependentUpon>MediaControl.vb</DependentUpon>
-    </Compile>
-    <Compile Include="MediaControl.vb">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Include="UserPrefs.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="AddFolders.resx">
@@ -228,10 +230,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="TreeView.resx">
       <DependentUpon>TreeView.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="MediaControl.resx">
-      <DependentUpon>MediaControl.vb</DependentUpon>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

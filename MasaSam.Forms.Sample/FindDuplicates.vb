@@ -21,7 +21,7 @@ Public Class FindDuplicates
             initiallist = Showlist
         End If
         'Add current showlist, in size sorted order, to lbxSorted
-        sortedList = SetPlayOrder(PlayOrder.Length, initiallist)
+        sortedList = SetPlayOrder(PlayOrder.State, initiallist)
         '    FillShowbox(lbxsorted, FilterState.All, sortedList)
         uniquelist = ExtractDups(sortedList)
         MsgBox("There are " & uniquelist.Count & " unique files having duplicates, out of " & Showlist.Count)

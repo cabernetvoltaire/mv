@@ -36,17 +36,19 @@ Partial Class MediaControl
         Me.wmp.Dock = System.Windows.Forms.DockStyle.Fill
         Me.wmp.Enabled = True
         Me.wmp.Location = New System.Drawing.Point(0, 0)
+        Me.wmp.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.wmp.Name = "wmp"
         Me.wmp.OcxState = CType(resources.GetObject("wmp.OcxState"), System.Windows.Forms.AxHost.State)
-        Me.wmp.Size = New System.Drawing.Size(1160, 714)
+        Me.wmp.Size = New System.Drawing.Size(633, 387)
         Me.wmp.TabIndex = 22
         '
         'Blanker
         '
         Me.Blanker.BackColor = System.Drawing.Color.Maroon
-        Me.Blanker.Location = New System.Drawing.Point(146, 155)
+        Me.Blanker.Location = New System.Drawing.Point(80, 84)
+        Me.Blanker.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.Blanker.Name = "Blanker"
-        Me.Blanker.Size = New System.Drawing.Size(762, 384)
+        Me.Blanker.Size = New System.Drawing.Size(416, 208)
         Me.Blanker.TabIndex = 21
         Me.Blanker.TabStop = False
         Me.Blanker.Visible = False
@@ -58,7 +60,7 @@ Partial Class MediaControl
         Me.PicBox.Location = New System.Drawing.Point(0, 0)
         Me.PicBox.Margin = New System.Windows.Forms.Padding(0)
         Me.PicBox.Name = "PicBox"
-        Me.PicBox.Size = New System.Drawing.Size(1160, 714)
+        Me.PicBox.Size = New System.Drawing.Size(633, 387)
         Me.PicBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
         Me.PicBox.TabIndex = 19
         Me.PicBox.TabStop = False
@@ -66,13 +68,14 @@ Partial Class MediaControl
         '
         'MediaControl
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(11.0!, 24.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.Controls.Add(Me.wmp)
         Me.Controls.Add(Me.Blanker)
         Me.Controls.Add(Me.PicBox)
+        Me.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.Name = "MediaControl"
-        Me.Size = New System.Drawing.Size(1160, 714)
+        Me.Size = New System.Drawing.Size(633, 387)
         CType(Me.wmp, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.Blanker, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.PicBox, System.ComponentModel.ISupportInitialize).EndInit()

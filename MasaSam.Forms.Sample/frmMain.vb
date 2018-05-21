@@ -16,11 +16,15 @@ Public Class frmMain
     Public StartType As Byte
     Public StartPointPercentage As Integer
     Public StartingUpFlag As Boolean = True
+    Public WithEvents Random As New RandomHandler
 
-    Public WithEvents NavigateMoveState As New StateHandler
+    Public WithEvents NavigateMoveState As New StateHandler()
     Public WithEvents CurrentFilterState As New FilterHandler
     Public WithEvents PlayOrder As New SortHandler
     Public WithEvents StartPoint As New StartPointHandler
+    Private WithEvents FM As New FilterMove()
+    'Public AppUserChoices As UserPrefs
+
 
 
 
@@ -32,26 +36,61 @@ Public Class frmMain
         sh.ShortcutName = f.Name
         sh.Create_ShortCut()
     End Sub
+    Public Sub OnFileListChanged() Handles FM.FilesMoved
+        UpdatePlayOrder(False)
 
-    Public Sub OnStartChanged() Handles StartPoint.StateChanged
+    End Sub
+    Public Sub OnRandomChanged() Handles Random.RandomChanged
+        If Random.All Then
+            PlayOrder.State = SortHandler.Order.Random
+            StartPoint.State = StartPointHandler.StartTypes.Random
+        Else
+            PlayOrder.State = SortHandler.Order.Original
+            StartPoint.State = StartPointHandler.StartTypes.NearBeginning
+        End If
+
+        If Random.StartPoint Then
+                StartPoint.State = StartPointHandler.StartTypes.Random
+            End If
+            ToggleRandomAdvanceToolStripMenuItem.Checked = Random.NextSelect
+        ToggleRandomSelectToolStripMenuItem.Checked = Random.OnDirChange
+        ToggleRandomStartToolStripMenuItem.Checked = Random.StartPoint
+        chbNextFile.Checked = Random.NextSelect
+        chbInDir.Checked = Random.OnDirChange
+
+
+    End Sub
+
+    Public Sub OnStartChanged() Handles StartPoint.StateChanged, StartPoint.StartPointChanged
         blnJumpToMark = True
         StartPoint.Distance = 65
-        Select Case StartPoint.State
-            Case StartPointHandler.StartTypes.Beginning
-                blnJumpToMark = False
-            Case Else
 
+        cbxStartPoint.SelectedIndex = StartPoint.State
+        Select Case StartPoint.State
+            Case StartPointHandler.StartTypes.ParticularAbsolute
+
+                tbxAbsolute.Text = New TimeSpan(0, 0, StartPoint.StartPoint).ToString("hh\:mm\:ss")
+                tbxPercentage.Enabled = False
+                tbxAbsolute.Enabled = True
+            Case StartPointHandler.StartTypes.ParticularPercentage
+                tbxPercentage.Text = StartPoint.StartPoint
+                tbxAbsolute.Enabled = False
+                tbxPercentage.Enabled = True
         End Select
         MediaJumpToMarker()
         tbStartpoint.Text = "START:" & StartPoint.Description
     End Sub
-    Public Sub OnStateChanged() Handles NavigateMoveState.StateChanged, CurrentFilterState.StateChanged, PlayOrder.StateChanged
+    Public Sub OnStateChanged(sender As Object, e As EventArgs) Handles NavigateMoveState.StateChanged, CurrentFilterState.StateChanged, PlayOrder.StateChanged
         If StartingUpFlag Then Exit Sub
-        UpdatePlayOrder(Showlist.Count > 0)
+        If sender IsNot NavigateMoveState Then
+            UpdatePlayOrder(Showlist.Count > 0)
+        Else
+        End If
         cbxOrder.SelectedIndex = PlayOrder.State
         cbxFilter.SelectedIndex = CurrentFilterState.State
         tbRandom.Text = "ORDER:" & UCase(PlayOrder.Description)
         tbFilter.Text = "FILTER:" & UCase(CurrentFilterState.Description)
+        tbState.Text = UCase(NavigateMoveState.Description)
         SetControlColours(NavigateMoveState.Colour, CurrentFilterState.Colour)
     End Sub
     Public Sub SetControlColours(MainColor As Color, FilterColor As Color)
@@ -274,7 +313,7 @@ Public Class frmMain
 
         'End If
         'Report
-        blnSpeedRestart = True
+        'blnSpeedRestart = True
         ' tbSpeed.Text = "SPEED (" & PlaybackSpeed * 100 & "%)"
         e.SuppressKeyPress = True
         Return e
@@ -308,8 +347,7 @@ Public Class frmMain
     End Sub
 
     Private Sub ToggleRandomStartPoint()
-        blnRandomStartAlways = Not blnRandomStartAlways
-        blnRandomStartPoint = blnRandomStartAlways
+        Random.StartPoint = Not Random.StartPoint
         'StartAlways is when the random start has been selected for all files
         'StartPoint is just a flag telling the video to jump to 
     End Sub
@@ -378,14 +416,24 @@ Public Class frmMain
         Else
             If count > 0 Then
 
-                If (blnRandomAdvance(CtrlFocus.ShowList) And lbx Is lbxShowList) Or (blnRandomAdvance(CtrlFocus.Files And lbx Is lbxFiles)) Or blnRandomAdvance(PFocus) Then
+                If Random.NextSelect Then
+                    '     If Random.NextSelect Then
+                    '    If blnForward Then
+
                     Dim i As Int32
                     i = Int(Rnd() * (count))
                     While FBCShown(i)
                         i = Int(Rnd() * (count))
                     End While
                     lbx.SelectedIndex = i
+                    '        LastPlayed.Push(strCurrentFilePath)
                 Else
+                    'If LastPlayed.Count > 0 Then
+                    '    lbx.SetSelected(lbx.FindString(LastPlayed.Pop), True)
+                    'End If
+
+                    '        End If
+                    '   Else
                     lbx.SelectedIndex = (lbx.SelectedIndex + diff) Mod count
                 End If
             End If
@@ -458,10 +506,8 @@ Public Class frmMain
     End Sub
     Public Sub JumpRandom(blnAutoTrail As Boolean)
         If Not blnAutoTrail Then
-            blnRandomStartPoint = True
-            If blnRandomStartPoint Then
-                NewPosition = (Rnd(1) * (currentWMP.currentMedia.duration))
-            End If
+            'Random.StartPoint = True
+            NewPosition = (Rnd(1) * (currentWMP.currentMedia.duration))
             tmrJumpVideo.Interval = lngInterval
             tmrJumpVideo.Enabled = True
             tbStartpoint.Text = "START:RANDOM"
@@ -486,6 +532,7 @@ Public Class frmMain
                 If blnLink Then
                     ' SetFilterState(FilterState.All)
                     blnLink = False
+                    CurrentFilterState.State = FilterHandler.FilterState.All
                     HighlightCurrent(strCurrentFilePath)
                 End If
             Case Keys.F5, Keys.F6, Keys.F7, Keys.F8, Keys.F9, Keys.F10, Keys.F11, Keys.F12
@@ -560,10 +607,12 @@ Public Class frmMain
             Case KeyRotate
                 RotatePic(currentPicBox, True)
             Case KeyJumpAutoT
-                If e.Control Then
-                    ToggleRandomStartPoint()
+                If e.Shift Then
+                    StartPoint.IncrementState()
+                    blnJumpToMark = True
                 End If
-                JumpRandom(e.Shift)
+
+                'JumpRandom(e.Control And e.Shift)
 
             Case KeyTraverseTree, KeyTraverseTreeBack
                 'e.suppresskeypress by Treeview behaviour unless focus is elsewhere. 
@@ -585,7 +634,7 @@ Public Class frmMain
                     Else
                         tmrSlideShow.Enabled = Not tmrSlideShow.Enabled
                     End If
-                    blnSpeedRestart = True
+                    'blnSpeedRestart = True
                     '  tbSpeed.Text = "SPEED (" & PlaybackSpeed * 100 & "%)"
                 End With
             Case KeySpeed1, KeySpeed2, KeySpeed3, KeySpeed3 + Keys.Control
@@ -648,7 +697,9 @@ Public Class frmMain
     End Sub
 
     Private Sub NavigateToFavourites()
+        CurrentFilterState.State = FilterHandler.FilterState.LinkOnly
         ChangeFolder(FavesFolderPath, True)
+
         tvMain2.SelectedFolder = CurrentFolderPath
     End Sub
 
@@ -664,6 +715,8 @@ Public Class frmMain
         With currentWMP
             tWMP.URL = .URL
             ' AxVLCPlugin21.MRL = "file:///" & .URL
+            'Media.Position = .Ctlcontrols.currentPosition
+
             tWMP.Ctlcontrols.currentPosition = .Ctlcontrols.currentPosition
             .URL = ""
             currentWMP = tWMP
@@ -807,8 +860,20 @@ Public Class frmMain
             cbxOrder.Items.Add(s)
         Next
         For Each s In StartPoint.Descriptions
-            StartPointComboBox.Items.Add(s)
+            cbxStartPoint.Items.Add(s)
         Next
+        If My.Settings.AppUserChoices Is Nothing Then
+            MessageBox.Show("AppUserChoices is nothing")
+            My.Settings.AppUserChoices = New UserPrefs
+            My.Settings.Save()
+        Else
+
+            PlayOrder = My.Settings.AppUserChoices.Sort
+            CurrentFilterState = My.Settings.AppUserChoices.Filter
+            NavigateMoveState = My.Settings.AppUserChoices.State
+            StartPoint = My.Settings.AppUserChoices.Start
+            MsgBox("Prefs loaded")
+        End If
         PreferencesGet()
         Randomize()
         AssignExtensionFilters()
@@ -822,7 +887,7 @@ Public Class frmMain
         currentWMP.uiMode = "FULL"
         currentWMP.Dock = DockStyle.Fill
         currentPicBox = PictureBox1
-
+        StartPointTrackBar.Enabled = True
 
 
         'Exit Sub
@@ -894,6 +959,7 @@ Public Class frmMain
         ' MsgBox("Ring")
     End Sub
     Private Sub frmMain_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
+
         Settings.PreferencesSave()
     End Sub
 
@@ -1179,11 +1245,6 @@ Public Class frmMain
         ' e.suppresskeypress = True
     End Sub
 
-    Private Sub btnChooseRandom_Click(sender As Object, e As EventArgs)
-        blnChooseRandomFile = Not blnChooseRandomFile
-
-
-    End Sub
 
 
 
@@ -1227,14 +1288,15 @@ Public Class frmMain
 
 
         HighlightCurrent(strCurrentFilePath)
-        LastPlayed.Push(strCurrentFilePath)
+        'LastPlayed.Push(strCurrentFilePath)
         tbLastFile.Text = strCurrentFilePath
         fType = FindType(strCurrentFilePath)
+        Console.WriteLine(fType.ToString)
         Select Case fType
             Case Filetype.Doc
 
             Case Filetype.Movie
-                HandleMovie(blnRandomStartPoint)
+                HandleMovie(Random.StartPoint)
 
             Case Filetype.Pic
                 Dim img As Image
@@ -1285,7 +1347,7 @@ Public Class frmMain
 
         currentWMP.BringToFront()
 
-        If Not blnRandomStartAlways Then blnRandomStartPoint = False
+        If Not blnRandomStartAlways Then Random.StartPoint = False
     End Sub
 
 
@@ -1352,7 +1414,7 @@ Public Class frmMain
         tbSpeed.Text = tbSpeed.Text = "SPEED (" & PlaybackSpeed & "fps)"
         tbButton.Text = "BUTTONFILE: " & strButtonFile
         tbZoom.Text = iZoomFactor
-        If blnRandomStartPoint Then
+        If Random.StartPoint Then
             tbStartpoint.Text = "START:RANDOM"
         Else
             tbStartpoint.Text = "START:NORMAL"
@@ -1502,7 +1564,7 @@ Public Class frmMain
 
 
     Private Sub ToggleMove()
-        NavigateMoveState.IncrementState()
+        NavigateMoveState.ToggleState()
 
         blnMoveMode = Not blnMoveMode
         UpdateButtonAppearance()
@@ -1521,7 +1583,7 @@ Public Class frmMain
     Private Sub tmrUpdateFolderSelection_Tick(sender As Object, e As EventArgs) Handles tmrUpdateFolderSelection.Tick
         'PreferencesSave()
 
-        FillListbox(lbxFiles, New DirectoryInfo(CurrentFolderPath), FileboxContents, blnChooseRandomFile)
+        FillListbox(lbxFiles, New DirectoryInfo(CurrentFolderPath), FileboxContents, Random.OnDirChange)
         'If lbxFiles.Items.Count = 0 Then tbFiles.Text = "0/" & Str(Showlist.Count)
         'tvMain2.SelectedFolder = CurrentFolderPath 'TODO Dodgy?
         tmrUpdateFolderSelection.Enabled = False
@@ -1653,23 +1715,23 @@ Public Class frmMain
         If x < 0.1 Then
             'Very Slow
             SpeedChange(New KeyEventArgs(KeySpeed1))
-            tmrAutoTrail.Interval = Int(Rnd() * 4 * 1000) + 1000
+            tmrAutoTrail.Interval = Int(Rnd() * 2 * 500) + 500
         ElseIf x < 0.3 Then
             'Slow
             SpeedChange(New KeyEventArgs(KeySpeed2))
-            tmrAutoTrail.Interval = Int(Rnd() * 6 * 1000) + 1000
+            tmrAutoTrail.Interval = Int(Rnd() * 2 * 500) + 500
         ElseIf x < 0.8 Then
             'slightly slow
             SpeedChange(New KeyEventArgs(KeySpeed3))
-            tmrAutoTrail.Interval = Int(Rnd() * 8 * 1000) + 1000
+            tmrAutoTrail.Interval = Int(Rnd() * 2 * 500) + 500
         Else
             'Normal
 
             HandleKeys(sender, New KeyEventArgs(KeyToggleSpeed))
-            tmrAutoTrail.Interval = Int(Rnd() * 2 * 1000) + 750
+            tmrAutoTrail.Interval = Int(Rnd() * 2 * 500) + 750
         End If
 
-        If Int(Rnd() * 12) + 1 = 1 Then
+        If Int(Rnd() * 30) + 1 = 1 Then
             '    To change the file. 1604
             HandleKeys(sender, New KeyEventArgs(KeyNextFile))
 
@@ -1688,9 +1750,9 @@ Public Class frmMain
         End If
     End Sub
 
-    Private Sub tsbToggleRandomAdvance_Click(sender As Object, e As EventArgs)
-        blnRandomAdvance(PFocus) = Not blnRandomAdvance(PFocus)
-    End Sub
+    'Private Sub tsbToggleRandomAdvance_Click(sender As Object, e As EventArgs)
+    '    blnRandomAdvance(PFocus) = Not blnRandomAdvance(PFocus)
+    'End Sub
 
 
     Private Sub ConstructMenuShortcuts()
@@ -1796,11 +1858,9 @@ Public Class frmMain
 
     Private Sub ToggleRandomSelectToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ToggleRandomSelectToolStripMenuItem.Click
         ToggleRandomSelect()
-        ToggleRandomSelectToolStripMenuItem.Checked = blnChooseRandomFile
     End Sub
     Private Sub ToggleRandomSelect()
-        blnChooseRandomFile = Not blnChooseRandomFile
-        ToggleRandomSelectToolStripMenuItem.Checked = blnChooseRandomFile
+        Random.OnDirChange = Not Random.OnDirChange
     End Sub
 
     Private Sub ToggleRandomAdvanceToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ToggleRandomAdvanceToolStripMenuItem.Click
@@ -1808,13 +1868,12 @@ Public Class frmMain
     End Sub
 
     Private Sub ToggleRandomAdvance()
-        blnRandomAdvance(PFocus) = Not blnRandomAdvance(PFocus)
-        ToggleRandomAdvanceToolStripMenuItem.Checked = blnRandomAdvance(PFocus)
+        Random.NextSelect = Not Random.NextSelect
+        '  blnRandomAdvance(PFocus) = Random.NextSelect
     End Sub
 
     Private Sub ToggleRandomStartToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ToggleRandomStartToolStripMenuItem.Click
-        blnRandomStartPoint = Not blnRandomStartPoint
-        ToggleRandomStartToolStripMenuItem.Checked = blnRandomAdvance(PFocus)
+        Random.StartPoint = Not Random.StartPoint
     End Sub
 
     Private Sub BundleToolStripMenuItem_Click_1(sender As Object, e As EventArgs) Handles BundleToolStripMenuItem.Click
@@ -1832,18 +1891,16 @@ Public Class frmMain
 
 
     Private Sub RandomiseNormalToggleToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RandomiseNormalToggleToolStripMenuItem.Click
-        Static Randomised As Boolean
-        Randomised = Not Randomised
-        RandomFunctionsToggle(Randomised)
+        ' Static Randomised As Boolean
+        'Randomised = Not Randomised
+        RandomFunctionsToggle()
 
 
     End Sub
 
-    Public Sub RandomFunctionsToggle(blnRandomise As Boolean)
-        blnRandomStartPoint = blnRandomise
-        blnRandomStartAlways = blnRandomise
-        blnRandomAdvance(PFocus) = blnRandomise
-        blnChooseRandomFile = blnRandomise
+    Public Sub RandomFunctionsToggle()
+        Random.All = Not Random.All
+        'blnRandomAdvance(PFocus) = Random.NextSelect
 
 
     End Sub
@@ -1901,7 +1958,7 @@ Public Class frmMain
                         ChangeFolder(strVisibleButtons(i), True)
                         'CancelDisplay()
                         tvMain2.SelectedFolder = CurrentFolderPath
-                    ElseIf blnChooseRandomFile Then
+                    ElseIf Random.OnDirChange Then
                         AdvanceFile(True, True)
 
                     End If
@@ -1946,7 +2003,7 @@ Public Class frmMain
                     ChangeFolder(strVisibleButtons(i), True)
                     'CancelDisplay()
                     tvMain2.SelectedFolder = CurrentFolderPath
-                ElseIf blnChooseRandomFile Then
+                ElseIf Random.OnDirChange Then
                     AdvanceFile(True, True)
 
                 End If
@@ -2007,15 +2064,70 @@ Public Class frmMain
     End Sub
 
 
-    Private Sub StartPointComboBox_SelectedIndexChanged_1(sender As Object, e As EventArgs) Handles StartPointComboBox.SelectedIndexChanged
-        StartPoint.State = StartPointComboBox.SelectedIndex
-        blnJumpToMark = True
+    Private Sub StartPointComboBox_SelectedIndexChanged_1(sender As Object, e As EventArgs) Handles cbxStartPoint.SelectedIndexChanged
+        If StartPoint.State <> cbxStartPoint.SelectedIndex Then
+            StartPoint.State = cbxStartPoint.SelectedIndex
+
+            blnJumpToMark = True
+
+        End If
+
 
     End Sub
 
     Private Sub StartPointTrackBar_ValueChanged(sender As Object, e As EventArgs) Handles StartPointTrackBar.ValueChanged
+        If cbxStartPoint.Items.Count > 0 Then StartPoint.State = StartPointHandler.StartTypes.ParticularPercentage
         StartPoint.Percentage = StartPointTrackBar.Value
+        tbxPercentage.Text = Str(StartPoint.Percentage) & "%"
+
+    End Sub
+
+    Private Sub tbxAbsolute_TextChanged(sender As Object, e As EventArgs) Handles tbxAbsolute.TextChanged
+        Dim s As String = tbxAbsolute.Text
+        Try
+            '  Dim n As Long = AbsoluteTrackBar.Value
+
+            StartPoint.Absolute = tbAbsolute.Value
+            StartPoint.State = StartPointHandler.StartTypes.ParticularAbsolute
+            '  MediaJumpToMarker()
+            blnJumpToMark = True
+        Catch ex As ArgumentException
+
+        End Try
+
+    End Sub
+
+    Private Sub btnFilterMoveFiles_Click(sender As Object, e As EventArgs) Handles btnFilterMoveFiles.Click
+        FM.Recursive = True
+        FM.FilterMoveFiles(CurrentFolderPath)
+
     End Sub
 
 
+
+
+
+    Private Sub AbsoluteTrackBar_ValueChanged(sender As Object, e As EventArgs) Handles tbAbsolute.ValueChanged
+        tbAbsolute.Maximum = MediaDuration
+        tbAbsolute.TickFrequency = tbAbsolute.Maximum / 25
+        StartPoint.StartPoint = StartPointTrackBar.Value
+        tbxAbsolute.Text = New TimeSpan(0, 0, tbAbsolute.Value).ToString("hh\:mm\:ss")
+
+    End Sub
+
+    Private Sub tbAbsolute_Scroll(sender As Object, e As EventArgs) Handles tbAbsolute.Scroll
+
+    End Sub
+
+    Private Sub chbNextFile_CheckedChanged(sender As Object, e As EventArgs) Handles chbNextFile.CheckedChanged
+        Random.NextSelect = chbNextFile.Checked
+    End Sub
+
+    Private Sub chbInDir_CheckedChanged(sender As Object, e As EventArgs) Handles chbInDir.CheckedChanged
+        Random.OnDirChange = chbInDir.Checked
+    End Sub
+
+    Private Sub chbAutoTrail_CheckedChanged(sender As Object, e As EventArgs) Handles chbAutoTrail.CheckedChanged
+
+    End Sub
 End Class

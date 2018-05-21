@@ -207,15 +207,32 @@ Module FileHandling
     End Function
     Public Sub MoveFolder(strDir As String, strDest As String, tvw As MasaSam.Forms.Controls.FileSystemTree, blnOverride As Boolean)
         If strDest Is Nothing Then Exit Sub
-        If Not blnOverride Then
-            If MsgBox("This will move current folder to " & strDest & ". Are you sure?", MsgBoxStyle.OkCancel) <> MsgBoxResult.Ok Then Exit Sub
-        End If
+        'If Not blnOverride Then
+        '    If MsgBox("This will move current folder to " & strDest & ". Are you sure?", MsgBoxStyle.OkCancel) <> MsgBoxResult.Ok Then Exit Sub
+        'End If
         Try
             With My.Computer.FileSystem
                 Dim dir = New DirectoryInfo(strDir)
                 Dim s As String = dir.Name
                 Dim destdir = New DirectoryInfo(strDest)
+                'Select Case NavigateMoveState.State
+                '    Case StateHandler.StateOptions.Copy
+                '        If Not blnOverride Then
+                '            If MsgBox("This will move current folder to " & strDest & ". Are you sure?", MsgBoxStyle.OkCancel) <> MsgBoxResult.Ok Then Exit Sub
+                '        End If
+                '        .CopyDirectory(strDir, strDest & "\" & s, FileIO.UIOption.OnlyErrorDialogs)
+                '    Case StateHandler.StateOptions.CopyLink
+                '    Case StateHandler.StateOptions.Move
+                '        If Not blnOverride Then
+                '            If MsgBox("This will move current folder to " & strDest & ". Are you sure?", MsgBoxStyle.OkCancel) <> MsgBoxResult.Ok Then Exit Sub
+                '        End If
+                '        .MoveDirectory(strDir, strDest & "\" & s, FileIO.UIOption.OnlyErrorDialogs)
+                '        tvw.RemoveNode(strDir)
 
+                '    Case StateHandler.StateOptions.MoveLeavingLink
+                '    Case StateHandler.StateOptions.Navigate
+
+                'End Select
                 If blnCopyMode Then
                     .CopyDirectory(strDir, strDest & "\" & s, FileIO.UIOption.OnlyErrorDialogs)
 

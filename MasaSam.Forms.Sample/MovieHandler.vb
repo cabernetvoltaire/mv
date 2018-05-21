@@ -12,7 +12,7 @@ Module MovieHandler
             NewPosition = MediaMarker
         Else
             NewPosition = frmMain.StartPoint.StartPoint
-            Console.WriteLine(frmMain.StartType & ":New position is " & NewPosition & " of " & MediaDuration)
+            Console.WriteLine(":New position is " & NewPosition & " of " & MediaDuration)
         End If
 
         frmMain.tmrJumpVideo.Enabled = True
@@ -29,16 +29,16 @@ Module MovieHandler
 
                 MediaDuration = currentWMP.currentMedia.duration
                 frmMain.StartPoint.Duration = MediaDuration
-                If blnJumpToMark Then
-                    MediaJumpToMarker()
+                MediaJumpToMarker()
+                'If blnJumpToMark Then
 
-                ElseIf blnRandomStartPoint Then
-                    If FullScreen.Changing Then
-                    Else
-                        frmMain.JumpRandom(False)
+                'ElseIf Random.StartPoint Then
+                '    If FullScreen.Changing Then
+                '    Else
+                '        frmMain.JumpRandom(False)
 
-                    End If
-                End If
+                '    End If
+                'End If
         End Select
     End Sub
 

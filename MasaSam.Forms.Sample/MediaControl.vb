@@ -101,6 +101,7 @@ Public Class MediaControl
         CtrlDown = e.Control
     End Sub
 
+    Private Sub wmp_Enter(sender As Object, e As EventArgs) Handles wmp.Enter
 
-
+    End Sub
 End Class

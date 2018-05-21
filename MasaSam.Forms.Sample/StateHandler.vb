@@ -7,7 +7,7 @@
         CopyLink
 
     End Enum
-    Public Event StateChanged(s As StateOptions)
+    Public Event StateChanged(sender As Object, e As EventArgs)
     Public mColour() As Color = ({Color.Aqua, Color.Orange, Color.Purple, Color.Gray, Color.AliceBlue})
 
     Private mDescription = {"Navigate Mode", "Move Mode", "Move (Leave link)", "Copy", "Copy Link"}
@@ -22,6 +22,11 @@
         End Get
     End Property
     Private mState As Byte
+
+    Public Sub New()
+        Me.State = StateOptions.Navigate
+    End Sub
+
     Public Property State() As Byte
         Get
             Return mState
@@ -42,7 +47,7 @@
                 Case StateOptions.CopyLink
 
             End Select
-            RaiseEvent StateChanged(mState)
+            RaiseEvent StateChanged(Me, New EventArgs)
         End Set
     End Property
     Public Sub ToggleState()

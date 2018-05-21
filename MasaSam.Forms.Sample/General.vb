@@ -19,15 +19,15 @@ Public Module General
         Files = 1
         ShowList = 2
     End Enum
-    Public Enum PlayOrder As Byte
-        Original
-        Random
-        Name
-        PathName
-        Time
-        Length
-        Type
-    End Enum
+    'Public Enum PlayOrder As Byte
+    '    Original
+    '    Random
+    '    Name
+    '    PathName
+    '    Time
+    '    Length
+    '    Type
+    'End Enum
 
 
     Public lngShowlistLines As Long = 0
@@ -317,6 +317,7 @@ Public Module General
 
             End If
             CurrentFolderPath = strPath 'Switch to this folder
+            ' FilterMoveFiles(strPath)
         End If
         ChangeWatcherPath(CurrentFolderPath)
         ReDim FBCShown(0)
@@ -355,7 +356,7 @@ Public Module General
 
             Try
                 Select Case Order
-                    Case PlayOrder.Name
+                    Case SortHandler.Order.Name
                         Dim l As Long = 0
                         Dim s As String
                         s = file.Name & Str(l)
@@ -366,7 +367,7 @@ Public Module General
 
                         End While
                         NewListS.Add(s, file.FullName)
-                    Case PlayOrder.Length
+                    Case SortHandler.Order.Size
                         Try
                             Dim l As Long
                             l = file.Length
@@ -380,8 +381,8 @@ Public Module General
                             MsgBox("Fail")
 
                         End Try
-                    Case PlayOrder.Time
-                        Dim time As DateTime = file.LastWriteTime
+                    Case SortHandler.Order.DateTime
+                        Dim time As DateTime = file.CreationTime
                         Dim time2 As DateTime = file.LastAccessTime
                         If time2 < time Then time = time2
                         'MsgBox(time)
@@ -389,7 +390,7 @@ Public Module General
                             time = time.AddSeconds(1)
                         End While
                         NewListD.Add(time, file.FullName)
-                    Case PlayOrder.PathName
+                    Case SortHandler.Order.PathName
                         Dim l As Long = 0
                         Dim s As String
                         s = file.FullName & Str(l)
@@ -402,10 +403,10 @@ Public Module General
                         '                        MsgBox(file.FullName)
                         NewListS.Add(s, file.FullName)
 
-                    Case PlayOrder.Type
+                    Case SortHandler.Order.Type
                         NewListS.Add(file.Extension & file.Name & Str(Rnd() * (100)), file.FullName)
 
-                    Case PlayOrder.Random
+                    Case SortHandler.Order.Random
                         Dim l As Long
                         l = Int(Rnd() * (100 * List.Count))
                         While NewListS.ContainsKey(Str(l))

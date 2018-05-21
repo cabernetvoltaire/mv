@@ -53,6 +53,17 @@ Namespace My
                 Return defaultInstance
             End Get
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute()>  _
+        Public Property AppUserChoices() As Global.MasaSam.Forms.Sample.UserPrefs
+            Get
+                Return CType(Me("AppUserChoices"),Global.MasaSam.Forms.Sample.UserPrefs)
+            End Get
+            Set
+                Me("AppUserChoices") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

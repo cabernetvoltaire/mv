@@ -8,7 +8,8 @@
         ParticularAbsolute
     End Enum
 
-    Public Event StateChanged(s As StartTypes)
+    Public Event StateChanged(sender As Object, e As EventArgs)
+    Public Event StartPointChanged(sender As Object, e As EventArgs)
     Public Event JumpKey()
     Private mOrder = {"Beginning", "Near Beginning", "Near End", "Random", "Particular(%)", "Particular(s)"}
     Private mDescList As New List(Of String)
@@ -56,7 +57,11 @@
             Return mAbsolute
         End Get
         Set(ByVal value As Long)
+
+            Dim b As Long = mAbsolute
+
             mAbsolute = value
+            If b <> mAbsolute Then RaiseEvent StartPointChanged(Me, Nothing)
         End Set
     End Property
     Private mPercentage As Byte
@@ -65,7 +70,9 @@
             Return mPercentage
         End Get
         Set(ByVal value As Byte)
+            Dim b As Byte = mPercentage
             mPercentage = value
+            If b <> mPercentage Then RaiseEvent StartPointChanged(Me, Nothing)
         End Set
     End Property
     Private mStartPoint As Long
@@ -84,28 +91,41 @@
             Return mState
         End Get
         Set(ByVal value As Byte)
+            Dim b As Byte = mState
             mState = value
             mStartPoint = GetStartPoint()
-            RaiseEvent StateChanged(mState)
+            If b <> mState Then RaiseEvent StateChanged(Me, New EventArgs)
         End Set
     End Property
-
+    Public Sub IncrementState()
+        State = (State + 1) Mod 6
+    End Sub
     Private Function GetStartPoint()
+
         Select Case mState
             Case StartTypes.Beginning
                 mStartPoint = 0
             Case StartTypes.NearBeginning
                 mStartPoint = mDistance
+                If mStartPoint > mDuration / 2 Then
+                    mStartPoint = mDuration * 0.1
+                End If
+
             Case StartTypes.NearEnd
                 mStartPoint = mDuration - mDistance
+                If mStartPoint < mDuration / 2 Then
+                    mStartPoint = mDuration * 0.9
+                End If
             Case StartTypes.ParticularAbsolute
-                mStartPoint = Math.Min(mAbsolute, mDuration / 2)
+                mStartPoint = mAbsolute
 
             Case StartTypes.ParticularPercentage
                 mStartPoint = mPercentage / 100 * mDuration
             Case StartTypes.Random
                 mStartPoint = Rnd() * mDuration
         End Select
+        If mDuration - mStartPoint < 5 Then mStartPoint = mDuration - 5
+        If mStartPoint > mDuration Then mStartPoint = mDuration / 2
         Return mStartPoint
     End Function
 End Class

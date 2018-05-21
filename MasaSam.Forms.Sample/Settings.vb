@@ -4,9 +4,13 @@ Public Module Settings
     Public PFocus As Byte = CtrlFocus.Tree
     Public Property ZoneSize As Decimal = 0.4
     Public Const OrientationId As Integer = &H112
-    Public blnSpeedRestart As Boolean = False
     Public currentWMP As New AxWMPLib.AxWindowsMediaPlayer
-
+    Public WithEvents Media As New MediaHandler
+    Public WithEvents NavigateMoveState As New StateHandler
+    Public WithEvents CurrentFilterState As New FilterHandler
+    Public WithEvents PlayOrder As New SortHandler
+    Public WithEvents StartPoint As New StartPointHandler
+    Public WithEvents Random As New RandomHandler
 #Region "Options"
 
     Public iSSpeeds() As Integer = {1500, 900, 200}
@@ -21,9 +25,9 @@ Public Module Settings
     Public Property LastShowList As String
     Public Property blnJumpToMark As Boolean = False
     Public blnRandomStartAlways As Boolean = True
-    Public blnRandomAdvance(3) As Boolean
+    '  Public blnRandomAdvance(3) As Boolean
     Public blnLoopPlay As Boolean = True
-    Public blnChooseRandomFile As Boolean = True
+    'Public blnChooseRandomFile As Boolean = True
     Public PlaybackSpeed As Double = 30
     Public strCurrentFilePath As String = ""
     Public CurrentFolderPath As String = "E:\"
@@ -40,7 +44,6 @@ Public Module Settings
     Public blnRestartSlideShowFlag As Boolean = False
     Public Property blnLink As Boolean
     Public Property lastselection As String
-    Public blnRandomStartPoint = True
 
 
     Public lngInterval = 10
@@ -98,7 +101,7 @@ Public Module Settings
         If Not IO.Directory.Exists(CurrentFolderPath) Then CurrentFolderPath = "C:\"
         If Not IO.File.Exists(strCurrentFilePath) Then strCurrentFilePath = ""
         frmMain.tssMoveCopy.Text = CurrentFolderPath
-        frmMain.RandomFunctionsToggle(False)
+        '   frmMain.RandomFunctionsToggle(False)
 
     End Sub
 

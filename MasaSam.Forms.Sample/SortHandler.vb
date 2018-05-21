@@ -9,7 +9,7 @@
         Type
     End Enum
 
-    Public Event StateChanged(s As Order)
+    Public Event StateChanged(sender As Object, e As EventArgs)
     Private mOrder = {"Original", "Random", "Name", "Path Name", "Date/Time", "Size", "Type"}
 
     Private mDescList As New List(Of String)
@@ -29,14 +29,19 @@
         End Get
     End Property
     Private mState As Byte
+
+    Public Sub New()
+        Me.State = Order.Original
+    End Sub
+
     Public Property State() As Byte
         Get
             Return mState
         End Get
         Set(ByVal value As Byte)
+            Dim b As Byte = mState
             mState = value
-
-            RaiseEvent StateChanged(mState)
+            If b <> value Then RaiseEvent StateChanged(Me, New EventArgs)
         End Set
     End Property
     Public Sub IncrementState()

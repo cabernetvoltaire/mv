@@ -1,9 +1,11 @@
 ﻿Imports System.IO
 
 Module ButtonHandling
+    Public buttons As ButtonSet
+
     Public nletts As Int16 = 36
-    Public layers(nletts) As Byte
-    Public currentlayer As Byte
+    '   Public layers(nletts) As Byte
+    ' Public currentlayer As Byte
     Public strButtonFilePath(8, nletts, 1) As String
     ' Public fButtonDests(8, nletts, 3) As IO.DirectoryInfo
     Private iAlphaCount = nletts
@@ -19,6 +21,7 @@ Module ButtonHandling
         ' blnButtonsLoaded = True
         InitialiseButtons()
     End Sub
+
     Public Sub UpdateButton(strPath As String, strDest As String)
         For i = 0 To nletts - 1
             For j = 0 To 7
@@ -52,25 +55,9 @@ Module ButtonHandling
             AssignButton(k, iAlpha + Int(i / 8), 1, di(i).FullName)
         Next
 
-        'If di(i).Parent.FullName = sPath Then
-        '        Dim k As Byte
-        '        While k <= 7 And i + k < n
-        '            AssignButton(k, iAlpha, 1, di(i + k).FullName)
-        '            k += 1
-        '            If k >= 8 And blnNext Then
-        '                iAlpha += 1
-        '                k = 0
-        '            End If
-        '        End While
 
-        '    End If
-        'Next
         KeyAssignmentsStore(strButtonFile)
-        'For Each di In d.Parent.EnumerateDirectories
-        '    AssignButton(i, iCurrentAlpha, di.FullName)
-        '    i += 1
-        '    If i = 8 Then Exit Sub
-        'Next
+
     End Sub
     Public Sub AssignAlphabetic()
 
@@ -184,27 +171,7 @@ Module ButtonHandling
 
 
 
-    Private Sub AssignButton(Index As Integer, Path As String)
-        Dim strCaption As String
 
-        'Assign dropped path to this button.
-        strButtonFilePath(Index, iCurrentAlpha, 1) = Path
-        lblDest(Index).Enabled = IO.Directory.Exists(Path)
-        'Give it a caption.
-        'Default Caption will be the folder name
-        strCaption = Right(strButtonFilePath(Index, iCurrentAlpha, 1), "\")
-
-        lblDest(Index).Text = strCaption
-        strButtonCaptions(Index, iCurrentAlpha, 1) = strCaption
-        'Assign the key to this.
-        SetDirectory(Path, Index)
-        If My.Computer.FileSystem.FileExists(strButtonFile) Then
-            KeyAssignmentsStore(strButtonFile)
-        Else
-            SaveButtonlist()
-        End If
-
-    End Sub
     Public Sub AssignButton(ByVal i As Byte, ByVal j As Integer, ByVal k As Byte, ByVal strPath As String, Optional blnStore As Boolean = False)
         Dim f As New DirectoryInfo(strPath)
         If strVisibleButtons(i) <> "" And Not blnMoveMode Then
@@ -221,6 +188,7 @@ Module ButtonHandling
         End If
     End Sub
     Public Sub ChangeButtonLetter(e As KeyEventArgs)
+
         frmMain.lblAlpha.Text = e.KeyCode.ToString
         iCurrentAlpha = ButtfromAsc(e.KeyCode)
         UpdateButtonAppearance()
@@ -294,11 +262,10 @@ Module ButtonHandling
             If s <> "" Then
                 lblDest(i).Text = s
                 If My.Computer.FileSystem.DirectoryExists(f) Then
-                    If blnMoveMode Xor CtrlDown Then
+                    If NavigateMoveState.State = StateHandler.StateOptions.Move Xor CtrlDown Then
                         lblDest(i).ForeColor = Color.Red
                     ElseIf ShiftDown Then
                         lblDest(i).ForeColor = Color.Blue
-
                     Else
                         lblDest(i).ForeColor = Color.Black
                     End If

@@ -8,7 +8,7 @@
         NoPicVid
     End Enum
 
-    Public Event StateChanged(s As FilterState)
+    Public Event StateChanged(sender As Object, e As EventArgs)
     Private mColour = {Color.MintCream, Color.LemonChiffon, Color.LightPink, Color.LightSeaGreen, Color.LightBlue, Color.PaleTurquoise}
     Private mDescription = {"All files", "Only pictures", "Only videos", "Only pictures and videos", "Only links", "No pictures or videos"}
     Public ReadOnly Property Colour() As Color
@@ -33,6 +33,11 @@
         End Get
     End Property
     Private mState As Byte
+
+    Public Sub New()
+        Me.State = FilterState.All
+    End Sub
+
     Public Property State() As Byte
         Get
             Return mState
@@ -40,7 +45,7 @@
         Set(ByVal value As Byte)
             mState = value
 
-            RaiseEvent StateChanged(mState)
+            RaiseEvent StateChanged(Me, New EventArgs)
         End Set
     End Property
     Public Sub IncrementState()
