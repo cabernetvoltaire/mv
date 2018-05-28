@@ -30,6 +30,14 @@ Public Class UserPrefs
         End Set
     End Property
     Private mStart As New StartPointHandler
+
+    Public Sub New()
+        Start = mStart
+        Filter = mFilter
+        Sort = mSort
+        State = mState
+    End Sub
+
     Public Property Start() As StartPointHandler
         Get
             Return mStart

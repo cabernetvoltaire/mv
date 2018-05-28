@@ -1,4 +1,6 @@
-﻿Module Shortcuts
+﻿Imports System.IO
+Module Shortcuts
+
     Public Class ShortcutHandler
         Public Sub New()
             Dim TargetPath As String = ""
@@ -39,7 +41,6 @@
 
         Public Sub Create_ShortCut()
 
-
             ' Requires reference to Windows Script Host Object Model
 
             Dim oShell As IWshRuntimeLibrary.WshShell
@@ -68,6 +69,14 @@
                 .TargetPath = sTargetPath
                 .Save()
 
+                Dim attr As FileAttributes
+                attr = File.GetAttributes(sTargetPath)
+                If attr.ReadOnly Then
+
+                Else
+                    File.SetAttributes(sTargetPath, attr Or FileAttributes.ReadOnly)
+                End If
+
 
             End With
 
@@ -95,15 +104,10 @@
 
     Public Sub ReAssign_ShortCutPath(ByVal sTargetPath As String, sShortCutPath As String, oShortcut As IWshRuntimeLibrary.WshShortcut)
 
-        ' Requires reference to Windows Script Host Object Model
-
-
         With oShortcut
-
             .TargetPath = sTargetPath
-            .Save
+            .Save()
         End With
-
         oShortcut = Nothing
     End Sub
 

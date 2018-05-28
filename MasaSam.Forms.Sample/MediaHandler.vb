@@ -15,10 +15,10 @@
     Private mType As Filetype
     Public Property MediaType() As Filetype
         Get
-            If mURL = "" Then
+            If mMediaPath = "" Then
             Else
 
-                mType = FindType(mURL)
+                mType = FindType(mMediaPath)
             End If
             Return mType
         End Get
@@ -76,13 +76,13 @@
         End Set
     End Property
 
-    Private mURL As String
-    Public Property URL() As String
+    Private mMediaPath As String
+    Public Property MediaPath() As String
         Get
-            Return mURL
+            Return mMediaPath
         End Get
         Set(ByVal value As String)
-            mURL = value
+            mMediaPath = value
         End Set
     End Property
     Public Sub New()
@@ -93,18 +93,18 @@
     End Sub
 
     Private Function FindType(file As String) As Filetype
-        blnLink = False
+        Dim IsLink As Boolean = False
         Try
             Dim info As New IO.FileInfo(file)
             Select Case LCase(info.Extension)
                 Case ""
                     Return Filetype.Unknown
                 Case ".lnk"
-                    blnLink = True
-                    mURL = LinkTarget(info.FullName) ' CreateObject("WScript.Shell").CreateShortcut(info.FullName).TargetPath
+                    IsLink = True
+                    mMediaPath = LinkTarget(info.FullName) ' CreateObject("WScript.Shell").CreateShortcut(info.FullName).TargetPath
                     Try
-                        If My.Computer.FileSystem.FileExists(mURL) Then
-                            info = New IO.FileInfo(mURL)
+                        If My.Computer.FileSystem.FileExists(mMediaPath) Then
+                            info = New IO.FileInfo(mMediaPath)
                         Else
                             Return Filetype.Unknown
                             Exit Function

@@ -34,9 +34,7 @@ Public Class FullScreen
         End If
     End Sub
 
-    Private Sub fullScreenPicBox_Click(sender As Object, e As EventArgs) Handles fullScreenPicBox.MouseClick
 
-    End Sub
 
     Private Sub fullScreenPicBox_MouseWheel(sender As Object, e As MouseEventArgs) Handles fullScreenPicBox.MouseWheel, Me.MouseWheel
         PictureFunctions.Mousewheel(fullScreenPicBox, sender, e)

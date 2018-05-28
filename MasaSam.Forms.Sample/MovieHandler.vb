@@ -7,7 +7,7 @@ Module MovieHandler
     Public Property NewPosition As Long
     Public Property FromFinish As Long = 65
     Public Sub MediaJumpToMarker()
-        'Jumps to lMediaMarker unless not set, in which case, jumps to 65s before end.
+        'Jumps to lMediaMarker unless not set, in which case, jumps to current startpoint
         If MediaMarker <> 0 Then
             NewPosition = MediaMarker
         Else
@@ -29,16 +29,14 @@ Module MovieHandler
 
                 MediaDuration = currentWMP.currentMedia.duration
                 frmMain.StartPoint.Duration = MediaDuration
-                MediaJumpToMarker()
-                'If blnJumpToMark Then
+                If FullScreen.Changing Then
+                    NewPosition = currentWMP.Ctlcontrols.currentPosition
+                    frmMain.tmrJumpVideo.Enabled = True
+                Else
+                    MediaJumpToMarker()
 
-                'ElseIf Random.StartPoint Then
-                '    If FullScreen.Changing Then
-                '    Else
-                '        frmMain.JumpRandom(False)
+                End If
 
-                '    End If
-                'End If
         End Select
     End Sub
 

@@ -39,7 +39,7 @@ Partial Class FullScreen
         Me.FSWMP.Location = New System.Drawing.Point(0, 0)
         Me.FSWMP.Name = "FSWMP"
         Me.FSWMP.OcxState = CType(resources.GetObject("FSWMP.OcxState"), System.Windows.Forms.AxHost.State)
-        Me.FSWMP.Size = New System.Drawing.Size(2492, 1144)
+        Me.FSWMP.Size = New System.Drawing.Size(1920, 1080)
         Me.FSWMP.TabIndex = 0
         Me.FSWMP.TabStop = False
         Me.FSWMP.UseWaitCursor = True
@@ -61,7 +61,7 @@ Partial Class FullScreen
         Me.fullScreenPicBox.Location = New System.Drawing.Point(0, 0)
         Me.fullScreenPicBox.Margin = New System.Windows.Forms.Padding(0)
         Me.fullScreenPicBox.Name = "fullScreenPicBox"
-        Me.fullScreenPicBox.Size = New System.Drawing.Size(2492, 1144)
+        Me.fullScreenPicBox.Size = New System.Drawing.Size(1920, 1080)
         Me.fullScreenPicBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
         Me.fullScreenPicBox.TabIndex = 18
         Me.fullScreenPicBox.TabStop = False
@@ -71,8 +71,9 @@ Partial Class FullScreen
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(11.0!, 24.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.AutoSize = True
         Me.BackColor = System.Drawing.Color.Black
-        Me.ClientSize = New System.Drawing.Size(2492, 1144)
+        Me.ClientSize = New System.Drawing.Size(1920, 1080)
         Me.Controls.Add(Me.FSBlanker)
         Me.Controls.Add(Me.fullScreenPicBox)
         Me.Controls.Add(Me.FSWMP)

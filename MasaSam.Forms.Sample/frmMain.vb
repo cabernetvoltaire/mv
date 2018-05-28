@@ -23,7 +23,7 @@ Public Class frmMain
     Public WithEvents PlayOrder As New SortHandler
     Public WithEvents StartPoint As New StartPointHandler
     Private WithEvents FM As New FilterMove()
-    'Public AppUserChoices As UserPrefs
+
 
 
 
@@ -46,7 +46,7 @@ Public Class frmMain
             StartPoint.State = StartPointHandler.StartTypes.Random
         Else
             PlayOrder.State = SortHandler.Order.Original
-            StartPoint.State = StartPointHandler.StartTypes.NearBeginning
+            '       StartPoint.State = StartPointHandler.StartTypes.NearBeginning
         End If
 
         If Random.StartPoint Then
@@ -64,7 +64,7 @@ Public Class frmMain
     Public Sub OnStartChanged() Handles StartPoint.StateChanged, StartPoint.StartPointChanged
         blnJumpToMark = True
         StartPoint.Distance = 65
-
+        MediaMarker = 0
         cbxStartPoint.SelectedIndex = StartPoint.State
         Select Case StartPoint.State
             Case StartPointHandler.StartTypes.ParticularAbsolute
@@ -73,7 +73,7 @@ Public Class frmMain
                 tbxPercentage.Enabled = False
                 tbxAbsolute.Enabled = True
             Case StartPointHandler.StartTypes.ParticularPercentage
-                tbxPercentage.Text = StartPoint.StartPoint
+                tbxPercentage.Text = StartPoint.StartPoint & "%"
                 tbxAbsolute.Enabled = False
                 tbxPercentage.Enabled = True
         End Select
@@ -129,14 +129,11 @@ Public Class frmMain
     Private Sub HandleMovie(blnRandom As Boolean)
         'If it is to jump to a random point, do not show first.
 
-        If tmrJumpVideo.Enabled Then
-            tbStartpoint.Text = "START:RANDOM"
-            currentWMP.Visible = False
-        Else
-            tbStartpoint.Text = "START:NORMAL"
-
-            currentWMP.Visible = True
-        End If
+        'If tmrJumpVideo.Enabled Then
+        '    currentWMP.Visible = False
+        'Else
+        '    currentWMP.Visible = True
+        'End If
 
         currentWMP.URL = strCurrentFilePath
         '  MsgBox(f)
@@ -226,7 +223,7 @@ Public Class frmMain
         With My.Computer.FileSystem
             Dim m As MsgBoxResult = MsgBoxResult.No
             If .DirectoryExists(CurrentFolderPath) Then
-                If blnConfirm Then
+                If NavigateMoveState.State = StateHandler.StateOptions.Navigate Then
                     m = MsgBox("Delete folder " & CurrentFolderPath & "?", MsgBoxStyle.YesNoCancel)
                 End If
                 If Not blnConfirm OrElse m = MsgBoxResult.Yes Then
@@ -253,10 +250,17 @@ Public Class frmMain
 
     Public Sub UpdatePlayOrder(blnShowBoxShown As Boolean)
         If blnShowBoxShown Then
+            Dim s = lbxShowList.SelectedItem
 
             Showlist = SetPlayOrder(PlayOrder.State, Showlist)
             lbxShowList.Items.Clear()
             FillShowbox(lbxShowList, CurrentFilterState.State, Showlist)
+            Try
+
+                lbxShowList.SelectedIndex = lbxShowList.FindString(s)
+            Catch ex As Exception
+                Throw New FileNotFoundException
+            End Try
         End If
         Dim e = New DirectoryInfo(CurrentFolderPath)
         FillListbox(lbxFiles, e, FileboxContents, False)
@@ -360,12 +364,16 @@ Public Class frmMain
             Dim screen As Screen
             If blnSecondScreen Then
                 screen = Screen.AllScreens(1)
+
             Else
                 screen = Screen.AllScreens(0)
                 SplitterPlace(0.75)
             End If
             FullScreen.StartPosition = FormStartPosition.Manual
+
             FullScreen.Location = screen.Bounds.Location + New Point(100, 100)
+            currentWMP.Size = screen.Bounds.Size
+
             FullScreen.Show()
 
         Else
@@ -410,6 +418,7 @@ Public Class frmMain
         ReDim Preserve FBCShown(count)
         lbx.SelectionMode = SelectionMode.One
         If count = 0 Then Exit Sub 'if no filelist, then give up.
+        If lbx.SelectedIndex = -1 Then lbx.SelectedIndex = 0
 
         If lbx.SelectedIndex = 0 And Not blnForward Then
             lbx.SelectedIndex = count - 1
@@ -499,9 +508,9 @@ Public Class frmMain
         End If
 
         With currentWMP
-            .Ctlcontrols.currentPosition = Math.Min(.currentMedia.duration, .Ctlcontrols.currentPosition + .currentMedia.duration * Math.Sign(e.KeyCode - (KeyBigJumpOn + KeyBigJumpBack) / 2) / (iJumpFactor * iPropjump))
+            NewPosition = Math.Min(.currentMedia.duration, .Ctlcontrols.currentPosition + .currentMedia.duration * Math.Sign(e.KeyCode - (KeyBigJumpOn + KeyBigJumpBack) / 2) / (iJumpFactor * iPropjump))
         End With
-
+        tmrJumpVideo.Enabled = True
 
     End Sub
     Public Sub JumpRandom(blnAutoTrail As Boolean)
@@ -532,11 +541,11 @@ Public Class frmMain
                 If blnLink Then
                     ' SetFilterState(FilterState.All)
                     blnLink = False
-                    CurrentFilterState.State = FilterHandler.FilterState.All
                     HighlightCurrent(strCurrentFilePath)
+                    CurrentFilterState.State = FilterHandler.FilterState.All
                 End If
             Case Keys.F5, Keys.F6, Keys.F7, Keys.F8, Keys.F9, Keys.F10, Keys.F11, Keys.F12
-                HandleFunctionKeyDown(sender, e)
+                HandleFunctionKeyDownNew(sender, e)
                 e.SuppressKeyPress = True
             Case Keys.A To Keys.Z, Keys.D0 To Keys.D9
                 If Not e.Control Then
@@ -612,7 +621,7 @@ Public Class frmMain
                     blnJumpToMark = True
                 End If
 
-                'JumpRandom(e.Control And e.Shift)
+                JumpRandom(e.Control And e.Shift)
 
             Case KeyTraverseTree, KeyTraverseTreeBack
                 'e.suppresskeypress by Treeview behaviour unless focus is elsewhere. 
@@ -658,15 +667,23 @@ Public Class frmMain
             Case KeyDelete
                 'Use Movefiles with current selected list, and option to delete. 
                 CancelDisplay()
-                Select Case PFocus
-                    Case CtrlFocus.Files
-                        MoveFiles(ListfromListbox(lbxFiles), "", lbxFiles)
-                    Case CtrlFocus.Tree
-                        DeleteFolder(tvMain2, Not blnMoveMode)
-                    Case CtrlFocus.ShowList
-                        '                        If MsgBox("This will DELETE ALL the showlist files! Is this what you want?", MsgBoxStyle.YesNoCancel) <> MsgBoxResult.Yes Then Exit Sub
-                        MoveFiles(ListfromListbox(lbxShowList), "", lbxShowList)
-                End Select
+                If e.Shift Then
+                    DeleteFolder(tvMain2, NavigateMoveState.State = StateHandler.StateOptions.Navigate)
+                Else
+                    MoveFiles(ListfromListbox(lbxFiles), "", lbxFiles)
+
+                End If
+                'MoveFiles(ListfromListbox(lbxShowList), "", lbxShowList)
+
+                'Select Case PFocus
+                '    Case CtrlFocus.Files
+                '        MoveFiles(ListfromListbox(lbxFiles), "", lbxFiles)
+                '    Case CtrlFocus.Tree
+                '        DeleteFolder(tvMain2, Not blnMoveMode)
+                '    Case CtrlFocus.ShowList
+                '        '                        If MsgBox("This will DELETE ALL the showlist files! Is this what you want?", MsgBoxStyle.YesNoCancel) <> MsgBoxResult.Yes Then Exit Sub
+                '        MoveFiles(ListfromListbox(lbxShowList), "", lbxShowList)
+                'End Select
                 'DisposePic(currentPicBox)
                 'Deletefile(strCurrentFilePath)
                 'UpdateBoxes(strCurrentFilePath, "")
@@ -718,8 +735,12 @@ Public Class frmMain
             'Media.Position = .Ctlcontrols.currentPosition
 
             tWMP.Ctlcontrols.currentPosition = .Ctlcontrols.currentPosition
+            Debug.Print(tWMP.Ctlcontrols.currentPosition)
             .URL = ""
             currentWMP = tWMP
+            Debug.Print(currentWMP.Ctlcontrols.currentPosition)
+
+            '            .Dock = DockStyle.Fill
             .stretchToFit = True
             .Visible = True
             .BringToFront()
@@ -765,53 +786,41 @@ Public Class frmMain
         If Len(strPath) > 247 Then Exit Sub 'Too long
         Dim finfo As New FileInfo(strPath)
         UpdateFileInfo()
-        If InStr(":\", strPath) = Len(strPath) - 2 Then 'TODO root folder
-            Dim s As String = Path.GetDirectoryName(strPath)
-            If tvMain2.SelectedFolder <> s Then tvMain2.SelectedFolder = s 'Only change tree if it needs changing
-
-        Else
-            'If Not blnLink Then
-
-            Dim s As String = Path.GetDirectoryName(strPath)
-            If tvMain2.SelectedFolder <> s Then tvMain2.SelectedFolder = s 'Only change tree if it needs changing
-            'End If
-        End If
-
-
-        'If Not blnLink Then
+        'Change the tree
+        Dim s As String = Path.GetDirectoryName(strPath)
+        If tvMain2.SelectedFolder <> s Then tvMain2.SelectedFolder = s 'Only change tree if it needs changing
+        'Select file in filelist
         If lbxFiles.SelectedItem <> strPath Then
-            'If Not blnChooseOne Then 
-            'TODO Rewrite this so that we can get a random file in the box when blnChooseONe is selected
-            'HighlightListboxSelected(strPath, lbxFiles) 'Highlight the current file in lbxFiles
             lbxFiles.SelectedIndex = lbxFiles.FindString(strPath)
-
-            'Else
-            '    strPath = lbxFiles.SelectedItem
-            'End If
         End If
-        'End If
-        If Not MasterContainer.Panel2Collapsed Then
-            'Highlight the file in lbxShowlist, but only if it has the focus
+        If Attributes.Visible Then
+        Else
+            '    Attributes.Show()
+
+        End If
+        'Attributes.UpdateLabel(strCurrentFilePath)
+
+        If Not MasterContainer.Panel2Collapsed Then 'Showlist is visible
+            'Select in the showlist unless CTRL held
             If PFocus = CtrlFocus.ShowList AndAlso Not CtrlDown Then
-                'HighlightListboxSelected(strPath, lbxShowList)
                 lbxShowList.SelectedIndex = lbxShowList.FindString(strPath)
             End If
         End If
 
     End Sub
 
-    Private Sub HighlightListboxSelected(strPath As String, ctrl As ListBox)
-        With ctrl
-            For i = 0 To .Items.Count - 1
-                If .Items(i) = strPath Then
-                    .SetSelected(i, True)
-                    Exit For
-                End If
+    'Private Sub HighlightListboxSelected(strPath As String, ctrl As ListBox)
+    '    With ctrl
+    '        For i = 0 To .Items.Count - 1
+    '            If .Items(i) = strPath Then
+    '                .SetSelected(i, True)
+    '                Exit For
+    '            End If
 
-            Next
-        End With
+    '        Next
+    '    End With
 
-    End Sub
+    'End Sub
 
 
     Private Sub AddMovies(blnRecurse As Boolean)
@@ -862,16 +871,26 @@ Public Class frmMain
         For Each s In StartPoint.Descriptions
             cbxStartPoint.Items.Add(s)
         Next
-        If My.Settings.AppUserChoices Is Nothing Then
-            MessageBox.Show("AppUserChoices is nothing")
-            My.Settings.AppUserChoices = New UserPrefs
+        My.Application.SaveMySettingsOnExit = True
+        My.Settings.Reload()
+
+        If My.Settings.UserChoices Is Nothing Then
+            ' MessageBox.Show("AppUserChoices is nothing")
+            My.Settings.UserChoices = New UserPrefs
+            My.Settings.UserChoices.State = NavigateMoveState
+            My.Settings.UserChoices.Filter = CurrentFilterState
+            My.Settings.UserChoices.Sort = PlayOrder
+
+
             My.Settings.Save()
+
         Else
 
-            PlayOrder = My.Settings.AppUserChoices.Sort
-            CurrentFilterState = My.Settings.AppUserChoices.Filter
-            NavigateMoveState = My.Settings.AppUserChoices.State
-            StartPoint = My.Settings.AppUserChoices.Start
+            MsgBox("NOT nothing")
+            PlayOrder = My.Settings.UserChoices.Sort
+            CurrentFilterState = My.Settings.UserChoices.Filter
+            NavigateMoveState = My.Settings.UserChoices.State
+            StartPoint = My.Settings.UserChoices.Start
             MsgBox("Prefs loaded")
         End If
         PreferencesGet()
@@ -959,8 +978,9 @@ Public Class frmMain
         ' MsgBox("Ring")
     End Sub
     Private Sub frmMain_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
+        My.Settings.Save()
 
-        Settings.PreferencesSave()
+        Mysettings.PreferencesSave()
     End Sub
 
 
@@ -1053,7 +1073,7 @@ Public Class frmMain
 
     'End Sub
 
-    Private Sub Listbox_SelectedIndexChanged(sender As Object, e As EventArgs) Handles lbxShowList.SelectedIndexChanged, lbxFiles.SelectedIndexChanged
+    Private Sub Listbox_SelectedIndexChanged(sender As Object, e As EventArgs) Handles lbxFiles.SelectedIndexChanged, lbxShowList.SelectedIndexChanged
         With sender
             Dim i As Long = .SelectedIndex
             If .Items.count = 0 Then
@@ -1061,6 +1081,7 @@ Public Class frmMain
             ElseIf i >= 0 Then
                 tmrPicLoad.Enabled = False
                 strCurrentFilePath = .Items(i)
+                Media.MediaPath = strCurrentFilePath
                 tmrPicLoad.Enabled = True
             End If
         End With
@@ -1340,9 +1361,7 @@ Public Class frmMain
 
         currentWMP.Ctlcontrols.currentPosition = NewPosition
         Console.WriteLine("Newposition " & NewPosition)
-        'While currentWMP.playState = WMPLib.WMPPlayState.wmppsTransitioning
 
-        'End While
         currentWMP.Visible = True
 
         currentWMP.BringToFront()
@@ -1362,11 +1381,11 @@ Public Class frmMain
         m.ButtonNumber = i
         m.Alpha = iCurrentAlpha
         m.Show()
-        If strVisibleButtons(i) = "" Then
-            m.Folder = CurrentFolderPath
-        Else
-            m.Folder = strVisibleButtons(i)
-        End If
+        ' If strVisibleButtons(i) = "" Then
+        m.Folder = CurrentFolderPath
+        'Else
+        'm.Folder = strVisibleButtons(i)
+        'End If
     End Sub
 
     Private Sub ButtonListToolStripMenuItem_Click(sender As Object, e As EventArgs)
@@ -1610,14 +1629,10 @@ Public Class frmMain
     End Sub
 
 
-    Private Sub TnButton_Click(sender As Object, e As EventArgs)
-        ThumbnailsStart()
-
-    End Sub
-
     Private Shared Sub ThumbnailsStart()
         Dim t As New Thumbnails
-        t.ThumbnailHeight = 125
+        t.ThumbnailHeight = 40
+
         If PFocus <> CtrlFocus.ShowList Then
             t.FileList = Duplicatelist(FileboxContents)
         Else
@@ -1638,9 +1653,9 @@ Public Class frmMain
     End Sub
 
 
-    Private Sub tsbOnlyOne_Click(sender As Object, e As EventArgs)
-        blnChooseOne = Not blnChooseOne
-    End Sub
+    'Private Sub tsbOnlyOne_Click(sender As Object, e As EventArgs)
+    '    blnChooseOne = Not blnChooseOne
+    'End Sub
 
 
     Private Sub AlphabeticToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AlphabeticToolStripMenuItem.Click
@@ -1906,6 +1921,16 @@ Public Class frmMain
     End Sub
 
     Private Sub DuplicatesToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles DuplicatesToolStripMenuItem1.Click
+        Dim s As List(Of List(Of String))
+        Duplicates.InputList = FileboxContents
+        s = Duplicates.Duplicates
+        For Each m In s
+            Debug.Print("")
+            For Each rs In m
+                Debug.Print(rs)
+            Next
+        Next
+
         FindDuplicates.Show()
     End Sub
 
@@ -1926,14 +1951,17 @@ Public Class frmMain
         PictureFunctions.MouseMove(PictureBox1, sender, e)
     End Sub
     Public Sub HandleFunctionKeyDownNew(sender As Object, e As KeyEventArgs)
+        HandleFunctionKeyDown(sender, e)
+        Exit Sub
         Dim i As Byte = e.KeyCode - Keys.F5
         Dim s As StateHandler.StateOptions = NavigateMoveState.State
         'Move files
+
         If e.Control Then NavigateMoveState.State = StateHandler.StateOptions.Move
         Select Case s
             Case StateHandler.StateOptions.Move, StateHandler.StateOptions.Copy
                 CancelDisplay()
-                ChangeWatcherPath(CurrentFolderPath)
+                'ChangeWatcherPath(CurrentFolderPath)
                 Select Case PFocus
                     Case CtrlFocus.Files
                         MoveFiles(ListfromListbox(lbxFiles), strVisibleButtons(i), lbxFiles)
@@ -1970,46 +1998,64 @@ Public Class frmMain
 
         'SetControlColours(blnMoveMode)
     End Sub
+
     Public Sub HandleFunctionKeyDown(sender As Object, e As KeyEventArgs)
-        HandleFunctionKeyDownNew(sender, e)
-        Exit Sub
         Dim i As Byte = e.KeyCode - Keys.F5
+        Dim s As StateHandler.StateOptions = NavigateMoveState.State
         'Move files
-        If e.Control Xor blnMoveMode Then 'Move files if CTRL held
-            CancelDisplay()
-            ChangeWatcherPath(CurrentFolderPath)
-
-            Select Case PFocus
-                Case CtrlFocus.Files
-                    MoveFiles(ListfromListbox(lbxFiles), strVisibleButtons(i), lbxFiles)
-                Case CtrlFocus.Tree
-                    MoveFolder(CurrentFolderPath, strVisibleButtons(i), tvMain2, blnMoveMode)
-                Case CtrlFocus.ShowList
-                    ' If MsgBox("This will move all the showlist files to the folder " & strVisibleButtons(i) & ". Is this what you want?", MsgBoxStyle.YesNoCancel) <> MsgBoxResult.Yes Then Exit Sub
-                    MoveFiles(ListfromListbox(lbxShowList), strVisibleButtons(i), lbxShowList)
-            End Select
-        Else
-            'Assign buttons
-            If e.Shift Or strVisibleButtons(i) = "" Then
-                AssignButton(i, iCurrentAlpha, 1, CurrentFolderPath, True) 'Just assign
-                If My.Computer.FileSystem.FileExists(strButtonFile) Then
-                    KeyAssignmentsStore(strButtonFile)
-                Else
-                    SaveButtonlist()
-                End If
+        CancelDisplay()
+        If e.Shift And e.Control And e.Alt Or strVisibleButtons(i) = "" Then
+            AssignButton(i, iCurrentAlpha, 1, CurrentFolderPath, True) 'Just assign
+            If My.Computer.FileSystem.FileExists(strButtonFile) Then
+                KeyAssignmentsStore(strButtonFile)
             Else
-                'SWITCH folder
-                If strVisibleButtons(i) <> CurrentFolderPath Then
-                    ChangeFolder(strVisibleButtons(i), True)
-                    'CancelDisplay()
-                    tvMain2.SelectedFolder = CurrentFolderPath
-                ElseIf Random.OnDirChange Then
-                    AdvanceFile(True, True)
-
-                End If
+                SaveButtonlist()
             End If
-
+            Exit Sub
         End If
+        Select Case s
+            Case StateHandler.StateOptions.Move, StateHandler.StateOptions.Copy
+                'ChangeWatcherPath(CurrentFolderPath)
+                If e.Control And e.Shift Then
+                    If strVisibleButtons(i) <> CurrentFolderPath Then
+                        ChangeFolder(strVisibleButtons(i), True)
+                        'CancelDisplay()
+                        tvMain2.SelectedFolder = CurrentFolderPath
+                    ElseIf Random.OnDirChange Then
+                        AdvanceFile(True, True)
+
+                    End If
+                ElseIf e.Shift Then
+                    MoveFolder(CurrentFolderPath, strVisibleButtons(i), tvMain2, True)
+                Else
+                    MoveFiles(ListfromListbox(lbxFiles), strVisibleButtons(i), lbxFiles)
+                    If lbxShowList.Visible Then
+                        MoveFiles(ListfromListbox(lbxShowList), strVisibleButtons(i), lbxShowList)
+                    End If
+                    ' If MsgBox("This will move all the showlist files to the folder " & strVisibleButtons(i) & ". Is this what you want?", MsgBoxStyle.YesNoCancel) <> MsgBoxResult.Yes Then Exit Sub
+                End If
+            Case StateHandler.StateOptions.Navigate
+
+                If e.Shift And e.Control And strVisibleButtons(i) <> "" Then
+                    MoveFolder(CurrentFolderPath, strVisibleButtons(i), tvMain2, True)
+                ElseIf e.Shift Then
+                    MoveFiles(ListfromListbox(lbxFiles), strVisibleButtons(i), lbxFiles)
+
+                Else
+                    'SWITCH folder
+                    If strVisibleButtons(i) <> CurrentFolderPath Then
+                        ChangeFolder(strVisibleButtons(i), True)
+                        'CancelDisplay()
+                        tvMain2.SelectedFolder = CurrentFolderPath
+                    ElseIf Random.OnDirChange Then
+                        AdvanceFile(True, True)
+
+                    End If
+                End If
+        End Select
+
+
+        SetControlColours(NavigateMoveState.Colour, CurrentFilterState.Colour)
 
         'SetControlColours(blnMoveMode)
     End Sub
@@ -2097,9 +2143,8 @@ Public Class frmMain
 
     End Sub
 
-    Private Sub btnFilterMoveFiles_Click(sender As Object, e As EventArgs) Handles btnFilterMoveFiles.Click
-        FM.Recursive = True
-        FM.FilterMoveFiles(CurrentFolderPath)
+    Private Sub btnFilterMoveFiles_Click(sender As Object, e As EventArgs)
+
 
     End Sub
 
@@ -2130,4 +2175,15 @@ Public Class frmMain
     Private Sub chbAutoTrail_CheckedChanged(sender As Object, e As EventArgs) Handles chbAutoTrail.CheckedChanged
 
     End Sub
+
+    Private Sub FilterMoveToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles FilterMoveToolStripMenuItem.Click
+        '   FM.Recursive = False
+        FM.FilterMoveFiles(CurrentFolderPath, False)
+    End Sub
+
+    Private Sub FilterMoveRecursiveToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles FilterMoveRecursiveToolStripMenuItem.Click
+        FM.FilterMoveFiles(CurrentFolderPath, True)
+
+    End Sub
+
 End Class

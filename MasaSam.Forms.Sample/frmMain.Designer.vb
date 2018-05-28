@@ -63,6 +63,8 @@ Partial Class frmMain
         Me.BundleToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.BurstFolderToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.PromoteFolderToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.FilterMoveToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.FilterMoveRecursiveToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.OptionsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToggleRandomSelectToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToggleRandomAdvanceToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -159,7 +161,6 @@ Partial Class frmMain
         Me.Panel9 = New System.Windows.Forms.Panel()
         Me.tbAbsolute = New System.Windows.Forms.TrackBar()
         Me.tbxAbsolute = New System.Windows.Forms.TextBox()
-        Me.btnFilterMoveFiles = New System.Windows.Forms.Button()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.tbxPercentage = New System.Windows.Forms.TextBox()
         Me.StartPointTrackBar = New System.Windows.Forms.TrackBar()
@@ -479,7 +480,7 @@ Partial Class frmMain
         '
         'HarvestFolderToolStripMenuItem
         '
-        Me.HarvestFolderToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.DeleteEmptyFoldersToolStripMenuItem, Me.HarvestFoldersToolStripMenuItem, Me.BundleToolStripMenuItem, Me.BurstFolderToolStripMenuItem, Me.PromoteFolderToolStripMenuItem})
+        Me.HarvestFolderToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.DeleteEmptyFoldersToolStripMenuItem, Me.HarvestFoldersToolStripMenuItem, Me.BundleToolStripMenuItem, Me.BurstFolderToolStripMenuItem, Me.PromoteFolderToolStripMenuItem, Me.FilterMoveToolStripMenuItem, Me.FilterMoveRecursiveToolStripMenuItem})
         Me.HarvestFolderToolStripMenuItem.Name = "HarvestFolderToolStripMenuItem"
         Me.HarvestFolderToolStripMenuItem.Size = New System.Drawing.Size(157, 34)
         Me.HarvestFolderToolStripMenuItem.Text = "Folder &Actions"
@@ -517,6 +518,18 @@ Partial Class frmMain
         Me.PromoteFolderToolStripMenuItem.Name = "PromoteFolderToolStripMenuItem"
         Me.PromoteFolderToolStripMenuItem.Size = New System.Drawing.Size(341, 34)
         Me.PromoteFolderToolStripMenuItem.Text = "Promote Folder"
+        '
+        'FilterMoveToolStripMenuItem
+        '
+        Me.FilterMoveToolStripMenuItem.Name = "FilterMoveToolStripMenuItem"
+        Me.FilterMoveToolStripMenuItem.Size = New System.Drawing.Size(341, 34)
+        Me.FilterMoveToolStripMenuItem.Text = "Filter Move"
+        '
+        'FilterMoveRecursiveToolStripMenuItem
+        '
+        Me.FilterMoveRecursiveToolStripMenuItem.Name = "FilterMoveRecursiveToolStripMenuItem"
+        Me.FilterMoveRecursiveToolStripMenuItem.Size = New System.Drawing.Size(341, 34)
+        Me.FilterMoveRecursiveToolStripMenuItem.Text = "Filter Move Recursive"
         '
         'OptionsToolStripMenuItem
         '
@@ -1390,7 +1403,6 @@ Partial Class frmMain
         '
         Me.Panel9.Controls.Add(Me.tbAbsolute)
         Me.Panel9.Controls.Add(Me.tbxAbsolute)
-        Me.Panel9.Controls.Add(Me.btnFilterMoveFiles)
         Me.Panel9.Controls.Add(Me.GroupBox2)
         Me.Panel9.Controls.Add(Me.GroupBox1)
         Me.Panel9.Controls.Add(Me.cbxSpeeds)
@@ -1423,15 +1435,6 @@ Partial Class frmMain
         Me.tbxAbsolute.Name = "tbxAbsolute"
         Me.tbxAbsolute.Size = New System.Drawing.Size(134, 29)
         Me.tbxAbsolute.TabIndex = 8
-        '
-        'btnFilterMoveFiles
-        '
-        Me.btnFilterMoveFiles.Location = New System.Drawing.Point(49, 849)
-        Me.btnFilterMoveFiles.Name = "btnFilterMoveFiles"
-        Me.btnFilterMoveFiles.Size = New System.Drawing.Size(266, 42)
-        Me.btnFilterMoveFiles.TabIndex = 31
-        Me.btnFilterMoveFiles.Text = "Filter Move Files"
-        Me.btnFilterMoveFiles.UseVisualStyleBackColor = True
         '
         'GroupBox2
         '
@@ -1902,8 +1905,9 @@ Partial Class frmMain
     Friend WithEvents cbxStartPoint As ComboBox
     Friend WithEvents StartPointTrackBar As TrackBar
     Friend WithEvents tbState As ToolStripStatusLabel
-    Friend WithEvents btnFilterMoveFiles As Button
     Friend WithEvents tbxAbsolute As TextBox
     Friend WithEvents tbxPercentage As TextBox
     Friend WithEvents tbAbsolute As TrackBar
+    Friend WithEvents FilterMoveToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents FilterMoveRecursiveToolStripMenuItem As ToolStripMenuItem
 End Class

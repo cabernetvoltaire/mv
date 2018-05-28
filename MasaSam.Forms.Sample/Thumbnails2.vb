@@ -1,14 +1,17 @@
 ﻿Imports System.Threading
 
 Public Class Thumbnails
-    Public flp2 As New FlowLayoutPanel
+    Public flp2 As New FlowLayoutPanel With {
+        .BackColor = Color.Blue,
+        .Dock = DockStyle.Bottom
+    }
     Public t As Thread
     Private flist As List(Of String)
     Private mSize As Int16 = 100
     Private Sub LoadThumbnails()
         Dim flp As New FlowLayoutPanel With {
-            .BackColor = Color.Azure,
-            .Dock = DockStyle.Fill
+            .BackColor = Color.WhiteSmoke,
+            .Dock = DockStyle.Top
         }
         flp.SendToBack()
         flp.Visible = True
@@ -52,7 +55,9 @@ Public Class Thumbnails
             End Try
         Next
         flp2 = flp
-        flp2.BringToFront()
+        '        flp2.Dock = DockStyle.Fill
+
+        '   flp2.SendToBack()
         '  flp.Visible = False
 
     End Sub
@@ -62,12 +67,12 @@ Public Class Thumbnails
     Private Sub pb_Click(sender As Object, e As EventArgs)
         Dim pb = DirectCast(sender, PictureBox)
         strCurrentFilePath = pb.Tag
+        Media.MediaPath = pb.Tag
         ToolTip1.SetToolTip(pb, pb.Tag)
         frmMain.lbxFiles.SelectionMode = SelectionMode.One
         frmMain.tmrPicLoad.Enabled = True
 
     End Sub
-
     Public Function ThumbnailCallback() As Boolean
         Return False
     End Function
@@ -87,6 +92,7 @@ Public Class Thumbnails
         End Try
     End Function
 
+#End Region
     Private p As PaintEventArgs
     Private Sub Thumbnails_Paint(sender As Object, e As PaintEventArgs) Handles Me.Paint
         p = e
@@ -103,6 +109,7 @@ Public Class Thumbnails
         t.IsBackground = True
         t.Start()
         Timer1.Enabled = True
+
     End Sub
 
 
@@ -127,6 +134,7 @@ Public Class Thumbnails
 
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
         If t.IsAlive Then
+            Me.Refresh()
             Exit Sub
         ElseIf Not t.IsAlive Then
 
@@ -135,4 +143,6 @@ Public Class Thumbnails
         End If
 
     End Sub
+
+
 End Class

@@ -3,7 +3,7 @@ Imports MasaSam.Forms.Controls
 Module FileHandling
     Public blnSuppressCreate As Boolean = False
     Public blnChooseOne As Boolean = False
-    Public strVideoExtensions = ".vob.webm.avi.flv.mov.m4p.mpeg.mpg.m4a.m4v.mkv.mp4.rm.wmv.wav.mp3.3gp"
+    Public strVideoExtensions = ".vob.webm.avi.flv.mov.m4p.mpeg.mpg.m4a.m4v.mkv.mp4.rm.ram.wmv.wav.mp3.3gp"
     Public strPicExtensions = ".jpeg.png.jpg.bmp.gif"
     Public CurrentfilterState As FilterHandler = frmMain.CurrentFilterState
 
@@ -51,13 +51,14 @@ Module FileHandling
 
 
             If lbx.Items.Count <> 0 Then
-                    If blnRandom Then
-                        Dim s As Long = lbx.Items.Count - 1
-                        lbx.SelectedIndex = Rnd() * s
-                    Else
-                        lbx.SelectedIndex = 0
-                    End If
+                If Random.OnDirChange Or Random.NextSelect Then
+                    Dim s As Long = lbx.Items.Count - 1
+                    lbx.SelectedIndex = Rnd() * s
+                Else
+                    lbx.SelectedIndex = lbx.FindString(strCurrentFilePath)
+                    If lbx.SelectedIndex = -1 Then lbx.SelectedIndex = 0
                 End If
+            End If
 
         Catch ex As ArgumentException
             MsgBox(ex.ToString)
@@ -265,7 +266,7 @@ Module FileHandling
 
         Dim ind As Long = lbx1.SelectedIndex
         'If only one file, then use the filepump
-        If files.Count = 1 Then
+        If files.Count = 1 And strDest <> "" Then
             'Try
             '    FileIO.FileSystem.CopyFile(files(0), strDest & "\" & FileIO.FileSystem.GetName(files(0)), FileIO.UIOption.OnlyErrorDialogs)
             '    FileIO.FileSystem.DeleteFile(files(0))
@@ -277,21 +278,22 @@ Module FileHandling
             FilePump(files.Item(0) & "|" & strDest, lbx1)
             lbx1.SelectionMode = SelectionMode.One
             If lbx1.Items.Count <> 0 Then lbx1.SetSelected(Math.Max(Math.Min(ind, lbx1.Items.Count - 1), 0), True)
+        Else
 
-            Exit Sub
+            Dim s As String = strDest 'if strDest is empty then delete
+
+            If files.Count > 1 And strDest <> "" Then
+                If Not blnSuppressCreate Then s = CreateNewDirectory(frmMain.tvMain2, strDest, True)
+            End If
+            Dim file As String
+
+            file = MovingFiles(files, strDest, lbx1, s)
+            lbx1.SelectionMode = SelectionMode.One
+            FillListbox(lbx1, New DirectoryInfo(CurrentFolderPath), FileboxContents, False)
+            If lbx1.Items.Count <> 0 Then lbx1.SetSelected(Math.Max(Math.Min(ind, lbx1.Items.Count - 1), 0), True)
         End If
-        Dim s As String = strDest 'if strDest is empty then delete
 
-        If files.Count > 1 And strDest <> "" Then
-            If Not blnSuppressCreate Then s = CreateNewDirectory(frmMain.tvMain2, strDest, True)
-        End If
-        Dim file As String
 
-        file = MovingFiles(files, strDest, lbx1, s)
-        lbx1.SelectionMode = SelectionMode.One
-        FillListbox(lbx1, New DirectoryInfo(CurrentFolderPath), FileboxContents, False)
-
-        If lbx1.Items.Count <> 0 Then lbx1.SetSelected(Math.Max(Math.Min(ind, lbx1.Items.Count - 1), 0), True)
 
     End Sub
     ''' <summary>
@@ -452,14 +454,14 @@ Module FileHandling
                 tv.RefreshTree(strDest)
             Catch ex As IO.DirectoryNotFoundException
             End Try
-            If MsgBox("Assign new folder to button?", MsgBoxStyle.YesNo, "Assign folder") = MsgBoxResult.Yes Then '
-                Dim i As Integer = -1
-                While i > 4 + 8 Or i < 5
-                    i = InputBox("Number?",, "f")
-                End While
-                i = i - 5
-                AssignButton(i, iCurrentAlpha, 1, s, True)
-            End If
+            'If MsgBox("Assign new folder to button?", MsgBoxStyle.YesNo, "Assign folder") = MsgBoxResult.Yes Then '
+            '    Dim i As Integer = -1
+            '    While i > 4 + 8 Or i < 5
+            '        i = InputBox("Number?",, "f")
+            '    End While
+            '    i = i - 5
+            '    AssignButton(i, iCurrentAlpha, 1, s, True)
+            'End If
         End If
         Return s
     End Function

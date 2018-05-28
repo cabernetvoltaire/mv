@@ -56,12 +56,12 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute()>  _
-        Public Property AppUserChoices() As Global.MasaSam.Forms.Sample.UserPrefs
+        Public Property UserChoices() As Global.MasaSam.Forms.Sample.UserPrefs
             Get
-                Return CType(Me("AppUserChoices"),Global.MasaSam.Forms.Sample.UserPrefs)
+                Return CType(Me("UserChoices"),Global.MasaSam.Forms.Sample.UserPrefs)
             End Get
             Set
-                Me("AppUserChoices") = value
+                Me("UserChoices") = value
             End Set
         End Property
     End Class

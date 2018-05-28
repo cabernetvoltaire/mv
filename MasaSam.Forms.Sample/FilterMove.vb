@@ -28,15 +28,17 @@ Class FilterMove
             mRecursive = value
         End Set
     End Property
-    Public Sub FilterMoveFiles(foldername As String)
-        GetFoldersBelow(foldername)
-        Dim s As New IO.DirectoryInfo(foldername)
+    Public Sub FilterMoveFiles(FolderName As String, Recurse As Boolean)
+        GetFoldersBelow(FolderName, Recurse)
+        Dim s As New IO.DirectoryInfo(FolderName)
         For Each f In s.GetFiles
             For Each d In mFolders
-                If InStr(f.Name, d.Name) <> 0 And Len(d.Name) > 1 Then
+                If InStr(LCase(f.Name), LCase(d.Name)) <> 0 And Len(d.Name) > 1 Then
                     Try
                         My.Computer.FileSystem.MoveFile(f.FullName, d.FullName & "\" & f.Name)
                         s.Refresh()
+                        Debug.Print("Moving " & f.FullName & vbCrLf & "to " & d.FullName)
+
                     Catch ex As Exception
                         ' MsgBox("While moving " & f.FullName & vbCrLf & "to " & d.FullName & vbCrLf & ex.Message)
                         Exit For
@@ -46,11 +48,11 @@ Class FilterMove
         Next
         RaiseEvent FilesMoved(Nothing, Nothing)
     End Sub
-    Private Sub GetFoldersBelow(folderpath As String)
+    Private Sub GetFoldersBelow(folderpath As String, recurse As Boolean)
 
         Dim s As New IO.DirectoryInfo(folderpath)
         For Each m In s.GetDirectories
-            If mRecursive Then GetFoldersBelow(m.FullName)
+            If recurse Then GetFoldersBelow(m.FullName, recurse)
             mFolders.Add(m)
         Next
 
