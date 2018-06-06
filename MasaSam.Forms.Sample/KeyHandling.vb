@@ -24,7 +24,6 @@
     Public KeyMarkPoint = Keys.NumPad4
     Public KeyMarkFavourite = Keys.Insert
 
-
     Public LKeyFullscreen = Keys.F + Keys.Control
     Public LKeyRandomize = Keys.R + Keys.Control
     Public LKeyTraverseTreeBack = Keys.Control + Keys.OemMinus

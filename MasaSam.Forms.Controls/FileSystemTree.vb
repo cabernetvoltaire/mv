@@ -45,8 +45,7 @@ Public Class FileSystemTree
     <Description("Notifies when file is selected either by clicking or expanding.")>
     <Category("Behavior")>
     Public Event FileSelected As EventHandler(Of FileInfoEventArgs)
-    'RaiseEvent (sender, )
-    '    Public Event DirectoryHighlighted As EventHandlerList()
+    Public Event LabelEdited As EventHandler(Of String)
 
 #End Region
 
@@ -1062,7 +1061,7 @@ Public Class FileSystemTree
     Private Function NodePath(e) As String
         Dim s As String
         Dim myc As String = "My Computer\"
-        s = e.node.fullname
+        s = e.node.FullPath
         If InStr(s, myc) <> 0 Then s = s.Remove(0, Len(myc))
         Return s
     End Function
@@ -1157,11 +1156,10 @@ Public Class FileSystemTree
         Dim node As FileSystemNode = CType(e.Node, FileSystemNode)
         Dim pnode As FileSystemNode = CType(e.Node.Parent, FileSystemNode)
         'Try
-        Replace(e.Node.FullPath, oldlabel, e.Label)
-        'Catch ex As Exception
-        'MsgBox(ex.ToString & vbCrLf & ex.Message)
-        '            e = RelabelFolder(e) 'TODO improve this.
-        'End Try
+        'Dim m As New DirectoryInfo(node.FullName)
+        'Dim s As String = Replace(e.Node.FullPath, oldlabel, e.Label)
+        'If InStr(s, "My Computer\") <> 0 Then s = s.Remove(0, Len("My Computer\"))
+        'm.MoveTo(s)
 
 
     End Sub
@@ -1172,6 +1170,7 @@ Public Class FileSystemTree
                 If e.Label.IndexOfAny(New Char() {"@"c, ","c, "!"c}) = -1 Then
                     ' Stop editing without canceling the label change.
                     e.Node.EndEdit(False)
+
                 Else
                     ' Cancel the label edit action, inform the user, and
                     ' place the node in edit mode again. 
@@ -1192,6 +1191,7 @@ Public Class FileSystemTree
                 e.Node.BeginEdit()
             End If
         End If
+
         Return e
     End Function
 
@@ -1245,6 +1245,10 @@ Public Class FileSystemTree
 
         'End If
         'e.Handled = True
+    End Sub
+
+    Private Sub tvFiles_BeforeLabelEdit(sender As Object, e As NodeLabelEditEventArgs) Handles tvFiles.BeforeLabelEdit
+
     End Sub
 
 

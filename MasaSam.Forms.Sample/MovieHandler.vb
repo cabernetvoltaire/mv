@@ -7,15 +7,22 @@ Module MovieHandler
     Public Property NewPosition As Long
     Public Property FromFinish As Long = 65
     Public Sub MediaJumpToMarker()
-        'Jumps to lMediaMarker unless not set, in which case, jumps to current startpoint
-        If MediaMarker <> 0 Then
-            NewPosition = MediaMarker
-        Else
-            NewPosition = frmMain.StartPoint.StartPoint
-            Console.WriteLine(":New position is " & NewPosition & " of " & MediaDuration)
-        End If
+        Static LastTriggered As DateTime
+        If (Now() - LastTriggered).TotalMilliseconds > 200 Then
 
-        frmMain.tmrJumpVideo.Enabled = True
+            'Jumps to lMediaMarker unless not set, in which case, jumps to current startpoint
+            If MediaMarker <> 0 Then
+                NewPosition = MediaMarker
+            Else
+                NewPosition = frmMain.StartPoint.StartPoint
+                Console.WriteLine(":New position is " & NewPosition & " of " & MediaDuration)
+            End If
+
+            frmMain.tmrJumpVideo.Enabled = True
+        Else
+        End If
+        LastTriggered = Now
+
     End Sub
     Public Sub PlaystateChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent)
         'MsgBox(e.newState)
@@ -29,13 +36,13 @@ Module MovieHandler
 
                 MediaDuration = currentWMP.currentMedia.duration
                 frmMain.StartPoint.Duration = MediaDuration
-                If FullScreen.Changing Then
-                    NewPosition = currentWMP.Ctlcontrols.currentPosition
+                '     If FullScreen.Changing Then
+                NewPosition = currentWMP.Ctlcontrols.currentPosition
                     frmMain.tmrJumpVideo.Enabled = True
-                Else
-                    MediaJumpToMarker()
+                '    Else
+                MediaJumpToMarker()
 
-                End If
+                '   End If
 
         End Select
     End Sub

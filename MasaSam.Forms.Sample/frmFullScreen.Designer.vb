@@ -57,6 +57,7 @@ Partial Class FullScreen
         'fullScreenPicBox
         '
         Me.fullScreenPicBox.BackColor = System.Drawing.Color.Black
+        Me.fullScreenPicBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.fullScreenPicBox.Dock = System.Windows.Forms.DockStyle.Fill
         Me.fullScreenPicBox.Location = New System.Drawing.Point(0, 0)
         Me.fullScreenPicBox.Margin = New System.Windows.Forms.Padding(0)
@@ -80,8 +81,9 @@ Partial Class FullScreen
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None
         Me.KeyPreview = True
         Me.Name = "FullScreen"
-        Me.StartPosition = System.Windows.Forms.FormStartPosition.Manual
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Form1"
+        Me.TopMost = True
         CType(Me.FSWMP, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.FSBlanker, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.fullScreenPicBox, System.ComponentModel.ISupportInitialize).EndInit()

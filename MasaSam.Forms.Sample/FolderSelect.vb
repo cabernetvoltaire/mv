@@ -69,5 +69,7 @@ Public Class FolderSelect
         fst1.SelectedFolder = newFolder
     End Sub
 
+    Private Sub FolderSelect_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
+    End Sub
 End Class

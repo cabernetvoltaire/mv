@@ -71,7 +71,7 @@
     Public Sub PicClick(pic As PictureBox)
         iScreenstate = (iScreenstate + 1) Mod 3
         DisposePic(pic)
-        Dim img As Image = GetImage(strCurrentFilePath)
+        Dim img As Image = GetImage(Media.MediaPath)
         PreparePic(pic, picBlanker, img)
     End Sub
     Public Sub Mousewheel(pbx1 As PictureBox, sender As Object, e As MouseEventArgs)
@@ -85,7 +85,7 @@
         If iScreenstate = Screenstate.Fitted Then
             frmMain.AdvanceFile(e.Delta < 0, False)
             frmMain.tmrSlideShow.Enabled = False 'Break slideshow if scrolled
-            Dim img As Image = GetImage(strCurrentFilePath)
+            Dim img As Image = GetImage(Media.MediaPath)
         Else
 
 
@@ -224,7 +224,7 @@
             iScreenstate = Screenstate.Fitted
         End If
         DisposePic(pic)
-        Dim img As Image = GetImage(strCurrentFilePath)
+        Dim img As Image = GetImage(Media.MediaPath)
         PreparePic(pic, picBlanker, img)
     End Sub
     Public Sub DisposePic(box As PictureBox)

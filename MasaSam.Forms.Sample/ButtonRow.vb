@@ -1,10 +1,18 @@
 ﻿Public Class ButtonRow
     Public Row(8) As MVButton
     Public Event CurrentChanged(ByVal sender As Object, ByVal e As EventArgs)
-        Public Sub New()
-            InitialiseButtons()
-        End Sub
-        Private mCurrent As Boolean
+    Public Sub New()
+        Dim S As String = "ABCDEFGH"
+        For i = 0 To 7
+            Row(i) = New MVButton
+            Row(i).FaceText = "f" & Str(i + 5)
+            Row(i).Label = S(i)
+        Next
+
+        'Current = False
+        'Letter = "A"
+    End Sub
+    Private mCurrent As Boolean
         Public Property Current() As Boolean
             Get
                 Return mCurrent
@@ -24,12 +32,12 @@
             Set(ByVal value As Char)
 
                 mLetter = value
-                Key = GetKey(value)
-            End Set
+            '     Key = GetKey(value)
+        End Set
         End Property
 
     Private Function GetKey(value As Char) As Integer
-        Dim alpha As String = "ABCEDEFGHIJKLMNOPWRSTUVWXYZ"
+        Dim alpha As String = "ABCDEFGHIJKLMNOPWRSTUVWXYZ"
         Dim i As Byte = InStr(alpha, value)
         If i = 0 Then
             i = InStr("0123456789", value)
@@ -48,7 +56,7 @@
         Set(ByVal value As Integer)
 
             mKey = value
-            Letter = Chr(value)
+            mLetter = Chr(value)
         End Set
     End Property
 

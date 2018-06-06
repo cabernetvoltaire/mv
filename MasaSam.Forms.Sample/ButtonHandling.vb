@@ -1,7 +1,7 @@
 ﻿Imports System.IO
 
 Module ButtonHandling
-    Public buttons As ButtonSet
+    Public buttons As New ButtonSet
 
     Public nletts As Int16 = 36
     '   Public layers(nletts) As Byte
@@ -15,6 +15,7 @@ Module ButtonHandling
 
     Public lblDest() As Label = {frmMain.lbl1, frmMain.lbl2, frmMain.lbl3, frmMain.lbl4, frmMain.lbl5, frmMain.lbl6, frmMain.lbl7, frmMain.lbl8}
     Public Sub Buttons_Load()
+        buttons.CurrentLetter = "A"
         For i As Byte = 0 To 7
             lblDest(i).Font = New Font(lblDest(i).Font, FontStyle.Bold)
         Next
@@ -48,46 +49,22 @@ Module ButtonHandling
         Dim di() As DirectoryInfo
         di = d.GetDirectories
         Dim n = d.GetDirectories.Count - 1
-        For i = 0 To n
-            Dim k As Byte
-            k = i Mod 8
+        If n > 0 Then
+            For i = 0 To n
+                Dim k As Byte
+                k = i Mod 8
 
-            AssignButton(k, iAlpha + Int(i / 8), 1, di(i).FullName)
-        Next
-
+                AssignButton(k, iAlpha + Int(i / 8), 1, di(i).FullName)
+            Next
+        End If
 
         KeyAssignmentsStore(strButtonFile)
 
-    End Sub
-    Public Sub AssignAlphabetic()
-
-        Dim dlist As New List(Of String)
-        Dim d As New DirectoryInfo(CurrentFolderPath)
-        FindAllFoldersBelow(d, dlist, True, True)
-        ' dlist = SetPlayOrder(PlayOrder.Name, dlist)
-        dlist.Sort()
-        Dim n(nletts) As Integer
-        For i = 0 To dlist.Count - 1
-            Dim s As String = dlist.Item(i)
-            Dim sht As String = New DirectoryInfo(s).Name
-            Dim l As String = UCase(sht(0))
-            Dim k As Int16 = ButtfromAsc(Asc(l))
-            If k >= 0 AndAlso k < nletts Then
-                If n(k) < 8 Then
-
-                    AssignButton(n(k), k, 1, s)
-                    '                   strButtonFilePath(n(k), k, 1) = s
-                    n(k) += 1
-                End If
-            End If
-
-        Next
-        KeyAssignmentsStore(strButtonFile)
     End Sub
     Public Sub AssignAlphabetic(blntest As Boolean)
 
         Dim dlist As New List(Of String)
-        Dim d As New DirectoryInfo(CurrentFolderPath)
+        Dim d As New DirectoryInfo(Media.MediaDirectory)
         FindAllFoldersBelow(d, dlist, True, True)
         ' dlist = SetPlayOrder(PlayOrder.Name, dlist)
         dlist.Sort()
@@ -169,12 +146,13 @@ Module ButtonHandling
     End Function
 
 
-
-
-
     Public Sub AssignButton(ByVal i As Byte, ByVal j As Integer, ByVal k As Byte, ByVal strPath As String, Optional blnStore As Boolean = False)
         Dim f As New DirectoryInfo(strPath)
-        If strVisibleButtons(i) <> "" And Not blnMoveMode Then
+        With buttons.CurrentRow.Row(i)
+            .Path = strPath
+            .Label = f.Name
+        End With
+        If strVisibleButtons(i) <> "" And NavigateMoveState.State = StateHandler.StateOptions.Navigate Then
             If Not MsgBox("Replace button assignment for F" & i + 5 & " with " & f.Name & "?", MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then Exit Sub
         End If
         strVisibleButtons(i) = strPath
@@ -227,7 +205,7 @@ Module ButtonHandling
             If s <> "" Then
                 lblDest(i).Text = s
                 If My.Computer.FileSystem.DirectoryExists(f) Then
-                    If blnMoveMode Xor CtrlDown Then
+                    If CtrlDown Then
                         lblDest(i).ForeColor = Color.Red
                     ElseIf ShiftDown Then
                         lblDest(i).ForeColor = Color.Blue
@@ -251,6 +229,10 @@ Module ButtonHandling
     ''' This is for when we hold down CTRL or SHIFT and the appearance of the buttons schanges. 
     ''' </summary>
     Public Sub UpdateButtonAppearance()
+        frmMain.lblAlpha.Text = buttons.CurrentLetter
+        For i = 0 To 7
+            frmMain.ToolTip1.SetToolTip(btnDest(i), buttons.CurrentRow.Row(i).Path)
+        Next
         For i = 0 To 7
             frmMain.lblAlpha.Text = Chr(AscfromButt(iCurrentAlpha)).ToString
             Dim s As String
@@ -262,7 +244,7 @@ Module ButtonHandling
             If s <> "" Then
                 lblDest(i).Text = s
                 If My.Computer.FileSystem.DirectoryExists(f) Then
-                    If NavigateMoveState.State = StateHandler.StateOptions.Move Xor CtrlDown Then
+                    If frmMain.NavigateMoveState.State = StateHandler.StateOptions.Move Xor CtrlDown Then
                         lblDest(i).ForeColor = Color.Red
                     ElseIf ShiftDown Then
                         lblDest(i).ForeColor = Color.Blue
@@ -285,13 +267,25 @@ Module ButtonHandling
         Dim alph As String = "ABCDEFGH"
         For i As Byte = 0 To 7
             With btnDest(i)
-                .Text = "F" & Str(i + 5)
+                .Text = buttons.CurrentRow.Row(i).FaceText
+                '.Text = "F" & Str(i + 5)
 
                 AddHandler .Click, AddressOf ButtonClick
                 '  AddHandler .MouseEnter, AddressOf ButtonMouse
             End With
 
-            lblDest(i).Text = alph(i)
+            lblDest(i).Text = buttons.CurrentRow.Row(i).Label
+        Next
+    End Sub
+    Public Sub InitialiseButtons(row As ButtonRow)
+        For i As Byte = 0 To 7
+            With btnDest(i)
+                .Text = "F" & Str(i + 5)
+
+                AddHandler .Click, AddressOf ButtonClick
+            End With
+
+            lblDest(i).Text = row.Row(i).Label
         Next
     End Sub
     Private Sub ButtonClick(sender As Object, e As MouseEventArgs)
@@ -355,8 +349,16 @@ Module ButtonHandling
     Public Sub KeyAssignmentsStore(path As String)
         Dim intLoop As Integer
         Dim iLetter As Integer
+        Dim Okay As Boolean
         Dim strEncrypted As String
         If path = "" Then
+            Okay = False
+        Else
+            Dim f As New FileInfo(path)
+            If f.Exists Then Okay = True
+        End If
+        If Not Okay Then
+
             With frmMain.SaveFileDialog1
                 .DefaultExt = "msb"
                 .Filter = "Metavisua button files|*.msb|All files|*.*"
@@ -370,17 +372,18 @@ Module ButtonHandling
         End If
 
         Dim fs As New StreamWriter(New FileStream(path, FileMode.OpenOrCreate, FileAccess.Write))
-        For iLetter = 0 To iAlphaCount - 1
-            For intLoop = 0 To 7
+            For iLetter = 0 To iAlphaCount - 1
+                For intLoop = 0 To 7
 
-                If strButtonFilePath(intLoop, iLetter, 1) <> "" Then
-                    strEncrypted = intLoop & "|" & iLetter & "|" & strButtonFilePath(intLoop, iLetter, 1) & "|" & strButtonCaptions(intLoop, iLetter, 1)
-                    fs.WriteLine(strEncrypted)
-                End If
+                    If strButtonFilePath(intLoop, iLetter, 1) <> "" Then
+                        strEncrypted = intLoop & "|" & iLetter & "|" & strButtonFilePath(intLoop, iLetter, 1) & "|" & strButtonCaptions(intLoop, iLetter, 1)
+                        fs.WriteLine(strEncrypted)
+                    End If
+                Next
             Next
-        Next
-        strButtonFile = path
-        fs.Close()
+            strButtonFile = path
+            fs.Close()
+
 
         PreferencesSave()
 

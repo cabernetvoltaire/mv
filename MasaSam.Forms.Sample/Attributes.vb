@@ -1,29 +1,71 @@
 ﻿Public Class Attributes
-    Private Choices() As String = {"Rate", "Height", "Width", "Date"}
+    Private Choices() As String = {"Rate", "Height", "Width", "Date", "Album", "Song"}
     Private Sub Attributes_Load(sender As Object, e As EventArgs) Handles MyBase.Load, MyBase.Shown
     End Sub
-
+    Private mDestinationLabel As Label
+    Public Property DestinationLabel() As Label
+        Get
+            Return mDestinationLabel
+        End Get
+        Set(ByVal value As Label)
+            mDestinationLabel = value
+        End Set
+    End Property
 
     Public Sub UpdateLabel(filename As String)
-        Exit Sub
+        'Exit Sub
         Dim AttributeName As String = ""
-        Dim AttList As List(Of KeyValuePair(Of String, String)) = FileMetaData.GetMetaText(filename, "Q:\exiftool.exe")
+        Dim AttList As List(Of KeyValuePair(Of String, String)) = FileMetaData.GetMetaText(filename, "C:\exiftool.exe")
         For Each f In AttList
             If ChosenString(f.Key) Then
                 AttributeName += f.Key & ": " & f.Value & vbCrLf
             End If
         Next
-        TextBox1.Text = AttributeName
+        mDestinationLabel.Text = AttributeName
     End Sub
+    Public Sub AlbumArtist(filename As String)
+        'Make folder 'Artist\Album'
+        'Move file to it. 
+        Dim f As New IO.FileInfo(filename)
+        Dim artist As String = ""
+        Dim album As String = ""
+        Dim title As String = ""
 
+        Dim AttList As List(Of KeyValuePair(Of String, String)) = FileMetaData.GetMetaText(filename, "C:\exiftool.exe")
+        For Each m In AttList
+            If m.Key = "Artist" Then artist = m.Value
+            If m.Key = "Album" Then album = m.Value
+            If m.Key = "Title" Then title = m.Value
+        Next
+        Dim dest As String
+        Dim dir As New IO.DirectoryInfo(f.Directory.Root.FullName & artist & "\" & album)
+        If Not dir.Exists Then
+            dir.Create()
+        End If
+        If title <> "" Then
+            dest = f.Directory.Root.FullName & artist & "\" & album & "\" & title & f.Extension
+        Else
+            dest = f.Directory.Root.FullName & artist & "\" & album & "\" & title & f.Name
+
+        End If
+        Dim r As New IO.FileInfo(dest)
+        If r.Exists Then
+            f.Delete()
+        Else
+            f.MoveTo(dest)
+        End If
+        ActiveForm.Refresh()
+    End Sub
     Private Function ChosenString(s As String) As Boolean
         Dim Flag As Boolean = False
-        For i = 0 To 3
+        For i = 0 To 5
             If Not Flag Then Flag = s.Contains(Choices(i))
 
         Next
         Return Flag
     End Function
+
+
 End Class
 
 

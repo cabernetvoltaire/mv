@@ -13,7 +13,17 @@
     Private mOrder = {"Original", "Random", "Name", "Path Name", "Date/Time", "Size", "Type"}
 
     Private mDescList As New List(Of String)
-
+    Private mReverseOrder As Boolean
+    Public Property ReverseOrder() As Boolean
+        Get
+            Return mReverseOrder
+        End Get
+        Set(ByVal value As Boolean)
+            Dim b = mReverseOrder
+            mReverseOrder = value
+            If b <> mReverseOrder Then RaiseEvent StateChanged(Me, Nothing)
+        End Set
+    End Property
     Public ReadOnly Property Descriptions As List(Of String)
         Get
             For i = 0 To 6
@@ -45,7 +55,8 @@
         End Set
     End Property
     Public Sub IncrementState()
-        Me.State = (Me.State + 1) Mod (Order.Type)
+        State = (State + 1) Mod (Order.Type)
+
     End Sub
 
     Public Sub Toggle()

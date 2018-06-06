@@ -1,6 +1,13 @@
 ﻿Public Class MVButton
 
     Private mPath As String
+    Public Sub New()
+        mPath = ""
+        mFaceText = ""
+        mlblText = ""
+        mActive = True
+        mColour = Color.Black
+    End Sub
     Public Property Path() As String
         Get
             Return mPath

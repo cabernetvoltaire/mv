@@ -1,5 +1,11 @@
 ﻿Imports System.IO
-Module Duplicates
+Class Duplicates
+    Private Enum KeepPref As Byte
+        Deepest
+        Longest
+        Shortest
+        Shallowest
+    End Enum
     Private mInputList As List(Of String)
     Public Property InputList() As List(Of String)
         Get
@@ -7,6 +13,7 @@ Module Duplicates
         End Get
         Set(ByVal value As List(Of String))
             mInputList = value
+            mInputList = SetPlayOrder(SortHandler.Order.Size, value)
         End Set
     End Property
 
@@ -21,21 +28,10 @@ Module Duplicates
         End Set
     End Property
 
-    'Get list sorted by size. 
 
-
-    'For Each item in mInputList, 
-    'If Size is first one to be exactly the same as previous
-    '   Add both to a Duplicates array
-    '   Thereafter, only add the current one
-
-    'Arrange each array in a new FlowPanel, with name beneath each one. 
-    'Have a scrollable window of those
-    'First thumbnail is the keeper
-    'Clicking a thumbnail removes it from the list. 
 
     ''' <summary>
-    ''' Takes size-ordered List1 and produces List of String arrays, each containing duplicates of the first indexed. 
+    ''' Takes size-ordered List1 and produces List of String lists, each containing duplicates of the first indexed. 
     ''' </summary>
     Private Function ExtractDups(List1 As List(Of String)) As List(Of List(Of String))
         Dim mCurrentRow As New List(Of String)
@@ -55,20 +51,30 @@ Module Duplicates
                         l.Add(m)
                     Next
                     mDuplicateArray.Add(l)
+                    Debug.Print(mDuplicateArray(0).Item(0))
                 End If
                 mCurrentRow.Clear()
                 mCurrentRow.Add(finfo3.FullName)
-                Debug.Print("Added " & finfo3.Name & "(First)")
 
             Else
                 mCurrentRow.Add(finfo3.FullName)
-                Debug.Print("Added " & finfo3.Name)
             End If
             lastinfo = finfo3
             lastlength = lastinfo.Length
         Next
+        If mCurrentRow.Count > 1 And mDuplicateArray.Count = 0 Then
+            Dim l As New List(Of String) '= Nothing
+            For Each m In mCurrentRow
+                l.Add(m)
+            Next
+            mDuplicateArray.Add(l)
+
+        End If
         Return mDuplicateArray
 
     End Function
 
-End Module
+    Private Sub SortList(l As List(Of String))
+        Throw New NotImplementedException()
+    End Sub
+End Class

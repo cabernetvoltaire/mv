@@ -8,6 +8,8 @@ Module Shortcuts
             Dim ShortCutName As String = ""
 
         End Sub
+        Private oShell As IWshRuntimeLibrary.WshShell
+        Private oShortcut As IWshRuntimeLibrary.WshShortcut
         Private sTargetPath As String
         Private sShortcutPath As String
         Private sShortcutName As String
@@ -36,15 +38,14 @@ Module Shortcuts
             End Set
         End Property
         ''' <summary>
-        ''' Creates a shortcut to sTargetPath, places it in sSHortCutPath, with a short name of sShortcutName
+        ''' Creates a shortcut to TargetPath, places it in ShortCutPath, with a short name of ShortcutName
         ''' </summary>
 
         Public Sub Create_ShortCut()
 
             ' Requires reference to Windows Script Host Object Model
 
-            Dim oShell As IWshRuntimeLibrary.WshShell
-            Dim oShortcut As IWshRuntimeLibrary.WshShortcut
+
             Dim sName As String
             oShell = New IWshRuntimeLibrary.WshShell
             Dim f As IO.FileInfo
@@ -84,11 +85,11 @@ Module Shortcuts
             oShell = Nothing
         End Sub
 
-        Public Sub Assign_ShortCutPath(ByVal sTargetPath As String, sShortCutPath As String, sShortCutName As String, oShortcut As IWshRuntimeLibrary.WshShortcut)
+        Public Sub Assign_ShortCutPath()
 
             ' Requires reference to Windows Script Host Object Model
             Dim sName As String
-            sName = sShortCutPath & "\" & sShortCutName & ".lnk"
+            sName = sShortcutPath & "\" & sShortcutName & ".lnk"
 
             With oShortcut
                 .TargetPath = sTargetPath
@@ -110,7 +111,14 @@ Module Shortcuts
         End With
         oShortcut = Nothing
     End Sub
-
+    Public Function LinkTargetExists(Linkfile As String) As Boolean
+        Dim Finfo = New FileInfo(CreateObject("WScript.Shell").CreateShortcut(Linkfile).TargetPath)
+        If Finfo.Exists Then
+            Return True
+        Else
+            Return False
+        End If
+    End Function
 
     Function GetTargetPath(ByVal FileName As String)
         '    If RightString(FileName, ".") <> "lnk" Then

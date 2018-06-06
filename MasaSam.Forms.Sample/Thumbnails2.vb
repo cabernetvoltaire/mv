@@ -1,28 +1,38 @@
 ﻿Imports System.Threading
 
 Public Class Thumbnails
+
+
     Public flp2 As New FlowLayoutPanel With {
         .BackColor = Color.Blue,
         .Dock = DockStyle.Bottom
     }
     Public t As Thread
-    Private flist As List(Of String)
-    Private mSize As Int16 = 100
+    Private mList As List(Of String)
+    Public Property List() As List(Of String)
+        Get
+            Return mList
+        End Get
+        Set(ByVal value As List(Of String))
+            mList = value
+        End Set
+    End Property
+    Private mSize As Int16 = 200
     Private Sub LoadThumbnails()
         Dim flp As New FlowLayoutPanel With {
             .BackColor = Color.WhiteSmoke,
-            .Dock = DockStyle.Top
+            .Dock = DockStyle.Fill
         }
         flp.SendToBack()
         flp.Visible = True
         flp.AutoScroll = True
         AddHandler flp.MouseMove, AddressOf flp_Mouseover
 
-        Dim pics(flist.Count) As PictureBox
+        Dim pics(mList.Count) As PictureBox
         Dim i As Int16 = 0
 
 
-        For Each f In flist
+        For Each f In mList
             Try
                 If FindType(f) = Filetype.Pic Then
                     Dim finfo = New IO.FileInfo(f)
@@ -40,14 +50,15 @@ Public Class Thumbnails
                         Else
                             .Image = GetThumb(p, .Height, f)
                         End If
-                        .Width = .Image.Width / .Image.Height * .Height
-                        .SizeMode = PictureBoxSizeMode.StretchImage
+                        If .Image IsNot Nothing Then
+
+                            .Width = .Image.Width / .Image.Height * .Height
+                            .SizeMode = PictureBoxSizeMode.StretchImage
+                        End If
                         .Tag = f
                         AddHandler .MouseEnter, AddressOf pb_Click
-                        ' .Image.Dispose()
 
                     End With
-                    'Me.Update()
                 End If
                 i += 1
             Catch ex As System.InvalidOperationException
@@ -66,8 +77,6 @@ Public Class Thumbnails
     End Sub
     Private Sub pb_Click(sender As Object, e As EventArgs)
         Dim pb = DirectCast(sender, PictureBox)
-        strCurrentFilePath = pb.Tag
-        Media.MediaPath = pb.Tag
         ToolTip1.SetToolTip(pb, pb.Tag)
         frmMain.lbxFiles.SelectionMode = SelectionMode.One
         frmMain.tmrPicLoad.Enabled = True
@@ -92,7 +101,6 @@ Public Class Thumbnails
         End Try
     End Function
 
-#End Region
     Private p As PaintEventArgs
     Private Sub Thumbnails_Paint(sender As Object, e As PaintEventArgs) Handles Me.Paint
         p = e
@@ -114,15 +122,7 @@ Public Class Thumbnails
 
 
 
-    Public Property FileList() As List(Of String)
-        Get
-            Return flist
-        End Get
-        Set(ByVal value As List(Of String))
-            flist = value
 
-        End Set
-    End Property
     Public Property ThumbnailHeight() As Int16
         Get
             Return mSize

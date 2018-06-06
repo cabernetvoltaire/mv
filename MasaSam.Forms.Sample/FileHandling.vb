@@ -4,10 +4,13 @@ Module FileHandling
     Public blnSuppressCreate As Boolean = False
     Public blnChooseOne As Boolean = False
     Public strVideoExtensions = ".vob.webm.avi.flv.mov.m4p.mpeg.mpg.m4a.m4v.mkv.mp4.rm.ram.wmv.wav.mp3.3gp"
-    Public strPicExtensions = ".jpeg.png.jpg.bmp.gif"
+    Public strPicExtensions = "arw.jpeg.png.jpg.bmp.gif"
     Public CurrentfilterState As FilterHandler = frmMain.CurrentFilterState
-
+    Public Random As RandomHandler = frmMain.Random
+    Public NavigateMoveState As StateHandler = frmMain.NavigateMoveState
     Public FilePumpList As New List(Of String)
+    Public FP As New FilePump
+
 
     Dim strFilterExtensions(6) As String
     Public Sub AssignExtensionFilters()
@@ -55,7 +58,7 @@ Module FileHandling
                     Dim s As Long = lbx.Items.Count - 1
                     lbx.SelectedIndex = Rnd() * s
                 Else
-                    lbx.SelectedIndex = lbx.FindString(strCurrentFilePath)
+                    lbx.SelectedIndex = lbx.FindString(Media.MediaPath)
                     If lbx.SelectedIndex = -1 Then lbx.SelectedIndex = 0
                 End If
             End If
@@ -125,6 +128,7 @@ Module FileHandling
         End If
     End Sub
 
+
     ''' <summary>
     ''' Actually saves the store list
     ''' </summary>
@@ -176,12 +180,8 @@ Module FileHandling
             End Try
 
 
-            '            frmMain.tbLastFile.Text = s & "(" & list.Count & ")"
             ProgressIncrement(40)
-            '           frmMain.TSPB.Value = Math.Min(count * 40, frmMain.TSPB.Maximum)
-            '          frmMain.Update()
         Loop
-        '     frmMain.TSPB.Visible = False
 
         If lbx.Items.Count <> 0 Then lbx.TabStop = True
         fs.Close()
@@ -192,7 +192,7 @@ Module FileHandling
             For Each s In notlist
                 list.Remove(s)
             Next
-            If MsgBox("Re-save list?") Then
+            If MsgBox("Re-save list?", vbYesNo, "Metavisua") Then
                 StoreList(list, Dest)
             End If
         End If
@@ -208,52 +208,44 @@ Module FileHandling
     End Function
     Public Sub MoveFolder(strDir As String, strDest As String, tvw As MasaSam.Forms.Controls.FileSystemTree, blnOverride As Boolean)
         If strDest Is Nothing Then Exit Sub
-        'If Not blnOverride Then
-        '    If MsgBox("This will move current folder to " & strDest & ". Are you sure?", MsgBoxStyle.OkCancel) <> MsgBoxResult.Ok Then Exit Sub
-        'End If
         Try
             With My.Computer.FileSystem
                 Dim dir = New DirectoryInfo(strDir)
                 Dim s As String = dir.Name
+                Dim f As New DirectoryInfo(dir.Parent.FullName)
                 Dim destdir = New DirectoryInfo(strDest)
-                'Select Case NavigateMoveState.State
-                '    Case StateHandler.StateOptions.Copy
-                '        If Not blnOverride Then
-                '            If MsgBox("This will move current folder to " & strDest & ". Are you sure?", MsgBoxStyle.OkCancel) <> MsgBoxResult.Ok Then Exit Sub
-                '        End If
-                '        .CopyDirectory(strDir, strDest & "\" & s, FileIO.UIOption.OnlyErrorDialogs)
-                '    Case StateHandler.StateOptions.CopyLink
-                '    Case StateHandler.StateOptions.Move
-                '        If Not blnOverride Then
-                '            If MsgBox("This will move current folder to " & strDest & ". Are you sure?", MsgBoxStyle.OkCancel) <> MsgBoxResult.Ok Then Exit Sub
-                '        End If
-                '        .MoveDirectory(strDir, strDest & "\" & s, FileIO.UIOption.OnlyErrorDialogs)
-                '        tvw.RemoveNode(strDir)
+                Select Case NavigateMoveState.State
+                    Case StateHandler.StateOptions.Copy
+                        .CopyDirectory(strDir, strDest & "\" & s, FileIO.UIOption.OnlyErrorDialogs)
+                    Case StateHandler.StateOptions.Move
+                        .MoveDirectory(strDir, strDest & "\" & s, FileIO.UIOption.OnlyErrorDialogs)
+                    Case StateHandler.StateOptions.MoveLeavingLink
 
-                '    Case StateHandler.StateOptions.MoveLeavingLink
-                '    Case StateHandler.StateOptions.Navigate
+                    Case StateHandler.StateOptions.CopyLink
+                    Case StateHandler.StateOptions.Navigate
 
-                'End Select
-                If blnCopyMode Then
-                    .CopyDirectory(strDir, strDest & "\" & s, FileIO.UIOption.OnlyErrorDialogs)
-
-                Else
-
-                    .MoveDirectory(strDir, strDest & "\" & s, FileIO.UIOption.OnlyErrorDialogs)
-                End If
+                End Select
                 UpdateButton(strDir, strDest & "\" & s) 'todo doesnt handle sub-tree
-                'tvw.Expand(strDest)
-                ' tvw.Traverse(False)
                 tvw.RemoveNode(strDir)
-                'tvw.RefreshTree(dir.Parent.FullName)
-                'tvw.RefreshTree(destdir.FullName)
-
-
+                '               tvw.RefreshTree(strDest)
+                '              tvw.RefreshTree(f.FullName)
             End With
         Catch ex As Exception
             MsgBox(ex.Message)
         End Try
 
+    End Sub
+
+    Public Sub SubFolderGroupsByName(s As List(Of String))
+        Dim first As String = s.First
+        Dim group As List(Of String)
+        For i = 0 To Len(first)
+            For Each x In s
+                If Left(x, i) = Left(first, i) Then
+
+                End If
+            Next
+        Next
     End Sub
 
     ''' <summary>
@@ -287,9 +279,9 @@ Module FileHandling
             End If
             Dim file As String
 
-            file = MovingFiles(files, strDest, lbx1, s)
+            file = MovingFiles(files, strDest, s)
             lbx1.SelectionMode = SelectionMode.One
-            FillListbox(lbx1, New DirectoryInfo(CurrentFolderPath), FileboxContents, False)
+            FillListbox(lbx1, New DirectoryInfo(Media.MediaDirectory), FileboxContents, False)
             If lbx1.Items.Count <> 0 Then lbx1.SetSelected(Math.Max(Math.Min(ind, lbx1.Items.Count - 1), 0), True)
         End If
 
@@ -301,10 +293,10 @@ Module FileHandling
     ''' </summary>
     ''' <param name="files"></param>
     ''' <param name="strDest"></param>
-    ''' <param name="lbx1"></param>
     ''' <param name="s"></param>
+    ''' 
     ''' <returns></returns>
-    Private Function MovingFiles(files As List(Of String), strDest As String, lbx1 As ListBox, s As String) As String
+    Private Function MovingFiles(files As List(Of String), strDest As String, s As String) As String
         Dim file As String = ""
 
         For Each file In files
@@ -330,29 +322,28 @@ Module FileHandling
 
                     i += 1
                 End While
-
-                'Exit For
-                If blnCopyMode Then
-                    .CopyFile(m.FullName, spath)
-                Else
-                    'Deal with existing files
-                    Try
+                Select Case NavigateMoveState.State
+                    Case StateHandler.StateOptions.Copy
+                        .CopyFile(m.FullName, spath)
+                    Case StateHandler.StateOptions.Move, StateHandler.StateOptions.Navigate
                         If Not currentPicBox.Image Is Nothing Then DisposePic(currentPicBox)
                         If strDest = "" Then
                             Deletefile(m.FullName)
                         Else
-                            Try
-                                .MoveFile(m.FullName, spath, FileIO.UIOption.OnlyErrorDialogs)
-                            Catch ex As Exception
-                                Exit For
-                            End Try
+                            m.MoveTo(spath)
+                            '                            .MoveFile(m.FullName, spath, FileIO.UIOption.OnlyErrorDialogs)
                         End If
+                    Case StateHandler.StateOptions.MoveLeavingLink
+                        'Move, and place link here
+                        m.MoveTo(spath)
+                        CreateLink(m.FullName, Media.MediaDirectory)
 
-                    Catch ex As IOException
-                        Continue For
-                        'MsgBox(ex.Message)
-                    End Try
-                End If
+                    Case StateHandler.StateOptions.CopyLink
+                        'Paste a link in destination
+                        Dim fpath As New FileInfo(spath)
+                        CreateLink(m.FullName, fpath.Directory.FullName)
+
+                End Select
             End With
         Next
 
@@ -396,37 +387,26 @@ Module FileHandling
                 End While
 
                 'Exit For
-                If blnCopyMode Then
-                    .CopyFile(m.FullName, spath)
-                Else
-                    'Deal with existing files
-                    Try
-                        ' m = Nothing
-                        ' currentPicBox.Image = Nothing
-
+                Select Case NavigateMoveState.State
+                    Case StateHandler.StateOptions.Copy
+                        .CopyFile(m.FullName, spath)
+                    Case StateHandler.StateOptions.Move
                         If Not currentPicBox.Image Is Nothing Then DisposePic(currentPicBox)
                         lbx1.Items.Remove(m.FullName)
-
                         If s = "" Then
-
                             Deletefile(m.FullName)
                         Else
-                            'MsgBox("Start")
                             Try
-                                .MoveFile(m.FullName, spath, FileIO.UIOption.AllDialogs, FileIO.UICancelOption.ThrowException)
+                                .MoveFile(m.FullName, spath, FileIO.UIOption.OnlyErrorDialogs, FileIO.UICancelOption.ThrowException)
                             Catch ex As Exception
                                 Exit For
                             End Try
-                            '.DeleteFile(m.FullName)
-                            'MsgBox("Finish")
                         End If
+                    Case StateHandler.StateOptions.MoveLeavingLink
+                    Case StateHandler.StateOptions.CopyLink
+                    Case StateHandler.StateOptions.Navigate
 
-
-                    Catch ex As IOException
-                        Continue For
-                        'MsgBox(ex.Message)
-                    End Try
-                End If
+                End Select
             End With
         Next
         lbx1.SelectionMode = SelectionMode.One
@@ -447,6 +427,8 @@ Module FileHandling
             s = InputBox("Name of folder to create? (Blank means none)", "Create sub-folder", lastselection)
             If s = "" Then blnCreate = False
             s = strDest & "\" & s
+        Else
+            s = strDest & "\"
         End If
         If blnCreate Then
             Try
@@ -465,18 +447,18 @@ Module FileHandling
         End If
         Return s
     End Function
-    Public Sub AddCurrentType(blnRecurse As Boolean)
-        AddFilesToCollection(Showlist, strFilterExtensions(CurrentfilterState.State), blnRecurse)
+    Public Sub AddCurrentType(Recurse As Boolean)
+        AddFilesToCollection(Showlist, strFilterExtensions(CurrentfilterState.State), Recurse)
         FillShowbox(frmMain.lbxShowList, FilterHandler.FilterState.All, Showlist)
 
     End Sub
-    Public Sub Addpics(blnRecurse As Boolean)
-        AddFilesToCollection(Showlist, strPicExtensions, blnRecurse)
+    Public Sub Addpics(Recurse As Boolean)
+        AddFilesToCollection(Showlist, strPicExtensions, Recurse)
         FillShowbox(frmMain.lbxShowList, CurrentfilterState.State, Showlist)
     End Sub
     Public Sub AddFilesToCollection(ByVal list As List(Of String), extensions As String, blnRecurse As Boolean)
         Dim s As String
-        Dim d As New DirectoryInfo(CurrentFolderPath)
+        Dim d As New DirectoryInfo(Media.MediaDirectory)
 
         s = InputBox("Only include files containing? (Leave empty to add all)")
         If blnChooseOne Then

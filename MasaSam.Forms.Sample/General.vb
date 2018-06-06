@@ -19,16 +19,6 @@ Public Module General
         Files = 1
         ShowList = 2
     End Enum
-    'Public Enum PlayOrder As Byte
-    '    Original
-    '    Random
-    '    Name
-    '    PathName
-    '    Time
-    '    Length
-    '    Type
-    'End Enum
-
 
     Public lngShowlistLines As Long = 0
 
@@ -80,13 +70,47 @@ Public Module General
         lbx.SelectedItems.Clear()
         Dim deadlinks As New List(Of String)
         For Each f In ls
-            Dim Finfo = New FileInfo(CreateObject("WScript.Shell").CreateShortcut(f).TargetPath)
-
-            If Not Finfo.Exists Then
+            If Not LinkTargetExists(f) Then
                 deadlinks.Add(f)
             End If
         Next
         Return deadlinks
+    End Function
+    Public Sub CreateFavourite(Filepath As String)
+        Dim sh As New ShortcutHandler
+        Dim f As New FileInfo(Filepath)
+        sh.TargetPath = Filepath
+        sh.ShortcutPath = FavesFolderPath
+        sh.ShortcutName = f.Name
+        sh.Create_ShortCut()
+    End Sub
+    Public Sub CreateLink(Filepath As String, DestinationDirectory As String)
+        Dim sh As New ShortcutHandler
+        Dim f As New FileInfo(Filepath)
+        sh.TargetPath = Filepath
+        sh.ShortcutPath = DestinationDirectory
+        sh.ShortcutName = f.Name
+        sh.Create_ShortCut()
+    End Sub
+
+    Public Function GetAllFilesBelow(DirectoryPath As String, ByVal FileList As List(Of String))
+        If DirectoryPath.Contains("RECYCLE") Then
+            Return FileList
+            Exit Function
+        End If
+        Dim m As New DirectoryInfo(DirectoryPath)
+        Try
+            For Each k In m.EnumerateDirectories
+                FileList = GetAllFilesBelow(k.FullName, FileList)
+            Next
+
+        Catch ex As System.UnauthorizedAccessException
+            Exit Function
+        End Try
+        For Each f In m.EnumerateFiles
+            FileList.Add(f.FullName)
+        Next
+        Return FileList
     End Function
 
     ''' <summary>
@@ -272,11 +296,11 @@ Public Module General
             'If it's a .lnk, find the file
             If LCase(info.Extension) = ".lnk" Then
                 blnLink = True
-                strCurrentFilePath = LinkTarget(info.FullName) ' CreateObject("WScript.Shell").CreateShortcut(info.FullName).TargetPath
+                Media.MediaPath = LinkTarget(info.FullName) ' CreateObject("WScript.Shell").CreateShortcut(info.FullName).TargetPath
                 Try
-                    If My.Computer.FileSystem.FileExists(strCurrentFilePath) Then
+                    If My.Computer.FileSystem.FileExists(Media.MediaPath) Then
 
-                        info = New FileInfo(strCurrentFilePath)
+                        info = New FileInfo(Media.MediaPath)
                     Else
                         'TODO: Ask whether to delete link, or fix it. 
                         Return Filetype.Unknown
@@ -309,17 +333,17 @@ Public Module General
 
     Public Sub ChangeFolder(strPath As String, blnSHow As Boolean)
 
-        If strPath = CurrentFolderPath Then
+        If strPath = Media.MediaDirectory Then
 
         Else
-            If Not LastFolder.Contains(CurrentFolderPath) Then
-                LastFolder.Push(CurrentFolderPath)
+            If Not LastFolder.Contains(Media.MediaDirectory) Then
+                LastFolder.Push(Media.MediaDirectory)
 
             End If
-            CurrentFolderPath = strPath 'Switch to this folder
+            Media.MediaDirectory = strPath 'Switch to this folder
             ' FilterMoveFiles(strPath)
         End If
-        ChangeWatcherPath(CurrentFolderPath)
+        ChangeWatcherPath(Media.MediaDirectory)
         ReDim FBCShown(0)
         NofShown = 0
         'frmMain.SetControlColours(blnMoveMode)
@@ -382,10 +406,8 @@ Public Module General
 
                         End Try
                     Case SortHandler.Order.DateTime
-                        Dim time As DateTime = file.CreationTime
-                        Dim time2 As DateTime = file.LastAccessTime
-                        If time2 < time Then time = time2
                         'MsgBox(time)
+                        Dim time = GetDate(file)
                         While NewListD.ContainsKey(time)
                             time = time.AddSeconds(1)
                         End While
@@ -437,12 +459,24 @@ Public Module General
 
         End If
 
+        If frmMain.PlayOrder.ReverseOrder Then
+            List = ReverseListOrder(List)
+        End If
 
         Return List
 
 
 
 
+    End Function
+
+    Function GetDate(f As FileInfo) As DateTime
+        Dim time As DateTime = f.CreationTime
+        Dim time2 As DateTime = f.LastAccessTime
+        Dim time3 As DateTime = f.LastWriteTime
+        If time2 < time Then time = time2
+        If time3 < time Then time = time3
+        Return time
     End Function
     ''' <summary>
     ''' Removes an item from a listbox, and its associated list, advances selected to next. 
@@ -513,7 +547,14 @@ Public Module General
             If i >= 0 Then lbx.SetSelected(i, True)
         Next
     End Sub
+    Public Function ReverseListOrder(m As List(Of String)) As List(Of String)
+        Dim k As New List(Of String)
+        For Each x In m
+            k.Insert(0, x)
 
+        Next
+        Return k
+    End Function
 
     Public Function ReturnListOfDirectories(ByVal list As List(Of String), strPath As String) As List(Of String)
         Dim d As New DirectoryInfo(strPath)

@@ -2,6 +2,7 @@
 
     Public Event MediaFinished(ByVal sender As Object, ByVal e As EventArgs)
     Public Event MediaClosed(ByVal sender As Object, ByVal e As EventArgs)
+    Public Event MediaChanged(ByVal sender As Object, ByVal e As EventArgs)
     Public Enum Filetype As Byte
         Pic
         Movie
@@ -82,16 +83,33 @@
             Return mMediaPath
         End Get
         Set(ByVal value As String)
-            mMediaPath = value
+            Dim b As String = mMediaPath
+            If value = "" Then Exit Property
+            Dim f As New IO.FileInfo(value)
+            If f.Exists Then
+                mMediaPath = value
+
+            End If
+            If b <> mMediaPath Then
+                mMediaDirectory = f.Directory.FullName
+                RaiseEvent MediaChanged(Me, New EventArgs)
+            End If
         End Set
     End Property
     Public Sub New()
 
     End Sub
-    Public Sub SetPlaybackSpeed()
-
-    End Sub
-
+    Private mMediaDirectory As String
+    Public Property MediaDirectory() As String
+        Get
+            'Dim f As New IO.FileInfo(mMediaPath)
+            ' mMediaDirectory = f.Directory.FullName
+            Return mMediaDirectory
+        End Get
+        Set(ByVal value As String)
+            mMediaDirectory = value
+        End Set
+    End Property
     Private Function FindType(file As String) As Filetype
         Dim IsLink As Boolean = False
         Try

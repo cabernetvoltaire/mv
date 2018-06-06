@@ -5,7 +5,7 @@ Public Class FullScreen
 
     Private Sub FullScreen_Shown(sender As Object, e As EventArgs) Handles Me.Shown
         FSWMP.uiMode = "None"
-        FSWMP.Location = Me.Location
+        FSWMP.Dock = DockStyle.Fill
 
     End Sub
 
@@ -65,4 +65,5 @@ Public Class FullScreen
                 PicClick(fullScreenPicBox)
         End Select
     End Sub
+
 End Class
