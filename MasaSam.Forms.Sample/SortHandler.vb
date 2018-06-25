@@ -55,7 +55,7 @@
         End Set
     End Property
     Public Sub IncrementState()
-        State = (State + 1) Mod (Order.Type)
+        State = (State + 1) Mod (Order.Type + 4)
 
     End Sub
 

@@ -13,7 +13,7 @@ Public Class frmMain
     Public defaultcolour As Color = Color.Aqua
     Public movecolour As Color = Color.Orange
     Public watchfolder As FileSystemWatcher
-
+    Public sound As New AxWindowsMediaPlayer
     Public WithEvents Random As New RandomHandler
     Public WithEvents NavigateMoveState As New StateHandler()
     Public WithEvents CurrentFilterState As New FilterHandler
@@ -23,15 +23,9 @@ Public Class frmMain
     Private WithEvents DM As New DateMove
     Private WithEvents Att As New Attributes
     Private WithEvents Op As New OrphanFinder
+    Public DraggedFolder As String
 
 
-    Public Sub OnParentFound() Handles op.FoundParent
-        For Each m In op.FoundParents
-
-            Debug.Print("{0} is the target of {1}", m.Key, m.Value)
-        Next
-
-    End Sub
 
 
 
@@ -49,9 +43,9 @@ Public Class frmMain
         End If
 
         If Random.StartPoint Then
-                StartPoint.State = StartPointHandler.StartTypes.Random
-            End If
-            ToggleRandomAdvanceToolStripMenuItem.Checked = Random.NextSelect
+            StartPoint.State = StartPointHandler.StartTypes.Random
+        End If
+        ToggleRandomAdvanceToolStripMenuItem.Checked = Random.NextSelect
         ToggleRandomSelectToolStripMenuItem.Checked = Random.OnDirChange
         ToggleRandomStartToolStripMenuItem.Checked = Random.StartPoint
         chbNextFile.Checked = Random.NextSelect
@@ -61,24 +55,29 @@ Public Class frmMain
     End Sub
 
     Public Sub OnStartChanged() Handles StartPoint.StateChanged, StartPoint.StartPointChanged
-        blnJumpToMark = True
-        StartPoint.Distance = 65
+        'blnJumpToMark = True
         MediaMarker = 0
-        cbxStartPoint.SelectedIndex = StartPoint.State
+        tbxAbsolute.Text = New TimeSpan(0, 0, StartPoint.StartPoint).ToString("hh\:mm\:ss")
+        tbxPercentage.Text = Int(100 * StartPoint.StartPoint / StartPoint.Duration).ToString & "%"
+        tbPercentage.Value = StartPoint.Percentage
+        tbAbsolute.Maximum = StartPoint.Duration
+        '    tbAbsolute.Value = StartPoint.StartPoint
         Select Case StartPoint.State
             Case StartPointHandler.StartTypes.ParticularAbsolute
-
-                tbxAbsolute.Text = New TimeSpan(0, 0, StartPoint.StartPoint).ToString("hh\:mm\:ss")
                 tbxPercentage.Enabled = False
                 tbxAbsolute.Enabled = True
             Case StartPointHandler.StartTypes.ParticularPercentage
-                tbxPercentage.Text = StartPoint.StartPoint & "%"
                 tbxAbsolute.Enabled = False
                 tbxPercentage.Enabled = True
+            Case Else
+                tbxAbsolute.Enabled = False
+                tbxPercentage.Enabled = False
         End Select
-        cbxStartPoint.SelectedIndex = StartPoint.State
+
+        FullScreen.Changing = False
         MediaJumpToMarker()
 
+        cbxStartPoint.SelectedIndex = StartPoint.State
         tbStartpoint.Text = "START:" & StartPoint.Description
 
     End Sub
@@ -132,7 +131,19 @@ Public Class frmMain
     Private Sub HandleMovie(blnRandom As Boolean)
         'If it is to jump to a random point, do not show first.
         'currentWMP.Visible = False
+        'If Media.IsLink Then
+        '    currentWMP.URL = Media.LinkPath
+
+        'Else
         currentWMP.URL = Media.MediaPath
+
+        If tmrAutoTrail.Enabled Then
+            SoundWMP.Ctlcontrols.currentPosition = currentWMP.Ctlcontrols.currentPosition
+            SoundWMP.URL = currentWMP.URL
+        Else
+            SoundWMP.URL = ""
+        End If
+        'End If
         '  MsgBox(f)
         currentWMP.BringToFront()
 
@@ -200,7 +211,7 @@ Public Class frmMain
     End Sub
     Private Sub AxWindowsMediaPlayer1_MediaError(ByVal sender As Object,
     ByVal e As _WMPOCXEvents_MediaErrorEvent) Handles MainWMP.MediaError
-        'MsgBox(e.pMediaObject.ToString)
+        'MsgBox(e.ToString)
     End Sub
     Public Sub CancelDisplay()
         If currentWMP.Visible Then
@@ -290,10 +301,14 @@ Public Class frmMain
 
         If e.KeyCode = KeyToggleSpeed Then
             If blnPlaying Then
+                If currentWMP.playState = WMPLib.WMPPlayState.wmppsPaused And tmrSlowMo.Enabled = False Then
 
-                currentWMP.settings.rate = 1
-                currentWMP.Ctlcontrols.play()
-                tmrSlowMo.Enabled = False
+                    currentWMP.settings.rate = 1
+                    currentWMP.Ctlcontrols.play()
+                    tmrSlowMo.Enabled = False
+                Else
+                    currentWMP.Ctlcontrols.pause()
+                End If
             Else
                 tmrSlideShow.Enabled = Not tmrSlideShow.Enabled
             End If
@@ -353,7 +368,7 @@ Public Class frmMain
         'StartPoint is just a flag telling the video to jump to 
     End Sub
     Public Sub GoFullScreen(blnGo As Boolean)
-        FullScreen.Changing = blnGo
+        FullScreen.Changing = True
         If blnGo Then
 
             SetWMP(FullScreen.FSWMP)
@@ -378,6 +393,7 @@ Public Class frmMain
             SetWMP(MainWMP)
             SetPB(PictureBox1)
             FullScreen.Close()
+            FullScreen.Changing = False
         End If
         blnFullScreen = Not blnFullScreen
         tmrPicLoad.Enabled = True
@@ -508,12 +524,11 @@ Public Class frmMain
 
     End Sub
     Public Sub JumpRandom(blnAutoTrail As Boolean)
-        If Media.MediaType = MediaHandler.Filetype.Movie Then
+        If Media.MediaType = Filetype.Movie Then
 
             If Not blnAutoTrail Then
                 'Random.StartPoint = True
                 NewPosition = (Rnd(1) * (currentWMP.currentMedia.duration))
-                tmrJumpVideo.Interval = lngInterval
                 tmrJumpVideo.Enabled = True
                 tbStartpoint.Text = "START:RANDOM"
 
@@ -527,8 +542,26 @@ Public Class frmMain
 
     End Sub
     Public Sub ToggleAutoTrail()
+        Static m As New StartPointHandler
         tmrAutoTrail.Enabled = Not tmrAutoTrail.Enabled
         TrailerModeToolStripMenuItem.Checked = tmrAutoTrail.Enabled
+        If tmrAutoTrail.Enabled Then
+            m = StartPoint
+            StartPoint.State = StartPointHandler.StartTypes.Random
+            SoundWMP.URL = currentWMP.URL
+            SoundWMP.settings.mute = False
+            currentWMP.settings.mute = True
+        Else
+            StartPoint = m
+            SoundWMP.URL = ""
+            currentWMP.settings.mute = False
+            SoundWMP.settings.mute = True
+
+            Debug.Print("Normal")
+            tmrSlowMo.Enabled = False
+            currentWMP.settings.rate = 1
+            currentWMP.Ctlcontrols.play()
+        End If
     End Sub
     Public Sub HandleKeys(sender As Object, e As KeyEventArgs)
         Me.Cursor = Cursors.WaitCursor
@@ -537,9 +570,7 @@ Public Class frmMain
             Case Keys.F4 And e.Alt
                 Me.Close()
             Case Keys.Enter And e.Control
-                If blnLink Then
-                    ' SetFilterState(FilterState.All)
-                    blnLink = False
+                If Media.IsLink Then
                     HighlightCurrent(Media.MediaPath)
                     CurrentFilterState.State = FilterHandler.FilterState.All
                 End If
@@ -547,6 +578,7 @@ Public Class frmMain
                 HandleFunctionKeyDown(sender, e)
                 e.SuppressKeyPress = True
             Case Keys.A To Keys.Z, Keys.D0 To Keys.D9
+                'If e.Alt Then Me.frmMain_KeyDown(Me, e)
                 If Not e.Control Then
                     ChangeButtonLetter(e)
                 Else
@@ -557,10 +589,14 @@ Public Class frmMain
                     End Select
                 End If
             Case Keys.Left, Keys.Right, Keys.Up, Keys.Down
-                ControlSetFocus(tvMain2)
-                tvMain2.tvFiles_KeyDown(sender, e)
+                If PFocus <> CtrlFocus.ShowList Then
+                    ControlSetFocus(tvMain2)
+
+                    tvMain2.tvFiles_KeyDown(sender, e)
+                End If
+
             Case KeyToggleButtons
-                ToggleButtons()
+                    ToggleButtons()
             Case KeyEscape
                 CancelDisplay()                'currentPicBox.Image.Dispose()
                 tmrAutoTrail.Enabled = False
@@ -575,7 +611,9 @@ Public Class frmMain
                 AddCurrentFileToShowlistToolStripMenuItem_Click(Nothing, Nothing)
 
             Case KeyNextFile, KeyPreviousFile, LKeyNextFile, LKeyPreviousFile
-
+                If PFocus <> CtrlFocus.ShowList Then
+                    ControlSetFocus(lbxFiles)
+                End If
                 AdvanceFile(e.KeyCode = KeyNextFile, e.Control)
                 e.SuppressKeyPress = True
                 tmrSlideShow.Enabled = False
@@ -598,8 +636,10 @@ Public Class frmMain
 
                 End If
             Case KeyJumpToPoint
-                StartPoint.State = StartPointHandler.StartTypes.NearEnd
-                NewPosition = StartPoint.StartPoint
+                Dim m As New StartPointHandler
+                m.Duration = MediaDuration
+                m.State = StartPointHandler.StartTypes.NearEnd
+                NewPosition = m.StartPoint
                 tmrJumpVideo.Enabled = True
                 e.SuppressKeyPress = True
             Case KeyMarkPoint, LKeyMarkPoint
@@ -620,7 +660,7 @@ Public Class frmMain
             Case KeyJumpAutoT
                 If e.Shift Then
                     StartPoint.IncrementState()
-                    blnJumpToMark = True
+                    'blnJumpToMark = True
                 End If
 
                 JumpRandom(e.Control And e.Shift)
@@ -628,6 +668,7 @@ Public Class frmMain
             Case KeyTraverseTree, KeyTraverseTreeBack
                 'e.suppresskeypress by Treeview behaviour unless focus is elsewhere. 
                 'We want the traverse keys always to work. 
+                ControlSetFocus(tvMain2)
                 If PFocus = CtrlFocus.Tree Then
                 Else
                     tvMain2.tvFiles_KeyDown(sender, e)
@@ -706,7 +747,9 @@ Public Class frmMain
 
             Case KeyBackUndo
                 If LastFolder.Count > 0 Then
+
                     Media.MediaDirectory = LastFolder.Pop
+
                     tvMain2.SelectedFolder = Media.MediaDirectory
                 End If
                 'Media.MediaPath = LastPlayed.Pop
@@ -789,13 +832,16 @@ Public Class frmMain
     '    End With
     'End Sub
     Private Sub HighlightCurrent(strPath As String)
+        strPath = Media.MediaPath
         'If strPath is a link, it highlights the link, not the file
         If strPath = "" Then Exit Sub 'Empty
         If Len(strPath) > 247 Then Exit Sub 'Too long
+
         Dim finfo As New FileInfo(strPath)
         UpdateFileInfo()
         'Change the tree
         Dim s As String = Path.GetDirectoryName(strPath)
+        Media.MediaDirectory = s
         If tvMain2.SelectedFolder <> s Then tvMain2.SelectedFolder = s 'Only change tree if it needs changing
         'Select file in filelist
         If lbxFiles.SelectedItem <> strPath Then
@@ -803,8 +849,10 @@ Public Class frmMain
         End If
 
         Att.DestinationLabel = lblAttributes
-        If Not tmrSlideShow.Enabled Then
-            '  Att.UpdateLabel(strPath)
+        If Not tmrSlideShow.Enabled And CheckBox1.Checked Then
+            Att.UpdateLabel(strPath)
+        Else
+            Att.Text = ""
         End If
 
         If Not MasterContainer.Panel2Collapsed Then 'Showlist is visible
@@ -830,10 +878,10 @@ Public Class frmMain
     'End Sub
 
 
-    Private Sub AddMovies(blnRecurse As Boolean)
-        AddFilesToCollection(Showlist, strVideoExtensions, blnRecurse)
-        FillShowbox(lbxShowList, FilterHandler.FilterState.All, Showlist)
-    End Sub
+    'Private Sub AddMovies(blnRecurse As Boolean)
+    '    AddFilesToCollection(Showlist, VIDEOEXTENSIONS, blnRecurse)
+    '    FillShowbox(lbxShowList, FilterHandler.FilterState.All, Showlist)
+    'End Sub
     Private Sub AddFiles(blnRecurse As Boolean)
         ProgressBarOn(1000)
 
@@ -892,8 +940,11 @@ Public Class frmMain
         currentWMP.stretchToFit = True
         currentWMP.uiMode = "FULL"
         currentWMP.Dock = DockStyle.Fill
+        Media.Player = currentWMP
+
         currentPicBox = PictureBox1
-        StartPointTrackBar.Enabled = True
+        Media.Picture = currentPicBox
+        tbPercentage.Enabled = True
 
 
         'Exit Sub
@@ -1212,7 +1263,7 @@ Public Class frmMain
     End Sub
 
     Private Sub AddPicVids(blnRecurse As Boolean)
-        AddFilesToCollection(Showlist, strPicExtensions & strVideoExtensions, blnRecurse)
+        AddFilesToCollection(Showlist, PICEXTENSIONS & VIDEOEXTENSIONS, blnRecurse)
         FillShowbox(lbxShowList, FilterHandler.FilterState.All, Showlist)
     End Sub
     Public Sub UpdateBoxes(strold As String, strnew As String)
@@ -1222,6 +1273,7 @@ Public Class frmMain
         If strnew <> "" Then lbxShowList.Items.Add(strnew)
     End Sub
     Private Sub tmrLoadLastFolder_Tick(sender As Object, e As EventArgs) Handles tmrLoadLastFolder.Tick
+
         tmrLoadLastFolder.Enabled = False
         'MsgBox("LLF")
         If Media.MediaPath = "" Then Exit Sub
@@ -1236,7 +1288,7 @@ Public Class frmMain
         ChangeFolder(e.Directory.FullName, True)
 
         tmrUpdateFolderSelection.Enabled = False
-        tmrUpdateFolderSelection.Interval = lngInterval * 8
+        tmrUpdateFolderSelection.Interval = lngInterval * 12
         tmrUpdateFolderSelection.Enabled = True
 
     End Sub
@@ -1271,6 +1323,8 @@ Public Class frmMain
     End Sub
     Private Sub MainWMP_PlayStateChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent) Handles MainWMP.PlayStateChange
         PlaystateChange(sender, e)
+
+        ' SoundWMP.settings.mute = True
     End Sub
 
     Private Sub tmrMediaSpeed_Tick(sender As Object, e As EventArgs) Handles tmrMediaSpeed.Tick
@@ -1286,13 +1340,14 @@ Public Class frmMain
         Dim f As New FileInfo(Media.MediaPath)
         If f.Exists = False Then Exit Sub
         HighlightCurrent(Media.MediaPath)
-        'LastPlayed.Push(Media.MediaPath)
         tbLastFile.Text = Media.MediaPath
-        fType = FindType(Media.MediaPath)
+        fType = Media.MediaType
+
         Select Case fType
             Case Filetype.Doc
 
-            Case Filetype.Movie
+            Case Filetype.Movie, Filetype.Link
+
                 HandleMovie(Random.StartPoint Or StartPoint.State <> StartPointHandler.StartTypes.Beginning)
             Case Filetype.Pic
                 Dim img As Image
@@ -1318,6 +1373,7 @@ Public Class frmMain
 
             Case Filetype.Unknown
                 tbLastFile.Text = "Unhandled file:" & Media.MediaPath
+
                 tmrPicLoad.Enabled = False
                 Exit Sub
         End Select
@@ -1325,8 +1381,13 @@ Public Class frmMain
 
         Me.Text = "Metavisua - " & Media.MediaPath
         tmrPicLoad.Enabled = False
+        'If FullScreen.Changing Then FullScreen.Changing = False
     End Sub
-
+    ''' <summary>
+    ''' Jumps video to NewPosition
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
 
     Private Sub tmrJumpVideo_Tick(sender As Object, e As EventArgs) Handles tmrJumpVideo.Tick
         tmrJumpVideo.Enabled = False
@@ -1335,12 +1396,9 @@ Public Class frmMain
 
         currentWMP.Ctlcontrols.currentPosition = NewPosition
         Console.WriteLine("Newposition " & NewPosition)
-
         currentWMP.Visible = True
-
         currentWMP.BringToFront()
-
-        If Not blnRandomStartAlways Then Random.StartPoint = False
+        ' If Not blnRandomStartAlways Then Random.StartPoint = False
     End Sub
 
 
@@ -1602,7 +1660,7 @@ Public Class frmMain
 
     Private Shared Sub ThumbnailsStart()
         Dim t As New Thumbnails
-        t.ThumbnailHeight = 270
+        t.ThumbnailHeight = 70
         If PFocus <> CtrlFocus.ShowList Then
             t.List = Duplicatelist(FileboxContents)
         Else
@@ -1635,7 +1693,7 @@ Public Class frmMain
         SaveButtonlist()
     End Sub
 
-    Private Sub ToggleMoveModeToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ToggleMoveModeToolStripMenuItem.Click
+    Private Sub ToggleMoveModeToolStripMenuItem_Click(sender As Object, e As EventArgs)
         ToggleMove()
 
     End Sub
@@ -1648,7 +1706,7 @@ Public Class frmMain
 
     Private Sub SingleFilePerFolderToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SingleFilePerFolderToolStripMenuItem.Click
         blnChooseOne = True
-        AddFilesToCollection(Showlist, strPicExtensions & strVideoExtensions, True)
+        AddFilesToCollection(Showlist, PICEXTENSIONS & VIDEOEXTENSIONS, True)
         FillShowbox(lbxShowList, CurrentFilterState.State, Showlist)
     End Sub
 
@@ -1713,32 +1771,55 @@ Public Class frmMain
     Private Sub tmrAutoTrail_Tick(sender As Object, e As EventArgs) Handles tmrAutoTrail.Tick
         'Change the case statements to weight the speeds differently.
         'Should probably be made programmable.
-        Dim x As Single = Rnd()
-        If x < 0.1 Then
-            'Very Slow
-            SpeedChange(New KeyEventArgs(KeySpeed1))
-            tmrAutoTrail.Interval = Int(Rnd() * 2 * 500) + 500
-        ElseIf x < 0.3 Then
-            'Slow
-            SpeedChange(New KeyEventArgs(KeySpeed2))
-            tmrAutoTrail.Interval = Int(Rnd() * 2 * 500) + 500
-        ElseIf x < 0.8 Then
-            'slightly slow
-            SpeedChange(New KeyEventArgs(KeySpeed3))
-            tmrAutoTrail.Interval = Int(Rnd() * 2 * 500) + 500
-        Else
-            'Normal
 
-            HandleKeys(sender, New KeyEventArgs(KeyToggleSpeed))
-            tmrAutoTrail.Interval = Int(Rnd() * 2 * 500) + 750
+        Dim x As Single = Rnd()
+        Dim vs, s, ss, n, ch, tot As Byte
+        vs = TrackBar1.Value
+        s = TrackBar2.Value
+        ss = TrackBar3.Value
+        n = TrackBar4.Value
+        ch = 255
+        tot = vs + s + ss + n
+
+        If Random.NextSelect Then
+            ch = 6
+            vs = 4
+            s = 4
+            ss = 4
+            n = 4
         End If
 
-        If Int(Rnd() * 3) + 1 = 1 Then
-            '    To change the file. 1604
+        If x < 0.2 Then
+            Debug.Print("Very Slow")
+            SpeedChange(New KeyEventArgs(KeySpeed1))
+            tmrAutoTrail.Interval = Int(Rnd() * vs * 500) + 500
+        ElseIf x < 0.4 Then
+            Debug.Print("Slow")
+            'Slow
+            SpeedChange(New KeyEventArgs(KeySpeed2))
+            tmrAutoTrail.Interval = Int(Rnd() * s * 500) + 500
+        ElseIf x < 0.75 Then
+            Debug.Print("Slightly Slow")
+
+            'slightly slow
+            SpeedChange(New KeyEventArgs(KeySpeed3))
+            tmrAutoTrail.Interval = Int(Rnd() * ss * 500) + 500
+        Else
+            'Normal
+            Debug.Print("Normal")
+            tmrSlowMo.Enabled = False
+            currentWMP.settings.rate = 1
+            currentWMP.Ctlcontrols.play()
+            tmrAutoTrail.Interval = Int(Rnd() * n * 500) + 750
+        End If
+
+        If Int(Rnd() * ch) + 1 = 1 Then
+            '    To change the file.
+            Debug.Print("Change file")
+
             HandleKeys(sender, New KeyEventArgs(KeyNextFile))
 
         End If
-        ' tmrAutoTrail.Interval = tmrAutoTrail.Interval / MediaDuration * 100
 
         HandleKeys(sender, New KeyEventArgs(KeyJumpAutoT)) 'This actually does the main job
 
@@ -1758,49 +1839,49 @@ Public Class frmMain
 
 
     Private Sub ConstructMenuShortcuts()
-        Dim prefixkeys As Keys
-        'CTRL+
-        prefixkeys = Keys.Control
-        'AddCurrentFileListToolStripMenuItem.ShortcutKeys = KeyAddFile
-        LoadListToolStripMenuItem1.ShortcutKeys = prefixkeys + Keys.L
-        SaveListToolStripMenuItem1.ShortcutKeys = prefixkeys + Keys.S
-        BundleToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.B
-        AddCurrentFileToShowlistToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.F
-        'Alt+
-        prefixkeys = Keys.Alt
-        ToggleRandomAdvanceToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.A
-        ToggleMoveModeToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.M
-        ToggleJumpToMarkToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.J
-        ToggleRandomSelectToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.R
-        SlowToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.S
-        NormalToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.N
-        FastToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.F
-        TrailerModeToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.T
-        RandomiseNormalToggleToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.Z
+        'Dim prefixkeys As Keys
+        ''CTRL+
+        'prefixkeys = Keys.Control
+        ''AddCurrentFileListToolStripMenuItem.ShortcutKeys = KeyAddFile
+        'LoadListToolStripMenuItem1.ShortcutKeys = prefixkeys + Keys.L
+        'SaveListToolStripMenuItem1.ShortcutKeys = prefixkeys + Keys.S
+        'BundleToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.B
+        'AddCurrentFileToShowlistToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.F
+        ''Alt+
+        'prefixkeys = Keys.Alt
+        'ToggleRandomAdvanceToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.A
+        'ToggleMoveModeToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.M
+        'ToggleJumpToMarkToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.J
+        'ToggleRandomSelectToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.R
+        'SlowToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.S
+        'NormalToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.N
+        'FastToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.F
+        'TrailerModeToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.T
+        'RandomiseNormalToggleToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.Z
 
-        'CTRL+SHIFT
-        prefixkeys = Keys.Control + Keys.Shift
-        DeleteEmptyFoldersToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.E
-        ClearCurrentListToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.C
-        NewButtonFileStripMenuItem.ShortcutKeys = prefixkeys + Keys.N
-        LoadButtonFileToolstripMenuItem.ShortcutKeys = prefixkeys + Keys.L
-        SaveButtonfileasToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.S
-        DuplicatesToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.D
-        ThumbnailsToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.T
-        DeleteEmptyFoldersToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.E
-        HarvestFoldersToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.H
-        BurstFolderToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.B
-        AddCurrentAndSubfoldersToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.A
-        'CTRL + ALT
-        prefixkeys = Keys.Control + Keys.Alt
+        ''CTRL+SHIFT
+        'prefixkeys = Keys.Control + Keys.Shift
+        'DeleteEmptyFoldersToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.E
+        'ClearCurrentListToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.C
+        'NewButtonFileStripMenuItem.ShortcutKeys = prefixkeys + Keys.N
+        'LoadButtonFileToolstripMenuItem.ShortcutKeys = prefixkeys + Keys.L
+        'SaveButtonfileasToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.S
+        'DuplicatesToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.D
+        'ThumbnailsToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.T
+        'DeleteEmptyFoldersToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.E
+        'HarvestFoldersToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.H
+        'BurstFolderToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.B
+        'AddCurrentAndSubfoldersToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.A
+        ''CTRL + ALT
+        'prefixkeys = Keys.Control + Keys.Alt
 
-        SingleFilePerFolderToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.S
-        SlowToolStripMenuItem1.ShortcutKeys = prefixkeys + Keys.S
-        NormalToolStripMenuItem1.ShortcutKeys = prefixkeys + Keys.N
-        FastToolStripMenuItem1.ShortcutKeys = prefixkeys + Keys.F
-        LinearToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.L
-        AlphabeticToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.A
-        TreeToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.T
+        'SingleFilePerFolderToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.S
+        'SlowToolStripMenuItem1.ShortcutKeys = prefixkeys + Keys.S
+        'NormalToolStripMenuItem1.ShortcutKeys = prefixkeys + Keys.N
+        'FastToolStripMenuItem1.ShortcutKeys = prefixkeys + Keys.F
+        'LinearToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.L
+        'AlphabeticToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.A
+        'TreeToolStripMenuItem.ShortcutKeys = prefixkeys + Keys.T
 
 
         'ToggleRandomStartToolStripMenuItem.ShortcutKeys = Keys.Shift + Keys.D
@@ -1815,13 +1896,13 @@ Public Class frmMain
 
 
         ToggleRandomAdvanceToolStripMenuItem.ToolTipText = "Toggles advancing the file randomly or sequentially"
-        ToggleMoveModeToolStripMenuItem.ToolTipText = "Toggles move mode, which changes what the f keys do."
+        'ToggleMoveModeToolStripMenuItem.ToolTipText = "Toggles move mode, which changes what the f keys do."
         ToggleJumpToMarkToolStripMenuItem.ToolTipText = "Makes movies start at the same fixed point"
         ToggleRandomSelectToolStripMenuItem.ToolTipText = "Toggles whether the first file, or a random file, is selected when the folder is changed."
         ToggleRandomStartToolStripMenuItem.ToolTipText = "Toggles whether movies begin at a random point"
-        SlowToolStripMenuItem.ToolTipText = "Sets slowest slideshow speed"
-        NormalToolStripMenuItem.ToolTipText = "Sets middle slideshow speed"
-        FastToolStripMenuItem.ToolTipText = "Sets fastest slideshow speed"
+        'SlowToolStripMenuItem.ToolTipText = "Sets slowest slideshow speed"
+        'NormalToolStripMenuItem.ToolTipText = "Sets middle slideshow speed"
+        'FastToolStripMenuItem.ToolTipText = "Sets fastest slideshow speed"
         TrailerModeToolStripMenuItem.ToolTipText = "Toggles auto-trail mode for movies"
         RandomiseNormalToggleToolStripMenuItem.ToolTipText = "Sets either all, or none of the random functions in one go"
 
@@ -1837,9 +1918,9 @@ Public Class frmMain
         'CTRL + ALT
         SelectDeadLinksToolStripMenuItem.ToolTipText = "Selects any .lnk files which are orphans"
         SingleFilePerFolderToolStripMenuItem.ToolTipText = "Adds a single file from all subfolders to the show list"
-        SlowToolStripMenuItem1.ToolTipText = "Sets slowest movie speed"
-        NormalToolStripMenuItem1.ToolTipText = "Sets middle movie speed"
-        FastToolStripMenuItem1.ToolTipText = "Sets fastest movie speed"
+        'SlowToolStripMenuItem1.ToolTipText = "Sets slowest movie speed"
+        'NormalToolStripMenuItem1.ToolTipText = "Sets middle movie speed"
+        'FastToolStripMenuItem1.ToolTipText = "Sets fastest movie speed"
         LinearToolStripMenuItem.ToolTipText = "Assigns next 8 folders to the f buttons"
         AlphabeticToolStripMenuItem.ToolTipText = "Assigns subfolders to the f buttons, alphabetically"
         TreeToolStripMenuItem.ToolTipText = "Assigns subfolders to the f buttons, hierarchically (preference given to higher up tree)"
@@ -1852,8 +1933,8 @@ Public Class frmMain
     End Sub
 
     Private Sub ToggleJumpToMark()
-        blnJumpToMark = Not blnJumpToMark
-        ToggleJumpToMarkToolStripMenuItem.Checked = blnJumpToMark
+        'blnJumpToMark = Not blnJumpToMark
+        'ToggleJumpToMarkToolStripMenuItem.Checked = blnJumpToMark
     End Sub
 
 
@@ -1922,14 +2003,16 @@ Public Class frmMain
             If PFocus = CtrlFocus.ShowList Then
                 .List = Showlist
             Else
+
                 .List = FileboxContents
+
 
             End If
             If .DuplicatesCount > 0 Then
-                .ThumbnailHeight = 150
+                .ThumbnailHeight = 100
                 .Show()
             Else
-                msgbox("No duplicates found.")
+                MsgBox("No duplicates found.")
             End If
         End With
     End Sub
@@ -2066,39 +2149,20 @@ Public Class frmMain
         If StartPoint.State <> cbxStartPoint.SelectedIndex Then
             StartPoint.State = cbxStartPoint.SelectedIndex
 
-            blnJumpToMark = True
 
         End If
 
 
     End Sub
 
-    Private Sub StartPointTrackBar_ValueChanged(sender As Object, e As EventArgs) Handles StartPointTrackBar.ValueChanged
-        If cbxStartPoint.Items.Count > 0 Then StartPoint.State = StartPointHandler.StartTypes.ParticularPercentage
-        StartPoint.Percentage = StartPointTrackBar.Value
-        tbxPercentage.Text = Str(StartPoint.Percentage) & "%"
+    Private Sub tbPercentage_ValueChanged(sender As Object, e As EventArgs) Handles tbPercentage.ValueChanged
+        'StartPoint.State = StartPointHandler.StartTypes.ParticularPercentage
+        StartPoint.Percentage = tbPercentage.Value
 
     End Sub
 
-    Private Sub tbxAbsolute_TextChanged(sender As Object, e As EventArgs) Handles tbxAbsolute.TextChanged
-        Dim s As String = tbxAbsolute.Text
-        Try
-            '  Dim n As Long = AbsoluteTrackBar.Value
-
-            StartPoint.Absolute = tbAbsolute.Value
-            StartPoint.State = StartPointHandler.StartTypes.ParticularAbsolute
-            '  MediaJumpToMarker()
-            blnJumpToMark = True
-        Catch ex As ArgumentException
-
-        End Try
-
-    End Sub
-
-    Private Sub btnFilterMoveFiles_Click(sender As Object, e As EventArgs)
 
 
-    End Sub
 
 
 
@@ -2107,8 +2171,7 @@ Public Class frmMain
     Private Sub AbsoluteTrackBar_ValueChanged(sender As Object, e As EventArgs) Handles tbAbsolute.ValueChanged
         tbAbsolute.Maximum = MediaDuration
         tbAbsolute.TickFrequency = tbAbsolute.Maximum / 25
-        StartPoint.StartPoint = StartPointTrackBar.Value
-        tbxAbsolute.Text = New TimeSpan(0, 0, tbAbsolute.Value).ToString("hh\:mm\:ss")
+        StartPoint.Absolute = tbAbsolute.Value
 
 
     End Sub
@@ -2158,16 +2221,15 @@ Public Class frmMain
 
     Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
         'Metadata sort
-        For Each f In New IO.DirectoryInfo(Media.MediaDirectory).GetFiles
-            Try
+    End Sub
+    Private Sub ReUniteFavesLinks()
 
-                Att.AlbumArtist(f.FullName)
-                ReportAction("Moving " & f.FullName)
-            Catch ex As Exception
-                Continue For
-            End Try
-
+        Dim f As New IO.DirectoryInfo(FavesFolderPath)
+        Dim r As New List(Of String)
+        For Each m In f.GetFiles
+            r.Add(m.FullName)
         Next
+        Op.OrphanList = r
     End Sub
     Private Sub ReportAction(Msg As String)
         Label4.Text = Msg
@@ -2199,17 +2261,41 @@ Public Class frmMain
         tvMain2.RefreshTree(Media.MediaDirectory)
     End Sub
 
-    Private Sub StartPointTrackBar_Scroll(sender As Object, e As EventArgs) Handles StartPointTrackBar.Scroll
+
+    Private Sub tbAbsolute_MouseUp(sender As Object, e As MouseEventArgs) Handles tbAbsolute.MouseUp
+        StartPoint.State = StartPointHandler.StartTypes.ParticularAbsolute
+        StartPoint.StartPoint = tbAbsolute.Value
+        tbxAbsolute.Text = New TimeSpan(0, 0, tbAbsolute.Value).ToString("hh\:mm\:ss")
+        tbxPercentage.Text = Str(StartPoint.Percentage) & "%"
+        ' MediaJumpToMarker()
 
     End Sub
 
-    Private Sub tbAbsolute_MouseUp(sender As Object, e As MouseEventArgs) Handles tbAbsolute.MouseUp, StartPointTrackBar.MouseUp
-
-        MediaJumpToMarker()
+    Private Sub tbPercentage_MouseUp(sender As Object, e As MouseEventArgs) Handles tbPercentage.MouseUp
+        StartPoint.State = StartPointHandler.StartTypes.ParticularPercentage
+        StartPoint.StartPoint = tbPercentage.Value
+        tbxAbsolute.Text = New TimeSpan(0, 0, tbAbsolute.Value).ToString("hh\:mm\:ss")
+        tbxPercentage.Text = Str(StartPoint.Percentage) & "%"
 
     End Sub
 
-    Private Sub tbAbsolute_Scroll(sender As Object, e As EventArgs) Handles tbAbsolute.Scroll
+    Private Sub ReclaimDeadLinksToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ReclaimDeadLinksToolStripMenuItem.Click
+        ReUniteFavesLinks()
 
+    End Sub
+
+    Private Sub tvMain2_MouseDown(sender As Object, e As MouseEventArgs) Handles tvMain2.MouseDown
+        tvMain2.DoDragDrop(DraggedFolder, DragDropEffects.Copy Or DragDropEffects.Move)
+
+    End Sub
+
+    Private Sub tvMain2_DragEnter(sender As Object, e As DragEventArgs) Handles tvMain2.DragEnter
+        If (e.Data.GetDataPresent(DataFormats.Text)) Then
+            If (e.KeyState And 8) = 8 Then
+                e.Effect = DragDropEffects.Copy
+            Else
+                e.Effect = DragDropEffects.Move
+            End If
+        End If
     End Sub
 End Class

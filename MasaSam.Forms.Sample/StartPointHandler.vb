@@ -15,8 +15,10 @@
     Private mDescList As New List(Of String)
     Public Sub New(Optional ByVal StartPercentage As Byte = 50, Optional ByVal StartAbsolute As Byte = 65)
         mState = StartTypes.Beginning
-        mPercentage = StartPercentage
-        mAbsolute = StartAbsolute
+        mPercentage = 50
+        mDuration = 100
+        mAbsolute = 65
+        mDistance = 65
     End Sub
     Public ReadOnly Property Descriptions As List(Of String)
         Get

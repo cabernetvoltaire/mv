@@ -8,24 +8,27 @@ Module MovieHandler
     Public Property FromFinish As Long = 65
     Public Sub MediaJumpToMarker()
         Static LastTriggered As DateTime
-        If (Now() - LastTriggered).TotalMilliseconds > 200 Then
+        '  If (Now() - LastTriggered).TotalMilliseconds > 200 Then
 
-            'Jumps to lMediaMarker unless not set, in which case, jumps to current startpoint
-            If MediaMarker <> 0 Then
+        'Jumps to lMediaMarker unless not set, in which case, jumps to current startpoint
+        If MediaMarker <> 0 Then
                 NewPosition = MediaMarker
             Else
-                NewPosition = frmMain.StartPoint.StartPoint
-                Console.WriteLine(":New position is " & NewPosition & " of " & MediaDuration)
+            NewPosition = frmMain.StartPoint.StartPoint
+
+
+            Console.WriteLine(":New position is " & NewPosition & " of " & MediaDuration)
             End If
 
             frmMain.tmrJumpVideo.Enabled = True
-        Else
-        End If
+        'Else
+        'End If
         LastTriggered = Now
 
     End Sub
     Public Sub PlaystateChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent)
         'MsgBox(e.newState)
+        Static Justpaused As Boolean
         Select Case e.newState
             Case WMPLib.WMPPlayState.wmppsMediaEnded
                 If Not frmMain.tmrAutoTrail.Enabled Then
@@ -33,17 +36,27 @@ Module MovieHandler
                 End If
 
             Case WMPLib.WMPPlayState.wmppsPlaying
-
+                If Justpaused Then
+                    Justpaused = False
+                    Exit Sub
+                End If
                 MediaDuration = currentWMP.currentMedia.duration
                 frmMain.StartPoint.Duration = MediaDuration
-                '     If FullScreen.Changing Then
-                NewPosition = currentWMP.Ctlcontrols.currentPosition
+                If FullScreen.Changing Then
+                    NewPosition = currentWMP.Ctlcontrols.currentPosition
                     frmMain.tmrJumpVideo.Enabled = True
-                '    Else
-                MediaJumpToMarker()
+                Else
+                    MediaJumpToMarker()
 
-                '   End If
+                End If
+                Justpaused = False
+            Case WMPLib.WMPPlayState.wmppsPaused
+                If frmMain.tmrSlowMo.Enabled Then
+                    Justpaused = False
+                Else
 
+                    Justpaused = True
+                End If
         End Select
     End Sub
 

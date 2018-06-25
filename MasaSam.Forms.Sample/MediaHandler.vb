@@ -3,16 +3,8 @@
     Public Event MediaFinished(ByVal sender As Object, ByVal e As EventArgs)
     Public Event MediaClosed(ByVal sender As Object, ByVal e As EventArgs)
     Public Event MediaChanged(ByVal sender As Object, ByVal e As EventArgs)
-    Public Enum Filetype As Byte
-        Pic
-        Movie
-        Doc
-        Gif
-        Xcel
-        Browsable
-        Link
-        Unknown
-    End Enum
+    Private DefaultFile As String = "C:\exiftools.exe"
+
     Private mType As Filetype
     Public Property MediaType() As Filetype
         Get
@@ -84,18 +76,24 @@
         End Get
         Set(ByVal value As String)
             Dim b As String = mMediaPath
-            If value = "" Then Exit Property
-            Dim f As New IO.FileInfo(value)
-            If f.Exists Then
-                mMediaPath = value
+            If value <> "" Then
+                Dim f As New IO.FileInfo(value)
+                If f.Exists Then
+                    mMediaPath = value
+                Else
+                    mMediaPath = DefaultFile
+                End If
+                If b <> mMediaPath Then
+                    mMediaDirectory = f.Directory.FullName
+                    RaiseEvent MediaChanged(Me, New EventArgs)
+                End If
+            Else
+                mMediaPath = DefaultFile
 
-            End If
-            If b <> mMediaPath Then
-                mMediaDirectory = f.Directory.FullName
-                RaiseEvent MediaChanged(Me, New EventArgs)
             End If
         End Set
     End Property
+
     Public Sub New()
 
     End Sub
@@ -111,15 +109,15 @@
         End Set
     End Property
     Private Function FindType(file As String) As Filetype
-        Dim IsLink As Boolean = False
         Try
             Dim info As New IO.FileInfo(file)
             Select Case LCase(info.Extension)
                 Case ""
                     Return Filetype.Unknown
                 Case ".lnk"
-                    IsLink = True
+                    mIsLink = True
                     mMediaPath = LinkTarget(info.FullName) ' CreateObject("WScript.Shell").CreateShortcut(info.FullName).TargetPath
+                    mLinkPath = info.FullName
                     Try
                         If My.Computer.FileSystem.FileExists(mMediaPath) Then
                             info = New IO.FileInfo(mMediaPath)
@@ -135,9 +133,9 @@
             End Select
 
             strExt = LCase(info.Extension)
-            If InStr(strVideoExtensions, strExt) <> 0 Then
+            If InStr(VIDEOEXTENSIONS, strExt) <> 0 Then
                 Return Filetype.Movie
-            ElseIf InStr(strPicExtensions, strExt) <> 0 Then
+            ElseIf InStr(PICEXTENSIONS, strExt) <> 0 Then
                 Return Filetype.Pic
             ElseIf InStr(".txt.prn.sty.doc", strExt) <> 0 Then
                 Return Filetype.Doc
@@ -151,5 +149,28 @@
         End Try
     End Function
 
+    Private mIsLink As Boolean
+    Public Property IsLink() As Boolean
+        Get
+            Return mIsLink
+        End Get
+        Set(ByVal value As Boolean)
+            mIsLink = value
+            If mIsLink Then
+            Else
+                mLinkPath = ""
+            End If
+        End Set
+    End Property
 
+    Private mLinkPath As String
+    Public Property LinkPath() As String
+        Get
+            Return mLinkPath
+        End Get
+        Set(ByVal value As String)
+            mLinkPath = value
+            If mLinkPath <> "" Then mIsLink = True
+        End Set
+    End Property
 End Class

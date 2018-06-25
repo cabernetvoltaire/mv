@@ -49,6 +49,6 @@
         End Set
     End Property
     Public Sub IncrementState()
-        Me.State = (Me.State + 1) Mod (FilterState.NoPicVid)
+        Me.State = (Me.State + 1) Mod (FilterState.NoPicVid + 1)
     End Sub
 End Class

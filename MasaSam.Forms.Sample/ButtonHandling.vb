@@ -172,6 +172,11 @@ Module ButtonHandling
         UpdateButtonAppearance()
 
     End Sub
+    Public Sub SaveButtonlist()
+        Dim path As String = ""
+
+        KeyAssignmentsStore(path)
+    End Sub
     Public Function ButtfromAsc(asc As Integer) As Integer
         Dim n As Integer
         If asc <= 57 Then
@@ -364,6 +369,7 @@ Module ButtonHandling
                 .Filter = "Metavisua button files|*.msb|All files|*.*"
                 If .ShowDialog() = System.Windows.Forms.DialogResult.OK Then
                     path = .FileName
+                    strButtonFile = path
                 Else
                     Exit Sub
 

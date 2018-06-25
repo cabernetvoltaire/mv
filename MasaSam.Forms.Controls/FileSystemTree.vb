@@ -977,7 +977,7 @@ Public Class FileSystemTree
     End Sub
 
     Private Sub Timer_Tick(sender As Object, e As EventArgs)
-        'Exit Sub
+        Exit Sub
         Try
             For Each node As FileSystemNode In Me.tvFiles.Nodes(0).Nodes
 
@@ -1156,10 +1156,11 @@ Public Class FileSystemTree
         Dim node As FileSystemNode = CType(e.Node, FileSystemNode)
         Dim pnode As FileSystemNode = CType(e.Node.Parent, FileSystemNode)
         'Try
-        'Dim m As New DirectoryInfo(node.FullName)
-        'Dim s As String = Replace(e.Node.FullPath, oldlabel, e.Label)
-        'If InStr(s, "My Computer\") <> 0 Then s = s.Remove(0, Len("My Computer\"))
-        'm.MoveTo(s)
+        Dim m As New DirectoryInfo(node.FullName)
+        Dim s As String = Replace(e.Node.FullPath, node.Text, e.Label)
+        s = Replace(s, "My Computer\", "")
+        s = Replace(s, "\\", "\")
+        m.MoveTo(s)
 
 
     End Sub
@@ -1245,10 +1246,6 @@ Public Class FileSystemTree
 
         'End If
         'e.Handled = True
-    End Sub
-
-    Private Sub tvFiles_BeforeLabelEdit(sender As Object, e As NodeLabelEditEventArgs) Handles tvFiles.BeforeLabelEdit
-
     End Sub
 
 

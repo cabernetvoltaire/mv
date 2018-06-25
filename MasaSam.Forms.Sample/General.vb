@@ -30,6 +30,7 @@ Public Module General
         Gif
         Xcel
         Browsable
+        Link
         Unknown
     End Enum
 
@@ -296,6 +297,7 @@ Public Module General
             'If it's a .lnk, find the file
             If LCase(info.Extension) = ".lnk" Then
                 blnLink = True
+
                 Media.MediaPath = LinkTarget(info.FullName) ' CreateObject("WScript.Shell").CreateShortcut(info.FullName).TargetPath
                 Try
                     If My.Computer.FileSystem.FileExists(Media.MediaPath) Then
@@ -312,9 +314,9 @@ Public Module General
             End If
             strExt = LCase(info.Extension)
             'Select Case LCase(strExt)
-            If InStr(strVideoExtensions, strExt) <> 0 Then
+            If InStr(VIDEOEXTENSIONS, strExt) <> 0 Then
                 Return Filetype.Movie
-            ElseIf InStr(strPicExtensions, strExt) <> 0 Then
+            ElseIf InStr(PICEXTENSIONS, strExt) <> 0 Then
                 Return Filetype.Pic
             ElseIf InStr(".txt.prn.sty.doc", strExt) <> 0 Then
                 Return Filetype.Doc

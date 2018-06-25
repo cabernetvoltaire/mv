@@ -33,8 +33,10 @@ Public Class Thumbnails
 
 
         For Each f In mList
+            Dim mMedia As New MediaHandler
+            mMedia.MediaPath = f
             Try
-                If FindType(f) = Filetype.Pic Then
+                If mMedia.MediaType = Filetype.Pic Then
                     Dim finfo = New IO.FileInfo(f)
                     pics(i) = New PictureBox
                     flp.Controls.Add(pics(i))
@@ -56,10 +58,13 @@ Public Class Thumbnails
                             .SizeMode = PictureBoxSizeMode.StretchImage
                         End If
                         .Tag = f
-                        AddHandler .MouseEnter, AddressOf pb_Click
+                        AddHandler .MouseEnter, AddressOf pb_Mouseover
+
+                        AddHandler .MouseClick, AddressOf pb_Click
 
                     End With
                 End If
+                '      Me.Refresh()
                 i += 1
             Catch ex As System.InvalidOperationException
                 Continue For
@@ -75,11 +80,20 @@ Public Class Thumbnails
     Private Sub flp_Mouseover(sender As Object, e As EventArgs)
         ToolTip1.SetToolTip(sender, sender.name)
     End Sub
-    Private Sub pb_Click(sender As Object, e As EventArgs)
+    Private Sub pb_Mouseover(sender As Object, e As EventArgs)
         Dim pb = DirectCast(sender, PictureBox)
+
         ToolTip1.SetToolTip(pb, pb.Tag)
+        Mysettings.Media.MediaPath = pb.Tag
         frmMain.lbxFiles.SelectionMode = SelectionMode.One
         frmMain.tmrPicLoad.Enabled = True
+
+    End Sub
+    Private Sub pb_Click(sender As Object, e As EventArgs)
+        Dim pb = DirectCast(sender, PictureBox)
+        pb.Visible = False
+        pb.Enabled = False
+        frmMain.HandleKeys(frmMain, New KeyEventArgs(KeyDelete))
 
     End Sub
     Public Function ThumbnailCallback() As Boolean
@@ -95,7 +109,7 @@ Public Class Thumbnails
             Dim myThumbnail As Image = myBitmap.GetThumbnailImage(h, h * ratio, myCallback, IntPtr.Zero)
             myBitmap.Dispose()
             Return myThumbnail
-            'e.Graphics.DrawImage(myThumbnail, 150, 75)
+            e.Graphics.DrawImage(myThumbnail, 150, 75)
         Catch ex As Exception
             Return Nothing
         End Try
@@ -103,7 +117,7 @@ Public Class Thumbnails
 
     Private p As PaintEventArgs
     Private Sub Thumbnails_Paint(sender As Object, e As PaintEventArgs) Handles Me.Paint
-        p = e
+        'p = e
 
 
         Loadthumbs()
@@ -115,6 +129,8 @@ Public Class Thumbnails
         Me.Controls.Add(flp2)
         t = New Thread(New ThreadStart(Sub() LoadThumbnails()))
         t.IsBackground = True
+        t.SetApartmentState(ApartmentState.STA)
+
         t.Start()
         Timer1.Enabled = True
 
@@ -134,7 +150,7 @@ Public Class Thumbnails
 
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
         If t.IsAlive Then
-            Me.Refresh()
+            '    Me.Refresh()
             Exit Sub
         ElseIf Not t.IsAlive Then
 

@@ -27,22 +27,20 @@ Partial Class FindDuplicates
         Me.ToolTipDups = New System.Windows.Forms.ToolTip(Me.components)
         Me.Panel3 = New System.Windows.Forms.Panel()
         Me.Button1 = New System.Windows.Forms.Button()
-        Me.Panel3.SuspendLayout()
         Me.SuspendLayout()
         '
         'Panel3
         '
         Me.Panel3.AutoScroll = True
-        Me.Panel3.Controls.Add(Me.Button1)
-        Me.Panel3.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.Panel3.Dock = System.Windows.Forms.DockStyle.Left
         Me.Panel3.Location = New System.Drawing.Point(0, 0)
         Me.Panel3.Name = "Panel3"
-        Me.Panel3.Size = New System.Drawing.Size(2614, 1640)
+        Me.Panel3.Size = New System.Drawing.Size(1829, 1640)
         Me.Panel3.TabIndex = 0
         '
         'Button1
         '
-        Me.Button1.Location = New System.Drawing.Point(1562, 1551)
+        Me.Button1.Location = New System.Drawing.Point(2348, 104)
         Me.Button1.Name = "Button1"
         Me.Button1.Size = New System.Drawing.Size(167, 62)
         Me.Button1.TabIndex = 0
@@ -54,12 +52,12 @@ Partial Class FindDuplicates
         Me.AutoScaleDimensions = New System.Drawing.SizeF(11.0!, 24.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(2614, 1640)
+        Me.Controls.Add(Me.Button1)
         Me.Controls.Add(Me.Panel3)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "FindDuplicates"
         Me.Text = "Finding duplicate files..."
         Me.WindowState = System.Windows.Forms.FormWindowState.Maximized
-        Me.Panel3.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub

@@ -1,4 +1,5 @@
 ﻿Imports System.IO
+Imports IWshRuntimeLibrary
 Module Shortcuts
 
     Public Class ShortcutHandler
@@ -8,8 +9,8 @@ Module Shortcuts
             Dim ShortCutName As String = ""
 
         End Sub
-        Private oShell As IWshRuntimeLibrary.WshShell
-        Private oShortcut As IWshRuntimeLibrary.WshShortcut
+        Private oShell As WshShell
+        Private oShortcut As WshShortcut
         Private sTargetPath As String
         Private sShortcutPath As String
         Private sShortcutName As String
@@ -43,26 +44,24 @@ Module Shortcuts
 
         Public Sub Create_ShortCut()
 
-            ' Requires reference to Windows Script Host Object Model
-
-
             Dim sName As String
-            oShell = New IWshRuntimeLibrary.WshShell
+            oShell = New WshShell
             Dim f As IO.FileInfo
             f = New IO.FileInfo(sShortcutPath)
-            If f.Extension <> "lnk" Then
+            If f.Extension <> ".lnk" Then
                 sName = sShortcutPath & "\" & sShortcutName & ".lnk"
             Else
                 sName = sShortcutPath
 
             End If
-            If IO.File.Exists(sName) Then IO.File.Delete(sName)
+            If IO.File.Exists(sName) Then Deletefile(sName)
 
             oShortcut = oShell.CreateShortcut(sName)
 
             With oShortcut
                 Dim d As New IO.DirectoryInfo(sShortcutPath)
                 If d.Exists Then
+
                 Else
                     d.Create()
                 End If
@@ -71,11 +70,11 @@ Module Shortcuts
                 .Save()
 
                 Dim attr As FileAttributes
-                attr = File.GetAttributes(sTargetPath)
+                attr = IO.File.GetAttributes(sTargetPath)
                 If attr.ReadOnly Then
 
                 Else
-                    File.SetAttributes(sTargetPath, attr Or FileAttributes.ReadOnly)
+                    IO.File.SetAttributes(sTargetPath, attr Or FileAttributes.ReadOnly)
                 End If
 
 
@@ -103,44 +102,52 @@ Module Shortcuts
 
 
 
-    Public Sub ReAssign_ShortCutPath(ByVal sTargetPath As String, sShortCutPath As String, oShortcut As IWshRuntimeLibrary.WshShortcut)
-
-        With oShortcut
-            .TargetPath = sTargetPath
-            .Save()
-        End With
-        oShortcut = Nothing
+    Public Sub ReAssign_ShortCutPath(ByVal sTargetPath As String, sShortCutPath As String)
+        Dim d As New DirectoryInfo(sShortCutPath)
+        CreateLink(sTargetPath, d.Parent.FullName)
     End Sub
     Public Function LinkTargetExists(Linkfile As String) As Boolean
-        Dim Finfo = New FileInfo(CreateObject("WScript.Shell").CreateShortcut(Linkfile).TargetPath)
+        Dim f As String
+        f = LinkTarget(Linkfile)
+        If f = "" Then
+            Return False
+            Exit Function
+        End If
+        Dim Finfo = New FileInfo(f)
         If Finfo.Exists Then
             Return True
         Else
             Return False
         End If
+
     End Function
 
-    Function GetTargetPath(ByVal FileName As String)
-        '    If RightString(FileName, ".") <> "lnk" Then
-        '        sReport "Not a shortcut"
-        'Exit Function
-        '    End If
+    Function GetTargetPath(ByVal FileName As String) As String
+        'Dim f As New FileInfo(FileName)
+        'If f.Extension <> ".lnk" Then
+        '    Return FileName
+        '    Exit Function
+        'End If
 
-        '    Dim Obj As Object
+        'Dim Obj As Object
 
-        'Set Obj = CreateObject("WScript.Shell")
+        'Obj = CreateObject("WScript.Shell")
 
-
+        'Dim TempTarget As String
         'Dim Shortcut As Object
 
-        'Set Shortcut = Obj.CreateShortcut(FileName)
+        'If Not f.Exists Then
+        '    Return LinkTarget(f.FullName)
+        'Else
+        '    TempTarget = LinkTarget(f.FullName)
+        '    Deletefile(f.FullName)
+        'End If
 
+        'Shortcut = Obj.CreateShortcut(FileName)
+        'Shortcut.TargetPath = TempTarget
         'GetTargetPath = Shortcut.TargetPath
 
-
-
-        '    Shortcut.Save
-
+        'Return GetTargetPath
 
     End Function
 

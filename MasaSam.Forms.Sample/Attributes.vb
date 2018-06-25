@@ -16,11 +16,14 @@
         'Exit Sub
         Dim AttributeName As String = ""
         Dim AttList As List(Of KeyValuePair(Of String, String)) = FileMetaData.GetMetaText(filename, "C:\exiftool.exe")
-        For Each f In AttList
-            If ChosenString(f.Key) Then
-                AttributeName += f.Key & ": " & f.Value & vbCrLf
-            End If
-        Next
+        If AttList IsNot Nothing Then
+
+            For Each f In AttList
+                If ChosenString(f.Key) Then
+                    AttributeName += f.Key & ": " & f.Value & vbCrLf
+                End If
+            Next
+        End If
         mDestinationLabel.Text = AttributeName
     End Sub
     Public Sub AlbumArtist(filename As String)
@@ -50,7 +53,7 @@
         End If
         Dim r As New IO.FileInfo(dest)
         If r.Exists Then
-            f.Delete()
+            Deletefile(r.FullName)
         Else
             f.MoveTo(dest)
         End If
@@ -131,7 +134,7 @@ Public NotInheritable Class FileMetaData
             End If
 
         Catch ex As Exception
-            Throw
+            'Throw
         End Try
 
         Return retVal

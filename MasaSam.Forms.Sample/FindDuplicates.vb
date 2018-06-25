@@ -1,11 +1,20 @@
 ﻿Imports System.IO
 Public Class FindDuplicates
     Private mDuplicates As List(Of List(Of String))
-    Public Property Maxfiles As Integer = 40
+    Public Property Maxfiles As Integer = 8000
     Private mList As List(Of String)
     Public WriteOnly Property List() As List(Of String)
         Set(ByVal value As List(Of String))
             mList = value
+            Dim nList = New List(Of String)
+            For Each m In mList
+                Dim inf = New IO.FileInfo(m)
+                If inf.Exists Then
+                    nList.Add(m)
+                Else
+                End If
+            Next
+            mList = nList
             t.InputList = mList
             mDuplicates = t.Duplicates()
             Me.Text = mDuplicates.Count & " files with duplicates found. Click to remove from delete list."
@@ -83,6 +92,7 @@ Public Class FindDuplicates
                     Dim r2 As New PictureBox
                     r2.Width = 400 - r.Width
                     If i = 0 Then x.Controls.Add(r2)
+                    Me.Refresh()
                     AddHandler r.MouseMove, AddressOf previewover
                     AddHandler r.Click, AddressOf picdoubleclick
                 Case Filetype.Movie
@@ -125,9 +135,9 @@ Public Class FindDuplicates
     End Function
     Private Function CreateDeleteList() As List(Of String)
         Dim mDeleteList As New List(Of String)
+        Dim i As Integer
         For Each m In mDuplicates
-
-            Dim i = 0
+            i = 0
             For Each s In m
                 If i > 0 And i <= Maxfiles Then mDeleteList.Add(s)
                 i += 1

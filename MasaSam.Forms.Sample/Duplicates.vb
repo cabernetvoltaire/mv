@@ -62,7 +62,7 @@ Class Duplicates
             lastinfo = finfo3
             lastlength = lastinfo.Length
         Next
-        If mCurrentRow.Count > 1 And mDuplicateArray.Count = 0 Then
+        If mCurrentRow.Count > 1 Then
             Dim l As New List(Of String) '= Nothing
             For Each m In mCurrentRow
                 l.Add(m)

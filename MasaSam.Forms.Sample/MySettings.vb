@@ -14,17 +14,14 @@ Public Module Mysettings
     'Public WithEvents Random As New RandomHandler
 #Region "Options"
 
-    Public iSSpeeds() As Integer = {1500, 600, 200}
+    Public iSSpeeds() As Integer = {1000, 300, 200}
     Public iPlaybackSpeed() As Integer = {3, 10, 20}
-    Public iPropjump As Integer = 10
-    Public iQuickJump As Integer = 30
-    Public lCurrentDisplayIndex As Long = 0
+    Public iPropjump As Integer = 6
+    Public iQuickJump As Integer = 25
     Public LastPlayed As New Stack(Of String)
     Public LastFolder As New Stack(Of String)
     Public Property LastShowList As String
     Public Property blnJumpToMark As Boolean = False
-    Public blnRandomStartAlways As Boolean = True
-    '  Public blnRandomAdvance(3) As Boolean
     Public blnLoopPlay As Boolean = True
     'Public blnChooseRandomFile As Boolean = True
     Public PlaybackSpeed As Double = 30
@@ -85,56 +82,35 @@ Public Module Mysettings
         End With
 
     End Sub
-    Public Sub OnMediaChanged() Handles Media.MediaChanged
-        'Dim lbx As ListBox = frmMain.lbxFiles
-        'Dim tvm As Controls.FileSystemTree = frmMain.tvMain2
-        'Dim strpath As String = Media.MediaPath
-        'If strPath = "" Then Exit Sub 'Empty
-        'If Len(strPath) > 247 Then Exit Sub 'Too long
-        'Dim finfo As New IO.FileInfo(strpath)
-        'frmMain.UpdateFileInfo()
-        ''Change the tree
-        'Dim s As String = Media.MediaPath
-        'If tvm.SelectedFolder <> s Then tvm.SelectedFolder = s 'Only change tree if it needs changing
-        ''Select file in filelist
-        'If lbx.SelectedItem <> strpath Then
-        '    lbx.SelectedIndex = lbx.FindString(strpath)
-        'End If
-
-        ''Att.DestinationLabel = lblAttributes
-        ''If Not tmrSlideShow.Enabled Then
-        ''    Att.UpdateLabel(strPath)
-        ''End If
-
-        'If Not frmMain.MasterContainer.Panel2Collapsed Then 'Showlist is visible
-        '    'Select in the showlist unless CTRL held
-        '    If PFocus = CtrlFocus.ShowList AndAlso Not CtrlDown Then
-        '        frmMain.lbxShowList.SelectedIndex = frmMain.lbxShowList.FindString(strpath)
-        '    End If
-        'End If
-
-    End Sub
     Public Sub PreferencesGet()
         frmMain.ctrPicAndButtons.SplitterDistance = 9 * frmMain.ctrPicAndButtons.Height / 10
         With My.Computer.Registry.CurrentUser
-            Media.MediaDirectory = .GetValue("Folder", System.Environment.GetFolderPath(Environment.SpecialFolder.MyPictures))
-            Media.MediaPath = .GetValue("File", "")
+            'Media.MediaDirectory = .GetValue("Folder", System.Environment.GetFolderPath(Environment.SpecialFolder.MyPictures))
+            Media.MediaPath = .GetValue("File", "C:\exiftool.exe")
+
             frmMain.ctrFileBoxes.SplitterDistance = .GetValue("VertSplit", frmMain.ctrFileBoxes.Height / 4)
             frmMain.ctrMainFrame.SplitterDistance = .GetValue("HorSplit", frmMain.ctrFileBoxes.Width / 2)
             frmMain.CurrentFilterState.State = .GetValue("Filter", 0)
             frmMain.PlayOrder.State = .GetValue("SortOrder", 0)
             frmMain.StartPoint.State = .GetValue("StartPoint", 0)
             frmMain.NavigateMoveState.State = .GetValue("State", 0)
-            strButtonFile = .GetValue("LastButtonFolder", "")
+            strButtonFile = .GetValue("LastButtonFolder", "Q:\Alpha2.msb")
 
             iCurrentAlpha = .GetValue("LastAlpha", 0)
 
         End With
-        If Not IO.Directory.Exists(Media.MediaDirectory) Then Media.MediaDirectory = "C:\"
+        '     If Not IO.Directory.Exists(Media.MediaDirectory) Then Media.MediaDirectory = "C:\"
         If Not IO.File.Exists(Media.MediaPath) Then Media.MediaPath = ""
         frmMain.tssMoveCopy.Text = Media.MediaDirectory
         '   frmMain.RandomFunctionsToggle(False)
 
+    End Sub
+    Public Sub OnMediaChanged(sender As Object, e As EventArgs) Handles Media.MediaChanged
+        '     frmMain.StartPoint.Duration = Media.Duration
+        'Dim s = frmMain.tvMain2.SelectedFolder
+
+        'If s <> Media.MediaDirectory Then frmMain.tvMain2.SelectedFolder = Media.MediaDirectory
+        'If frmMain.lbxFiles.SelectedItem <> Media.MediaPath Then frmMain.lbxFiles.SelectedItem = Media.MediaPath
     End Sub
 
 End Module
