@@ -154,6 +154,10 @@ Partial Class frmMain
         Me.lblAlpha = New System.Windows.Forms.Label()
         Me.PictureBox2 = New System.Windows.Forms.PictureBox()
         Me.Panel9 = New System.Windows.Forms.Panel()
+        Me.TrackBar4 = New System.Windows.Forms.TrackBar()
+        Me.TrackBar3 = New System.Windows.Forms.TrackBar()
+        Me.TrackBar2 = New System.Windows.Forms.TrackBar()
+        Me.TrackBar1 = New System.Windows.Forms.TrackBar()
         Me.CheckBox1 = New System.Windows.Forms.CheckBox()
         Me.Label4 = New System.Windows.Forms.Label()
         Me.Button3 = New System.Windows.Forms.Button()
@@ -194,10 +198,7 @@ Partial Class frmMain
         Me.tmrPumpFiles = New System.Windows.Forms.Timer(Me.components)
         Me.tmrAutoTrail = New System.Windows.Forms.Timer(Me.components)
         Me.ColorDialog1 = New System.Windows.Forms.ColorDialog()
-        Me.TrackBar1 = New System.Windows.Forms.TrackBar()
-        Me.TrackBar2 = New System.Windows.Forms.TrackBar()
-        Me.TrackBar3 = New System.Windows.Forms.TrackBar()
-        Me.TrackBar4 = New System.Windows.Forms.TrackBar()
+        Me.RecursiveToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip1.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
         Me.TableLayoutPanel2.SuspendLayout()
@@ -232,15 +233,15 @@ Partial Class frmMain
         Me.Panel1.SuspendLayout()
         CType(Me.PictureBox2, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.Panel9.SuspendLayout()
+        CType(Me.TrackBar4, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.TrackBar3, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.TrackBar2, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.TrackBar1, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.tbAbsolute, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox2.SuspendLayout()
         CType(Me.tbPercentage, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox1.SuspendLayout()
         CType(Me.FileSystemWatcher1, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.TrackBar1, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.TrackBar2, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.TrackBar3, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.TrackBar4, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'MenuStrip1
@@ -439,6 +440,7 @@ Partial Class frmMain
         '
         'HarvestFoldersToolStripMenuItem
         '
+        Me.HarvestFoldersToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RecursiveToolStripMenuItem})
         Me.HarvestFoldersToolStripMenuItem.Name = "HarvestFoldersToolStripMenuItem"
         Me.HarvestFoldersToolStripMenuItem.ShortcutKeys = CType(((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.Shift) _
             Or System.Windows.Forms.Keys.H), System.Windows.Forms.Keys)
@@ -1422,6 +1424,38 @@ Partial Class frmMain
         Me.Panel9.Size = New System.Drawing.Size(266, 1114)
         Me.Panel9.TabIndex = 18
         '
+        'TrackBar4
+        '
+        Me.TrackBar4.Dock = System.Windows.Forms.DockStyle.Top
+        Me.TrackBar4.Location = New System.Drawing.Point(0, 1058)
+        Me.TrackBar4.Name = "TrackBar4"
+        Me.TrackBar4.Size = New System.Drawing.Size(266, 80)
+        Me.TrackBar4.TabIndex = 42
+        '
+        'TrackBar3
+        '
+        Me.TrackBar3.Dock = System.Windows.Forms.DockStyle.Top
+        Me.TrackBar3.Location = New System.Drawing.Point(0, 978)
+        Me.TrackBar3.Name = "TrackBar3"
+        Me.TrackBar3.Size = New System.Drawing.Size(266, 80)
+        Me.TrackBar3.TabIndex = 41
+        '
+        'TrackBar2
+        '
+        Me.TrackBar2.Dock = System.Windows.Forms.DockStyle.Top
+        Me.TrackBar2.Location = New System.Drawing.Point(0, 898)
+        Me.TrackBar2.Name = "TrackBar2"
+        Me.TrackBar2.Size = New System.Drawing.Size(266, 80)
+        Me.TrackBar2.TabIndex = 40
+        '
+        'TrackBar1
+        '
+        Me.TrackBar1.Dock = System.Windows.Forms.DockStyle.Top
+        Me.TrackBar1.Location = New System.Drawing.Point(0, 818)
+        Me.TrackBar1.Name = "TrackBar1"
+        Me.TrackBar1.Size = New System.Drawing.Size(266, 80)
+        Me.TrackBar1.TabIndex = 39
+        '
         'CheckBox1
         '
         Me.CheckBox1.AutoSize = True
@@ -1559,7 +1593,7 @@ Partial Class frmMain
         Me.chbAutoTrail.Location = New System.Drawing.Point(6, 111)
         Me.chbAutoTrail.Margin = New System.Windows.Forms.Padding(4)
         Me.chbAutoTrail.Name = "chbAutoTrail"
-        Me.chbAutoTrail.Size = New System.Drawing.Size(125, 29)
+        Me.chbAutoTrail.Size = New System.Drawing.Size(122, 29)
         Me.chbAutoTrail.TabIndex = 3
         Me.chbAutoTrail.TabStop = False
         Me.chbAutoTrail.Text = "Auto Trail"
@@ -1571,7 +1605,7 @@ Partial Class frmMain
         Me.chbInDir.Location = New System.Drawing.Point(7, 72)
         Me.chbInDir.Margin = New System.Windows.Forms.Padding(4)
         Me.chbInDir.Name = "chbInDir"
-        Me.chbInDir.Size = New System.Drawing.Size(217, 29)
+        Me.chbInDir.Size = New System.Drawing.Size(214, 29)
         Me.chbInDir.TabIndex = 1
         Me.chbInDir.TabStop = False
         Me.chbInDir.Text = "On directory change"
@@ -1583,7 +1617,7 @@ Partial Class frmMain
         Me.chbNextFile.Location = New System.Drawing.Point(7, 37)
         Me.chbNextFile.Margin = New System.Windows.Forms.Padding(4)
         Me.chbNextFile.Name = "chbNextFile"
-        Me.chbNextFile.Size = New System.Drawing.Size(117, 29)
+        Me.chbNextFile.Size = New System.Drawing.Size(114, 29)
         Me.chbNextFile.TabIndex = 0
         Me.chbNextFile.TabStop = False
         Me.chbNextFile.Text = "Next File"
@@ -1724,37 +1758,14 @@ Partial Class frmMain
         'tmrAutoTrail
         '
         '
-        'TrackBar1
+        'RecursiveToolStripMenuItem
         '
-        Me.TrackBar1.Dock = System.Windows.Forms.DockStyle.Top
-        Me.TrackBar1.Location = New System.Drawing.Point(0, 818)
-        Me.TrackBar1.Name = "TrackBar1"
-        Me.TrackBar1.Size = New System.Drawing.Size(266, 80)
-        Me.TrackBar1.TabIndex = 39
-        '
-        'TrackBar2
-        '
-        Me.TrackBar2.Dock = System.Windows.Forms.DockStyle.Top
-        Me.TrackBar2.Location = New System.Drawing.Point(0, 898)
-        Me.TrackBar2.Name = "TrackBar2"
-        Me.TrackBar2.Size = New System.Drawing.Size(266, 80)
-        Me.TrackBar2.TabIndex = 40
-        '
-        'TrackBar3
-        '
-        Me.TrackBar3.Dock = System.Windows.Forms.DockStyle.Top
-        Me.TrackBar3.Location = New System.Drawing.Point(0, 978)
-        Me.TrackBar3.Name = "TrackBar3"
-        Me.TrackBar3.Size = New System.Drawing.Size(266, 80)
-        Me.TrackBar3.TabIndex = 41
-        '
-        'TrackBar4
-        '
-        Me.TrackBar4.Dock = System.Windows.Forms.DockStyle.Top
-        Me.TrackBar4.Location = New System.Drawing.Point(0, 1058)
-        Me.TrackBar4.Name = "TrackBar4"
-        Me.TrackBar4.Size = New System.Drawing.Size(266, 80)
-        Me.TrackBar4.TabIndex = 42
+        Me.RecursiveToolStripMenuItem.Name = "RecursiveToolStripMenuItem"
+        Me.RecursiveToolStripMenuItem.ShortcutKeys = CType((((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.Alt) _
+            Or System.Windows.Forms.Keys.Shift) _
+            Or System.Windows.Forms.Keys.H), System.Windows.Forms.Keys)
+        Me.RecursiveToolStripMenuItem.Size = New System.Drawing.Size(361, 34)
+        Me.RecursiveToolStripMenuItem.Text = "Recursive"
         '
         'frmMain
         '
@@ -1818,6 +1829,10 @@ Partial Class frmMain
         CType(Me.PictureBox2, System.ComponentModel.ISupportInitialize).EndInit()
         Me.Panel9.ResumeLayout(False)
         Me.Panel9.PerformLayout()
+        CType(Me.TrackBar4, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.TrackBar3, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.TrackBar2, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.TrackBar1, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.tbAbsolute, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
@@ -1825,10 +1840,6 @@ Partial Class frmMain
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()
         CType(Me.FileSystemWatcher1, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.TrackBar1, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.TrackBar2, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.TrackBar3, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.TrackBar4, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -2009,4 +2020,5 @@ Partial Class frmMain
     Friend WithEvents TrackBar3 As TrackBar
     Friend WithEvents TrackBar2 As TrackBar
     Friend WithEvents TrackBar1 As TrackBar
+    Friend WithEvents RecursiveToolStripMenuItem As ToolStripMenuItem
 End Class

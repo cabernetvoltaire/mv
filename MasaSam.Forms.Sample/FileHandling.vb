@@ -661,10 +661,10 @@ Module FileHandling
     ''' <summary>
     ''' Takes files in d and places them in target, recursively for subfolders if selected
     ''' </summary>
-    ''' <param name="d"></param>
-    ''' <param name="target"></param>
-    ''' <param name="blnRecurse"></param>
-    Public Sub HarvestFolder(d As DirectoryInfo, target As DirectoryInfo, blnRecurse As Boolean)
+    ''' <param name="Directory"></param>
+    ''' <param name="Target"></param>
+    ''' <param name="Recurse"></param>
+    Public Sub HarvestFolder(Directory As DirectoryInfo, Target As DirectoryInfo, Recurse As Boolean)
         'HarvestFolder(d, blnRecurse)
         'Exit Sub
         Dim i
@@ -673,21 +673,19 @@ Module FileHandling
 
         Dim s As New List(Of String) '= Nothing
         ' s.Add("Test")
-        s = AppendToListFromFolder(s, d, i)
+        s = AppendToListFromFolder(s, Directory, i)
 
-        If blnRecurse Then
-            For Each di In d.EnumerateDirectories
+        If Recurse Then
+            For Each di In Directory.EnumerateDirectories
                 s = AppendToListFromFolder(s, di, i)
             Next
         End If
         blnSuppressCreate = True 'Prevent request make folder for plural files
-        MoveFiles(s, target.FullName, frmMain.lbxFiles)
+        MoveFiles(s, Target.FullName, frmMain.lbxFiles)
         blnSuppressCreate = False
-        DeleteEmptyFolders(d, True)
+        DeleteEmptyFolders(Directory, True)
     End Sub
     Public Sub HarvestFolder(d As DirectoryInfo, Recurse As Boolean)
-
-
         If Recurse Then
 
             For Each di In d.EnumerateDirectories
@@ -700,7 +698,14 @@ Module FileHandling
         Next
         DeleteEmptyFolders(d, True)
     End Sub
-
+    ''' <summary>
+    ''' Adds all the files in d to s, provided there are no more than icount, or icount is zero
+    ''' If icount is zero, then all files are added.
+    ''' </summary>
+    ''' <param name="s"></param>
+    ''' <param name="d"></param>
+    ''' <param name="icount"></param>
+    ''' <returns></returns>
     Private Function AppendToListFromFolder(ByVal s As List(Of String), d As DirectoryInfo, icount As Short) As List(Of String)
         Dim l As New List(Of String)
         l = s

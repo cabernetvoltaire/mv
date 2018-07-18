@@ -1,34 +1,18 @@
-﻿Public Class ListBoxHandler
-    Private mListBox As ListBox
-    Public Event ListChanged()
-    Public Property Listbox() As ListBox
-        Get
-            Return mListBox
-        End Get
-        Set(ByVal value As ListBox)
-            mListBox = value
-        End Set
-    End Property
+﻿Module ListboxHandler
+    Private WithEvents lbxf As ListBox = frmMain.lbxFiles
+    Private WithEvents lbxs As ListBox = frmMain.lbxShowList
+    Public Event FileListSelectionChanged()
+    Public Event ShowListSelectionChange()
 
-    Private mList As List(Of String)
-    Public Property List() As List(Of String)
-        Get
-            Return mList
-        End Get
-        Set(ByVal value As List(Of String))
-            Dim b As List(Of String)
+    Public Sub ListBoxChanged(sender As Object, e As EventArgs) Handles lbxf.SelectedIndexChanged
 
-            mList = value
-            If b.Equals(mList) Then RaiseEvent ListChanged()
-        End Set
-    End Property
-
-    Private Sub PopulateList()
-        mListBox.Items.Clear()
-
-        For Each s In mList
-            mListBox.Items.Add(s)
-        Next
+        With sender
+            Dim i As Long = .SelectedIndex
+            If .Items.count = 0 Then
+                .items.add("If there is nothing showing here, check your filters")
+            ElseIf i >= 0 Then
+                Media.MediaPath = .items(i)
+            End If
+        End With
     End Sub
-
-End Class
+End Module

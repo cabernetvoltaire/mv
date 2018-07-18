@@ -15,9 +15,9 @@ Public Module Mysettings
 #Region "Options"
 
     Public iSSpeeds() As Integer = {1000, 300, 200}
-    Public iPlaybackSpeed() As Integer = {3, 10, 20}
-    Public iPropjump As Integer = 6
-    Public iQuickJump As Integer = 25
+    Public iPlaybackSpeed() As Integer = {3, 15, 45}
+    Public iPropjump As Integer = 12
+    Public iQuickJump As Integer = 20
     Public LastPlayed As New Stack(Of String)
     Public LastFolder As New Stack(Of String)
     Public Property LastShowList As String

@@ -132,7 +132,7 @@
 
             End Select
 
-            strExt = LCase(info.Extension)
+            Dim strExt = LCase(info.Extension)
             If InStr(VIDEOEXTENSIONS, strExt) <> 0 Then
                 Return Filetype.Movie
             ElseIf InStr(PICEXTENSIONS, strExt) <> 0 Then

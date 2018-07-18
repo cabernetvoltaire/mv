@@ -139,7 +139,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Grouper.vb" />
-    <Compile Include="ListBoxHandler.vb" />
+    <Compile Include="ListboxHandler.vb" />
     <Compile Include="MediaHandler.vb" />
     <Compile Include="MVButton.vb" />
     <Compile Include="OrphanFinder.vb" />

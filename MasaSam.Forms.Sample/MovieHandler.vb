@@ -49,6 +49,7 @@ Module MovieHandler
                     MediaJumpToMarker()
 
                 End If
+                '  GetAttributes(sender)
                 Justpaused = False
             Case WMPLib.WMPPlayState.wmppsPaused
                 If frmMain.tmrSlowMo.Enabled Then
@@ -64,9 +65,10 @@ Module MovieHandler
         Dim AttributeName As String = ""
         'This routine returns each of the attributes within the Media File
         For i As Integer = 0 To sender.currentMedia.attributeCount - 1
-            AttributeName += sender.currentMedia.getAttributeName(i) & vbCrLf
+
+            AttributeName += sender.currentMedia.getAttributeName(i) & vbTab & sender.currentMedia.getItemInfo(sender.currentMedia.getAttributeName(i)) & vbCrLf
         Next
-        MsgBox(AttributeName)
+        frmMain.lblAttributes.Text = AttributeName
         'The Attributes returned are:
         ' Duration
         ' FileType

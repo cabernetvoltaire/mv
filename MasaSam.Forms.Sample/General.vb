@@ -106,6 +106,7 @@ Public Module General
             Next
 
         Catch ex As System.UnauthorizedAccessException
+            Return FileList
             Exit Function
         End Try
         For Each f In m.EnumerateFiles
@@ -286,49 +287,6 @@ Public Module General
         Next
     End Sub
 #End Region
-    Public Function FindType(file As String) As Filetype
-        blnLink = False
-        Try
-            Dim info As New FileInfo(file)
-            If info.Extension = "" Then
-                Return Filetype.Unknown
-                Exit Function
-            End If
-            'If it's a .lnk, find the file
-            If LCase(info.Extension) = ".lnk" Then
-                blnLink = True
-
-                Media.MediaPath = LinkTarget(info.FullName) ' CreateObject("WScript.Shell").CreateShortcut(info.FullName).TargetPath
-                Try
-                    If My.Computer.FileSystem.FileExists(Media.MediaPath) Then
-
-                        info = New FileInfo(Media.MediaPath)
-                    Else
-                        'TODO: Ask whether to delete link, or fix it. 
-                        Return Filetype.Unknown
-                        Exit Function
-                    End If
-
-                Catch ex As Exception
-                End Try
-            End If
-            strExt = LCase(info.Extension)
-            'Select Case LCase(strExt)
-            If InStr(VIDEOEXTENSIONS, strExt) <> 0 Then
-                Return Filetype.Movie
-            ElseIf InStr(PICEXTENSIONS, strExt) <> 0 Then
-                Return Filetype.Pic
-            ElseIf InStr(".txt.prn.sty.doc", strExt) <> 0 Then
-                Return Filetype.Doc
-            Else
-                Return Filetype.Unknown
-
-
-            End If
-        Catch ex As PathTooLongException
-            Return Filetype.Unknown
-        End Try
-    End Function
 
 
 
@@ -539,6 +497,13 @@ Public Module General
             End If
         Next
         Return ls
+    End Function
+    Public Function SelectOnWord(lbx As ListBox) As List(Of String)
+        Dim ls As New List(Of String)
+        For Each s In lbx.Items
+            Dim r As New Text.RegularExpressions.Regex(s)
+            'r.Match()
+        Next
     End Function
     Public Sub HighlightList(lbx As ListBox, ls As List(Of String))
         lbx.SelectedItems.Clear()

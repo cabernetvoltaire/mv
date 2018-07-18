@@ -48,7 +48,9 @@ Public Class FindDuplicates
         Dim i = 0
         For Each m In mDuplicates
             If i > Maxfiles Then Exit Sub
-            Panel3.Controls.Add(FPCreator(m, FindType(m(0))))
+            Dim f As New MediaHandler
+            f.MediaPath = m(0)
+            Panel3.Controls.Add(FPCreator(m, f.MediaType))
             i += 1
         Next
 

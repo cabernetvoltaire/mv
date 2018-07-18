@@ -136,10 +136,12 @@ Public Class frmMain
 
         'Else
         currentWMP.URL = Media.MediaPath
+        currentWMP.Ctlcontrols.play()
 
         If tmrAutoTrail.Enabled Then
             SoundWMP.Ctlcontrols.currentPosition = currentWMP.Ctlcontrols.currentPosition
             SoundWMP.URL = currentWMP.URL
+
         Else
             SoundWMP.URL = ""
         End If
@@ -661,9 +663,11 @@ Public Class frmMain
                 If e.Shift Then
                     StartPoint.IncrementState()
                     'blnJumpToMark = True
+                Else
+                    JumpRandom(e.Control And e.Shift)
+
                 End If
 
-                JumpRandom(e.Control And e.Shift)
 
             Case KeyTraverseTree, KeyTraverseTreeBack
                 'e.suppresskeypress by Treeview behaviour unless focus is elsewhere. 
@@ -1288,7 +1292,7 @@ Public Class frmMain
         ChangeFolder(e.Directory.FullName, True)
 
         tmrUpdateFolderSelection.Enabled = False
-        tmrUpdateFolderSelection.Interval = lngInterval * 12
+        tmrUpdateFolderSelection.Interval = lngInterval * 5
         tmrUpdateFolderSelection.Enabled = True
 
     End Sub
@@ -2297,5 +2301,9 @@ Public Class frmMain
                 e.Effect = DragDropEffects.Move
             End If
         End If
+    End Sub
+
+    Private Sub RecursiveToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RecursiveToolStripMenuItem.Click
+        HarvestCurrent()
     End Sub
 End Class
