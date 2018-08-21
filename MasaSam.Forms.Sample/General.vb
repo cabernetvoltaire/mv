@@ -260,6 +260,7 @@ Public Module General
     ''' <param name="lst"></param>
     '''
     Public Sub FillShowbox(lbx As ListBox, Filter As Byte, ByVal lst As List(Of String))
+
         If lst.Count = 0 Then Exit Sub
         If lst.Count > 1000 Then
             ProgressBarOn(lst.Count)
@@ -278,6 +279,8 @@ Public Module General
         Next
         '        lbx.TabStop = True
         ProgressBarOff()
+        frmMain.FilterShowBox()
+
         'frmMain.UpdateFileInfo()
     End Sub
     Private Sub CopyList(list As List(Of String), list2 As SortedList(Of Date, String))
@@ -306,6 +309,7 @@ Public Module General
         ChangeWatcherPath(Media.MediaDirectory)
         ReDim FBCShown(0)
         NofShown = 0
+        My.Computer.Registry.CurrentUser.SetValue("File", Media.MediaPath)
         'frmMain.SetControlColours(blnMoveMode)
     End Sub
     Public Sub ChangeWatcherPath(path As String)

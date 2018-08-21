@@ -26,7 +26,11 @@ Public Class frmMain
     Public DraggedFolder As String
 
 
-
+    Public Sub OnRenameFolderStart(sender As Object, e As KeyEventArgs) Handles tvMain2.KeyDown
+        If e.KeyCode = Keys.F2 Then
+            CancelDisplay()
+        End If
+    End Sub
 
 
     Public Sub OnFileListChanged() Handles FM.FilesMoved
@@ -441,8 +445,6 @@ Public Class frmMain
             If count > 0 Then
 
                 If Random.NextSelect Then
-                    '     If Random.NextSelect Then
-                    '    If blnForward Then
 
                     Dim i As Int32
                     i = Int(Rnd() * (count))
@@ -450,14 +452,7 @@ Public Class frmMain
                         i = Int(Rnd() * (count))
                     End While
                     lbx.SelectedIndex = i
-                    '        LastPlayed.Push(Media.MediaPath)
                 Else
-                    'If LastPlayed.Count > 0 Then
-                    '    lbx.SetSelected(lbx.FindString(LastPlayed.Pop), True)
-                    'End If
-
-                    '        End If
-                    '   Else
                     lbx.SelectedIndex = (lbx.SelectedIndex + diff) Mod count
                 End If
             End If
@@ -569,6 +564,8 @@ Public Class frmMain
         Me.Cursor = Cursors.WaitCursor
         'MsgBox(e.KeyCode.ToString)
         Select Case e.KeyCode
+            Case Keys.F2
+                CancelDisplay()
             Case Keys.F4 And e.Alt
                 Me.Close()
             Case Keys.Enter And e.Control
@@ -598,7 +595,7 @@ Public Class frmMain
                 End If
 
             Case KeyToggleButtons
-                    ToggleButtons()
+                ToggleButtons()
             Case KeyEscape
                 CancelDisplay()                'currentPicBox.Image.Dispose()
                 tmrAutoTrail.Enabled = False
@@ -1099,11 +1096,11 @@ Public Class frmMain
     ''    Showlist = SetPlayOrder(i, Showlist)
     ''    FillShowbox(lbxShowList, CurrentFilterState, Showlist)
     ''End Sub
-    'Private Sub ToolStripButton14_Click(sender As Object, e As EventArgs)
-    '    RemoveFilesFromCollection(Showlist, strVideoExtensions)
-    '    FillShowbox(lbxShowList, FilterState.All, Showlist)
+    Private Sub RemoveFiles(sender As Object, e As EventArgs)
+        ' RemoveFilesFromCollection(Showlist, strVideoExtensions)
+        FillShowbox(lbxShowList, CurrentFilterState.State, Showlist)
 
-    'End Sub
+    End Sub
     'Private Sub ToolStripButton15_Click(sender As Object, e As EventArgs)
     '    tmrSlideShow.Enabled = Not tmrSlideShow.Enabled
     '    If tmrSlideShow.Enabled = False Then blnRestartSlideShowFlag = False
@@ -1130,6 +1127,54 @@ Public Class frmMain
     End Sub
 
 
+    Public Function FilterShowBox()
+        Dim l As New List(Of String)
+        For Each m In lbxShowList.Items
+            If Len(m) > 240 Then Continue For
+
+            Dim f As New FileInfo(m)
+            Dim s As String = LCase(f.Extension)
+
+            Select Case CurrentFilterState.State
+                Case FilterHandler.FilterState.All
+
+                    l.Add(f.FullName)
+                Case FilterHandler.FilterState.NoPicVid
+
+                    If InStr(VIDEOEXTENSIONS & PICEXTENSIONS, s) <> 0 And Len(s) > 0 Then
+                    Else
+                        l.Add(f.FullName)
+
+                    End If
+
+                Case FilterHandler.FilterState.Piconly
+                    If InStr(PICEXTENSIONS, s) <> 0 And Len(s) > 0 Then
+
+                        l.Add(f.FullName)
+                    Else
+                    End If
+                Case FilterHandler.FilterState.LinkOnly
+                    If s = ".lnk" Then
+                        l.Add(f.FullName)
+                    End If
+
+                Case FilterHandler.FilterState.Vidonly
+                    If InStr(VIDEOEXTENSIONS, s) <> 0 And Len(s) > 0 Then
+                        l.Add(f.FullName)
+                    End If
+
+                Case FilterHandler.FilterState.PicVid
+                    If InStr(VIDEOEXTENSIONS & PICEXTENSIONS, s) <> 0 And Len(s) > 0 Then
+                        l.Add(f.FullName)
+                    End If
+            End Select
+
+        Next
+        lbxShowList.Items.Clear()
+        For Each fl In l
+            lbxShowList.Items.Add(fl)
+        Next
+    End Function
 
 
 
@@ -1298,10 +1343,7 @@ Public Class frmMain
     End Sub
 
 
-    Private Sub tvMain2_KeyPress(sender As Object, e As KeyPressEventArgs) Handles tvMain2.KeyPress
-        'Exit Sub
-        ' e.suppresskeypress = True
-    End Sub
+
 
     Private Sub ToolStripButton4_Click_1(sender As Object, e As EventArgs)
         'Toggle collapse
@@ -1759,17 +1801,9 @@ Public Class frmMain
     End Sub
 
 
-    Private Sub btn1_MouseEnter(sender As Object, e As EventArgs) Handles btn1.MouseEnter
-
-
-    End Sub
-
-    Private Sub ToolTip1_Popup(sender As Object, e As PopupEventArgs) Handles ToolTip1.Popup
-
-    End Sub
 
     Private Sub lbxFiles_MouseHover(sender As Object, e As EventArgs) Handles lbxFiles.MouseHover
-        'MouseHoverInfo(lbxFiles, ToolTip1)
+        MouseHoverInfo(lbxFiles, ToolTip1)
     End Sub
 
     Private Sub tmrAutoTrail_Tick(sender As Object, e As EventArgs) Handles tmrAutoTrail.Tick
@@ -2223,8 +2257,9 @@ Public Class frmMain
         tvMain2.RefreshTree(Media.MediaDirectory)
     End Sub
 
-    Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
-        'Metadata sort
+    Private Sub FilterBySize()
+        DM.FilterBySize(Media.MediaDirectory, False)
+        tvMain2.RefreshTree(Media.MediaDirectory)
     End Sub
     Private Sub ReUniteFavesLinks()
 
@@ -2305,5 +2340,18 @@ Public Class frmMain
 
     Private Sub RecursiveToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RecursiveToolStripMenuItem.Click
         HarvestCurrent()
+    End Sub
+
+    Private Sub HarvestFolderToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles HarvestFolderToolStripMenuItem.Click
+
+    End Sub
+
+    Private Sub BySizeToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles BySizeToolStripMenuItem.Click
+        DM.FilterBySize(Media.MediaDirectory, False)
+        tvMain2.RefreshTree(Media.MediaDirectory)
+    End Sub
+
+    Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
+        PromoteFolder(New DirectoryInfo(Media.MediaDirectory))
     End Sub
 End Class

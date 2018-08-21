@@ -84,17 +84,27 @@
 
     End Sub
     Public Sub FindOrphans()
+        'Original file must have been moved to a lower folder or to a different branch
+        'First check if it is below. 
+        'Find all lower folders, and add to a list
+        'If the original folder doesn't exist ignore
+        'Repeat this for all orphans.
+        'Run through the list for all orphans.
+        '
+
+
         For Each m In mOrphanList
             'For each directory in LinkTarget's folder
             'Check all files until match found
 
-            Dim f As New IO.FileInfo(m)
+            '   Dim f As New IO.FileInfo(m)
             'Find LinkTarget
             Dim s As String = LinkTarget(m)
-            Dim StartDest = New IO.DirectoryInfo(s)
+            Dim f As New IO.FileInfo(s)
+            Dim StartDest = New IO.DirectoryInfo(f.Directory.FullName)
             'Find higher folder if this one doesn't exist any more
-            While StartDest.Exists = False And StartDest IsNot StartDest.Root
-                StartDest = New IO.DirectoryInfo(StartDest.Parent.FullName)
+            While StartDest.Exists = False And StartDest.Parent.Exists
+                StartDest = StartDest.Parent
             End While
             If StartDest Is StartDest.Root Then
                 Throw New Exception
@@ -103,22 +113,19 @@
             Dim DirsToSearch As New List(Of String)
             Dim i = 0
             FindAllFoldersBelow(StartDest, DirsToSearch, True, True)
-            While Not Found
-                For Each j In DirsToSearch
-                    Dim filelist = New IO.DirectoryInfo(j).GetFiles
-                    For Each x In filelist
-                        If x.Name.Equals(f.Name.Replace(f.Extension, "")) Then
-                            mFoundParents.Add(x.FullName, m)
-                            Found = True
-                            Exit For
-                        End If
+            DirsToSearch.Add(StartDest.FullName)
 
-                    Next
+            For Each j In DirsToSearch
+                Dim filelist = New IO.DirectoryInfo(j).GetFiles
+                For Each x In filelist
+                    If x.Name.Equals(f.Name.Replace(f.Extension, "")) Then
+                        mFoundParents.Add(x.FullName, m)
+                        Found = True
+                        Exit For
+                    End If
+
                 Next
-            End While
-
-
-
+            Next
         Next
         If mFoundParents.Count <> 0 Then
             RaiseEvent FoundParent(Me, Nothing)

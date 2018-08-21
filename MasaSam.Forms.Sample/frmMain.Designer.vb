@@ -50,15 +50,18 @@ Partial Class frmMain
         Me.HarvestFolderToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.DeleteEmptyFoldersToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.HarvestFoldersToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.RecursiveToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.BundleToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.BurstFolderToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.PromoteFolderToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.FilterMoveToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.FilterMoveRecursiveToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.FilterToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ByYearToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ByMonthToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ByDateToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ByYearToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ByTimeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.BySizeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.OptionsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToggleRandomSelectToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToggleRandomAdvanceToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -198,7 +201,6 @@ Partial Class frmMain
         Me.tmrPumpFiles = New System.Windows.Forms.Timer(Me.components)
         Me.tmrAutoTrail = New System.Windows.Forms.Timer(Me.components)
         Me.ColorDialog1 = New System.Windows.Forms.ColorDialog()
-        Me.RecursiveToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip1.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
         Me.TableLayoutPanel2.SuspendLayout()
@@ -447,6 +449,15 @@ Partial Class frmMain
         Me.HarvestFoldersToolStripMenuItem.Size = New System.Drawing.Size(426, 34)
         Me.HarvestFoldersToolStripMenuItem.Text = "Harvest Folders"
         '
+        'RecursiveToolStripMenuItem
+        '
+        Me.RecursiveToolStripMenuItem.Name = "RecursiveToolStripMenuItem"
+        Me.RecursiveToolStripMenuItem.ShortcutKeys = CType((((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.Alt) _
+            Or System.Windows.Forms.Keys.Shift) _
+            Or System.Windows.Forms.Keys.H), System.Windows.Forms.Keys)
+        Me.RecursiveToolStripMenuItem.Size = New System.Drawing.Size(361, 34)
+        Me.RecursiveToolStripMenuItem.Text = "Recursive"
+        '
         'BundleToolStripMenuItem
         '
         Me.BundleToolStripMenuItem.Name = "BundleToolStripMenuItem"
@@ -483,16 +494,10 @@ Partial Class frmMain
         '
         'FilterToolStripMenuItem
         '
-        Me.FilterToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ByYearToolStripMenuItem, Me.ByMonthToolStripMenuItem, Me.ByDateToolStripMenuItem})
+        Me.FilterToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ByMonthToolStripMenuItem, Me.ByDateToolStripMenuItem, Me.ByYearToolStripMenuItem, Me.ByTimeToolStripMenuItem, Me.BySizeToolStripMenuItem})
         Me.FilterToolStripMenuItem.Name = "FilterToolStripMenuItem"
         Me.FilterToolStripMenuItem.Size = New System.Drawing.Size(426, 34)
         Me.FilterToolStripMenuItem.Text = "&Group..."
-        '
-        'ByYearToolStripMenuItem
-        '
-        Me.ByYearToolStripMenuItem.Name = "ByYearToolStripMenuItem"
-        Me.ByYearToolStripMenuItem.Size = New System.Drawing.Size(194, 34)
-        Me.ByYearToolStripMenuItem.Text = "By &Year"
         '
         'ByMonthToolStripMenuItem
         '
@@ -505,6 +510,24 @@ Partial Class frmMain
         Me.ByDateToolStripMenuItem.Name = "ByDateToolStripMenuItem"
         Me.ByDateToolStripMenuItem.Size = New System.Drawing.Size(194, 34)
         Me.ByDateToolStripMenuItem.Text = "By &Date"
+        '
+        'ByYearToolStripMenuItem
+        '
+        Me.ByYearToolStripMenuItem.Name = "ByYearToolStripMenuItem"
+        Me.ByYearToolStripMenuItem.Size = New System.Drawing.Size(194, 34)
+        Me.ByYearToolStripMenuItem.Text = "By &Year"
+        '
+        'ByTimeToolStripMenuItem
+        '
+        Me.ByTimeToolStripMenuItem.Name = "ByTimeToolStripMenuItem"
+        Me.ByTimeToolStripMenuItem.Size = New System.Drawing.Size(194, 34)
+        Me.ByTimeToolStripMenuItem.Text = "By &Time"
+        '
+        'BySizeToolStripMenuItem
+        '
+        Me.BySizeToolStripMenuItem.Name = "BySizeToolStripMenuItem"
+        Me.BySizeToolStripMenuItem.Size = New System.Drawing.Size(288, 34)
+        Me.BySizeToolStripMenuItem.Text = "By &Size"
         '
         'OptionsToolStripMenuItem
         '
@@ -1484,7 +1507,7 @@ Partial Class frmMain
         Me.Button3.Name = "Button3"
         Me.Button3.Size = New System.Drawing.Size(266, 76)
         Me.Button3.TabIndex = 36
-        Me.Button3.Text = "Button3"
+        Me.Button3.Text = "TryButton"
         Me.Button3.UseVisualStyleBackColor = True
         '
         'Button2
@@ -1753,19 +1776,10 @@ Partial Class frmMain
         '
         'tmrPumpFiles
         '
-        Me.tmrPumpFiles.Interval = 500
+        Me.tmrPumpFiles.Interval = 2500
         '
         'tmrAutoTrail
         '
-        '
-        'RecursiveToolStripMenuItem
-        '
-        Me.RecursiveToolStripMenuItem.Name = "RecursiveToolStripMenuItem"
-        Me.RecursiveToolStripMenuItem.ShortcutKeys = CType((((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.Alt) _
-            Or System.Windows.Forms.Keys.Shift) _
-            Or System.Windows.Forms.Keys.H), System.Windows.Forms.Keys)
-        Me.RecursiveToolStripMenuItem.Size = New System.Drawing.Size(361, 34)
-        Me.RecursiveToolStripMenuItem.Text = "Recursive"
         '
         'frmMain
         '
@@ -2021,4 +2035,6 @@ Partial Class frmMain
     Friend WithEvents TrackBar2 As TrackBar
     Friend WithEvents TrackBar1 As TrackBar
     Friend WithEvents RecursiveToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ByTimeToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents BySizeToolStripMenuItem As ToolStripMenuItem
 End Class

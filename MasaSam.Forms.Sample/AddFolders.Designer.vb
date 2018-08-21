@@ -31,9 +31,9 @@ Partial Class AddFolders
         Me.Label1.AutoSize = True
         Me.Label1.Location = New System.Drawing.Point(23, 19)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(71, 25)
+        Me.Label1.Size = New System.Drawing.Size(185, 25)
         Me.Label1.TabIndex = 0
-        Me.Label1.Text = "Label1"
+        Me.Label1.Text = "Type folders to add:"
         '
         'TextBox1
         '
@@ -51,7 +51,7 @@ Partial Class AddFolders
         Me.Controls.Add(Me.TextBox1)
         Me.Controls.Add(Me.Label1)
         Me.Name = "AddFolders"
-        Me.Text = "AddFolders"
+        Me.Text = "Add Subfolders"
         Me.ResumeLayout(False)
         Me.PerformLayout()
 

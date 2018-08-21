@@ -45,7 +45,7 @@ Public Class FileSystemTree
     <Description("Notifies when file is selected either by clicking or expanding.")>
     <Category("Behavior")>
     Public Event FileSelected As EventHandler(Of FileInfoEventArgs)
-    Public Event LabelEdited As EventHandler(Of String)
+    Public Event LabelEditBegun As EventHandler(Of String)
 
 #End Region
 
@@ -1148,7 +1148,6 @@ Public Class FileSystemTree
     End Sub
 
 
-
     Public Sub AfterLabelEdit(sender As Object, e As NodeLabelEditEventArgs) Handles tvFiles.AfterLabelEdit
         Dim oldlabel As String = e.Label
 
@@ -1160,8 +1159,9 @@ Public Class FileSystemTree
         Dim s As String = Replace(e.Node.FullPath, node.Text, e.Label)
         s = Replace(s, "My Computer\", "")
         s = Replace(s, "\\", "\")
-        m.MoveTo(s)
-
+        '      RaiseEvent LabelEdited(sender, s)
+        If m.FullName <> s Then m.MoveTo(s)
+        Me.RefreshTree()
 
     End Sub
 
@@ -1197,6 +1197,7 @@ Public Class FileSystemTree
     End Function
 
     Public Sub tvFiles_KeyDown(sender As Object, e As KeyEventArgs) Handles tvFiles.KeyDown
+        
         'Exit Sub
 
         'Enables traversing of the filetree

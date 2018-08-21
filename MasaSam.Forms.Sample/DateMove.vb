@@ -16,6 +16,7 @@ Class DateMove
         Minute
 
     End Enum
+    Private SizeNames As String() = {"Size 0- Small", "Size 1-Medium", "Size 2-Large", "Size 3-Very Large", "Size 4-Gigantic", "Size 5-OMG"}
     Public Property Folder() As String
         Get
             Return mFolder
@@ -66,6 +67,26 @@ Class DateMove
             f.Directory.CreateSubdirectory(Str(i) & "\")
             'End If
             f.MoveTo(f.DirectoryName & "\" & Str(i) & "\" & f.Name)
+        Next
+        RaiseEvent FilesMoved(Nothing, Nothing)
+
+    End Sub
+    Public Sub FilterBySize(FolderName As String, Recurse As Boolean)
+
+        'For each file
+        'Move to folder with the year, creating it first
+
+        Dim s As New IO.DirectoryInfo(FolderName)
+        Dim i As Integer
+        For Each f In s.GetFiles
+            For m = 5 To 10
+                If f.Length < 10 ^ m And f.Length >= 10 ^ (m - 1) Then
+                    f.Directory.CreateSubdirectory(SizeNames(m - 5) & "\")
+                    f.MoveTo(f.DirectoryName & "\" & SizeNames(m - 5) & "\" & f.Name)
+                End If
+            Next
+
+            'If f.Directory.EnumerateDirectories(Str(i)) Is Nothing Then
         Next
         RaiseEvent FilesMoved(Nothing, Nothing)
 

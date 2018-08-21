@@ -75,7 +75,7 @@ Partial Class FileSystemTree
         Me.ResumeLayout(False)
 
     End Sub
-    Friend WithEvents tvFiles As System.Windows.Forms.TreeView
+    Public WithEvents tvFiles As System.Windows.Forms.TreeView
     Friend WithEvents imageListIcons As System.Windows.Forms.ImageList
 
 End Class

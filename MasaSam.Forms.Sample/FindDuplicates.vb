@@ -8,6 +8,7 @@ Public Class FindDuplicates
             mList = value
             Dim nList = New List(Of String)
             For Each m In mList
+                If Len(m) > 240 Then Exit For
                 Dim inf = New IO.FileInfo(m)
                 If inf.Exists Then
                     nList.Add(m)

@@ -67,8 +67,8 @@ Module FileHandling
 
 
     End Sub
-
     Private Function FilterListBox(e As DirectoryInfo, ByVal lst As List(Of String))
+        'Dim l As New List(Of String)
         For Each f In e.EnumerateFiles
             Dim s As String = LCase(f.Extension)
 
@@ -189,7 +189,11 @@ Module FileHandling
             End If
         End If
     End Sub
-
+    Public Sub PromoteFolder(folder As DirectoryInfo)
+        frmMain.CancelDisplay()
+        folder.MoveTo(folder.Parent.Parent.FullName & "\" & folder.Name)
+        frmMain.tvMain2.RefreshTree(folder.FullName)
+    End Sub
     Public Sub MoveFolder(strDir As String, strDest As String, tvw As MasaSam.Forms.Controls.FileSystemTree, blnOverride As Boolean)
         If strDest Is Nothing Then Exit Sub
         Try
@@ -202,7 +206,13 @@ Module FileHandling
                     Case StateHandler.StateOptions.Copy
                         .CopyDirectory(strDir, strDest & "\" & s, FileIO.UIOption.OnlyErrorDialogs)
                     Case StateHandler.StateOptions.Move
+                        Dim flist As FileInfo() = dir.GetFiles()
                         .MoveDirectory(strDir, strDest & "\" & s, FileIO.UIOption.OnlyErrorDialogs)
+
+                        For Each x In flist
+                            Movelink(x, strDest & "\" & s & "\" & x.Name)
+                        Next
+
                     Case StateHandler.StateOptions.MoveLeavingLink
                         'Create link directory?
                         .MoveDirectory(strDir, strDest & "\" & s, FileIO.UIOption.OnlyErrorDialogs)
@@ -215,7 +225,7 @@ Module FileHandling
                 tvw.RemoveNode(strDir)
             End With
         Catch ex As Exception
-            MsgBox(ex.Message)
+            '            MsgBox(ex.Message) '
         End Try
 
     End Sub
@@ -333,6 +343,12 @@ Module FileHandling
 
         Return file
     End Function
+    ''' <summary>
+    ''' Checks to see if f is in the favourite links, and if so, updates the link. 
+    ''' </summary>
+    ''' <param name="f"></param>
+    ''' <param name="path"></param>
+
     Private Sub Movelink(f As IO.FileInfo, path As String)
         Dim links As New List(Of String)
         Dim faves As New IO.DirectoryInfo(FavesFolderPath)
@@ -416,6 +432,7 @@ Module FileHandling
     Public Sub CreateNewDirectory(strDir As String)
         AddFolders.Show()
         AddFolders.Folder = strDir
+        frmMain.tvMain2.RefreshTree(strDir)
 
     End Sub
     Public Function CreateNewDirectory(tv As FileSystemTree, strDest As String, blnAsk As Boolean) As String
@@ -546,7 +563,7 @@ Module FileHandling
     End Sub
 
     Private Sub AddRemove(list As List(Of String), blnRemove As Boolean, strSearch As String, file As FileInfo)
-        If InStr(LCase(file.FullName), LCase(strSearch)) = 0 Or strSearch = "" Then
+        If InStr(LCase(file.FullName), LCase(strSearch)) <> 0 Or strSearch = "" Then
             If blnRemove Then
                 list.Remove(file.FullName)
             Else
