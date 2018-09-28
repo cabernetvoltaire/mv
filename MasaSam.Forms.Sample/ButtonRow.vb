@@ -18,23 +18,23 @@
                 Return mCurrent
             End Get
             Set(ByVal value As Boolean)
+            If mCurrent <> value Then
                 mCurrent = value
                 RaiseEvent CurrentChanged(Me, New EventArgs)
+            End If
 
-
-            End Set
-        End Property
-        Private mLetter As Char
-        Public Property Letter() As Char
-            Get
-                Return mLetter
-            End Get
-            Set(ByVal value As Char)
-
-                mLetter = value
-            '     Key = GetKey(value)
         End Set
         End Property
+    Private mLetter As Keys
+    Public Property Letter() As Keys
+        Get
+            Return mLetter
+        End Get
+        Set(ByVal value As Keys)
+
+            mLetter = value
+        End Set
+    End Property
 
     Private Function GetKey(value As Char) As Integer
         Dim alpha As String = "ABCDEFGHIJKLMNOPWRSTUVWXYZ"
@@ -48,17 +48,7 @@
         Throw New NotImplementedException()
     End Function
 
-    Private mKey As Keys
-    Public Property Key() As Integer
-        Get
-            Return mKey
-        End Get
-        Set(ByVal value As Integer)
 
-            mKey = value
-            mLetter = Chr(value)
-        End Set
-    End Property
 
 
     Public Sub InitialiseButtons()

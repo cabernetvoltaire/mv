@@ -103,8 +103,11 @@
             Dim f As New IO.FileInfo(s)
             Dim StartDest = New IO.DirectoryInfo(f.Directory.FullName)
             'Find higher folder if this one doesn't exist any more
-            While StartDest.Exists = False And StartDest.Parent.Exists
+            While StartDest.Exists = False
                 StartDest = StartDest.Parent
+                Do Until StartDest.Parent.Exists
+                    StartDest = StartDest.Parent
+                Loop
             End While
             If StartDest Is StartDest.Root Then
                 Throw New Exception

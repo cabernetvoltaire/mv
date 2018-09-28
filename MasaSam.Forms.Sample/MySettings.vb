@@ -16,8 +16,7 @@ Public Module Mysettings
 
     Public iSSpeeds() As Integer = {1000, 300, 200}
     Public iPlaybackSpeed() As Integer = {3, 15, 45}
-    Public iPropjump As Integer = 12
-    Public iQuickJump As Integer = 20
+
     Public LastPlayed As New Stack(Of String)
     Public LastFolder As New Stack(Of String)
     Public Property LastShowList As String
@@ -68,32 +67,32 @@ Public Module Mysettings
     Public Sub PreferencesSave()
 
         With My.Computer.Registry.CurrentUser
-            .SetValue("VertSplit", frmMain.ctrFileBoxes.SplitterDistance)
-            .SetValue("HorSplit", frmMain.ctrMainFrame.SplitterDistance)
+            .SetValue("VertSplit", MainForm.ctrFileBoxes.SplitterDistance)
+            .SetValue("HorSplit", MainForm.ctrMainFrame.SplitterDistance)
 
             .SetValue("Folder", Media.MediaDirectory)
             .SetValue("File", Media.MediaPath)
-            .SetValue("Filter", frmMain.CurrentFilterState.State)
-            .SetValue("SortOrder", frmMain.PlayOrder.State)
-            .SetValue("StartPoint", frmMain.StartPoint.State)
-            .SetValue("State", frmMain.NavigateMoveState.State)
+            .SetValue("Filter", MainForm.CurrentFilterState.State)
+            .SetValue("SortOrder", MainForm.PlayOrder.State)
+            .SetValue("StartPoint", MainForm.StartPoint.State)
+            .SetValue("State", MainForm.NavigateMoveState.State)
             .SetValue("LastButtonFolder", strButtonFile)
             .SetValue("LastAlpha", iCurrentAlpha)
         End With
 
     End Sub
     Public Sub PreferencesGet()
-        frmMain.ctrPicAndButtons.SplitterDistance = 9 * frmMain.ctrPicAndButtons.Height / 10
+        MainForm.ctrPicAndButtons.SplitterDistance = 9 * MainForm.ctrPicAndButtons.Height / 10
         With My.Computer.Registry.CurrentUser
             'Media.MediaDirectory = .GetValue("Folder", System.Environment.GetFolderPath(Environment.SpecialFolder.MyPictures))
             Media.MediaPath = .GetValue("File", "C:\exiftool.exe")
 
-            frmMain.ctrFileBoxes.SplitterDistance = .GetValue("VertSplit", frmMain.ctrFileBoxes.Height / 4)
-            frmMain.ctrMainFrame.SplitterDistance = .GetValue("HorSplit", frmMain.ctrFileBoxes.Width / 2)
-            frmMain.CurrentFilterState.State = .GetValue("Filter", 0)
-            frmMain.PlayOrder.State = .GetValue("SortOrder", 0)
-            frmMain.StartPoint.State = .GetValue("StartPoint", 0)
-            frmMain.NavigateMoveState.State = .GetValue("State", 0)
+            MainForm.ctrFileBoxes.SplitterDistance = .GetValue("VertSplit", MainForm.ctrFileBoxes.Height / 4)
+            MainForm.ctrMainFrame.SplitterDistance = .GetValue("HorSplit", MainForm.ctrFileBoxes.Width / 2)
+            MainForm.CurrentFilterState.State = .GetValue("Filter", 0)
+            MainForm.PlayOrder.State = .GetValue("SortOrder", 0)
+            MainForm.StartPoint.State = .GetValue("StartPoint", 0)
+            MainForm.NavigateMoveState.State = .GetValue("State", 0)
             strButtonFile = .GetValue("LastButtonFolder", "Q:\Alpha2.msb")
 
             iCurrentAlpha = .GetValue("LastAlpha", 0)
@@ -101,16 +100,14 @@ Public Module Mysettings
         End With
         '     If Not IO.Directory.Exists(Media.MediaDirectory) Then Media.MediaDirectory = "C:\"
         If Not IO.File.Exists(Media.MediaPath) Then Media.MediaPath = ""
-        frmMain.tssMoveCopy.Text = Media.MediaDirectory
+        MainForm.tssMoveCopy.Text = Media.MediaDirectory
         '   frmMain.RandomFunctionsToggle(False)
 
     End Sub
     Public Sub OnMediaChanged(sender As Object, e As EventArgs) Handles Media.MediaChanged
-        '     frmMain.StartPoint.Duration = Media.Duration
-        'Dim s = frmMain.tvMain2.SelectedFolder
 
-        'If s <> Media.MediaDirectory Then frmMain.tvMain2.SelectedFolder = Media.MediaDirectory
-        'If frmMain.lbxFiles.SelectedItem <> Media.MediaPath Then frmMain.lbxFiles.SelectedItem = Media.MediaPath
+        ChangeFolder(Media.MediaDirectory, True)
+
     End Sub
 
 End Module

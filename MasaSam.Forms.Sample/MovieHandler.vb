@@ -14,13 +14,13 @@ Module MovieHandler
         If MediaMarker <> 0 Then
                 NewPosition = MediaMarker
             Else
-            NewPosition = frmMain.StartPoint.StartPoint
+            NewPosition = MainForm.StartPoint.StartPoint
 
 
             Console.WriteLine(":New position is " & NewPosition & " of " & MediaDuration)
             End If
 
-            frmMain.tmrJumpVideo.Enabled = True
+            MainForm.tmrJumpVideo.Enabled = True
         'Else
         'End If
         LastTriggered = Now
@@ -31,8 +31,8 @@ Module MovieHandler
         Static Justpaused As Boolean
         Select Case e.newState
             Case WMPLib.WMPPlayState.wmppsMediaEnded
-                If Not frmMain.tmrAutoTrail.Enabled Then
-                    frmMain.AdvanceFile(True, True)
+                If Not MainForm.tmrAutoTrail.Enabled Then
+                    MainForm.AdvanceFile(True, True)
                 End If
 
             Case WMPLib.WMPPlayState.wmppsPlaying
@@ -41,10 +41,12 @@ Module MovieHandler
                     Exit Sub
                 End If
                 MediaDuration = currentWMP.currentMedia.duration
-                frmMain.StartPoint.Duration = MediaDuration
+                MainForm.StartPoint.Duration = MediaDuration
+                MainForm.SoundWMP.settings.mute = True
+
                 If FullScreen.Changing Then
                     NewPosition = currentWMP.Ctlcontrols.currentPosition
-                    frmMain.tmrJumpVideo.Enabled = True
+                    MainForm.tmrJumpVideo.Enabled = True
                 Else
                     MediaJumpToMarker()
 
@@ -52,8 +54,14 @@ Module MovieHandler
                 '  GetAttributes(sender)
                 Justpaused = False
             Case WMPLib.WMPPlayState.wmppsPaused
-                If frmMain.tmrSlowMo.Enabled Then
+
+                If MainForm.tmrSlowMo.Enabled Then
                     Justpaused = False
+                    With MainForm.SoundWMP
+                        .URL = currentWMP.URL
+                        .settings.mute = False
+                    End With
+
                 Else
 
                     Justpaused = True
@@ -68,7 +76,7 @@ Module MovieHandler
 
             AttributeName += sender.currentMedia.getAttributeName(i) & vbTab & sender.currentMedia.getItemInfo(sender.currentMedia.getAttributeName(i)) & vbCrLf
         Next
-        frmMain.lblAttributes.Text = AttributeName
+        MainForm.lblAttributes.Text = AttributeName
         'The Attributes returned are:
         ' Duration
         ' FileType

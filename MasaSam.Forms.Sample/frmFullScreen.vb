@@ -14,11 +14,11 @@ Public Class FullScreen
         CtrlDown = e.Control
 
         If e.KeyCode = Keys.Escape Then
-            frmMain.GoFullScreen(False)
+            MainForm.GoFullScreen(False)
 
         End If
 
-        frmMain.HandleKeys(Me, e)
+        MainForm.HandleKeys(Me, e)
         e.SuppressKeyPress = True
     End Sub
 
@@ -30,7 +30,7 @@ Public Class FullScreen
 
     Private Sub FSWMP_KeyDownEvent(sender As Object, e As _WMPOCXEvents_KeyDownEvent) Handles FSWMP.KeyDownEvent
         If e.nKeyCode = Keys.Escape Then
-            frmMain.GoFullScreen(False)
+            MainForm.GoFullScreen(False)
         End If
     End Sub
 
@@ -58,7 +58,7 @@ Public Class FullScreen
     Private Sub fullScreenPicBox_MouseDown(sender As Object, e As MouseEventArgs) Handles fullScreenPicBox.MouseDown
         Select Case e.Button
             Case MouseButtons.XButton1, MouseButtons.XButton2
-                frmMain.AdvanceFile(e.Button = MouseButtons.XButton2, True)
+                MainForm.AdvanceFile(e.Button = MouseButtons.XButton2, True)
                 e = Nothing
 
             Case Else

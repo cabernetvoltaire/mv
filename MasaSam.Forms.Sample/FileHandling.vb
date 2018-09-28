@@ -1,16 +1,18 @@
 ﻿Imports System.IO
 Imports MasaSam.Forms.Controls
+Imports System.Threading
 Module FileHandling
     Public blnSuppressCreate As Boolean = False
     Public blnChooseOne As Boolean = False
     Public VIDEOEXTENSIONS = ".divx.vob.webm.avi.flv.mov.m4p.mpeg.mpg.m4a.m4v.mkv.mp4.rm.ram.wmv.wav.mp3.3gp"
     Public PICEXTENSIONS = "arw.jpeg.png.jpg.bmp.gif"
-    Public CurrentfilterState As FilterHandler = frmMain.CurrentFilterState
-    Public Random As RandomHandler = frmMain.Random
-    Public NavigateMoveState As StateHandler = frmMain.NavigateMoveState
+    Public CurrentfilterState As FilterHandler = MainForm.CurrentFilterState
+    Public Random As RandomHandler = MainForm.Random
+    Public NavigateMoveState As StateHandler = MainForm.NavigateMoveState
     Public FilePumpList As New List(Of String)
     Public FP As New FilePump
-
+    Public Event FolderMoved(Path As String)
+    Public t As Thread
 
     Dim strFilterExtensions(6) As String
     Public Sub AssignExtensionFilters()
@@ -43,8 +45,8 @@ Module FileHandling
         End If
         Try
             FilterListBox(e, flist)
-            flist = SetPlayOrder(frmMain.PlayOrder.State, flist)
-            FillShowbox(lbx, frmMain.CurrentFilterState.State, flist)
+            flist = SetPlayOrder(MainForm.PlayOrder.State, flist)
+            FillShowbox(lbx, MainForm.CurrentFilterState.State, flist)
 
             lbx.Tag = e
 
@@ -110,15 +112,6 @@ Module FileHandling
     End Function
 
 
-    Public Sub FilePump(strFileDest As String, lbx1 As ListBox)
-
-        FilePumpList.Add(strFileDest)
-        If FilePumpList.Count = 35 Then
-
-            MoveFiles(FilePumpList, lbx1)
-            FilePumpList.Clear()
-        End If
-    End Sub
 
 
     ''' <summary>
@@ -167,7 +160,7 @@ Module FileHandling
             Catch ex As System.IO.PathTooLongException
                 Continue Do
             Catch ex As System.ArgumentException
-                MsgBox(ex.Message)
+                ReportFault("Filehandling.Getlist", ex.Message)
                 Exit Sub
             End Try
 
@@ -190,11 +183,11 @@ Module FileHandling
         End If
     End Sub
     Public Sub PromoteFolder(folder As DirectoryInfo)
-        frmMain.CancelDisplay()
+        MainForm.CancelDisplay()
         folder.MoveTo(folder.Parent.Parent.FullName & "\" & folder.Name)
-        frmMain.tvMain2.RefreshTree(folder.FullName)
+        MainForm.tvMain2.RefreshTree(folder.FullName)
     End Sub
-    Public Sub MoveFolder(strDir As String, strDest As String, tvw As MasaSam.Forms.Controls.FileSystemTree, blnOverride As Boolean)
+    Public Sub MoveFolder(strDir As String, strDest As String, blnOverride As Boolean)
         If strDest Is Nothing Then Exit Sub
         Try
             With My.Computer.FileSystem
@@ -222,7 +215,6 @@ Module FileHandling
 
                 End Select
                 UpdateButton(strDir, strDest & "\" & s) 'todo doesnt handle sub-tree
-                tvw.RemoveNode(strDir)
             End With
         Catch ex As Exception
             '            MsgBox(ex.Message) '
@@ -240,38 +232,45 @@ Module FileHandling
     ''' <param name="lbx1"></param>
     Public Sub MoveFiles(files As List(Of String), strDest As String, lbx1 As ListBox)
         Dim ind As Long = lbx1.SelectedIndex
-        'If only one file, then use the filepump
-        If files.Count = 1 And strDest <> "" Then
-            'Try
-            '    FileIO.FileSystem.CopyFile(files(0), strDest & "\" & FileIO.FileSystem.GetName(files(0)), FileIO.UIOption.OnlyErrorDialogs)
-            '    FileIO.FileSystem.DeleteFile(files(0))
-            'Catch ex As Exception
-            'End Try
-            'Build a single filepump
-            lbx1.Items.Remove(files(0))
-            frmMain.tmrPumpFiles.Enabled = True
-            FilePump(files.Item(0) & "|" & strDest, lbx1)
-            lbx1.SelectionMode = SelectionMode.One
-            If lbx1.Items.Count <> 0 Then lbx1.SetSelected(Math.Max(Math.Min(ind, lbx1.Items.Count - 1), 0), True)
-        Else
+        ''If only one file, then use the filepump
+        'If files.Count = 1 And strDest <> "" Then 'TODO This causes Bundle not to work if only one file
+        '    'Try
+        '    '    FileIO.FileSystem.CopyFile(files(0), strDest & "\" & FileIO.FileSystem.GetName(files(0)), FileIO.UIOption.OnlyErrorDialogs)
+        '    '    FileIO.FileSystem.DeleteFile(files(0))
+        '    'Catch ex As Exception
+        '    'End Try
+        '    'Build a single filepump
+        '    lbx1.Items.Remove(files(0))
+        '    MainForm.tmrPumpFiles.Enabled = True
+        '    FilePump(files.Item(0) & "|" & strDest, lbx1)
+        '    lbx1.SelectionMode = SelectionMode.One
+        '    If lbx1.Items.Count <> 0 Then lbx1.SetSelected(Math.Max(Math.Min(ind, lbx1.Items.Count - 1), 0), True)
+        'Else
 
-            Dim s As String = strDest 'if strDest is empty then delete
+        Dim s As String = strDest 'if strDest is empty then delete
 
-            If files.Count > 1 And strDest <> "" Then
-                If Not blnSuppressCreate Then s = CreateNewDirectory(frmMain.tvMain2, strDest, True)
-            End If
-            Dim file As String
-
-            file = MovingFiles(files, strDest, s)
-            lbx1.SelectionMode = SelectionMode.One
-            For Each f In files
-                If NavigateMoveState.State = StateHandler.StateOptions.Move Then
-                    lbx1.Items.Remove(f)
-                End If
-            Next
-            'FillListbox(lbx1, New DirectoryInfo(Media.MediaDirectory), FileboxContents, False)
-            If lbx1.Items.Count <> 0 Then lbx1.SetSelected(Math.Max(Math.Min(ind, lbx1.Items.Count - 1), 0), True)
+        If files.Count > 1 And strDest <> "" Then
+            If Not blnSuppressCreate Then s = CreateNewDirectory(MainForm.tvMain2, strDest, True)
         End If
+        t = New Thread(New ThreadStart(Sub() MovingFiles(files, strDest, s)))
+        t.IsBackground = True
+        t.SetApartmentState(ApartmentState.STA)
+
+        t.Start()
+
+        '  Dim file As String
+
+        ' file = MovingFiles(files, strDest, s)
+        lbx1.SelectionMode = SelectionMode.One
+        For Each f In files
+            If NavigateMoveState.State <> StateHandler.StateOptions.Copy Then
+                lbx1.Items.Remove(f)
+            End If
+        Next
+        '            lbx1.Refresh
+        '  FillListbox(lbx1, New DirectoryInfo(Media.MediaDirectory), FileboxContents, False)
+        If lbx1.Items.Count <> 0 Then lbx1.SetSelected(Math.Max(Math.Min(ind, lbx1.Items.Count - 1), 0), True)
+        'End If
 
 
 
@@ -286,7 +285,7 @@ Module FileHandling
     ''' <param name="s"></param>
     ''' 
     ''' <returns></returns>
-    Private Function MovingFiles(files As List(Of String), strDest As String, s As String) As String
+    Private Sub MovingFiles(files As List(Of String), strDest As String, s As String)
 
         Dim file As String = ""
 
@@ -341,8 +340,7 @@ Module FileHandling
             End With
         Next
 
-        Return file
-    End Function
+    End Sub
     ''' <summary>
     ''' Checks to see if f is in the favourite links, and if so, updates the link. 
     ''' </summary>
@@ -432,7 +430,7 @@ Module FileHandling
     Public Sub CreateNewDirectory(strDir As String)
         AddFolders.Show()
         AddFolders.Folder = strDir
-        frmMain.tvMain2.RefreshTree(strDir)
+        MainForm.tvMain2.RefreshTree(strDir)
 
     End Sub
     Public Function CreateNewDirectory(tv As FileSystemTree, strDest As String, blnAsk As Boolean) As String
@@ -465,12 +463,12 @@ Module FileHandling
     End Function
     Public Sub AddCurrentType(Recurse As Boolean)
         AddFilesToCollection(Showlist, strFilterExtensions(CurrentfilterState.State), Recurse)
-        FillShowbox(frmMain.lbxShowList, FilterHandler.FilterState.All, Showlist)
+        FillShowbox(MainForm.lbxShowList, FilterHandler.FilterState.All, Showlist)
 
     End Sub
     Public Sub Addpics(Recurse As Boolean)
         AddFilesToCollection(Showlist, PICEXTENSIONS, Recurse)
-        FillShowbox(frmMain.lbxShowList, CurrentfilterState.State, Showlist)
+        FillShowbox(MainForm.lbxShowList, CurrentfilterState.State, Showlist)
     End Sub
     Public Sub AddFilesToCollection(ByVal list As List(Of String), extensions As String, blnRecurse As Boolean)
         Dim s As String
@@ -480,11 +478,11 @@ Module FileHandling
         If blnChooseOne Then
         Else
         End If
-        frmMain.Cursor = Cursors.WaitCursor
+        MainForm.Cursor = Cursors.WaitCursor
         ProgressBarOn(1000)
         FindAllFilesBelow(d, list, extensions, False, s, blnRecurse, blnChooseOne)
 
-        frmMain.Cursor = Cursors.Default
+        MainForm.Cursor = Cursors.Default
 
     End Sub
     Public Sub AddSingleFileToList(ByVal list As List(Of String), strPath As String)
@@ -497,8 +495,8 @@ Module FileHandling
             If .FileExists(s) Then
                 Try
                     .DeleteFile(s, FileIO.UIOption.OnlyErrorDialogs, FileIO.RecycleOption.SendToRecycleBin)
-                    If frmMain.lbxFiles.Items.Contains(s) Then
-                        frmMain.lbxFiles.Items.Remove(s)
+                    If MainForm.lbxFiles.Items.Contains(s) Then
+                        MainForm.lbxFiles.Items.Remove(s)
                     End If
                 Catch ex As Exception
                     'Exit Sub
@@ -542,7 +540,7 @@ Module FileHandling
                 End If
                 If blnOneOnly Then Exit For 'Exits each folder when one file has been found matching the condition.
             Catch ex As PathTooLongException
-                MsgBox(ex.Message)
+                ReportFault("FindAllFilesBelow", ex.Message)
             End Try
 
             ProgressIncrement(1)
@@ -582,7 +580,7 @@ Module FileHandling
                 End If
 
             Catch ex As PathTooLongException
-                MsgBox(ex.Message)
+                ReportFault("FindAllFoldersBelow", ex.Message)
             Catch ex As System.UnauthorizedAccessException
                 Continue For
             End Try
@@ -635,7 +633,7 @@ Module FileHandling
             If di.EnumerateDirectories.Count = 0 And di.EnumerateFiles.Count = 0 Then
                 di.Delete()
                 'TODO What to do if node doesn't exist?
-                frmMain.tvMain2.RemoveNode(di.FullName)
+                MainForm.tvMain2.RemoveNode(di.FullName)
                 ProgressIncrement(1)
             End If
 
@@ -698,9 +696,10 @@ Module FileHandling
             Next
         End If
         blnSuppressCreate = True 'Prevent request make folder for plural files
-        MoveFiles(s, Target.FullName, frmMain.lbxFiles)
+        MoveFiles(s, Target.FullName, MainForm.lbxFiles)
         blnSuppressCreate = False
         DeleteEmptyFolders(Directory, True)
+
     End Sub
     Public Sub HarvestFolder(d As DirectoryInfo, Recurse As Boolean)
         If Recurse Then

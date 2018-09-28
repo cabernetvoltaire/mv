@@ -38,7 +38,7 @@ Public Module General
 #Region "Controls"
 
     Public Sub ProgressBarOn(max As Long)
-        With frmMain.TSPB
+        With MainForm.TSPB
             .Value = 0
             .Maximum = max 'Math.Max(lngListSizeBytes, 100)
             .Visible = True
@@ -46,15 +46,15 @@ Public Module General
 
     End Sub
     Public Sub ProgressIncrement(st As Integer)
-        With frmMain.TSPB
+        With MainForm.TSPB
             '   .Maximum = max
             .Value = (.Value + st) Mod .Maximum 'TODO this could be causing the stalling
 
         End With
-        frmMain.Update()
+        MainForm.Update()
     End Sub
     Public Sub ProgressBarOff()
-        With frmMain.TSPB
+        With MainForm.TSPB
             .Visible = False
         End With
 
@@ -267,7 +267,7 @@ Public Module General
         End If
 
         If lbx.Name = "lbxShowList" Then
-            frmMain.CollapseShowlist(False)
+            MainForm.CollapseShowlist(False)
 
         End If
 
@@ -279,7 +279,7 @@ Public Module General
         Next
         '        lbx.TabStop = True
         ProgressBarOff()
-        frmMain.FilterShowBox()
+        'frmMain.FilterShowBox()
 
         'frmMain.UpdateFileInfo()
     End Sub
@@ -292,20 +292,20 @@ Public Module General
 #End Region
 
 
-
+    Public Sub ReportFault(routinename As String, msg As String)
+        MsgBox("Exception in " & routinename & vbCrLf & msg)
+    End Sub
 
     Public Sub ChangeFolder(strPath As String, blnSHow As Boolean)
 
-        If strPath = Media.MediaDirectory Then
 
-        Else
-            If Not LastFolder.Contains(Media.MediaDirectory) Then
-                LastFolder.Push(Media.MediaDirectory)
+        If Not LastFolder.Contains(Media.MediaDirectory) Then
+            LastFolder.Push(Media.MediaDirectory)
 
-            End If
-            Media.MediaDirectory = strPath 'Switch to this folder
-            ' FilterMoveFiles(strPath)
         End If
+        Media.MediaDirectory = strPath 'Switch to this folder
+            ' FilterMoveFiles(strPath)
+            MainForm.FileBox1.FolderPath = Media.MediaDirectory
         ChangeWatcherPath(Media.MediaDirectory)
         ReDim FBCShown(0)
         NofShown = 0
@@ -317,7 +317,7 @@ Public Module General
         If d.Parent Is Nothing Then
         Else
 
-            frmMain.WatchStart(d.Parent.FullName)
+            MainForm.WatchStart(d.Parent.FullName)
         End If
 
 
@@ -404,7 +404,7 @@ Public Module General
 
                 End Select
             Catch ex As System.ArgumentException 'TODO could do better than this. 
-                MsgBox(ex.Message)
+                ReportFault("General.SetPlayOrder", ex.Message)
                 Continue For
             Catch ex As IO.FileNotFoundException
                 Continue For
@@ -423,7 +423,7 @@ Public Module General
 
         End If
 
-        If frmMain.PlayOrder.ReverseOrder Then
+        If MainForm.PlayOrder.ReverseOrder Then
             List = ReverseListOrder(List)
         End If
 
@@ -448,22 +448,12 @@ Public Module General
     ''' <param name="item"></param>
     ''' <param name="lbx"></param>
     ''' <param name="lst"></param>
-    Public Sub RemoveFromListBox(item As String, lbx As ListBox, lst As List(Of String))
-        Exit Sub
-        If item = "" Then Exit Sub
-        Dim s As Integer = lbx.FindString(item)
-        If s = "" Then Exit Sub
-        lbx.SelectedItem = lbx.Items((s) Mod lbx.Items.Count) 'actually an increment, because of 0 start. 
-        lbx.Items.Remove(item)
-        lst.Remove(item)
 
-
-    End Sub
 
     Public Sub MediaAdvance(wmp As AxWMPLib.AxWindowsMediaPlayer, stp As Long)
         wmp.Ctlcontrols.step(stp)
         wmp.Refresh()
-
+        Media.Position = wmp.Ctlcontrols.currentPosition
 
     End Sub
     Public Function LoadImage(fname As String) As Image

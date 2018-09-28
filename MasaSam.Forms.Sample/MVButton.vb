@@ -1,5 +1,6 @@
-﻿Public Class MVButton
-
+﻿Imports System.IO
+Public Class MVButton
+    Public Event LabelChanged(ByVal label As String)
     Private mPath As String
     Public Sub New()
         mPath = ""
@@ -13,7 +14,14 @@
             Return mPath
         End Get
         Set(ByVal value As String)
-            mPath = value
+            If value <> mPath Then
+                Dim m As New IO.DirectoryInfo(value)
+                If m.Exists Then
+                    mPath = value
+                    Label = m.Name
+
+                End If
+            End If
         End Set
     End Property
     Private mFaceText As String
@@ -31,6 +39,7 @@
             Return mlblText
         End Get
         Set(ByVal value As String)
+            If value <> mlblText Then RaiseEvent LabelChanged(value)
             mlblText = value
         End Set
     End Property

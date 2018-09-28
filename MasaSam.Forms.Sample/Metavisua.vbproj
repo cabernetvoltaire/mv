@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{AE2A260B-7821-4E97-A843-D96814954527}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <StartupObject>MasaSam.Forms.Sample.frmMain</StartupObject>
+    <StartupObject>MasaSam.Forms.Sample.MainForm</StartupObject>
     <RootNamespace>MasaSam.Forms.Sample</RootNamespace>
     <AssemblyName>MasaSam.Forms.Sample</AssemblyName>
     <FileAlignment>512</FileAlignment>
@@ -60,6 +60,12 @@
   <PropertyGroup>
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Resources\FileAccess_Alpha_frmMain_Icon1.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Interop.Dsofile">
       <HintPath>C:\DsoFile\Demo\Interop.Dsofile.dll</HintPath>
@@ -112,10 +118,28 @@
     <Compile Include="Attributes.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="ButtonForm.Designer.vb">
+      <DependentUpon>ButtonForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ButtonForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="ButtonSet.vb" />
     <Compile Include="ButtonRow.vb" />
     <Compile Include="DateMove.vb" />
     <Compile Include="Duplicates.vb" />
+    <Compile Include="Explorer1.Designer.vb">
+      <DependentUpon>Explorer1.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Explorer1.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FileBox.Designer.vb">
+      <DependentUpon>FileBox.vb</DependentUpon>
+    </Compile>
+    <Compile Include="FileBox.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="FilePump.vb" />
     <Compile Include="FilterHandler.vb" />
     <Compile Include="Colors.vb" />
@@ -139,13 +163,27 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Grouper.vb" />
+    <Compile Include="GroupingForm.Designer.vb">
+      <DependentUpon>GroupingForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="GroupingForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="ListboxHandler.vb" />
     <Compile Include="MediaHandler.vb" />
+    <Compile Include="Module1.vb" />
     <Compile Include="MVButton.vb" />
+    <Compile Include="My Project\Class1.vb" />
     <Compile Include="OrphanFinder.vb" />
     <Compile Include="RandomHandler.vb" />
     <Compile Include="Settings.vb" />
     <Compile Include="Shortcuts.vb" />
+    <Compile Include="Listform.Designer.vb">
+      <DependentUpon>Listform.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Listform.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="SortHandler.vb" />
     <Compile Include="StartPointHandler.vb" />
     <Compile Include="StateHandler.vb" />
@@ -161,11 +199,11 @@
     <Compile Include="frmFullScreen.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmMain.vb">
+    <Compile Include="MainForm.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmMain.Designer.vb">
-      <DependentUpon>frmMain.vb</DependentUpon>
+    <Compile Include="MainForm.Designer.vb">
+      <DependentUpon>MainForm.vb</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="KeyHandling.vb" />
@@ -210,6 +248,15 @@
     <EmbeddedResource Include="Attributes.resx">
       <DependentUpon>Attributes.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="ButtonForm.resx">
+      <DependentUpon>ButtonForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Explorer1.resx">
+      <DependentUpon>Explorer1.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FileBox.resx">
+      <DependentUpon>FileBox.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FindDuplicates.resx">
       <DependentUpon>FindDuplicates.vb</DependentUpon>
       <SubType>Designer</SubType>
@@ -222,6 +269,12 @@
       <DependentUpon>Form2.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="GroupingForm.resx">
+      <DependentUpon>GroupingForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Listform.resx">
+      <DependentUpon>Listform.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Sublists.resx">
       <DependentUpon>Sublists.vb</DependentUpon>
       <SubType>Designer</SubType>
@@ -230,8 +283,8 @@
       <DependentUpon>frmFullScreen.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmMain.resx">
-      <DependentUpon>frmMain.vb</DependentUpon>
+    <EmbeddedResource Include="MainForm.resx">
+      <DependentUpon>MainForm.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
@@ -248,6 +301,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="My Project\app.manifest" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
     </None>

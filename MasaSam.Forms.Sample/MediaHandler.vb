@@ -47,7 +47,7 @@
         End Get
         Set(ByVal value As Long)
             mPlayPosition = value
-            mPlayer.Ctlcontrols.currentPosition = mPlayPosition
+            '    mPlayer.Ctlcontrols.currentPosition = mPlayPosition
         End Set
     End Property
 
@@ -58,7 +58,15 @@
             Return mDuration
         End Get
     End Property
-
+    Private mFrameRate As Int32
+    Public Property FrameRate() As Int32
+        Get
+            Return mFrameRate
+        End Get
+        Set(ByVal value As Int32)
+            mFrameRate = mPlayer.network.frameRate
+        End Set
+    End Property
     Private mMarkers As List(Of String)
     Public Property Markers() As List(Of String)
         Get
@@ -105,7 +113,10 @@
             Return mMediaDirectory
         End Get
         Set(ByVal value As String)
-            mMediaDirectory = value
+            If value <> mMediaDirectory Then
+                mMediaDirectory = value
+                RaiseEvent MediaChanged(Me, New EventArgs)
+            End If
         End Set
     End Property
     Private Function FindType(file As String) As Filetype

@@ -17,7 +17,7 @@ Public Class AddFolders
             Dim s As String = Folder & "\" & l
             IO.Directory.CreateDirectory(s)
         Next
-        frmMain.tvMain2.RefreshTree(Media.MediaDirectory)
+        MainForm.tvMain2.RefreshTree(Media.MediaDirectory)
     End Sub
 
     Private Sub AddFolders_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing

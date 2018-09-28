@@ -43,7 +43,7 @@
                 Dim img As Image = Image.FromFile(strPath)
                 Return img
             Catch ex As Exception
-                'MsgBox(ex.Message)
+                'Reportfault("",ex.message)
                 Return Nothing
 
             End Try
@@ -83,8 +83,8 @@
 
         End If
         If iScreenstate = Screenstate.Fitted Then
-            frmMain.AdvanceFile(e.Delta < 0, False)
-            frmMain.tmrSlideShow.Enabled = False 'Break slideshow if scrolled
+            MainForm.AdvanceFile(e.Delta < 0, False)
+            MainForm.tmrSlideShow.Enabled = False 'Break slideshow if scrolled
             Dim img As Image = GetImage(Media.MediaPath)
         Else
 
@@ -306,7 +306,7 @@
                 'PlacePic(pbx)
         End Select
         iScreenstate = Sstate
-        frmMain.tsslPicState.Text = "Picture State:" & strScreenState(iScreenstate)
+        MainForm.tsslPicState.Text = "Picture State:" & strScreenState(iScreenstate)
     End Sub
     Public Sub FadeInLabel(lbl As Label)
         lbl.Visible = True

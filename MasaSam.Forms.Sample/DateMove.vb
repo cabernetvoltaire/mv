@@ -16,7 +16,7 @@ Class DateMove
         Minute
 
     End Enum
-    Private SizeNames As String() = {"Size 0- Small", "Size 1-Medium", "Size 2-Large", "Size 3-Very Large", "Size 4-Gigantic", "Size 5-OMG"}
+    Private SizeNames As String() = {"Size 0- Tiny", "Size 1-Small", "Size 2-Medium", "Size 3-Large", "Size 4-Very Large", "Size 5-Gigantic"}
     Public Property Folder() As String
         Get
             Return mFolder

@@ -318,9 +318,7 @@ Public Class FileSystemTree
             End If
         Next
     End Function
-    Public Sub Rename(strPath As String)
 
-    End Sub
 
     Public Sub Expand(ByVal fullPath As String)
         Dim directoryNames As New List(Of String)(fullPath.Split(Path.DirectorySeparatorChar))
@@ -1054,7 +1052,7 @@ Public Class FileSystemTree
     Public Sub tvFiles_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles tvFiles.AfterSelect
         'MsgBox("tvFiles_AfterSelect")
         HighlightSelectedNodes()
-        If e IsNot Nothing Then RaiseEvent DirectorySelected(Me, New DirectoryInfoEventArgs(New DirectoryInfo(NodePath(e))))
+        If e.Node.FullPath <> "" Then RaiseEvent DirectorySelected(Me, New DirectoryInfoEventArgs(New DirectoryInfo(NodePath(e))))
         'RaiseEvent DriveSelected(Me, New DriveInfoEventArgs(New DriveInfo(NodePath(e))))
 
     End Sub
@@ -1161,7 +1159,7 @@ Public Class FileSystemTree
         s = Replace(s, "\\", "\")
         '      RaiseEvent LabelEdited(sender, s)
         If m.FullName <> s Then m.MoveTo(s)
-        Me.RefreshTree()
+        '  Me.RefreshTree()
 
     End Sub
 

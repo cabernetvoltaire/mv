@@ -1,6 +1,6 @@
 ﻿Module ListboxHandler
-    Private WithEvents lbxf As ListBox = frmMain.lbxFiles
-    Private WithEvents lbxs As ListBox = frmMain.lbxShowList
+    Private WithEvents lbxf As ListBox = MainForm.lbxFiles
+    Private WithEvents lbxs As ListBox = MainForm.lbxShowList
     Public Event FileListSelectionChanged()
     Public Event ShowListSelectionChange()
 

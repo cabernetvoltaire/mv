@@ -85,15 +85,15 @@ Public Class Thumbnails
 
         ToolTip1.SetToolTip(pb, pb.Tag)
         Mysettings.Media.MediaPath = pb.Tag
-        frmMain.lbxFiles.SelectionMode = SelectionMode.One
-        frmMain.tmrPicLoad.Enabled = True
+        MainForm.lbxFiles.SelectionMode = SelectionMode.One
+        MainForm.tmrPicLoad.Enabled = True
 
     End Sub
     Private Sub pb_Click(sender As Object, e As EventArgs)
         Dim pb = DirectCast(sender, PictureBox)
         pb.Visible = False
         pb.Enabled = False
-        frmMain.HandleKeys(frmMain, New KeyEventArgs(KeyDelete))
+        MainForm.HandleKeys(MainForm, New KeyEventArgs(KeyDelete))
 
     End Sub
     Public Function ThumbnailCallback() As Boolean
