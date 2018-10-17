@@ -7,13 +7,10 @@ Module MovieHandler
     Public Property NewPosition As Long
     Public Property FromFinish As Long = 65
     Public Sub MediaJumpToMarker()
-        Static LastTriggered As DateTime
-        '  If (Now() - LastTriggered).TotalMilliseconds > 200 Then
 
-        'Jumps to lMediaMarker unless not set, in which case, jumps to current startpoint
         If MediaMarker <> 0 Then
-                NewPosition = MediaMarker
-            Else
+            NewPosition = MediaMarker
+        Else
             NewPosition = MainForm.StartPoint.StartPoint
 
 
@@ -23,7 +20,6 @@ Module MovieHandler
             MainForm.tmrJumpVideo.Enabled = True
         'Else
         'End If
-        LastTriggered = Now
 
     End Sub
     Public Sub PlaystateChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent)
@@ -42,25 +38,24 @@ Module MovieHandler
                 End If
                 MediaDuration = currentWMP.currentMedia.duration
                 MainForm.StartPoint.Duration = MediaDuration
-                MainForm.SoundWMP.settings.mute = True
+                MainForm.SwitchSound(False)
 
-                If FullScreen.Changing Then
+                If FullScreen.Changing Then 'Hold current position if switching to FS or back. 
                     NewPosition = currentWMP.Ctlcontrols.currentPosition
                     MainForm.tmrJumpVideo.Enabled = True
                 Else
+
                     MediaJumpToMarker()
 
                 End If
                 '  GetAttributes(sender)
                 Justpaused = False
             Case WMPLib.WMPPlayState.wmppsPaused
+                '                MediaJumpToMarker()
 
                 If MainForm.tmrSlowMo.Enabled Then
                     Justpaused = False
-                    With MainForm.SoundWMP
-                        .URL = currentWMP.URL
-                        .settings.mute = False
-                    End With
+                    MainForm.SwitchSound(True)
 
                 Else
 

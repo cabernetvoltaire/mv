@@ -10,7 +10,7 @@ Module FileHandling
     Public Random As RandomHandler = MainForm.Random
     Public NavigateMoveState As StateHandler = MainForm.NavigateMoveState
     Public FilePumpList As New List(Of String)
-    Public FP As New FilePump
+    ' Public FP As New FilePump
     Public Event FolderMoved(Path As String)
     Public t As Thread
 
@@ -59,6 +59,8 @@ Module FileHandling
                     lbx.SelectedIndex = lbx.FindString(Media.MediaPath)
                     If lbx.SelectedIndex = -1 Then lbx.SelectedIndex = 0
                 End If
+            Else
+                'MainForm.CancelDisplay()
             End If
 
         Catch ex As ArgumentException
@@ -625,19 +627,19 @@ Module FileHandling
     End Function
     Public Function DeleteEmptyFolders(d As DirectoryInfo, blnRecurse As Boolean) As Boolean
 
+        If blnRecurse Then
+            For Each di In d.EnumerateDirectories
 
+                DeleteEmptyFolders(di, True)
+            Next
+        End If
+        If d.EnumerateDirectories.Count = 0 And d.EnumerateFiles.Count = 0 Then
+            Dim s As String = d.Parent.FullName
+            d.Delete()
+            MainForm.tvMain2.RemoveNode(d.FullName)
+            MainForm.tvMain2.RefreshTree(s)
+        End If
 
-        For Each di In d.EnumerateDirectories
-            ProgressBarOn(d.EnumerateDirectories.Count)
-            If blnRecurse Then DeleteEmptyFolders(di, True)
-            If di.EnumerateDirectories.Count = 0 And di.EnumerateFiles.Count = 0 Then
-                di.Delete()
-                'TODO What to do if node doesn't exist?
-                MainForm.tvMain2.RemoveNode(di.FullName)
-                ProgressIncrement(1)
-            End If
-
-        Next
 
         Return True
     End Function
@@ -680,14 +682,13 @@ Module FileHandling
     ''' <param name="Target"></param>
     ''' <param name="Recurse"></param>
     Public Sub HarvestFolder(Directory As DirectoryInfo, Target As DirectoryInfo, Recurse As Boolean)
-        'HarvestFolder(d, blnRecurse)
-        'Exit Sub
+        HarvestFolder(Directory, Recurse, False)
+        Exit Sub
         Dim i
         i = InputBox("Harvest folders with no more than how many files in?")
         If i = "" Then i = 0
 
         Dim s As New List(Of String) '= Nothing
-        ' s.Add("Test")
         s = AppendToListFromFolder(s, Directory, i)
 
         If Recurse Then
@@ -701,16 +702,33 @@ Module FileHandling
         DeleteEmptyFolders(Directory, True)
 
     End Sub
-    Public Sub HarvestFolder(d As DirectoryInfo, Recurse As Boolean)
+    Public Sub HarvestBelow(d As DirectoryInfo)
+        For Each di In d.EnumerateDirectories
+            BurstFolder(di)
+        Next
+    End Sub
+    Public Sub HarvestFolder(d As DirectoryInfo, Recurse As Boolean, Parent As Boolean)
         If Recurse Then
 
             For Each di In d.EnumerateDirectories
-                HarvestFolder(di, Recurse)
+                HarvestFolder(di, Recurse, Parent)
             Next
         End If
         blnSuppressCreate = True
+        Dim LIST As List(Of String)
+
         For Each f In d.EnumerateFiles
-            f.MoveTo(Media.MediaDirectory & "\" & f.Name)
+
+            If Parent Then
+                Dim m As String = d.Parent.FullName & "\" & f.Name
+                Dim fi As New FileInfo(m)
+                If fi.Exists Then
+                Else
+                    f.MoveTo(m)
+                End If
+            Else
+                f.MoveTo(Media.MediaDirectory & "\" & f.Name)
+            End If
         Next
         DeleteEmptyFolders(d, True)
     End Sub
@@ -734,7 +752,7 @@ Module FileHandling
     End Function
 
     Public Sub BurstFolder(d As DirectoryInfo)
-        HarvestFolder(d, d.Parent, True)
+        HarvestFolder(d, True, True)
     End Sub
 
 End Module

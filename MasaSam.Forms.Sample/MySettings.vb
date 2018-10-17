@@ -1,5 +1,5 @@
 ﻿
-Public Module Mysettings
+Friend Module Mysettings
 
 
     Public PFocus As Byte = CtrlFocus.Tree
@@ -7,18 +7,15 @@ Public Module Mysettings
     Public Const OrientationId As Integer = &H112
     Public currentWMP As New AxWMPLib.AxWindowsMediaPlayer
     Public WithEvents Media As New MediaHandler
-    'Public WithEvents NavigateMoveState As New StateHandler
-    'Public WithEvents CurrentFilterState As New FilterHandler
-    'Public WithEvents PlayOrder As New SortHandler
-    'Public WithEvents StartPoint As New StartPointHandler
-    'Public WithEvents Random As New RandomHandler
+
+    Public LastPlayed As New Stack(Of String)
+    Public LastFolder As New Stack(Of String)
+
 #Region "Options"
 
     Public iSSpeeds() As Integer = {1000, 300, 200}
     Public iPlaybackSpeed() As Integer = {3, 15, 45}
 
-    Public LastPlayed As New Stack(Of String)
-    Public LastFolder As New Stack(Of String)
     Public Property LastShowList As String
     Public Property blnJumpToMark As Boolean = False
     Public blnLoopPlay As Boolean = True
@@ -105,8 +102,9 @@ Public Module Mysettings
 
     End Sub
     Public Sub OnMediaChanged(sender As Object, e As EventArgs) Handles Media.MediaChanged
-
-        ChangeFolder(Media.MediaDirectory, True)
+        ChangeWatcherPath(Media.MediaDirectory)
+        ChangeFolder(Media.MediaDirectory)
+        MainForm.UpdateFileInfo()
 
     End Sub
 

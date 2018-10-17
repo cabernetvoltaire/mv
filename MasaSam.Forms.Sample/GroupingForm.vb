@@ -2,6 +2,8 @@
 Public Class GroupingForm
     Private mFolderPath As String
     Private mFolder As IO.DirectoryInfo
+    Private mFewest As Int16 = 3
+    Private mMost As Int16 = 20
     Public Property FolderPath() As String
         Get
             Return mFolderPath
@@ -9,19 +11,13 @@ Public Class GroupingForm
         Set(ByVal value As String)
             mFolderPath = value
             mFolder = New IO.DirectoryInfo(mFolderPath)
-            MakeList(mFolder.EnumerateFiles, 3, 20)
+            MakeList(mFolder.EnumerateFiles)
             '            Subgroups(x.EnumerateFiles, 13)
         End Set
     End Property
-    Public Property Min As Integer = 3
-    Public Property Max As Integer = 20
-    Private Property Starts As New List(Of String)
-    Private Sub Subgroups(SearchList As IEnumerable(Of IO.FileInfo), length As Integer)
-        'Make list of different start strings of given length '
-        ListStarts(SearchList, length)
-        CreateRow(SearchList)
 
-    End Sub
+    Private Property Starts As New List(Of String)
+
 
     'List all the starts of length MAXLENGTH, and count the number of each
     'For each start which has a count smaller than MINCOUNT, make a new start of length one shorter and repeat
@@ -31,18 +27,20 @@ Public Class GroupingForm
     '
     'Reduce the length by 1 and repeat
 
-    Private Sub MakeList(Slist As IEnumerable(Of IO.FileInfo), mincount As Integer, maxcount As Integer)
+    Private Sub MakeList(Slist As IEnumerable(Of IO.FileInfo))
         Dim check As String = ""
         Dim count As Integer = 1
         Dim total As Integer
+        DataGridView1.Rows.Clear()
+        Starts.Clear()
 
         For i = 40 To 1 Step -1
             For Each s In Slist
                 If LCase(Strings.Left(s.Name, i)) <> LCase(check) Then
                     'Check changed
-                    If count >= mincount And count <= maxcount Then
+                    If count >= mFewest And count <= mMost Then
                         Dim val As String = Starts.Find(Function(value As String)
-                                                            Return InStr(lcase(value), lcase(check)) <> 0
+                                                            Return InStr(LCase(value), LCase(check)) <> 0
                                                         End Function)
 
                         If val <> "" Then
@@ -65,39 +63,17 @@ Public Class GroupingForm
         DataGridView1.Rows.Add(New String() {"TOTAL", total})
 
     End Sub
-    Private Sub CreateDirectories()
-        For Each row In DataGridView1.Rows
-            Dim x As String = row(0)
 
-        Next
-    End Sub
 
-    Private Sub ListStarts(SearchList As IEnumerable(Of IO.FileInfo), length As Integer)
-        Starts.Clear()
-        Dim check As String = ""
-        For Each s In SearchList
-            If LCase(Strings.Left(s.Name, length)) <> LCase(check) Then
-                check = Strings.Left(s.Name, length)
-                If CountStarters(SearchList, check) > Min Then
-                    Starts.Add(check)
-                Else
-
-                End If
-            End If
-        Next
-    End Sub
-    Private Sub CreateRow(list As IEnumerable(Of IO.FileInfo))
-        For Each s In Starts
-            Dim m As Integer = (CountStarters(list, s))
-            DataGridView1.Rows.Add(New String() {s, m})
-        Next
-
-    End Sub
     Private Sub GroupingForm_Load(sender As Object, e As EventArgs) Handles Me.Load
         FolderPath = Media.MediaDirectory
     End Sub
 
-    Private Sub GroupingForm_Closed(sender As Object, e As EventArgs) Handles Me.Closed
+
+
+
+
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
         For Each row In DataGridView1.Rows
             If row.Equals(DataGridView1.Rows(DataGridView1.Rows.Count - 1)) Then Exit For
             Dim m As String = row.Cells(0).Value.ToString
@@ -114,16 +90,28 @@ Public Class GroupingForm
                 End If
             Next
         Next
-
+        MainForm.tvMain2.RefreshTree(Me.FolderPath)
+        Me.Close()
     End Sub
 
-    Private Function CountStarters(Slist As IEnumerable(Of IO.FileInfo), start As String) As Integer
-        Dim count As Integer
-        For Each m In Slist
-            If m.Name.StartsWith(start) Then
-                count += 1
-            End If
-        Next
-        Return count
-    End Function
+    Private Sub TextBox1_TextChanged(sender As Object, e As EventArgs) Handles TextBox1.TextChanged
+        Try
+            If TextBox1.Text <> "" Then mFewest = Val(TextBox1.Text)
+            MakeList(mFolder.EnumerateFiles)
+
+        Catch ex As Exception
+
+            'MakeList(mFolder.EnumerateFiles, mFewest, mMost)
+        End Try
+    End Sub
+
+    Private Sub TextBox2_TextChanged(sender As Object, e As EventArgs) Handles TextBox2.TextChanged
+        Try
+            If TextBox2.Text <> "" Then mMost = Val(TextBox2.Text)
+            MakeList(mFolder.EnumerateFiles)
+
+        Catch ex As Exception
+            'MakeList(mFolder.EnumerateFiles, mFewest, mMost)
+        End Try
+    End Sub
 End Class

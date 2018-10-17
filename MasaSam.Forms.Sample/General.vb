@@ -296,21 +296,20 @@ Public Module General
         MsgBox("Exception in " & routinename & vbCrLf & msg)
     End Sub
 
-    Public Sub ChangeFolder(strPath As String, blnSHow As Boolean)
+    Public Sub ChangeFolder(strPath As String)
+        If strPath = Media.MediaDirectory Then
+        Else
+            If Not LastFolder.Contains(Media.MediaDirectory) Then
+                LastFolder.Push(Media.MediaDirectory)
 
-
-        If Not LastFolder.Contains(Media.MediaDirectory) Then
-            LastFolder.Push(Media.MediaDirectory)
-
+            End If
+            Media.MediaDirectory = strPath 'Switch to this folder
+            ChangeWatcherPath(Media.MediaDirectory)
+            ReDim FBCShown(0)
+            NofShown = 0
+            My.Computer.Registry.CurrentUser.SetValue("File", Media.MediaPath)
         End If
-        Media.MediaDirectory = strPath 'Switch to this folder
-            ' FilterMoveFiles(strPath)
-            MainForm.FileBox1.FolderPath = Media.MediaDirectory
-        ChangeWatcherPath(Media.MediaDirectory)
-        ReDim FBCShown(0)
-        NofShown = 0
-        My.Computer.Registry.CurrentUser.SetValue("File", Media.MediaPath)
-        'frmMain.SetControlColours(blnMoveMode)
+
     End Sub
     Public Sub ChangeWatcherPath(path As String)
         Dim d As New DirectoryInfo(path)
@@ -325,13 +324,13 @@ Public Module General
 
 
     Public Sub MouseHoverInfo(lbx As ListBox, tt As ToolTip)
-        Dim cc, sc As Point
-        cc = New Point
-        sc = New Point
-        sc = lbx.MousePosition()
-        cc = lbx.PointToClient(sc)
-        Dim i As Int32 = lbx.IndexFromPoint(cc)
-        If i >= 0 AndAlso i < lbx.Items.Count - 1 Then tt.SetToolTip(lbx, New FileInfo(lbx.Items(i)).Length)
+        'Dim cc, sc As Point
+        'cc = New Point
+        'sc = New Point
+        'sc = lbx.MousePosition()
+        'cc = lbx.PointToClient(sc)
+        'Dim i As Int32 = lbx.IndexFromPoint(cc)
+        'If i >= 0 AndAlso i < lbx.Items.Count - 1 Then tt.SetToolTip(lbx, New FileInfo(lbx.Items(i)).Length)
     End Sub
     Public Function SetPlayOrder(Order As Byte, ByVal List As List(Of String)) As List(Of String)
         Dim NewListS As New SortedList(Of String, String)
@@ -442,12 +441,7 @@ Public Module General
         If time3 < time Then time = time3
         Return time
     End Function
-    ''' <summary>
-    ''' Removes an item from a listbox, and its associated list, advances selected to next. 
-    ''' </summary>
-    ''' <param name="item"></param>
-    ''' <param name="lbx"></param>
-    ''' <param name="lst"></param>
+
 
 
     Public Sub MediaAdvance(wmp As AxWMPLib.AxWindowsMediaPlayer, stp As Long)
@@ -492,13 +486,7 @@ Public Module General
         Next
         Return ls
     End Function
-    Public Function SelectOnWord(lbx As ListBox) As List(Of String)
-        Dim ls As New List(Of String)
-        For Each s In lbx.Items
-            Dim r As New Text.RegularExpressions.Regex(s)
-            'r.Match()
-        Next
-    End Function
+
     Public Sub HighlightList(lbx As ListBox, ls As List(Of String))
         lbx.SelectedItems.Clear()
         lbx.Refresh()

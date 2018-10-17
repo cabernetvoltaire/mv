@@ -40,11 +40,20 @@
 
                 Else
                     Dim s As String = buttons.CurrentRow.Row(e.KeyCode - Keys.F5).Path
-                    If s <> "" Then Media.MediaDirectory = s
+                    If s <> "" Then
+                        Media.MediaDirectory = s
+                    Else
+                        Exit Sub
+                    End If
+                    ChangeFolder(s)
+                    'CancelDisplay()
+                    MainForm.tvMain2.SelectedFolder = Media.MediaDirectory
                 End If
 
-            Case Else
+            Case Keys.A To Keys.Z, Keys.D0 To Keys.D9
                 buttons.CurrentLetter = e.KeyCode
+            Case Else
+                MainForm.frmMain_KeyDown(sender, e)
 
         End Select
 

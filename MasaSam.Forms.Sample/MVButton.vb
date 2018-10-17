@@ -14,7 +14,7 @@ Public Class MVButton
             Return mPath
         End Get
         Set(ByVal value As String)
-            If value <> mPath Then
+            If value <> mPath And value <> "" Then
                 Dim m As New IO.DirectoryInfo(value)
                 If m.Exists Then
                     mPath = value

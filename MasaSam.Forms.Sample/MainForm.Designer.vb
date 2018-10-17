@@ -51,9 +51,6 @@ Partial Class MainForm
         Me.RecursiveToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.BundleToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.BurstFolderToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.PromoteFolderToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.FilterMoveToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.FilterMoveRecursiveToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.FilterToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ByMonthToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ByDateToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -61,6 +58,9 @@ Partial Class MainForm
         Me.ByTimeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.BySizeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ByNameToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.PromoteFolderToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.FilterMoveToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.FilterMoveRecursiveToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.OptionsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToggleRandomSelectToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToggleRandomAdvanceToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -80,6 +80,13 @@ Partial Class MainForm
         Me.RegexSearchToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ShowlistToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ButtonFormToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItem2 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItem3 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItem4 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItem5 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItem6 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItem7 = New System.Windows.Forms.ToolStripMenuItem()
         Me.FileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.NewToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.OpenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -251,7 +258,7 @@ Partial Class MainForm
         'MenuStrip1
         '
         Me.MenuStrip1.ImageScalingSize = New System.Drawing.Size(28, 28)
-        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ButtonFilesToolStripMenuItem, Me.ListsToolStripMenuItem, Me.FullScreenToolStripMenuItem1, Me.AssignButtonsToolStripMenuItem, Me.HarvestFolderToolStripMenuItem, Me.OptionsToolStripMenuItem, Me.DuplicatesToolStripMenuItem, Me.SearchFunctionsToolStripMenuItem, Me.ShowlistToolStripMenuItem, Me.ButtonFormToolStripMenuItem})
+        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ButtonFilesToolStripMenuItem, Me.ListsToolStripMenuItem, Me.FullScreenToolStripMenuItem1, Me.AssignButtonsToolStripMenuItem, Me.HarvestFolderToolStripMenuItem, Me.OptionsToolStripMenuItem, Me.DuplicatesToolStripMenuItem, Me.SearchFunctionsToolStripMenuItem, Me.ShowlistToolStripMenuItem, Me.ButtonFormToolStripMenuItem, Me.ToolStripMenuItem1})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
         Me.MenuStrip1.Size = New System.Drawing.Size(2358, 38)
@@ -414,7 +421,7 @@ Partial Class MainForm
         '
         'HarvestFolderToolStripMenuItem
         '
-        Me.HarvestFolderToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.DeleteEmptyFoldersToolStripMenuItem, Me.HarvestFoldersToolStripMenuItem, Me.BundleToolStripMenuItem, Me.BurstFolderToolStripMenuItem, Me.PromoteFolderToolStripMenuItem, Me.FilterMoveToolStripMenuItem, Me.FilterMoveRecursiveToolStripMenuItem, Me.FilterToolStripMenuItem})
+        Me.HarvestFolderToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.DeleteEmptyFoldersToolStripMenuItem, Me.HarvestFoldersToolStripMenuItem, Me.BundleToolStripMenuItem, Me.BurstFolderToolStripMenuItem, Me.FilterToolStripMenuItem, Me.PromoteFolderToolStripMenuItem, Me.FilterMoveToolStripMenuItem, Me.FilterMoveRecursiveToolStripMenuItem})
         Me.HarvestFolderToolStripMenuItem.Name = "HarvestFolderToolStripMenuItem"
         Me.HarvestFolderToolStripMenuItem.Size = New System.Drawing.Size(157, 34)
         Me.HarvestFolderToolStripMenuItem.Text = "&Folder Actions"
@@ -461,24 +468,6 @@ Partial Class MainForm
         Me.BurstFolderToolStripMenuItem.Size = New System.Drawing.Size(426, 34)
         Me.BurstFolderToolStripMenuItem.Text = "Burst Folder"
         '
-        'PromoteFolderToolStripMenuItem
-        '
-        Me.PromoteFolderToolStripMenuItem.Name = "PromoteFolderToolStripMenuItem"
-        Me.PromoteFolderToolStripMenuItem.Size = New System.Drawing.Size(426, 34)
-        Me.PromoteFolderToolStripMenuItem.Text = "Promote Folder"
-        '
-        'FilterMoveToolStripMenuItem
-        '
-        Me.FilterMoveToolStripMenuItem.Name = "FilterMoveToolStripMenuItem"
-        Me.FilterMoveToolStripMenuItem.Size = New System.Drawing.Size(426, 34)
-        Me.FilterMoveToolStripMenuItem.Text = "Filter &Move"
-        '
-        'FilterMoveRecursiveToolStripMenuItem
-        '
-        Me.FilterMoveRecursiveToolStripMenuItem.Name = "FilterMoveRecursiveToolStripMenuItem"
-        Me.FilterMoveRecursiveToolStripMenuItem.Size = New System.Drawing.Size(426, 34)
-        Me.FilterMoveRecursiveToolStripMenuItem.Text = "Filter Move Recursive"
-        '
         'FilterToolStripMenuItem
         '
         Me.FilterToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ByMonthToolStripMenuItem, Me.ByDateToolStripMenuItem, Me.ByYearToolStripMenuItem, Me.ByTimeToolStripMenuItem, Me.BySizeToolStripMenuItem, Me.ByNameToolStripMenuItem})
@@ -521,6 +510,24 @@ Partial Class MainForm
         Me.ByNameToolStripMenuItem.Name = "ByNameToolStripMenuItem"
         Me.ByNameToolStripMenuItem.Size = New System.Drawing.Size(194, 34)
         Me.ByNameToolStripMenuItem.Text = "By Name"
+        '
+        'PromoteFolderToolStripMenuItem
+        '
+        Me.PromoteFolderToolStripMenuItem.Name = "PromoteFolderToolStripMenuItem"
+        Me.PromoteFolderToolStripMenuItem.Size = New System.Drawing.Size(426, 34)
+        Me.PromoteFolderToolStripMenuItem.Text = "Promote Folder"
+        '
+        'FilterMoveToolStripMenuItem
+        '
+        Me.FilterMoveToolStripMenuItem.Name = "FilterMoveToolStripMenuItem"
+        Me.FilterMoveToolStripMenuItem.Size = New System.Drawing.Size(426, 34)
+        Me.FilterMoveToolStripMenuItem.Text = "Filter &Move"
+        '
+        'FilterMoveRecursiveToolStripMenuItem
+        '
+        Me.FilterMoveRecursiveToolStripMenuItem.Name = "FilterMoveRecursiveToolStripMenuItem"
+        Me.FilterMoveRecursiveToolStripMenuItem.Size = New System.Drawing.Size(426, 34)
+        Me.FilterMoveRecursiveToolStripMenuItem.Text = "Filter Move Recursive"
         '
         'OptionsToolStripMenuItem
         '
@@ -668,6 +675,49 @@ Partial Class MainForm
         Me.ButtonFormToolStripMenuItem.Name = "ButtonFormToolStripMenuItem"
         Me.ButtonFormToolStripMenuItem.Size = New System.Drawing.Size(134, 34)
         Me.ButtonFormToolStripMenuItem.Text = "ButtonForm"
+        '
+        'ToolStripMenuItem1
+        '
+        Me.ToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem2, Me.ToolStripMenuItem3, Me.ToolStripMenuItem4, Me.ToolStripMenuItem5, Me.ToolStripMenuItem6, Me.ToolStripMenuItem7})
+        Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
+        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(97, 34)
+        Me.ToolStripMenuItem1.Text = "&Group..."
+        '
+        'ToolStripMenuItem2
+        '
+        Me.ToolStripMenuItem2.Name = "ToolStripMenuItem2"
+        Me.ToolStripMenuItem2.Size = New System.Drawing.Size(194, 34)
+        Me.ToolStripMenuItem2.Text = "By &Month"
+        '
+        'ToolStripMenuItem3
+        '
+        Me.ToolStripMenuItem3.Name = "ToolStripMenuItem3"
+        Me.ToolStripMenuItem3.Size = New System.Drawing.Size(194, 34)
+        Me.ToolStripMenuItem3.Text = "By &Date"
+        '
+        'ToolStripMenuItem4
+        '
+        Me.ToolStripMenuItem4.Name = "ToolStripMenuItem4"
+        Me.ToolStripMenuItem4.Size = New System.Drawing.Size(194, 34)
+        Me.ToolStripMenuItem4.Text = "By &Year"
+        '
+        'ToolStripMenuItem5
+        '
+        Me.ToolStripMenuItem5.Name = "ToolStripMenuItem5"
+        Me.ToolStripMenuItem5.Size = New System.Drawing.Size(194, 34)
+        Me.ToolStripMenuItem5.Text = "By &Time"
+        '
+        'ToolStripMenuItem6
+        '
+        Me.ToolStripMenuItem6.Name = "ToolStripMenuItem6"
+        Me.ToolStripMenuItem6.Size = New System.Drawing.Size(194, 34)
+        Me.ToolStripMenuItem6.Text = "By &Size"
+        '
+        'ToolStripMenuItem7
+        '
+        Me.ToolStripMenuItem7.Name = "ToolStripMenuItem7"
+        Me.ToolStripMenuItem7.Size = New System.Drawing.Size(194, 34)
+        Me.ToolStripMenuItem7.Text = "By Name"
         '
         'FileToolStripMenuItem
         '
@@ -1737,7 +1787,7 @@ Partial Class MainForm
         '
         'tmrUpdateFileList
         '
-        Me.tmrUpdateFileList.Enabled = True
+        Me.tmrUpdateFileList.Interval = 500
         '
         'tmrPicLoad
         '
@@ -2033,10 +2083,6 @@ Partial Class MainForm
     Friend WithEvents lblAttributes As Label
     Friend WithEvents Button2 As Button
     Friend WithEvents Button3 As Button
-    Friend WithEvents FilterToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents ByYearToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents ByMonthToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents ByDateToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents Label4 As Label
     Friend WithEvents SoundWMP As AxWMPLib.AxWindowsMediaPlayer
     Friend WithEvents ReclaimDeadLinksToolStripMenuItem As ToolStripMenuItem
@@ -2046,8 +2092,6 @@ Partial Class MainForm
     Friend WithEvents TrackBar2 As TrackBar
     Friend WithEvents TrackBar1 As TrackBar
     Friend WithEvents RecursiveToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents ByTimeToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents BySizeToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents FileBox1 As FileBox
     Friend WithEvents ShowlistToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ButtonFormToolStripMenuItem As ToolStripMenuItem
@@ -2058,5 +2102,18 @@ Partial Class MainForm
     Friend WithEvents SaveListToolStripMenuItem1 As ToolStripMenuItem
     Friend WithEvents LoadListToolStripMenuItem1 As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator5 As ToolStripSeparator
+    Friend WithEvents FilterToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ByMonthToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ByDateToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ByYearToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ByTimeToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents BySizeToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ByNameToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItem1 As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItem2 As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItem3 As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItem4 As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItem5 As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItem6 As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItem7 As ToolStripMenuItem
 End Class

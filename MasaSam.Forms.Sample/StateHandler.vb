@@ -60,7 +60,7 @@
 
     End Sub
     Public Sub IncrementState()
-        Me.State = (Me.State + 1) Mod (StateOptions.CopyLink)
+        Me.State = (Me.State + 1) Mod (StateOptions.CopyLink + 1)
     End Sub
 End Class
 

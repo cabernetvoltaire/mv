@@ -1,16 +1,17 @@
 ﻿Public Class FilterHandler
     Public Enum FilterState As Byte
         All
+        PicVid
+
         Piconly
         Vidonly
-        PicVid
         LinkOnly
         NoPicVid
     End Enum
 
     Public Event StateChanged(sender As Object, e As EventArgs)
     Private mColour = {Color.MintCream, Color.LemonChiffon, Color.LightPink, Color.LightSeaGreen, Color.LightBlue, Color.PaleTurquoise}
-    Private mDescription = {"All files", "Only pictures", "Only videos", "Only pictures and videos", "Only links", "No pictures or videos"}
+    Private mDescription = {"All files", "Only pictures and videos", "Only pictures", "Only videos", "Only links", "No pictures or videos"}
     Public ReadOnly Property Colour() As Color
         Get
             Return mColour(mState)

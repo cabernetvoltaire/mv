@@ -15,7 +15,9 @@ Class DateMove
         Hour
         Minute
 
+
     End Enum
+    Private MonthNames As String() = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
     Private SizeNames As String() = {"Size 0- Tiny", "Size 1-Small", "Size 2-Medium", "Size 3-Large", "Size 4-Very Large", "Size 5-Gigantic"}
     Public Property Folder() As String
         Get
@@ -57,16 +59,21 @@ Class DateMove
                     Case DMY.Day
                         i = .Day
 
+
                     Case DMY.Hour
                         i = .Hour
                     Case DMY.Minute
                         i = .Minute
                 End Select
             End With
+            Dim folname As String = Str(i)
+            If Choice = DMY.Month Then
+                folname = MonthName(i)
+            End If
             'If f.Directory.EnumerateDirectories(Str(i)) Is Nothing Then
-            f.Directory.CreateSubdirectory(Str(i) & "\")
+            f.Directory.CreateSubdirectory(folname & "\")
             'End If
-            f.MoveTo(f.DirectoryName & "\" & Str(i) & "\" & f.Name)
+            f.MoveTo(f.DirectoryName & "\" & folname & "\" & f.Name)
         Next
         RaiseEvent FilesMoved(Nothing, Nothing)
 

@@ -83,8 +83,10 @@
             Return mMediaPath
         End Get
         Set(ByVal value As String)
+            'If path changes, we need to check it exists, and if so, change stored directory as well, 
+            'And raise a media changed event. 
             Dim b As String = mMediaPath
-            If value <> "" Then
+            If value <> "" And value <> mMediaPath Then
                 Dim f As New IO.FileInfo(value)
                 If f.Exists Then
                     mMediaPath = value
