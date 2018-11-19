@@ -1,6 +1,6 @@
 ﻿Imports System.IO
-Imports MasaSam.Forms.Controls
 Imports System.Threading
+Imports MasaSam.Forms.Controls
 Module FileHandling
     Public blnSuppressCreate As Boolean = False
     Public blnChooseOne As Boolean = False
@@ -13,6 +13,7 @@ Module FileHandling
     ' Public FP As New FilePump
     Public Event FolderMoved(Path As String)
     Public t As Thread
+    Public fm As New FavouritesMinder(FavesFolderPath)
 
     Dim strFilterExtensions(6) As String
     Public Sub AssignExtensionFilters()
@@ -31,7 +32,11 @@ Module FileHandling
     ''' <param name="e"></param>
     ''' <param name="flist"></param>
     ''' <param name="blnRandom"></param>
-    Public Sub FillListbox(lbx As ListBox, e As IO.DirectoryInfo, ByVal flist As List(Of String), blnRandom As Boolean)
+    Public Sub FillListbox(lbx As ListBox, e As DirectoryInfo, blnRandom As Boolean)
+        Dim flist As New List(Of String)
+        For Each m In e.GetFiles
+            flist.Add(m.FullName)
+        Next
         If Not e.Exists Then Exit Sub
         If e.Name = "My Computer" Then Exit Sub
 
@@ -46,6 +51,8 @@ Module FileHandling
         Try
             FilterListBox(e, flist)
             flist = SetPlayOrder(MainForm.PlayOrder.State, flist)
+
+            MainForm.FNG.Filenames = flist
             FillShowbox(lbx, MainForm.CurrentFilterState.State, flist)
 
             lbx.Tag = e
@@ -63,8 +70,6 @@ Module FileHandling
                 'MainForm.CancelDisplay()
             End If
 
-        Catch ex As ArgumentException
-            MsgBox(ex.ToString)
         Catch ex As IOException
             Exit Try
         End Try
@@ -201,12 +206,14 @@ Module FileHandling
                     Case StateHandler.StateOptions.Copy
                         .CopyDirectory(strDir, strDest & "\" & s, FileIO.UIOption.OnlyErrorDialogs)
                     Case StateHandler.StateOptions.Move
-                        Dim flist As FileInfo() = dir.GetFiles()
+                        Dim flist As New List(Of String)
+                        GetFiles(dir, flist)
+
+                        fm.DestinationPath = strDest
+                        fm.CheckFiles(flist)
+
                         .MoveDirectory(strDir, strDest & "\" & s, FileIO.UIOption.OnlyErrorDialogs)
 
-                        For Each x In flist
-                            Movelink(x, strDest & "\" & s & "\" & x.Name)
-                        Next
 
                     Case StateHandler.StateOptions.MoveLeavingLink
                         'Create link directory?
@@ -224,6 +231,14 @@ Module FileHandling
 
     End Sub
 
+    Private Sub GetFiles(dir As DirectoryInfo, flist As List(Of String))
+        For Each m In dir.EnumerateFiles()
+            flist.Add(m.FullName)
+        Next
+        For Each x In dir.EnumerateDirectories
+            GetFiles(x, flist)
+        Next
+    End Sub
 
 
     ''' <summary>
@@ -292,6 +307,8 @@ Module FileHandling
         Dim file As String = ""
 
         For Each file In files
+            If Media.Player.URL = file Then Media.Player.URL = ""
+
             Dim m As New FileInfo(file)
             With My.Computer.FileSystem
                 Dim i As Long = 0
@@ -324,8 +341,11 @@ Module FileHandling
 
                         Else
                             Dim f As New IO.FileInfo(m.FullName)
+
+                            fm.DestinationPath = spath
+                            fm.CheckFile(f)
                             m.MoveTo(spath)
-                            Movelink(f, spath)
+                            '    Movelink(f, spath)
 
                         End If
                     Case StateHandler.StateOptions.MoveLeavingLink
@@ -363,12 +383,12 @@ Module FileHandling
         End If
     End Sub
 
-    Public Sub MoveFiles(filendest As List(Of String), lbx1 As ListBox)
+    Public Sub MoveFiles(filelist As List(Of String), lbx1 As ListBox)
 
         Dim ind As Long = lbx1.SelectedIndex
 
         Dim fd As String
-        For Each fd In filendest
+        For Each fd In filelist
             Dim fds() As String
             fds = fd.Split("|")
             Dim file As String = fds(0)
@@ -428,7 +448,21 @@ Module FileHandling
         'If lbx1.Items.Count <> 0 Then lbx1.SetSelected(Math.Max(Math.Min(ind, lbx1.Items.Count - 1), 0), True)
 
     End Sub
+    Public Sub MoveFiles(list As List(Of String), Destination As String)
+        With My.Computer.FileSystem
+            For Each f In list
+                If Len(f) < 200 Then
+                    Dim m = New IO.FileInfo(f)
+                    Try
+                        .MoveFile(m.FullName, Destination & "\" & m.Name)
 
+                    Catch ex As Exception
+                        Continue For
+                    End Try
+                End If
+            Next
+        End With
+    End Sub
     Public Sub CreateNewDirectory(strDir As String)
         AddFolders.Show()
         AddFolders.Folder = strDir
@@ -635,9 +669,9 @@ Module FileHandling
         End If
         If d.EnumerateDirectories.Count = 0 And d.EnumerateFiles.Count = 0 Then
             Dim s As String = d.Parent.FullName
-            d.Delete()
             MainForm.tvMain2.RemoveNode(d.FullName)
-            MainForm.tvMain2.RefreshTree(s)
+            d.Delete()
+            ' MainForm.tvMain2.RefreshTree(s)
         End If
 
 
@@ -675,33 +709,7 @@ Module FileHandling
         End If
         Return count
     End Function
-    ''' <summary>
-    ''' Takes files in d and places them in target, recursively for subfolders if selected
-    ''' </summary>
-    ''' <param name="Directory"></param>
-    ''' <param name="Target"></param>
-    ''' <param name="Recurse"></param>
-    Public Sub HarvestFolder(Directory As DirectoryInfo, Target As DirectoryInfo, Recurse As Boolean)
-        HarvestFolder(Directory, Recurse, False)
-        Exit Sub
-        Dim i
-        i = InputBox("Harvest folders with no more than how many files in?")
-        If i = "" Then i = 0
 
-        Dim s As New List(Of String) '= Nothing
-        s = AppendToListFromFolder(s, Directory, i)
-
-        If Recurse Then
-            For Each di In Directory.EnumerateDirectories
-                s = AppendToListFromFolder(s, di, i)
-            Next
-        End If
-        blnSuppressCreate = True 'Prevent request make folder for plural files
-        MoveFiles(s, Target.FullName, MainForm.lbxFiles)
-        blnSuppressCreate = False
-        DeleteEmptyFolders(Directory, True)
-
-    End Sub
     Public Sub HarvestBelow(d As DirectoryInfo)
         For Each di In d.EnumerateDirectories
             BurstFolder(di)
@@ -709,21 +717,19 @@ Module FileHandling
     End Sub
     Public Sub HarvestFolder(d As DirectoryInfo, Recurse As Boolean, Parent As Boolean)
         If Recurse Then
-
             For Each di In d.EnumerateDirectories
                 HarvestFolder(di, Recurse, Parent)
             Next
         End If
         blnSuppressCreate = True
-        Dim LIST As List(Of String)
 
         For Each f In d.EnumerateFiles
-
             If Parent Then
                 Dim m As String = d.Parent.FullName & "\" & f.Name
                 Dim fi As New FileInfo(m)
                 If fi.Exists Then
                 Else
+                    'Use an encapsulated move routine
                     f.MoveTo(m)
                 End If
             Else

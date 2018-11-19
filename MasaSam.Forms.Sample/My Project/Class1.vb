@@ -14,6 +14,7 @@
     End Property
     Private mSpeed As Byte
     Public Property Fullspeed As Boolean = True
+    Public Property Unpause As Boolean = False
     Public Property Paused As Boolean = False
     Public Property AbsoluteJump As Integer = 20
     Public Property FractionalJump As Integer = 12
@@ -45,6 +46,7 @@
         End Get
         Set(ByVal value As Integer)
             mFrameRates(mSpeed) = value
+            RaiseEvent SpeedChanged(mSlideshow)
         End Set
     End Property
     Public Sub IncreaseSpeed()

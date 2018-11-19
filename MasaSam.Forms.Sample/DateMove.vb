@@ -7,14 +7,14 @@ Class DateMove
     Private mFolder As String
 
     Private mFolders As New List(Of IO.DirectoryInfo)
-
+    Private mYears As String = ""
     Public Enum DMY As Byte
         Year
         Month
         Day
         Hour
         Minute
-
+        Calendar
 
     End Enum
     Private MonthNames As String() = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
@@ -41,35 +41,57 @@ Class DateMove
             mRecursive = value
         End Set
     End Property
+    Public Sub FilterByCalendar(Folder As IO.DirectoryInfo)
+        FilterByDate(Folder.FullName, False, DMY.Year)
+        For Each f In Folder.GetDirectories
+            If InStr(mYears, f.Name) <> 0 Then
+                FilterByDate(f.FullName, False, DMY.Month)
 
+            End If
+            For Each m In f.GetDirectories
+                For i = 0 To 11
+                    If m.Name = MonthNames(i) Then
+                        FilterByDate(m.FullName, False, DMY.Day)
+                    End If
+                Next
+            Next
+
+        Next
+    End Sub
     Public Sub FilterByDate(FolderName As String, Recurse As Boolean, Choice As DMY)
-
-        'For each file
-        'Move to folder with the year, creating it first
 
         Dim s As New IO.DirectoryInfo(FolderName)
         Dim i As Integer
         For Each f In s.GetFiles
+            Dim folname As String = ""
             With GetDate(f)
                 Select Case Choice
                     Case DMY.Year
                         i = .Year
+                        folname = Str(i)
+                        mYears = mYears & folname
                     Case DMY.Month
                         i = .Month
+                        folname = i
+                        If i < 10 Then folname = "0" & folname
+
+                        folname = folname & " - " & MonthName(i)
                     Case DMY.Day
                         i = .Day
-
-
+                        folname = i
+                        If i < 10 Then folname = "0" & folname
                     Case DMY.Hour
                         i = .Hour
+                        folname = i
+                        If i < 10 Then folname = "0" & folname
+
                     Case DMY.Minute
                         i = .Minute
+                        folname = i
+                        If i < 10 Then folname = "0" & folname
                 End Select
             End With
-            Dim folname As String = Str(i)
-            If Choice = DMY.Month Then
-                folname = MonthName(i)
-            End If
+
             'If f.Directory.EnumerateDirectories(Str(i)) Is Nothing Then
             f.Directory.CreateSubdirectory(folname & "\")
             'End If
@@ -84,7 +106,6 @@ Class DateMove
         'Move to folder with the year, creating it first
 
         Dim s As New IO.DirectoryInfo(FolderName)
-        Dim i As Integer
         For Each f In s.GetFiles
             For m = 5 To 10
                 If f.Length < 10 ^ m And f.Length >= 10 ^ (m - 1) Then
@@ -97,6 +118,19 @@ Class DateMove
         Next
         RaiseEvent FilesMoved(Nothing, Nothing)
 
+    End Sub
+    Public Sub FilterByType(FolderName As String)
+        Dim s As New IO.DirectoryInfo(FolderName)
+
+
+        For Each f In s.GetFiles
+            If f.Directory.GetDirectories(f.Extension).Length > 0 Then
+            Else
+                f.Directory.CreateSubdirectory(f.Extension & "\")
+            End If
+            f.MoveTo(f.DirectoryName & "\" & f.Extension & "\" & f.Name)
+        Next
+        RaiseEvent FilesMoved(Nothing, Nothing)
     End Sub
     Private Sub GetFoldersBelow(folderpath As String, recurse As Boolean)
 

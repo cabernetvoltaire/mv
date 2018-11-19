@@ -135,12 +135,14 @@
     <Compile Include="Explorer1.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="FavouritesMinder.vb" />
     <Compile Include="FileBox.Designer.vb">
       <DependentUpon>FileBox.vb</DependentUpon>
     </Compile>
     <Compile Include="FileBox.vb">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="FileNamesGrouper.vb" />
     <Compile Include="FilterHandler.vb" />
     <Compile Include="Colors.vb" />
     <Compile Include="FilterMove.vb" />
@@ -172,7 +174,6 @@
     <Compile Include="KeyHandler.vb" />
     <Compile Include="ListboxHandler.vb" />
     <Compile Include="MediaHandler.vb" />
-    <Compile Include="Module1.vb" />
     <Compile Include="MVButton.vb" />
     <Compile Include="My Project\Class1.vb" />
     <Compile Include="OrphanFinder.vb" />
@@ -232,6 +233,7 @@
     <Compile Include="Thumbnails2.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="TrailMode.vb" />
     <Compile Include="TreeView.Designer.vb">
       <DependentUpon>TreeView.vb</DependentUpon>
     </Compile>

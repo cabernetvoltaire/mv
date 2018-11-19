@@ -19,7 +19,7 @@ Friend MustInherit Class DirectoryTreeNode
 
     Public Function Add(ByVal directory As DirectoryInfo) As DirectoryNode
         Dim node As New DirectoryNode(directory)
-        Me.Nodes.Add(node)
+        Nodes.Add(node)
         Return node
     End Function
 

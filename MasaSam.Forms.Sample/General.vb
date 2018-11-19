@@ -78,7 +78,7 @@ Public Module General
         Return deadlinks
     End Function
     Public Sub CreateFavourite(Filepath As String)
-        Dim sh As New ShortcutHandler
+        Dim sh As New ShortcutHandler()
         Dim f As New FileInfo(Filepath)
         sh.TargetPath = Filepath
         sh.ShortcutPath = FavesFolderPath
@@ -303,8 +303,11 @@ Public Module General
                 LastFolder.Push(Media.MediaDirectory)
 
             End If
+            MainForm.FNG.Clear()
+
             Media.MediaDirectory = strPath 'Switch to this folder
             ChangeWatcherPath(Media.MediaDirectory)
+
             ReDim FBCShown(0)
             NofShown = 0
             My.Computer.Registry.CurrentUser.SetValue("File", Media.MediaPath)

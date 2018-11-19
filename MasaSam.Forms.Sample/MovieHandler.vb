@@ -15,12 +15,11 @@ Module MovieHandler
 
 
             Console.WriteLine(":New position is " & NewPosition & " of " & MediaDuration)
-            End If
+        End If
 
-            MainForm.tmrJumpVideo.Enabled = True
+        MainForm.tmrJumpVideo.Enabled = True
         'Else
         'End If
-
     End Sub
     Public Sub PlaystateChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent)
         'MsgBox(e.newState)
@@ -40,7 +39,7 @@ Module MovieHandler
                 MainForm.StartPoint.Duration = MediaDuration
                 MainForm.SwitchSound(False)
 
-                If FullScreen.Changing Then 'Hold current position if switching to FS or back. 
+                If FullScreen.Changing Or MainForm.SP.Unpause Then 'Hold current position if switching to FS or back. 
                     NewPosition = currentWMP.Ctlcontrols.currentPosition
                     MainForm.tmrJumpVideo.Enabled = True
                 Else
@@ -50,15 +49,13 @@ Module MovieHandler
                 End If
                 '  GetAttributes(sender)
                 Justpaused = False
-            Case WMPLib.WMPPlayState.wmppsPaused
+            Case WMPLib.WMPPlayState.wmppsPaused ', WMPLib.WMPPlayState.wmppsTransitioning
                 '                MediaJumpToMarker()
 
                 If MainForm.tmrSlowMo.Enabled Then
                     Justpaused = False
                     MainForm.SwitchSound(True)
-
                 Else
-
                     Justpaused = True
                 End If
         End Select

@@ -21,6 +21,8 @@ Public Class FileSystemTree
     Private m_timer As Timer
     Private m_selectedNodes As New Dictionary(Of String, FileSystemNode)
     Private m_rootDrive As String
+    Private m_currentNode As FileSystemNode 'pac
+
 
 #End Region
 
@@ -922,6 +924,7 @@ Public Class FileSystemTree
         For Each node In m_selectedNodes.Values
             node.BackColor = SystemColors.Highlight
             node.ForeColor = SystemColors.HighlightText
+            m_currentNode = node
         Next
     End Sub
 
@@ -965,8 +968,10 @@ Public Class FileSystemTree
     End Sub
     Public Sub RemoveNode(strpath As String)
         Expand(strpath)
-        tvFiles.SelectedNode.Remove()
-        Expand(tvFiles.SelectedNode.FullPath)
+        Dim nd As FileSystemNode = tvFiles.SelectedNode
+        Traverse(True)
+        nd.Remove()
+        'Expand(tvFiles.SelectedNode.FullPath)
     End Sub
     Public Sub MoveNode(strDir As String, StrDest As String)
         tvFiles.Nodes.RemoveByKey(strDir)

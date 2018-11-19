@@ -96,13 +96,13 @@ Friend Module Mysettings
 
         End With
         '     If Not IO.Directory.Exists(Media.MediaDirectory) Then Media.MediaDirectory = "C:\"
-        If Not IO.File.Exists(Media.MediaPath) Then Media.MediaPath = ""
+        ' If Not IO.File.Exists(Media.MediaPath) Then Media.MediaPath = ""
         MainForm.tssMoveCopy.Text = Media.MediaDirectory
         '   frmMain.RandomFunctionsToggle(False)
 
     End Sub
     Public Sub OnMediaChanged(sender As Object, e As EventArgs) Handles Media.MediaChanged
-        ChangeWatcherPath(Media.MediaDirectory)
+        'ChangeWatcherPath(Media.MediaDirectory)
         ChangeFolder(Media.MediaDirectory)
         MainForm.UpdateFileInfo()
 

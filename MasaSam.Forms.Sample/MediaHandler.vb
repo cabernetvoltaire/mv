@@ -86,23 +86,64 @@
             'If path changes, we need to check it exists, and if so, change stored directory as well, 
             'And raise a media changed event. 
             Dim b As String = mMediaPath
-            If value <> "" And value <> mMediaPath Then
+
+            If value = b Then
+            ElseIf value = "" Then
+                mMediaPath = DefaultFile
+                mMediaDirectory = New IO.FileInfo(mMediaPath).Directory.FullName
+                RaiseEvent MediaChanged(Me, New EventArgs)
+
+            Else
+                mMediaPath = value
                 Dim f As New IO.FileInfo(value)
                 If f.Exists Then
-                    mMediaPath = value
+                    mMediaDirectory = f.Directory.FullName
                 Else
                     mMediaPath = DefaultFile
+                    mMediaDirectory = New IO.FileInfo(mMediaPath).Directory.FullName
                 End If
-                If b <> mMediaPath Then
-                    mMediaDirectory = f.Directory.FullName
-                    RaiseEvent MediaChanged(Me, New EventArgs)
-                End If
-            Else
-                mMediaPath = DefaultFile
-
+                RaiseEvent MediaChanged(Me, New EventArgs)
             End If
+
+
         End Set
     End Property
+    Private Function Findfile(f As IO.FileInfo, dir As IO.DirectoryInfo) As IO.FileInfo
+        'If f doesn't exist
+        'Split the path up into bits
+        'Progressively check the existence of each path
+        'When a part doesn't exist, choose the first file in that directory
+        While Not f.Exists
+            Dim directoryNames As New List(Of String)(f.FullName.Split(System.IO.Path.DirectorySeparatorChar))
+            Dim path As String = ""
+            For i = 0 To directoryNames.Count - 1
+                If i = 0 Then
+                    path = directoryNames(i) & IO.Path.DirectorySeparatorChar
+                Else
+                    path = path & directoryNames(i) & IO.Path.DirectorySeparatorChar
+                End If
+                Dim subdir As New IO.DirectoryInfo(path)
+                If subdir.Exists Then
+                    Findfile(f, subdir)
+                Else
+                    f = Nothing
+                End If
+            Next
+            Try
+                If Not f.Exists Then
+                    Try
+                        f = dir.GetFiles.First
+                    Catch ex As IO.DirectoryNotFoundException
+                        f = Nothing
+                    Catch ex As Exception
+                    End Try
+                End If
+            Catch ex As System.NullReferenceException
+                f = Nothing
+            End Try
+        End While
+        Return f
+    End Function
 
     Public Sub New()
 
@@ -131,6 +172,8 @@
                     mIsLink = True
                     mMediaPath = LinkTarget(info.FullName) ' CreateObject("WScript.Shell").CreateShortcut(info.FullName).TargetPath
                     mLinkPath = info.FullName
+                    MainForm.Text = "Metavisua - " & Media.MediaPath
+
                     Try
                         If My.Computer.FileSystem.FileExists(mMediaPath) Then
                             info = New IO.FileInfo(mMediaPath)

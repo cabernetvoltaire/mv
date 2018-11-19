@@ -36,8 +36,17 @@ Public Class UserPrefs
         Filter = mFilter
         Sort = mSort
         State = mState
+        Media = mMedia
     End Sub
-
+    Private mMedia As New MediaHandler
+    Public Property Media() As MediaHandler
+        Get
+            Return mMedia
+        End Get
+        Set(ByVal value As MediaHandler)
+            mMedia = value
+        End Set
+    End Property
     Public Property Start() As StartPointHandler
         Get
             Return mStart

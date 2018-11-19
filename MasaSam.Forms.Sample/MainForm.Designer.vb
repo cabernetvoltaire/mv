@@ -86,7 +86,10 @@ Partial Class MainForm
         Me.ToolStripMenuItem4 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem5 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem6 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItem8 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator6 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripMenuItem7 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItem9 = New System.Windows.Forms.ToolStripMenuItem()
         Me.FileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.NewToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.OpenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -166,6 +169,7 @@ Partial Class MainForm
         Me.lblAlpha = New System.Windows.Forms.Label()
         Me.PictureBox2 = New System.Windows.Forms.PictureBox()
         Me.Panel9 = New System.Windows.Forms.Panel()
+        Me.ListBox1 = New System.Windows.Forms.ListBox()
         Me.TrackBar4 = New System.Windows.Forms.TrackBar()
         Me.TrackBar3 = New System.Windows.Forms.TrackBar()
         Me.TrackBar2 = New System.Windows.Forms.TrackBar()
@@ -678,7 +682,7 @@ Partial Class MainForm
         '
         'ToolStripMenuItem1
         '
-        Me.ToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem2, Me.ToolStripMenuItem3, Me.ToolStripMenuItem4, Me.ToolStripMenuItem5, Me.ToolStripMenuItem6, Me.ToolStripMenuItem7})
+        Me.ToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem2, Me.ToolStripMenuItem3, Me.ToolStripMenuItem4, Me.ToolStripMenuItem5, Me.ToolStripMenuItem6, Me.ToolStripMenuItem8, Me.ToolStripSeparator6, Me.ToolStripMenuItem7, Me.ToolStripMenuItem9})
         Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
         Me.ToolStripMenuItem1.Size = New System.Drawing.Size(97, 34)
         Me.ToolStripMenuItem1.Text = "&Group..."
@@ -686,38 +690,57 @@ Partial Class MainForm
         'ToolStripMenuItem2
         '
         Me.ToolStripMenuItem2.Name = "ToolStripMenuItem2"
-        Me.ToolStripMenuItem2.Size = New System.Drawing.Size(194, 34)
+        Me.ToolStripMenuItem2.Size = New System.Drawing.Size(319, 34)
         Me.ToolStripMenuItem2.Text = "By &Month"
         '
         'ToolStripMenuItem3
         '
         Me.ToolStripMenuItem3.Name = "ToolStripMenuItem3"
-        Me.ToolStripMenuItem3.Size = New System.Drawing.Size(194, 34)
+        Me.ToolStripMenuItem3.Size = New System.Drawing.Size(319, 34)
         Me.ToolStripMenuItem3.Text = "By &Date"
         '
         'ToolStripMenuItem4
         '
         Me.ToolStripMenuItem4.Name = "ToolStripMenuItem4"
-        Me.ToolStripMenuItem4.Size = New System.Drawing.Size(194, 34)
+        Me.ToolStripMenuItem4.Size = New System.Drawing.Size(319, 34)
         Me.ToolStripMenuItem4.Text = "By &Year"
         '
         'ToolStripMenuItem5
         '
         Me.ToolStripMenuItem5.Name = "ToolStripMenuItem5"
-        Me.ToolStripMenuItem5.Size = New System.Drawing.Size(194, 34)
+        Me.ToolStripMenuItem5.Size = New System.Drawing.Size(319, 34)
         Me.ToolStripMenuItem5.Text = "By &Time"
         '
         'ToolStripMenuItem6
         '
         Me.ToolStripMenuItem6.Name = "ToolStripMenuItem6"
-        Me.ToolStripMenuItem6.Size = New System.Drawing.Size(194, 34)
+        Me.ToolStripMenuItem6.Size = New System.Drawing.Size(319, 34)
         Me.ToolStripMenuItem6.Text = "By &Size"
+        '
+        'ToolStripMenuItem8
+        '
+        Me.ToolStripMenuItem8.Name = "ToolStripMenuItem8"
+        Me.ToolStripMenuItem8.Size = New System.Drawing.Size(319, 34)
+        Me.ToolStripMenuItem8.Text = "&Calendar"
+        '
+        'ToolStripSeparator6
+        '
+        Me.ToolStripSeparator6.Name = "ToolStripSeparator6"
+        Me.ToolStripSeparator6.Size = New System.Drawing.Size(316, 6)
         '
         'ToolStripMenuItem7
         '
         Me.ToolStripMenuItem7.Name = "ToolStripMenuItem7"
-        Me.ToolStripMenuItem7.Size = New System.Drawing.Size(194, 34)
+        Me.ToolStripMenuItem7.ShortcutKeys = CType(((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.Shift) _
+            Or System.Windows.Forms.Keys.N), System.Windows.Forms.Keys)
+        Me.ToolStripMenuItem7.Size = New System.Drawing.Size(319, 34)
         Me.ToolStripMenuItem7.Text = "By Name"
+        '
+        'ToolStripMenuItem9
+        '
+        Me.ToolStripMenuItem9.Name = "ToolStripMenuItem9"
+        Me.ToolStripMenuItem9.Size = New System.Drawing.Size(319, 34)
+        Me.ToolStripMenuItem9.Text = "By E&xtension"
         '
         'FileToolStripMenuItem
         '
@@ -1487,6 +1510,7 @@ Partial Class MainForm
         '
         'Panel9
         '
+        Me.Panel9.Controls.Add(Me.ListBox1)
         Me.Panel9.Controls.Add(Me.TrackBar4)
         Me.Panel9.Controls.Add(Me.TrackBar3)
         Me.Panel9.Controls.Add(Me.TrackBar2)
@@ -1512,6 +1536,16 @@ Partial Class MainForm
         Me.Panel9.Name = "Panel9"
         Me.Panel9.Size = New System.Drawing.Size(241, 1215)
         Me.Panel9.TabIndex = 18
+        '
+        'ListBox1
+        '
+        Me.ListBox1.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.ListBox1.FormattingEnabled = True
+        Me.ListBox1.ItemHeight = 24
+        Me.ListBox1.Location = New System.Drawing.Point(0, 1138)
+        Me.ListBox1.Name = "ListBox1"
+        Me.ListBox1.Size = New System.Drawing.Size(241, 52)
+        Me.ListBox1.TabIndex = 4
         '
         'TrackBar4
         '
@@ -2116,4 +2150,8 @@ Partial Class MainForm
     Friend WithEvents ToolStripMenuItem5 As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItem6 As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItem7 As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItem8 As ToolStripMenuItem
+    Friend WithEvents ToolStripSeparator6 As ToolStripSeparator
+    Friend WithEvents ToolStripMenuItem9 As ToolStripMenuItem
+    Friend WithEvents ListBox1 As ListBox
 End Class

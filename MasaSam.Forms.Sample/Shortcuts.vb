@@ -9,6 +9,11 @@ Module Shortcuts
             Dim ShortCutName As String = ""
 
         End Sub
+        Public Sub New(TargetPath, ShortCutPath, shortCutName)
+            sTargetPath = TargetPath
+            sShortcutPath = ShortCutPath
+            sShortcutName = shortCutName
+        End Sub
         Private oShell As WshShell
         Private oShortcut As WshShortcut
         Private sTargetPath As String
@@ -54,7 +59,8 @@ Module Shortcuts
                 sName = sShortcutPath
 
             End If
-            If IO.File.Exists(sName) Then Deletefile(sName)
+            Dim exf As New IO.FileInfo(sName)
+            If exf.Exists Then exf.Delete()
 
             oShortcut = oShell.CreateShortcut(sName)
 
@@ -69,13 +75,6 @@ Module Shortcuts
                 .TargetPath = sTargetPath
                 .Save()
 
-                Dim attr As FileAttributes
-                attr = IO.File.GetAttributes(sTargetPath)
-                If attr.ReadOnly Then
-
-                Else
-                    IO.File.SetAttributes(sTargetPath, attr Or FileAttributes.ReadOnly)
-                End If
 
 
             End With
@@ -122,48 +121,5 @@ Module Shortcuts
 
     End Function
 
-    Function GetTargetPath(ByVal FileName As String) As String
-        'Dim f As New FileInfo(FileName)
-        'If f.Extension <> ".lnk" Then
-        '    Return FileName
-        '    Exit Function
-        'End If
-
-        'Dim Obj As Object
-
-        'Obj = CreateObject("WScript.Shell")
-
-        'Dim TempTarget As String
-        'Dim Shortcut As Object
-
-        'If Not f.Exists Then
-        '    Return LinkTarget(f.FullName)
-        'Else
-        '    TempTarget = LinkTarget(f.FullName)
-        '    Deletefile(f.FullName)
-        'End If
-
-        'Shortcut = Obj.CreateShortcut(FileName)
-        'Shortcut.TargetPath = TempTarget
-        'GetTargetPath = Shortcut.TargetPath
-
-        'Return GetTargetPath
-
-    End Function
-
-    Public Function ShortcutFolderCopy(fol As String, sDest As String)
-        '    Dim sName As String
-        '    Dim DestFol As folder
-        '    sName = fol.ShortName
-        'Set DestFol = fs2.CreateFolder(sDest + "\" + sName)
-        'Dim f As file
-        '    For Each f In fol.Files
-
-        '        FileMoveToFolder f, DestFol, FOF_SILENT
-
-        'Next
-
-
-    End Function
 
 End Module

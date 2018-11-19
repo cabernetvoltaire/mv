@@ -1,10 +1,10 @@
 ﻿Public Class RandomHandler
     Public Event RandomChanged(ByVal sender As Object, ByVal e As EventArgs)
     Public Sub New()
-        OnDirChange = False
-        NextSelect = False
-        StartPoint = False
-        All = False
+        mOnDirChange = True
+        mNextSelect = False
+        mStartPoint = False
+        mAll = False
     End Sub
     Private mOnDirChange As Boolean
     Public Property OnDirChange() As Boolean
