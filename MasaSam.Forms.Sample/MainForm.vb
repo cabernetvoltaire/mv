@@ -1622,13 +1622,14 @@ Public Class MainForm
 
     Private Sub OnFilenamesParsed() Handles FNG.WordsParsed
 
-        For Each s In FNG.WordList
-            ListBox1.Items.Add(s)
+        '        For Each s In FNG.WordList
+        '       ListBox1.Items.Add(s)
 
-        Next
+        'Next
         Dim i As Integer = 0
 
         For Each g In FNG.Groups
+            ListBox1.Items.Add(FNG.GroupNames(i) & " (" & g.Count & ")")
             Console.WriteLine(FNG.GroupNames(i))
 
             i += 1

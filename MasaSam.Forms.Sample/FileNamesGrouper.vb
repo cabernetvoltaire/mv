@@ -55,9 +55,10 @@
         For Each f In mFilenames
             StringParser(f)
         Next
-        UpdateWordlist(2)
+        UpdateWordlist(5)
+
         GetGroups()
-        If mWordlist.Count <> 0 Then RaiseEvent WordsParsed()
+            If mWordlist.Count <> 0 Then RaiseEvent WordsParsed()
     End Sub
     ''' <summary>
     ''' Takes a string, and uses a regular expression to strip out all the words. 
@@ -70,7 +71,7 @@
         If r.Matches(str).Count > 0 Then
             Dim localwords As New List(Of String)
             For Each s In r.Matches(str)
-                If mWordlist.ContainsKey(s.ToString) Then 'already encountered this word in this string, so increment the count. 
+                If mWordlist.ContainsKey(s.ToString) Then
                     If localwords.Contains(s.ToString) Then
                     Else
                         Dim k As Integer = mWordlist.Item(s.ToString) 'currently counts multiple occurrences in same str
@@ -148,10 +149,17 @@
         Dim x As New SortedList(Of String, Integer)
 
         For Each m In mWordlist
-            If m.Value > mFilenames.Count / 2 Or m.Value < Count Then
-            Else
-                x.Add(m.Key, m.Value)
-            End If
+            For i = 100 To Count Step -1
+
+                If m.Value = mFilenames.Count Or m.Value < i Then
+                Else
+                    If x.Keys.Contains(m.Key) Then
+                    Else
+                        x.Add(m.Key, m.Value)
+
+                    End If
+                End If
+            Next
         Next
         mWordlist = x
     End Sub

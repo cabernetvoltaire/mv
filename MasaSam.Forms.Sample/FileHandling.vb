@@ -249,20 +249,7 @@ Module FileHandling
     ''' <param name="lbx1"></param>
     Public Sub MoveFiles(files As List(Of String), strDest As String, lbx1 As ListBox)
         Dim ind As Long = lbx1.SelectedIndex
-        ''If only one file, then use the filepump
-        'If files.Count = 1 And strDest <> "" Then 'TODO This causes Bundle not to work if only one file
-        '    'Try
-        '    '    FileIO.FileSystem.CopyFile(files(0), strDest & "\" & FileIO.FileSystem.GetName(files(0)), FileIO.UIOption.OnlyErrorDialogs)
-        '    '    FileIO.FileSystem.DeleteFile(files(0))
-        '    'Catch ex As Exception
-        '    'End Try
-        '    'Build a single filepump
-        '    lbx1.Items.Remove(files(0))
-        '    MainForm.tmrPumpFiles.Enabled = True
-        '    FilePump(files.Item(0) & "|" & strDest, lbx1)
-        '    lbx1.SelectionMode = SelectionMode.One
-        '    If lbx1.Items.Count <> 0 Then lbx1.SetSelected(Math.Max(Math.Min(ind, lbx1.Items.Count - 1), 0), True)
-        'Else
+
 
         Dim s As String = strDest 'if strDest is empty then delete
 
@@ -722,20 +709,31 @@ Module FileHandling
             Next
         End If
         blnSuppressCreate = True
-
+        Dim l As New List(Of String)
         For Each f In d.EnumerateFiles
-            If Parent Then
-                Dim m As String = d.Parent.FullName & "\" & f.Name
-                Dim fi As New FileInfo(m)
-                If fi.Exists Then
-                Else
-                    'Use an encapsulated move routine
-                    f.MoveTo(m)
-                End If
-            Else
-                f.MoveTo(Media.MediaDirectory & "\" & f.Name)
-            End If
+            l.Add(f.FullName)
         Next
+        If Parent Then
+            MoveFiles(l, d.Parent.FullName, MainForm.lbxFiles)
+        Else
+            MoveFiles(l, Media.MediaDirectory, MainForm.lbxFiles)
+
+
+        End If
+
+        'For Each f In d.EnumerateFiles
+        '    If Parent Then
+        '        Dim m As String = d.Parent.FullName & "\" & f.Name
+        '        Dim fi As New FileInfo(m)
+        '        If fi.Exists Then
+        '        Else
+        '            'Use an encapsulated move routine
+        '            f.MoveTo(m)
+        '        End If
+        '    Else
+        '        f.MoveTo(Media.MediaDirectory & "\" & f.Name)
+        '    End If
+        'Next
         DeleteEmptyFolders(d, True)
     End Sub
     ''' <summary>
@@ -759,6 +757,7 @@ Module FileHandling
 
     Public Sub BurstFolder(d As DirectoryInfo)
         HarvestFolder(d, True, True)
+
     End Sub
 
 End Module
