@@ -81,7 +81,7 @@ Friend Module Mysettings
     Public Sub PreferencesGet()
         MainForm.ctrPicAndButtons.SplitterDistance = 9 * MainForm.ctrPicAndButtons.Height / 10
         With My.Computer.Registry.CurrentUser
-            'Media.MediaDirectory = .GetValue("Folder", System.Environment.GetFolderPath(Environment.SpecialFolder.MyPictures))
+            Media.MediaDirectory = .GetValue("Folder", System.Environment.GetFolderPath(Environment.SpecialFolder.MyPictures))
             Media.MediaPath = .GetValue("File", "C:\exiftool.exe")
 
             MainForm.ctrFileBoxes.SplitterDistance = .GetValue("VertSplit", MainForm.ctrFileBoxes.Height / 4)

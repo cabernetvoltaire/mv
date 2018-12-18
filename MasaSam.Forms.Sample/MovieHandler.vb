@@ -10,6 +10,7 @@ Module MovieHandler
 
         If MediaMarker <> 0 Then
             NewPosition = MediaMarker
+            ' Media.Bookmark = MediaMarker
         Else
             NewPosition = MainForm.StartPoint.StartPoint
 

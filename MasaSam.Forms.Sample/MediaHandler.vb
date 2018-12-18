@@ -13,6 +13,11 @@
 
                 mType = FindType(mMediaPath)
             End If
+            If mType = Filetype.Link Then
+                IsLink = True
+            Else
+                IsLink = False
+            End If
             Return mType
         End Get
         Set(ByVal value As Filetype)
@@ -42,7 +47,7 @@
     Private mPlayPosition As Long
     Public Property Position() As Long
         Get
-            mPlayPosition = mPlayer.Ctlcontrols.currentPosition
+            ' mPlayPosition = mPlayer.Ctlcontrols.currentPosition
             Return mPlayPosition
         End Get
         Set(ByVal value As Long)
@@ -109,6 +114,7 @@
         End Set
     End Property
     Private Function Findfile(f As IO.FileInfo, dir As IO.DirectoryInfo) As IO.FileInfo
+
         'If f doesn't exist
         'Split the path up into bits
         'Progressively check the existence of each path
@@ -170,8 +176,9 @@
                     Return Filetype.Unknown
                 Case ".lnk"
                     mIsLink = True
+
                     mMediaPath = LinkTarget(info.FullName) ' CreateObject("WScript.Shell").CreateShortcut(info.FullName).TargetPath
-                    mLinkPath = info.FullName
+                    LinkPath = info.FullName
                     MainForm.Text = "Metavisua - " & Media.MediaPath
 
                     Try
@@ -200,9 +207,11 @@
 
 
             End If
+
         Catch ex As IO.PathTooLongException
             Return Filetype.Unknown
         End Try
+
     End Function
 
     Private mIsLink As Boolean
@@ -213,12 +222,32 @@
         Set(ByVal value As Boolean)
             mIsLink = value
             If mIsLink Then
+                GetBookmark()
             Else
                 mLinkPath = ""
             End If
         End Set
     End Property
+    Private mBookmark As Long
+    Public Property Bookmark() As Long
+        Get
+            Return mBookmark
+        End Get
+        Set(ByVal value As Long)
+            mBookmark = value
+        End Set
+    End Property
+    Public Sub GetBookmark()
+        If InStr(mLinkPath, "%") <> 0 Then
 
+            Dim s As String()
+            s = mLinkPath.Split("%")
+            mBookmark = Val(s(1))
+        Else
+            mBookmark = 0
+        End If
+
+    End Sub
     Private mLinkPath As String
     Public Property LinkPath() As String
         Get
@@ -226,6 +255,7 @@
         End Get
         Set(ByVal value As String)
             mLinkPath = value
+            ' GetBookmark()
             If mLinkPath <> "" Then mIsLink = True
         End Set
     End Property

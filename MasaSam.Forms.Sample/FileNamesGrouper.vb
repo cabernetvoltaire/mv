@@ -1,6 +1,6 @@
 ﻿Public Class FileNamesGrouper
     Public Event WordsParsed()
-
+    Private RegexOptions() As String = {"[[A-Z|a-z]*[0-9]{3,}]|[\w]*", "(([A-Z|a-z]*[AEIOUY|aeiouy][A-Z|a-z]*[ |_|-|,]*)*)", "([A-Z|a-z]*[ |_|-]*)", "([A-Z|a-z]+[ |_|-]*)+"}
     Private mWordlist As New SortedList(Of String, Integer)
     Public Property WordList() As SortedList(Of String, Integer)
         Get
@@ -12,6 +12,7 @@
     End Property
 
 #Region "Properties"
+    Public Property Count As Integer = 2
     Private mFilenames As New List(Of String)
     Public Property Filenames() As List(Of String)
         Get
@@ -29,9 +30,11 @@
     Public Property Groups As List(Of List(Of String))
         Get
             Return mGroups
+
         End Get
         Set(ByVal value As List(Of List(Of String)))
             mGroups = value
+
         End Set
     End Property
     Private mGroupNames As New List(Of String)
@@ -46,89 +49,112 @@
 
 #End Region
 #Region "Methods"
+    Private Sub ParseNames()
+        OutputList("ParseNames", mFilenames)
+        For Each f In mFilenames
+            ' For i = RegexOptions.Length - 1 To 0 Step -1
+            CreateWordList(f, RegexOptions(1))
+            '   StringParser(f, RegexOptions(2))
+
+            'Next
+        Next
+        OutputList("mWordlist", mWordlist)
+        UpdateWordlist()
+        OutputList("mWordList after Update", mWordlist)
+
+        GetGroups()
+        '  REcurseGroups()
+
+        If mWordlist.Count <> 0 Then RaiseEvent WordsParsed()
+    End Sub
+
     Public Sub Clear()
         mFilenames.Clear()
         mGroupNames.Clear()
         mGroups.Clear()
-    End Sub
-    Private Sub ParseNames()
-        For Each f In mFilenames
-            StringParser(f)
-        Next
-        UpdateWordlist(5)
-
-        GetGroups()
-            If mWordlist.Count <> 0 Then RaiseEvent WordsParsed()
     End Sub
     ''' <summary>
     ''' Takes a string, and uses a regular expression to strip out all the words. 
     ''' Adds those words to a sorted list maintaining a count of the global frequency 
     ''' </summary>
     ''' <param name="str"></param>
+    Private Sub OutputList(s As String, x As Object)
+        Exit Sub
+        Debug.Print(" ")
+        Debug.Print(UCase(s))
+        For Each m In x
+            Debug.Print(m.ToString)
 
-    Private Sub StringParser(str As String)
-        Dim r As New System.Text.RegularExpressions.Regex("([A-Z|a-z]+[AEIOUY|aeiouy][A-Z|a-z]+[_]*)+") '("([A-Z]^[0-9])\w+")
+        Next
+    End Sub
+    Private Sub CreateWordList(str As String, rgx As String)
+        Dim r As New System.Text.RegularExpressions.Regex(rgx) '("([A-Z]^[0-9])\w+")
+        ' Console.WriteLine(str)
         If r.Matches(str).Count > 0 Then
             Dim localwords As New List(Of String)
+            'OutputList("Matches", r.Matches(str))
             For Each s In r.Matches(str)
-                If mWordlist.ContainsKey(s.ToString) Then
-                    If localwords.Contains(s.ToString) Then
+                Dim match As String = s.ToString
+                'match = LCase(match)
+                If mWordlist.ContainsKey(match) Then
+                    If localwords.Contains(match) Then
                     Else
-                        Dim k As Integer = mWordlist.Item(s.ToString) 'currently counts multiple occurrences in same str
+                        Dim k As Integer = mWordlist.Item(match) 'currently counts multiple occurrences in same str
                         k = k + 1
-                        mWordlist.Remove(s.ToString)
-                        mWordlist.Add(s.ToString, k)
-                        localwords.Add(s.ToString)
+                        mWordlist.Remove(match)
+                        mWordlist.Add(match, k)
+                        localwords.Add(match)
                     End If
                 Else
-                    mWordlist.Add(s.ToString, 1)
-                    localwords.Add(s.ToString)
+                    mWordlist.Add(match, 1)
+                    localwords.Add(match)
 
                 End If
 
             Next
+            OutputList("Local words", localwords)
         End If
+
     End Sub
 
     ''' <summary>
     ''' For each filename, adds to a lists which pair each name with a target group and its associated count
     ''' </summary>
     Private Sub GetGroups()
+        'Add each file to a countofgroup and a targetgroup
         mGroups.Clear()
-        Dim Group As New SortedList(Of String, Integer) 'Filenames, Count
+        Dim CountOfGroup As New SortedList(Of String, Integer) 'Filenames, Count
         Dim TargetGroup As New SortedList(Of String, String) 'Filenames, Target
-        For Each f In mFilenames
-            Group.Add(f, 0)
-            Console.WriteLine(Group.Last)
+        For Each filefromlist In mFilenames
+            CountOfGroup.Add(filefromlist, 0)
 
-            TargetGroup.Add(f, "")
-            Console.WriteLine(TargetGroup.Last)
+            TargetGroup.Add(filefromlist, "")
 
-            For Each w In mWordlist 'Go through wordlist and allocate files which contain it
+            For Each foundword In mWordlist 'Go through wordlist and allocate files which contain it
 
-                If InStr(f, w.Key) <> 0 And Group(f) < w.Value Then
-                    'If the file contains the word, and the occurrence of the word is greater than the currently assigned group, reassign them. 
-                    'The problem is that this allocates each and every file to the group which has the largest frequency overall, irrespective of whether 
-                    Console.WriteLine(w.Value & ", " & w.Key)
-                    Console.WriteLine()
+                If InStr(filefromlist, foundword.Key) <> 0 And CountOfGroup(filefromlist) < foundword.Value Then
 
-                    If w.Value > 0 Then
-                        Group(f) = w.Value
-                        TargetGroup(f) = w.Key
+
+                    If foundword.Value > 0 And foundword.Key <> "" Then
+                        CountOfGroup(filefromlist) = foundword.Value
+                        TargetGroup(filefromlist) = foundword.Key
 
                     End If
                 End If
 
             Next
         Next
+        OutputList("Count Of Group", CountOfGroup)
+        OutputList("Target Group", TargetGroup)
         Dim targets As New List(Of String)
-
-        For Each f In TargetGroup
-            If targets.Contains(f.Value) Or f.Value = "" Then
+        'Construct a new file list which only 
+        For Each filefromtargetgroup In TargetGroup
+            If targets.Contains(filefromtargetgroup.Value) Or filefromtargetgroup.Value = "" Then 'Don't repeat, don't add empties
             Else
-                targets.Add(f.Value)
+                targets.Add(filefromtargetgroup.Value)
             End If
         Next
+        OutputList("targets", targets)
         For Each tgt In targets
             Dim flst As New List(Of String)
             For Each f In TargetGroup
@@ -136,22 +162,32 @@
                     flst.Add(f.Key)
                 End If
             Next
-            mGroups.Add(flst)
-            mGroupNames.Add(tgt)
+            If flst.Count >= Count Then
+                mGroups.Add(flst)
+                mGroupNames.Add(tgt)
+            End If
         Next
+
     End Sub
+
+
 
     ''' <summary>
     ''' Goes through the Wordlist and doesn't copy any entries which are singletons, or universal
     ''' </summary>
     ''' 
-    Private Sub UpdateWordlist(Count As Byte)
+    Private Sub UpdateWordlist()
+        'm.value is the count of files containing m.key
+        'Remove words which are universal
+        'Also remove file extensions
+        'Rank the names by m.value
+        '
         Dim x As New SortedList(Of String, Integer)
 
         For Each m In mWordlist
-            For i = 100 To Count Step -1
+            For i = mFilenames.Count - 1 To Count Step -1
 
-                If m.Value = mFilenames.Count Or m.Value < i Then
+                If m.Value = mFilenames.Count Or m.Value < i Or InStr(PICEXTENSIONS & VIDEOEXTENSIONS & ".lnk", m.Key) <> 0 Then
                 Else
                     If x.Keys.Contains(m.Key) Then
                     Else

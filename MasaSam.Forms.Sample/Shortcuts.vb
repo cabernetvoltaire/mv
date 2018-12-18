@@ -21,6 +21,9 @@ Module Shortcuts
         Private sShortcutName As String
         Public Property TargetPath() As String
             Get
+                'If sTargetPath does not exist
+                'check in lower folders
+                'if fewer than 200 files
                 Return sTargetPath
             End Get
             Set(ByVal value As String)
@@ -43,9 +46,16 @@ Module Shortcuts
                 sShortcutName = value
             End Set
         End Property
-        ''' <summary>
-        ''' Creates a shortcut to TargetPath, places it in ShortCutPath, with a short name of ShortcutName
-        ''' </summary>
+
+        Private mBookmark As Long
+        Public Property Bookmark() As Long
+            Get
+                Return mBookmark
+            End Get
+            Set(ByVal value As Long)
+                mBookmark = value
+            End Set
+        End Property
 
         Public Sub Create_ShortCut()
 
@@ -61,6 +71,10 @@ Module Shortcuts
             End If
             Dim exf As New IO.FileInfo(sName)
             If exf.Exists Then exf.Delete()
+
+            If Bookmark <> 0 Then
+                sName = Replace(sName, ".lnk", "%" & Str(Bookmark) & "%.lnk")
+            End If
 
             oShortcut = oShell.CreateShortcut(sName)
 

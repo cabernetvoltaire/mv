@@ -29,7 +29,11 @@
     End Sub
 
     Public Sub CheckFile(f As IO.FileInfo)
-        Check(f, mDestPath)
+        If f.Extension = ".lnk" Then
+        Else
+            Check(f, mDestPath)
+
+        End If
     End Sub
     Public Sub CheckFiles(f As List(Of String))
         For Each m In f

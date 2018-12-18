@@ -11,9 +11,21 @@
 
     Public Event StateChanged(sender As Object, e As EventArgs)
     Private mOrder = {"Original", "Random", "Name", "Path Name", "Date/Time", "Size", "Type"}
+    Private mColour As Color() = {Color.Red, Color.Orange, Color.Yellow, Color.Green, Color.Blue, Color.Indigo, Color.Violet}
 
     Private mDescList As New List(Of String)
     Private mReverseOrder As Boolean
+
+    Private mColor As Color
+    Public Property Colour() As Color
+        Get
+            Return mColour(mState)
+        End Get
+        Set(ByVal value As Color)
+            mColor = value
+        End Set
+    End Property
+
     Public Property ReverseOrder() As Boolean
         Get
             Return mReverseOrder

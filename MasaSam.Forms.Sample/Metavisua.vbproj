@@ -119,6 +119,7 @@
     <Compile Include="Attributes.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="AutoTrailer.vb" />
     <Compile Include="ButtonForm.Designer.vb">
       <DependentUpon>ButtonForm.vb</DependentUpon>
     </Compile>
@@ -129,12 +130,6 @@
     <Compile Include="ButtonRow.vb" />
     <Compile Include="DateMove.vb" />
     <Compile Include="Duplicates.vb" />
-    <Compile Include="Explorer1.Designer.vb">
-      <DependentUpon>Explorer1.vb</DependentUpon>
-    </Compile>
-    <Compile Include="Explorer1.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="FavouritesMinder.vb" />
     <Compile Include="FileBox.Designer.vb">
       <DependentUpon>FileBox.vb</DependentUpon>
@@ -174,6 +169,7 @@
     <Compile Include="KeyHandler.vb" />
     <Compile Include="ListboxHandler.vb" />
     <Compile Include="MediaHandler.vb" />
+    <Compile Include="MoverCopier.vb" />
     <Compile Include="MVButton.vb" />
     <Compile Include="My Project\Class1.vb" />
     <Compile Include="OrphanFinder.vb" />
@@ -254,9 +250,6 @@
     <EmbeddedResource Include="ButtonForm.resx">
       <DependentUpon>ButtonForm.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Explorer1.resx">
-      <DependentUpon>Explorer1.vb</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="FileBox.resx">
       <DependentUpon>FileBox.vb</DependentUpon>
     </EmbeddedResource>
@@ -304,7 +297,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="My Project\app.manifest" />
+    <None Include="My Project\app.manifest">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
     </None>
@@ -318,14 +313,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <COMReference Include="AxFolderViewControl">
-      <Guid>{53BA5BA6-78E7-4837-AAFB-7F52822D8A9E}</Guid>
-      <VersionMajor>12</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>aximp</WrapperTool>
-      <Isolated>False</Isolated>
-    </COMReference>
     <COMReference Include="AxWMPLib">
       <Guid>{6BF52A50-394A-11D3-B153-00C04F79FAA6}</Guid>
       <VersionMajor>1</VersionMajor>

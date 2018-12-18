@@ -1,5 +1,5 @@
 ﻿Public Class FileBox
-    ' Inherits ListBox
+    'Inherits ListBox
     Public Event FileSelected()
 
     Private mFolderPath As String

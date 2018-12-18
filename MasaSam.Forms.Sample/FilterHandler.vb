@@ -38,12 +38,13 @@
     Public Sub New()
         Me.State = FilterState.All
     End Sub
-
+    Public Property OldState As Byte
     Public Property State() As Byte
         Get
             Return mState
         End Get
         Set(ByVal value As Byte)
+            If value = FilterState.LinkOnly Then OldState = mState
             mState = value
 
             RaiseEvent StateChanged(Me, New EventArgs)

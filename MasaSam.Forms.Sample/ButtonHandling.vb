@@ -44,6 +44,8 @@ Module ButtonHandling
     ''' Assigns all the buttons in a generation, beneath sPath, to the letter iAlpha
     ''' </summary>
     Public Sub AssignLinear(sPath As String, iAlpha As Integer, blnNext As Boolean)
+        If MsgBox("This will replace a large number of button assignments. Are you sure?", MsgBoxStyle.OkCancel) = MsgBoxResult.Cancel Then Exit Sub
+
         Dim d As New DirectoryInfo(sPath)
         Dim i As Byte
         Dim di() As DirectoryInfo
@@ -62,6 +64,7 @@ Module ButtonHandling
 
     End Sub
     Public Sub AssignAlphabetic(blntest As Boolean)
+        If MsgBox("This will replace a large number of button assignments. Are you sure?", MsgBoxStyle.OkCancel) = MsgBoxResult.Cancel Then Exit Sub
 
         Dim dlist As New List(Of String)
         Dim d As New DirectoryInfo(Media.MediaDirectory)
@@ -79,6 +82,7 @@ Module ButtonHandling
                 If (n(k) Mod 8) = 0 Then
                     layer += 1
                     ReDim Preserve strButtonFilePath(8, nletts, layer)
+                    ReDim Preserve strButtonCaptions(8, nletts, layer)
                 Else
                 End If
                 AssignButton(n(k), k, layer, s)
@@ -90,6 +94,7 @@ Module ButtonHandling
         KeyAssignmentsStore(strButtonFile)
     End Sub
     Public Sub AssignTree(strStart As String)
+        If MsgBox("This will replace a large number of button assignments. Are you sure?", MsgBoxStyle.OkCancel) = MsgBoxResult.Cancel Then Exit Sub
 
         Dim dlist As New SortedList(Of String, DirectoryInfo)
         Dim plist As New SortedList(Of String, DirectoryInfo)
@@ -100,6 +105,8 @@ Module ButtonHandling
             dlist.Add(di.Name, di)
         Next
         Dim i As Int16 = 0
+
+
 
         Dim n(nletts) As Integer
         While i < 8 AndAlso (n(0) < 8 OrElse n(1) < 8 OrElse n(2) < 8 OrElse n(3) < 8 OrElse n(4) < 8 OrElse n(5) < 8 OrElse n(6) < 8 OrElse n(7) < 8 OrElse n(8) < 8 OrElse n(9) < 8 OrElse n(10) < 8 OrElse n(11) < 8 OrElse n(12) < 8 OrElse n(1) < 8 OrElse n(13) < 8 OrElse n(14) < 8 OrElse n(15) < 8 OrElse n(17) < 8 OrElse n(18) < 8 OrElse n(19) < 8 OrElse n(20) < 8 OrElse n(21) < 8 OrElse n(22) < 8 OrElse n(23) < 8 OrElse n(24) < 8)
@@ -148,10 +155,14 @@ Module ButtonHandling
 
     Public Sub AssignButton(ByVal i As Byte, ByVal j As Integer, ByVal k As Byte, ByVal strPath As String, Optional blnStore As Boolean = False)
         Dim f As New DirectoryInfo(strPath)
-
-        If strVisibleButtons(i) <> "" And NavigateMoveState.State = StateHandler.StateOptions.Navigate Then
-            If Not MsgBox("Replace button assignment for F" & i + 5 & " with " & f.Name & "?", MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then Exit Sub
-        End If
+        'Static AskAgain As Boolean
+        'If strVisibleButtons(i) <> "" And NavigateMoveState.State = StateHandler.StateOptions.Navigate Then
+        '    If AskAgain Then
+        '        If MsgBox("Replace button assignment for F" & i + 5 & " with " & f.Name & "?", MsgBoxStyle.YesNoCancel) = MsgBoxResult.Cancel Then
+        '            Exit Sub
+        '        End If
+        '    End If
+        'End If
         With buttons.CurrentRow.Row(i)
             .Path = strPath
             .Label = f.Name

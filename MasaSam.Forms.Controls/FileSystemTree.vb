@@ -969,7 +969,7 @@ Public Class FileSystemTree
     Public Sub RemoveNode(strpath As String)
         Expand(strpath)
         Dim nd As FileSystemNode = tvFiles.SelectedNode
-        Traverse(True)
+        Traverse(False)
         nd.Remove()
         'Expand(tvFiles.SelectedNode.FullPath)
     End Sub
@@ -1057,7 +1057,8 @@ Public Class FileSystemTree
     Public Sub tvFiles_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles tvFiles.AfterSelect
         'MsgBox("tvFiles_AfterSelect")
         HighlightSelectedNodes()
-        If e.Node.FullPath <> "" Then RaiseEvent DirectorySelected(Me, New DirectoryInfoEventArgs(New DirectoryInfo(NodePath(e))))
+        If e.Node.FullPath <> "" Then RaiseEvent DirectorySelected(Me, New DirectoryInfoEventArgs(New DirectoryInfo(NodePath(e)))) 'TODO Causing crashes
+
         'RaiseEvent DriveSelected(Me, New DriveInfoEventArgs(New DriveInfo(NodePath(e))))
 
     End Sub
@@ -1163,7 +1164,14 @@ Public Class FileSystemTree
         s = Replace(s, "My Computer\", "")
         s = Replace(s, "\\", "\")
         '      RaiseEvent LabelEdited(sender, s)
-        If m.FullName <> s Then m.MoveTo(s)
+        If m.FullName <> s Then
+            Dim n As New DirectoryInfo(s)
+            If n.Exists Then
+
+            Else
+                m.MoveTo(s)
+            End If
+        End If
         '  Me.RefreshTree()
 
     End Sub
@@ -1250,6 +1258,14 @@ Public Class FileSystemTree
 
         'End If
         'e.Handled = True
+    End Sub
+
+    Private Sub tvFiles_DoubleClick(sender As Object, e As EventArgs) Handles tvFiles.DoubleClick
+
+    End Sub
+
+    Private Sub tvFiles_Click(sender As Object, e As EventArgs) Handles tvFiles.Click
+        'MsgBox(e.ToString)
     End Sub
 
 

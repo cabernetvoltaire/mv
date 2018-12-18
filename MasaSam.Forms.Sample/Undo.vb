@@ -1,7 +1,10 @@
 ﻿Public Class Undo
     Public Enum Functions
-        MoveFile
+        MoveFiles
         MoveFolder
+        DeleteFile
+        DeleteFolder
+
 
     End Enum
 
@@ -38,9 +41,16 @@
 
     Public Sub Undo()
         Select Case mAction
-            Case Functions.MoveFile
-
+            Case Functions.MoveFiles
+                'Movefiles back from where moved to
+                'Refresh listbox
             Case Functions.MoveFolder
+                'Movefolder back
+                'Refresh treeview
+            Case Functions.DeleteFile
+
+            Case Functions.DeleteFolder
+
 
         End Select
     End Sub

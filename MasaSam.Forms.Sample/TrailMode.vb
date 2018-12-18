@@ -1,19 +1,12 @@
 ﻿Public Class TrailMode
     Private mActive As Boolean
-    Public Property Active() As Boolean
-        Get
-            Return mActive
-        End Get
-        Set(ByVal value As Boolean)
-            mActive = value
-        End Set
-    End Property
+
 
     ''' <summary>
     ''' Maximum number of half seconds at each speed (in addition to default half second)
     ''' </summary>
     ''' <returns></returns>
-    Public Property RandomTimes As Byte() = {3, 3, 3, 3}
+    Public Property RandomTimes As Byte() = {4, 3, 5, 2}
 
     ''' <summary>
     ''' Proportions of each speed, out of 3, cumulative. Last is normal speed

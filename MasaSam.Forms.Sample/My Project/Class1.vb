@@ -1,6 +1,6 @@
 ﻿Public Class SpeedHandler
-    Dim mIntervals() = {1000, 300, 200}
-    Dim mFrameRates() = {5, 15, 20}
+    Public Intervals() As Integer = {1000, 300, 200}
+    Public FrameRates() As Byte = {5, 15, 20}
     Public Event SpeedChanged(mSlideshow As Boolean)
     Private mSlideshow As Boolean = False
     Public Property Slideshow() As Boolean
@@ -16,7 +16,7 @@
     Public Property Fullspeed As Boolean = True
     Public Property Unpause As Boolean = False
     Public Property Paused As Boolean = False
-    Public Property AbsoluteJump As Integer = 20
+    Public Property AbsoluteJump As Integer = 5
     Public Property FractionalJump As Integer = 12
     Public Property Speed() As Byte
         Get
@@ -24,44 +24,57 @@
         End Get
         Set(ByVal value As Byte)
             mSpeed = value
+            FrameRate = FrameRates(mSpeed)
             Fullspeed = False
             RaiseEvent SpeedChanged(mSlideshow)
         End Set
     End Property
+    Private Property mSSSpeed As Byte
+    Public Property SSSpeed() As Byte
+        Get
+            Return mSSSpeed
+        End Get
+        Set(ByVal value As Byte)
+            mSSSpeed = value
+            Interval = Intervals(mSSSpeed)
+            RaiseEvent SpeedChanged(mSlideshow)
+        End Set
+    End Property
+
 
     Private mInterval As Byte
     Public Property Interval() As Integer
         Get
-            Return mIntervals(mSpeed)
+            Return Intervals(mSSSpeed)
         End Get
         Set(ByVal value As Integer)
-            mIntervals(mSpeed) = value
+            Intervals(mSSSpeed) = value
         End Set
     End Property
 
     Private mFrameRate As Integer
     Public Property FrameRate() As Integer
         Get
-            Return mFrameRates(mSpeed)
+            Return FrameRates(mSpeed)
         End Get
         Set(ByVal value As Integer)
-            mFrameRates(mSpeed) = value
+            FrameRates(mSpeed) = value
             RaiseEvent SpeedChanged(mSlideshow)
         End Set
     End Property
     Public Sub IncreaseSpeed()
         If mSlideshow Then
-            mIntervals(mSpeed) = mIntervals(mSpeed) * 0.9
+            Intervals(mSpeed) = Intervals(mSpeed) * 0.9
         Else
-            mFrameRates(mSpeed) = mFrameRates(mSpeed) * 1.1
+            FrameRates(mSpeed) = FrameRates(mSpeed) * 1.1
         End If
         RaiseEvent SpeedChanged(mSlideshow)
     End Sub
     Public Sub DecreaseSpeed()
         If mSlideshow Then
-            mIntervals(mSpeed) = mIntervals(mSpeed) * 1.1
+            Intervals(mSpeed) = Intervals(mSpeed) * 1.1
         Else
-            mFrameRates(mSpeed) = mFrameRates(mSpeed) * 0.9
+            FrameRates(mSpeed) = FrameRates(mSpeed) * 0.9
         End If
         RaiseEvent SpeedChanged(mSlideshow)
 

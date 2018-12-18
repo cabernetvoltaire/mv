@@ -99,9 +99,24 @@
             If b <> mState Then RaiseEvent StateChanged(Me, New EventArgs)
         End Set
     End Property
+    Private mSavedState As Byte
+    Public Property SavedState() As Byte
+        Get
+            RaiseEvent StateChanged(Me, New EventArgs)
+            Return mSavedState
+            mSavedState = 0
+        End Get
+        Set(ByVal value As Byte)
+
+            mSavedState = value
+
+        End Set
+    End Property
     Public Sub IncrementState()
         State = (State + 1) Mod 6
     End Sub
+
+
     Private Function GetStartPoint()
 
         Select Case mState

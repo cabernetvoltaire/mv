@@ -48,8 +48,7 @@ Public Module General
     Public Sub ProgressIncrement(st As Integer)
         With MainForm.TSPB
             '   .Maximum = max
-            .Value = (.Value + st) Mod .Maximum 'TODO this could be causing the stalling
-
+            .Value = (.Value + st) Mod .Maximum
         End With
         MainForm.Update()
     End Sub
@@ -80,6 +79,7 @@ Public Module General
     Public Sub CreateFavourite(Filepath As String)
         Dim sh As New ShortcutHandler()
         Dim f As New FileInfo(Filepath)
+        sh.Bookmark = Media.Position
         sh.TargetPath = Filepath
         sh.ShortcutPath = FavesFolderPath
         sh.ShortcutName = f.Name
@@ -88,6 +88,8 @@ Public Module General
     Public Sub CreateLink(Filepath As String, DestinationDirectory As String)
         Dim sh As New ShortcutHandler
         Dim f As New FileInfo(Filepath)
+        sh.Bookmark = Media.Position
+
         sh.TargetPath = Filepath
         sh.ShortcutPath = DestinationDirectory
         sh.ShortcutName = f.Name
@@ -279,9 +281,10 @@ Public Module General
         Next
         '        lbx.TabStop = True
         ProgressBarOff()
+
         'frmMain.FilterShowBox()
 
-        'frmMain.UpdateFileInfo()
+        MainForm.UpdateFileInfo()
     End Sub
     Private Sub CopyList(list As List(Of String), list2 As SortedList(Of Date, String))
         list.Clear()
@@ -324,6 +327,26 @@ Public Module General
 
 
     End Sub
+
+    Public Function FileLengthCheck(file As String) As Boolean
+        Dim m As New FileInfo(file)
+        If Len(m.FullName) > 247 Then
+            If MsgBox("Filename too long - truncate?", MsgBoxStyle.YesNo, "Filename too long") = MsgBoxResult.Yes Then
+                Dim i As Byte = Len(m.FullName)
+                Dim l As Byte = Len(m.Directory.FullName)
+                If l > 247 Then
+                    ReportFault("FileLengthCheck", "Unsuccessful - folder name alone is too long")
+                    Return False
+                    Exit Function
+                Else
+                    Dim str As String = Right(m.Name, 247 - l)
+                    m.MoveTo(m.Directory.FullName & "\" & str)
+                    Return True
+                End If
+            End If
+        End If
+        Return True
+    End Function
 
 
     Public Sub MouseHoverInfo(lbx As ListBox, tt As ToolTip)
