@@ -41,6 +41,7 @@
         End Get
         Set(ByVal value As Long)
             mDuration = value
+            ReportTime("Duration:" & mDuration)
         End Set
     End Property
     Private mDistance As Long
@@ -81,7 +82,8 @@
     Public Property StartPoint() As Long
         Get
 
-            Return GetStartPoint()
+            GetStartPoint()
+            Return mStartPoint
         End Get
         Set(ByVal value As Long)
             mStartPoint = value
@@ -95,7 +97,6 @@
         Set(ByVal value As Byte)
             Dim b As Byte = mState
             mState = value
-            mStartPoint = GetStartPoint()
             If b <> mState Then RaiseEvent StateChanged(Me, New EventArgs)
         End Set
     End Property
@@ -117,7 +118,7 @@
     End Sub
 
 
-    Private Function GetStartPoint()
+    Private Function GetStartPoint() As Long
 
         Select Case mState
             Case StartTypes.Beginning
@@ -138,11 +139,19 @@
 
             Case StartTypes.ParticularPercentage
                 mStartPoint = mPercentage / 100 * mDuration
+                ReportTime("Startpoint is " & mStartPoint)
             Case StartTypes.Random
                 mStartPoint = Rnd() * mDuration
         End Select
-        If mDuration - mStartPoint < 5 Then mStartPoint = mDuration - 5
-        If mStartPoint > mDuration Then mStartPoint = mDuration / 2
+        'Apply limits
+        'Not too close to end
+        If mDuration - mStartPoint < 5 Then
+            mStartPoint = mDuration - 5
+            If mStartPoint < 0 Then mStartPoint = 0 'But the beginning if clip is less than min duration
+        End If
+        If mStartPoint > mDuration Then
+            mStartPoint = mDuration / 2 'If we overshoot, re-locate to halfway point. 
+        End If
         Return mStartPoint
     End Function
 End Class

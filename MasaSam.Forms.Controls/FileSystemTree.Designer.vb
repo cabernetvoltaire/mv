@@ -75,7 +75,16 @@ Partial Class FileSystemTree
         Me.ResumeLayout(False)
 
     End Sub
-    Public WithEvents tvFiles As System.Windows.Forms.TreeView
+
+    Private Sub tvFiles_NodeMouseHover(sender As Object, e As TreeNodeMouseHoverEventArgs) Handles tvFiles.NodeMouseHover
+        If AutoExpandNodes Then
+            e.Node.Expand()
+            'e.Node.BackColor = Color.Azure
+        End If
+
+    End Sub
+
+    Private WithEvents tvFiles As System.Windows.Forms.TreeView
     Friend WithEvents imageListIcons As System.Windows.Forms.ImageList
 
 End Class

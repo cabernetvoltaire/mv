@@ -7,6 +7,7 @@ Friend Module Mysettings
     Public Const OrientationId As Integer = &H112
     Public currentWMP As New AxWMPLib.AxWindowsMediaPlayer
     Public WithEvents Media As New MediaHandler
+    Public strButtonfile As String
 
     Public LastPlayed As New Stack(Of String)
     Public LastFolder As New Stack(Of String)
@@ -21,8 +22,7 @@ Friend Module Mysettings
     Public blnLoopPlay As Boolean = True
     'Public blnChooseRandomFile As Boolean = True
     Public PlaybackSpeed As Double = 30
-    Public FavesFolderPath As String = "Q:\Favourites"
-    Public strButtonFile As String = "Q:\Alpha2.msb"
+    Public FavesFolderPath As String
 
     Public Autozoomrate As Decimal = 0.4
     Public iCurrentAlpha As Integer = 0
@@ -66,43 +66,77 @@ Friend Module Mysettings
         With My.Computer.Registry.CurrentUser
             .SetValue("VertSplit", MainForm.ctrFileBoxes.SplitterDistance)
             .SetValue("HorSplit", MainForm.ctrMainFrame.SplitterDistance)
-
-            .SetValue("Folder", Media.MediaDirectory)
             .SetValue("File", Media.MediaPath)
             .SetValue("Filter", MainForm.CurrentFilterState.State)
             .SetValue("SortOrder", MainForm.PlayOrder.State)
             .SetValue("StartPoint", MainForm.StartPoint.State)
             .SetValue("State", MainForm.NavigateMoveState.State)
-            .SetValue("LastButtonFolder", strButtonFile)
+            .SetValue("LastButtonFile", strButtonfile)
             .SetValue("LastAlpha", iCurrentAlpha)
+            .SetValue("Favourites", FavesFolderPath)
         End With
 
     End Sub
     Public Sub PreferencesGet()
         MainForm.ctrPicAndButtons.SplitterDistance = 9 * MainForm.ctrPicAndButtons.Height / 10
         With My.Computer.Registry.CurrentUser
-            Media.MediaDirectory = .GetValue("Folder", System.Environment.GetFolderPath(Environment.SpecialFolder.MyPictures))
-            Media.MediaPath = .GetValue("File", "C:\exiftool.exe")
+            Try
+                MainForm.ctrFileBoxes.SplitterDistance = .GetValue("VertSplit", MainForm.ctrFileBoxes.Height / 4)
+                MainForm.ctrMainFrame.SplitterDistance = .GetValue("HorSplit", MainForm.ctrFileBoxes.Width / 2)
 
-            MainForm.ctrFileBoxes.SplitterDistance = .GetValue("VertSplit", MainForm.ctrFileBoxes.Height / 4)
-            MainForm.ctrMainFrame.SplitterDistance = .GetValue("HorSplit", MainForm.ctrFileBoxes.Width / 2)
-            MainForm.CurrentFilterState.State = .GetValue("Filter", 0)
-            MainForm.PlayOrder.State = .GetValue("SortOrder", 0)
-            MainForm.StartPoint.State = .GetValue("StartPoint", 0)
-            MainForm.NavigateMoveState.State = .GetValue("State", 0)
-            strButtonFile = .GetValue("LastButtonFolder", "Q:\Alpha2.msb")
 
-            iCurrentAlpha = .GetValue("LastAlpha", 0)
+
+                Dim s = .GetValue("File", "")
+                If s = "" Then s = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures)
+                'Media.MediaDirectory = .GetValue("Folder", System.Environment.GetFolderPath(Environment.SpecialFolder.MyPictures))
+                Media.MediaPath = .GetValue("File", s)
+                MainForm.CurrentFilterState.State = .GetValue("Filter", 0)
+
+                MainForm.PlayOrder.State = .GetValue("SortOrder", 0)
+                MainForm.StartPoint.State = .GetValue("StartPoint", 0)
+                MainForm.NavigateMoveState.State = .GetValue("State", 0)
+                strButtonfile = .GetValue("LastButtonFile", "")
+                iCurrentAlpha = .GetValue("LastAlpha", 0)
+                FavesFolderPath = .GetValue("Favourites", Media.MediaDirectory)
+                Dim fol As New IO.DirectoryInfo(FavesFolderPath)
+                If fol.Exists = False Then
+                    MainForm.FavouritesFolderToolStripMenuItem.PerformClick()
+                End If
+
+            Catch ex As Exception
+                PreferencesReset()
+            End Try
+
 
         End With
-        '     If Not IO.Directory.Exists(Media.MediaDirectory) Then Media.MediaDirectory = "C:\"
-        ' If Not IO.File.Exists(Media.MediaPath) Then Media.MediaPath = ""
         MainForm.tssMoveCopy.Text = Media.MediaDirectory
-        '   frmMain.RandomFunctionsToggle(False)
+    End Sub
+    Public Sub PreferencesReset()
+        With My.Computer.Registry.CurrentUser
+            Dim s As String = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures)
+            Media.MediaDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures)
+            Dim fol As New IO.DirectoryInfo(Media.MediaDirectory)
 
+
+            Media.MediaPath = New IO.DirectoryInfo(Media.MediaDirectory).EnumerateFiles("*", IO.SearchOption.AllDirectories).First.FullName
+            FavesFolderPath = s & "\Favourites\"
+            '            strButtonfile=Media.MediaPath
+        End With
+        With MainForm
+            .ctrFileBoxes.SplitterDistance = .ctrFileBoxes.Height / 4
+            .ctrMainFrame.SplitterDistance = .ctrFileBoxes.Width / 2
+
+            .CurrentFilterState.State = .0
+            .PlayOrder.State = 0
+            .StartPoint.State = 0
+            .NavigateMoveState.State = 0
+            iCurrentAlpha = 0
+            strButtonfile = ""
+            '.SetValue("LastButtonFolder", strButtonfile)
+        End With
+        PreferencesSave()
     End Sub
     Public Sub OnMediaChanged(sender As Object, e As EventArgs) Handles Media.MediaChanged
-        'ChangeWatcherPath(Media.MediaDirectory)
         ChangeFolder(Media.MediaDirectory)
         MainForm.UpdateFileInfo()
 

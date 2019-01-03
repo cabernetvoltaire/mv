@@ -13,7 +13,7 @@
     <MyType>WindowsForms</MyType>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <PublishUrl>publish\</PublishUrl>
+    <PublishUrl>K:\MV\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
     <UpdateEnabled>false</UpdateEnabled>
@@ -128,15 +128,15 @@
     </Compile>
     <Compile Include="ButtonSet.vb" />
     <Compile Include="ButtonRow.vb" />
+    <Compile Include="Dashboard.Designer.vb">
+      <DependentUpon>Dashboard.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="DateMove.vb" />
     <Compile Include="Duplicates.vb" />
     <Compile Include="FavouritesMinder.vb" />
-    <Compile Include="FileBox.Designer.vb">
-      <DependentUpon>FileBox.vb</DependentUpon>
-    </Compile>
-    <Compile Include="FileBox.vb">
-      <SubType>UserControl</SubType>
-    </Compile>
     <Compile Include="FileNamesGrouper.vb" />
     <Compile Include="FilterHandler.vb" />
     <Compile Include="Colors.vb" />
@@ -167,30 +167,25 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="KeyHandler.vb" />
-    <Compile Include="ListboxHandler.vb" />
     <Compile Include="MediaHandler.vb" />
-    <Compile Include="MoverCopier.vb" />
     <Compile Include="MVButton.vb" />
     <Compile Include="My Project\Class1.vb" />
     <Compile Include="OrphanFinder.vb" />
+    <Compile Include="Preferences.Designer.vb">
+      <DependentUpon>Preferences.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Preferences.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Progress.vb">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="RandomHandler.vb" />
     <Compile Include="Settings.vb" />
     <Compile Include="Shortcuts.vb" />
-    <Compile Include="Listform.Designer.vb">
-      <DependentUpon>Listform.vb</DependentUpon>
-    </Compile>
-    <Compile Include="Listform.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="SortHandler.vb" />
     <Compile Include="StartPointHandler.vb" />
     <Compile Include="StateHandler.vb" />
-    <Compile Include="Sublists.Designer.vb">
-      <DependentUpon>Sublists.vb</DependentUpon>
-    </Compile>
-    <Compile Include="Sublists.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="frmFullScreen.Designer.vb">
       <DependentUpon>frmFullScreen.vb</DependentUpon>
     </Compile>
@@ -250,8 +245,8 @@
     <EmbeddedResource Include="ButtonForm.resx">
       <DependentUpon>ButtonForm.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="FileBox.resx">
-      <DependentUpon>FileBox.vb</DependentUpon>
+    <EmbeddedResource Include="Dashboard.resx">
+      <DependentUpon>Dashboard.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FindDuplicates.resx">
       <DependentUpon>FindDuplicates.vb</DependentUpon>
@@ -268,12 +263,11 @@
     <EmbeddedResource Include="GroupingForm.resx">
       <DependentUpon>GroupingForm.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Listform.resx">
-      <DependentUpon>Listform.vb</DependentUpon>
+    <EmbeddedResource Include="Preferences.resx">
+      <DependentUpon>Preferences.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Sublists.resx">
-      <DependentUpon>Sublists.vb</DependentUpon>
-      <SubType>Designer</SubType>
+    <EmbeddedResource Include="Progress.resx">
+      <DependentUpon>Progress.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmFullScreen.resx">
       <DependentUpon>frmFullScreen.vb</DependentUpon>
@@ -361,6 +355,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\FileAccess_Alpha_frmMain_Icon1.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\Key_empty_Small.png" />
+    <None Include="Resources\Key_empty_Small1.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

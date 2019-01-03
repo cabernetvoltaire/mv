@@ -13,6 +13,8 @@ Module ButtonHandling
 
     Public btnDest() As Button = {MainForm.btn1, MainForm.btn2, MainForm.btn3, MainForm.btn4, MainForm.btn5, MainForm.btn6, MainForm.btn7, MainForm.btn8}
 
+
+
     Public lblDest() As Label = {MainForm.lbl1, MainForm.lbl2, MainForm.lbl3, MainForm.lbl4, MainForm.lbl5, MainForm.lbl6, MainForm.lbl7, MainForm.lbl8}
     Public Sub Buttons_Load()
         buttons.CurrentLetter = Asc("A")
@@ -22,6 +24,52 @@ Module ButtonHandling
         ' blnButtonsLoaded = True
         InitialiseButtons()
     End Sub
+
+    Public Sub InitialiseButtons()
+        For i As Byte = 0 To 7
+            With btnDest(i)
+                .Text = buttons.CurrentRow.Row(i).FaceText
+                AddHandler .Click, AddressOf ButtonClick
+                AddHandler .MouseEnter, AddressOf showPreview
+                AddHandler .MouseHover, AddressOf ChangePreviewMedia
+
+            End With
+
+            lblDest(i).Text = buttons.CurrentRow.Row(i).Label
+        Next
+    End Sub
+    Public Sub ChangePreviewMedia()
+        FolderSelect.ChangeMedia()
+    End Sub
+
+    Private Sub showPreview(sender As Object, e As EventArgs)
+        'Exit Sub
+
+        MainForm.tbLastFile.Text = "Entered Button"
+
+        Dim index As Byte = Val(sender.Name.ToString(3))
+        FolderSelect.Show()
+        Dim s As String = buttons.CurrentRow.Row(index - 1).Path
+        If s = "" Then s = Media.MediaDirectory
+        FolderSelect.Folder = s
+        '        x.Show()
+        Dim control As Control = CType(sender, Control)
+
+        Dim startpoint As Point
+        startpoint.X = control.Left
+        startpoint.Y = control.Top
+        startpoint = control.PointToScreen(startpoint)
+        FolderSelect.Left = startpoint.X - FolderSelect.Width / 2
+        FolderSelect.Top = startpoint.Y - FolderSelect.Height
+
+    End Sub
+
+
+    Private Function PreviewHover(sender As Object, e As EventArgs) As Boolean
+        Dim button As Button = CType(sender, Button)
+        Dim form As Form = CType(sender, Form)
+        Return form.DisplayRectangle.Contains(Cursor.Position)
+    End Function
 
     Public Sub UpdateButton(strPath As String, strDest As String)
         For i = 0 To nletts - 1
@@ -292,16 +340,7 @@ Module ButtonHandling
             End If
         Next
     End Sub
-    Public Sub InitialiseButtons()
-        For i As Byte = 0 To 7
-            With btnDest(i)
-                .Text = buttons.CurrentRow.Row(i).FaceText
-                AddHandler .Click, AddressOf ButtonClick
-            End With
 
-            lblDest(i).Text = buttons.CurrentRow.Row(i).Label
-        Next
-    End Sub
     'Public Sub InitialiseButtons(row As ButtonRow)
     '    For i As Byte = 0 To 7
     '        With btnDest(i)

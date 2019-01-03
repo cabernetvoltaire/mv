@@ -1,17 +1,17 @@
 ﻿Public Class SortHandler
     Public Enum Order As Byte
-        Original
+        DateTime
         Random
         Name
-        PathName
-        DateTime
         Size
+        Original
+        PathName
         Type
     End Enum
 
     Public Event StateChanged(sender As Object, e As EventArgs)
-    Private mOrder = {"Original", "Random", "Name", "Path Name", "Date/Time", "Size", "Type"}
-    Private mColour As Color() = {Color.Red, Color.Orange, Color.Yellow, Color.Green, Color.Blue, Color.Indigo, Color.Violet}
+    Private mOrder = {"DateTime", "Random", "Name", "Size", "Original", "PathName", "Type"}
+    Private mColour As Color() = {Color.IndianRed, Color.OrangeRed, Color.LightYellow, Color.LightGreen, Color.LightBlue, Color.LightCoral, Color.PaleVioletRed}
 
     Private mDescList As New List(Of String)
     Private mReverseOrder As Boolean
@@ -23,6 +23,7 @@
         End Get
         Set(ByVal value As Color)
             mColor = value
+
         End Set
     End Property
 

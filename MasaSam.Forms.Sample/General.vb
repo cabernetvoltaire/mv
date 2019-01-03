@@ -50,7 +50,7 @@ Public Module General
             '   .Maximum = max
             .Value = (.Value + st) Mod .Maximum
         End With
-        MainForm.Update()
+        'MainForm.Update()
     End Sub
     Public Sub ProgressBarOff()
         With MainForm.TSPB
@@ -66,8 +66,13 @@ Public Module General
     End Sub
     Public Function GetDeadLinks(lbx As ListBox) As List(Of String)
         Dim ls As New List(Of String)
-        ls = SelectFromListbox(lbx, ".lnk", False)
+        'ls = SelectFromListbox(lbx, ".lnk", False)
         lbx.SelectedItems.Clear()
+        For Each fl In lbx.Items
+            If InStr(fl, ".lnk") <> 0 Then
+                ls.Add(fl)
+            End If
+        Next
         Dim deadlinks As New List(Of String)
         For Each f In ls
             If Not LinkTargetExists(f) Then
@@ -83,7 +88,7 @@ Public Module General
         sh.TargetPath = Filepath
         sh.ShortcutPath = FavesFolderPath
         sh.ShortcutName = f.Name
-        sh.Create_ShortCut()
+        sh.Create_ShortCut(sh.Bookmark)
     End Sub
     Public Sub CreateLink(Filepath As String, DestinationDirectory As String)
         Dim sh As New ShortcutHandler
@@ -93,7 +98,7 @@ Public Module General
         sh.TargetPath = Filepath
         sh.ShortcutPath = DestinationDirectory
         sh.ShortcutName = f.Name
-        sh.Create_ShortCut()
+        sh.Create_ShortCut(sh.Bookmark)
     End Sub
 
     Public Function GetAllFilesBelow(DirectoryPath As String, ByVal FileList As List(Of String))
@@ -295,8 +300,17 @@ Public Module General
 #End Region
 
 
-    Public Sub ReportFault(routinename As String, msg As String)
-        MsgBox("Exception in " & routinename & vbCrLf & msg)
+    Public Sub ReportFault(routinename As String, msg As String, Optional box As Boolean = True)
+        If box Then
+            MsgBox("Exception in " & routinename & vbCrLf & msg)
+        Else
+            Console.Write("Exception in " & routinename & vbCrLf & msg)
+
+        End If
+    End Sub
+
+    Public Sub ReportTime(str As String)
+        Debug.Print(str & " " & Int(Now().Millisecond))
     End Sub
 
     Public Sub ChangeFolder(strPath As String)
@@ -332,8 +346,8 @@ Public Module General
         Dim m As New FileInfo(file)
         If Len(m.FullName) > 247 Then
             If MsgBox("Filename too long - truncate?", MsgBoxStyle.YesNo, "Filename too long") = MsgBoxResult.Yes Then
-                Dim i As Byte = Len(m.FullName)
-                Dim l As Byte = Len(m.Directory.FullName)
+                Dim i As Integer = Len(m.FullName)
+                Dim l As Integer = Len(m.Directory.FullName)
                 If l > 247 Then
                     ReportFault("FileLengthCheck", "Unsuccessful - folder name alone is too long")
                     Return False

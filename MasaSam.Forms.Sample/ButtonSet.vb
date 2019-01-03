@@ -5,6 +5,10 @@ Public Class ButtonSet
     Private alph As String = "ABCEDFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
     Private mCurrentRow As New ButtonRow
+    ''' <summary>
+    ''' The row which is current and displayed, of all the rows of the button set. 
+    ''' </summary>
+    ''' <returns></returns>
     Public Property CurrentRow() As ButtonRow
         Get
             Return mCurrentRow
@@ -16,6 +20,11 @@ Public Class ButtonSet
         End Set
     End Property
     Private mCurrentLetter As Keys
+
+    ''' <summary>
+    ''' The current letter, as a keycode
+    ''' </summary>
+    ''' <returns></returns>
     Public Property CurrentLetter() As Keys
         Get
             Return mCurrentLetter
@@ -36,6 +45,7 @@ Public Class ButtonSet
 
         End Set
     End Property
+
     Public Sub New()
         Dim Rows(Len(alph)) As ButtonRow
         For i = 0 To Len(alph) - 1
@@ -45,6 +55,23 @@ Public Class ButtonSet
         Next
         CurrentRow = CurrentSet(0)
     End Sub
+    Private Function LetterFromNumber(Num As Integer) As Char
+        Dim ch As Char = alph(Num)
+        'If Num < Asc("A") Then
+        '    Num = Num -
+        'End If
+        Return ch
+    End Function
 
+    Private Function NumberFromLetter(ch As Char) As Integer
+        Dim num As Integer
+        num = InStr(alph, ch)
+        'If num < 26 Then
+        '    num = num + Asc("A")
+        'Else
+        '    num = num + Asc("0")
+        'End If
+        Return num
+    End Function
 End Class
 

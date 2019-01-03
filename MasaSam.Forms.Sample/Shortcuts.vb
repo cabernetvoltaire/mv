@@ -9,6 +9,8 @@ Module Shortcuts
             Dim ShortCutName As String = ""
 
         End Sub
+        Public PlaybackOffset As Long = 0
+        Public MarkOffset As Long = 1
         Public Sub New(TargetPath, ShortCutPath, shortCutName)
             sTargetPath = TargetPath
             sShortcutPath = ShortCutPath
@@ -27,6 +29,10 @@ Module Shortcuts
                 Return sTargetPath
             End Get
             Set(ByVal value As String)
+                If InStr(value, ".lnk") <> 0 Then
+                    value = LinkTarget(value)
+
+                End If
                 sTargetPath = value
             End Set
         End Property
@@ -50,14 +56,14 @@ Module Shortcuts
         Private mBookmark As Long
         Public Property Bookmark() As Long
             Get
-                Return mBookmark
+                Return mBookmark + PlaybackOffset
             End Get
             Set(ByVal value As Long)
                 mBookmark = value
             End Set
         End Property
 
-        Public Sub Create_ShortCut()
+        Public Sub Create_ShortCut(Optional bkmk As Long = 0)
 
             Dim sName As String
             oShell = New WshShell
@@ -72,8 +78,8 @@ Module Shortcuts
             Dim exf As New IO.FileInfo(sName)
             If exf.Exists Then exf.Delete()
 
-            If Bookmark <> 0 Then
-                sName = Replace(sName, ".lnk", "%" & Str(Bookmark) & "%.lnk")
+            If bkmk <> 0 Then
+                sName = Replace(sName, ".lnk", "%" & Str(bkmk - MarkOffset) & "%.lnk")
             End If
 
             oShortcut = oShell.CreateShortcut(sName)
@@ -97,19 +103,7 @@ Module Shortcuts
             oShell = Nothing
         End Sub
 
-        Public Sub Assign_ShortCutPath()
 
-            ' Requires reference to Windows Script Host Object Model
-            Dim sName As String
-            sName = sShortcutPath & "\" & sShortcutName & ".lnk"
-
-            With oShortcut
-                .TargetPath = sTargetPath
-                .Save()
-            End With
-
-            oShortcut = Nothing
-        End Sub
     End Class
 
 

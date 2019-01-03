@@ -68,7 +68,7 @@ Class DateMove
                 Select Case Choice
                     Case DMY.Year
                         i = .Year
-                        folname = Str(i)
+                        folname = i
                         mYears = mYears & folname
                     Case DMY.Month
                         i = .Month

@@ -47,7 +47,7 @@
     Private mPlayPosition As Long
     Public Property Position() As Long
         Get
-            ' mPlayPosition = mPlayer.Ctlcontrols.currentPosition
+            '  mPlayPosition = mPlayer.Ctlcontrols.currentPosition
             Return mPlayPosition
         End Get
         Set(ByVal value As Long)
@@ -91,22 +91,32 @@
             'If path changes, we need to check it exists, and if so, change stored directory as well, 
             'And raise a media changed event. 
             Dim b As String = mMediaPath
-
             If value = b Then
             ElseIf value = "" Then
                 mMediaPath = DefaultFile
                 mMediaDirectory = New IO.FileInfo(mMediaPath).Directory.FullName
+
                 RaiseEvent MediaChanged(Me, New EventArgs)
 
             Else
+
                 mMediaPath = value
+                mType = FindType(value)
                 Dim f As New IO.FileInfo(value)
                 If f.Exists Then
+                    If mType = Filetype.Link Then
+                        mIsLink = True
+                        mLinkPath = LinkTarget(f.FullName)
+                    Else
+                        mIsLink = False
+                        mLinkPath = ""
+                    End If
                     mMediaDirectory = f.Directory.FullName
                 Else
                     mMediaPath = DefaultFile
                     mMediaDirectory = New IO.FileInfo(mMediaPath).Directory.FullName
                 End If
+
                 RaiseEvent MediaChanged(Me, New EventArgs)
             End If
 
@@ -176,23 +186,25 @@
                     Return Filetype.Unknown
                 Case ".lnk"
                     mIsLink = True
+                    IsLink = True
 
-                    mMediaPath = LinkTarget(info.FullName) ' CreateObject("WScript.Shell").CreateShortcut(info.FullName).TargetPath
-                    LinkPath = info.FullName
-                    MainForm.Text = "Metavisua - " & Media.MediaPath
+                    'mMediaPath = LinkTarget(info.FullName) ' CreateObject("WScript.Shell").CreateShortcut(info.FullName).TargetPath
+                    'mLinkPath = info.FullName
+                    'MediaDirectory = info.Directory.FullName
+                    'MainForm.Text = "Metavisua - " & Media.MediaPath
 
-                    Try
-                        If My.Computer.FileSystem.FileExists(mMediaPath) Then
-                            info = New IO.FileInfo(mMediaPath)
-                        Else
-                            Return Filetype.Unknown
-                            Exit Function
-                        End If
+                    'Try
+                    'If My.Computer.FileSystem.FileExists(mMediaPath) Then
+                    'info = New IO.FileInfo(mMediaPath)
+                    'Else
+                    'Return Filetype.Unknown
+                    'Exit Function
+                    'End If
 
-                    Catch ex As Exception
-                    End Try
+                    'Catch ex As Exception
+                    'End Try
                     Return Filetype.Link
-
+                    '           Exit Function
             End Select
 
             Dim strExt = LCase(info.Extension)
@@ -214,7 +226,7 @@
 
     End Function
 
-    Private mIsLink As Boolean
+    Private mIsLink As Boolean = False
     Public Property IsLink() As Boolean
         Get
             Return mIsLink
@@ -238,10 +250,10 @@
         End Set
     End Property
     Public Sub GetBookmark()
-        If InStr(mLinkPath, "%") <> 0 Then
+        If InStr(mMediaPath, "%") <> 0 Then
 
             Dim s As String()
-            s = mLinkPath.Split("%")
+            s = mMediaPath.Split("%")
             mBookmark = Val(s(1))
         Else
             mBookmark = 0
@@ -249,14 +261,10 @@
 
     End Sub
     Private mLinkPath As String
-    Public Property LinkPath() As String
+    Public ReadOnly Property LinkPath() As String
         Get
             Return mLinkPath
         End Get
-        Set(ByVal value As String)
-            mLinkPath = value
-            ' GetBookmark()
-            If mLinkPath <> "" Then mIsLink = True
-        End Set
+
     End Property
 End Class

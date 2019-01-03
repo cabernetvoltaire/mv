@@ -22,7 +22,8 @@
 
     Public Sub New(path As String)
         Dim faves As New IO.DirectoryInfo(path)
-        For Each f In faves.GetFiles
+        If Not faves.Exists Then faves = IO.Directory.CreateDirectory(Environment.SpecialFolder.MyPictures & "\Favourites")
+        For Each f In faves.GetFiles("*.lnk", IO.SearchOption.AllDirectories)
 
             mFavesList.Add(f.FullName)
         Next
@@ -44,9 +45,20 @@
 
     Public Sub Check(f As IO.FileInfo, destinationpath As String)
         Dim m As String = FavesList.Find(Function(x) x.Contains(f.Name))
+        Dim bk As Long = 0
         If m <> "" Then
-            Dim sch As New ShortcutHandler(destinationpath, FavesFolderPath, f.Name)
-            sch.Create_ShortCut()
+            Dim minfo As New IO.FileInfo(m)
+
+            If InStr(m, "%") <> 0 Then
+
+                Dim s As String()
+                s = m.Split("%")
+                bk = Val(s(1))
+            Else
+                bk = 0
+            End If
+            Dim sch As New ShortcutHandler(destinationpath, minfo.Directory.FullName, f.Name)
+            sch.Create_ShortCut(bk)
 
         End If
     End Sub

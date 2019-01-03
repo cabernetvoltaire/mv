@@ -52,7 +52,15 @@ Public Class FileSystemTree
 #End Region
 
 #Region "Properties"
-
+    Private mAutoExpandNodes As Boolean
+    Public Property AutoExpandNodes() As Boolean
+        Get
+            Return mAutoExpandNodes
+        End Get
+        Set(ByVal value As Boolean)
+            mAutoExpandNodes = value
+        End Set
+    End Property
     Private mShowFiles As Boolean = False
     <DefaultValue(False)>
     <Category("Behavior")>
@@ -295,7 +303,7 @@ Public Class FileSystemTree
             End If
             Expand(d.FullName)
             HighlightSelectedNodes()
-
+            RaiseEvent DirectorySelected(Me, New DirectoryInfoEventArgs(d))
         End Set
     End Property
 
@@ -357,6 +365,8 @@ Public Class FileSystemTree
         'CreateDirectoryTree(nd)
         Collapse(path)
         Expand(path)
+        '    RaiseEvent DirectorySelected(Me, New DirectoryInfoEventArgs(New DirectoryInfo(path)))
+
     End Sub
     Private Sub ExpandDriveNode(ByVal dn As DriveNode, ByVal driveName As String, ByVal directoryNames As List(Of String))
         'Only expand if it's in the path we seek
@@ -1054,12 +1064,12 @@ Public Class FileSystemTree
 
     End Sub
 
-    Public Sub tvFiles_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles tvFiles.AfterSelect
-        'MsgBox("tvFiles_AfterSelect")
+    Private Sub tvFiles_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles tvFiles.AfterSelect
+        '    'MsgBox("tvFiles_AfterSelect")
         HighlightSelectedNodes()
         If e.Node.FullPath <> "" Then RaiseEvent DirectorySelected(Me, New DirectoryInfoEventArgs(New DirectoryInfo(NodePath(e)))) 'TODO Causing crashes
 
-        'RaiseEvent DriveSelected(Me, New DriveInfoEventArgs(New DriveInfo(NodePath(e))))
+        '    ''RaiseEvent DriveSelected(Me, New DriveInfoEventArgs(New DriveInfo(NodePath(e))))
 
     End Sub
     Private Function NodePath(e) As String
@@ -1070,32 +1080,7 @@ Public Class FileSystemTree
         Return s
     End Function
 
-    Private Sub tvFiles_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles tvFiles.PreviewKeyDown
-        Exit Sub
-        'Enables traversing of the filetree
-        If e.KeyCode = TraverseKey Then
-            Traverse(False)
-        End If
-        If e.KeyCode = TraverseKeyBack Then
-            Traverse(True)
-        End If
-        If e.KeyCode = Keys.F2 Then
-            tvFiles.LabelEdit = True
-            Dim nd As TreeNode = tvFiles.SelectedNode
-            If Not (nd Is Nothing) And Not (nd.Parent Is Nothing) Then
-                tvFiles.SelectedNode = nd
-                tvFiles.LabelEdit = True
-                If Not nd.IsEditing Then
-                    nd.BeginEdit()
-                End If
-            Else
-                MessageBox.Show("No tree node selected or selected node is a root node." &
-                  Microsoft.VisualBasic.ControlChars.Cr &
-                  "Editing of root nodes is not allowed.", "Invalid selection")
-            End If
 
-        End If
-    End Sub
 
     Public Sub Traverse(blnBack As Boolean)
         'Exit Sub
@@ -1208,10 +1193,6 @@ Public Class FileSystemTree
     End Function
 
     Public Sub tvFiles_KeyDown(sender As Object, e As KeyEventArgs) Handles tvFiles.KeyDown
-        
-        'Exit Sub
-
-        'Enables traversing of the filetree
         Select Case e.KeyCode
             Case TraverseKey, TraverseKeyBack
                 Traverse(e.KeyCode = TraverseKeyBack)
@@ -1234,30 +1215,7 @@ Public Class FileSystemTree
             Case Else
                 e.SuppressKeyPress = True
         End Select
-        Exit Sub
-        'If e.KeyCode = TraverseKey Then
-        '    Traverse(False)
-        'End If
-        'If e.KeyCode = TraverseKeyBack Then
-        '    Traverse(True)
-        'End If
-        'If e.KeyCode = Keys.F2 Then
-        '    tvFiles.LabelEdit = True
-        '    Dim nd As TreeNode = tvFiles.SelectedNode
-        '    If Not (nd Is Nothing) And Not (nd.Parent Is Nothing) Then
-        '        tvFiles.SelectedNode = nd
-        '        tvFiles.LabelEdit = True
-        '        If Not nd.IsEditing Then
-        '            nd.BeginEdit()
-        '        End If
-        '    Else
-        '        MessageBox.Show("No tree node selected or selected node is a root node." &
-        '          Microsoft.VisualBasic.ControlChars.Cr &
-        '          "Editing of root nodes is not allowed.", "Invalid selection")
-        '    End If
 
-        'End If
-        'e.Handled = True
     End Sub
 
     Private Sub tvFiles_DoubleClick(sender As Object, e As EventArgs) Handles tvFiles.DoubleClick

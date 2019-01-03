@@ -13,7 +13,7 @@ Module FileHandling
     Public Event FolderMoved(Path As String)
     Public Event FileMoved(Files As List(Of String), lbx As ListBox)
     Public t As Thread
-    Public fm As New FavouritesMinder(FavesFolderPath)
+    Public fm As New FavouritesMinder("Q:\Favourites")
 
     Dim strFilterExtensions(6) As String
     Public Sub AssignExtensionFilters()
@@ -192,7 +192,7 @@ Module FileHandling
         Dim x As New DirectoryInfo(Media.MediaDirectory)
         For Each m In x.EnumerateDirectories("*", SearchOption.AllDirectories)
             If m.Parent.FullName <> Media.MediaDirectory Then
-                MoveFolder(m.FullName, Media.MediaDirectory, True)
+                MoveFolder(m.FullName, Media.MediaDirectory)
             End If
         Next
     End Sub
@@ -202,7 +202,23 @@ Module FileHandling
         folder.MoveTo(folder.Parent.Parent.FullName & "\" & folder.Name)
         MainForm.tvMain2.RefreshTree(folder.FullName)
     End Sub
-    Public Sub MoveFolder(strDir As String, strDest As String, blnOverride As Boolean)
+    Public Sub MoveFolderNew(Dir As String, Dest As String)
+        Dim TargetDir As New DirectoryInfo(Dest)
+        Dim SourceDir As New DirectoryInfo(Dir)
+
+        My.Computer.FileSystem.CreateDirectory(TargetDir.FullName & "\" & SourceDir.Name)
+        Dim flist As New List(Of String)
+        For Each f In SourceDir.GetFiles
+            flist.Add(f.FullName)
+        Next
+        blnSuppressCreate = True
+        MoveFiles(flist, TargetDir.FullName & "\" & SourceDir.Name, MainForm.lbxFiles)
+
+    End Sub
+
+    Public Sub MoveFolder(strDir As String, strDest As String)
+        MoveFolderNew(strDir, strDest)
+        Exit Sub
         If strDest = "" Then
             Dim k As New DirectoryInfo(strDir)
             k.Delete(True)
@@ -238,7 +254,7 @@ Module FileHandling
                 UpdateButton(strDir, strDest & "\" & s) 'todo doesnt handle sub-tree
             End With
         Catch ex As Exception
-            '            MsgBox(ex.Message) '
+            MsgBox(ex.Message) '
         End Try
 
     End Sub
@@ -280,7 +296,6 @@ Module FileHandling
         t.Start()
 
         'Deal with the list box
-
         RaiseEvent FileMoved(files, lbx1)
 
 
@@ -342,6 +357,9 @@ Module FileHandling
                         End If
                     Case StateHandler.StateOptions.MoveLeavingLink
                         'Move, and place link here
+                        Dim f As New IO.FileInfo(m.FullName)
+                        fm.DestinationPath = spath
+                        fm.CheckFile(f)
                         m.MoveTo(spath)
                         CreateLink(m.FullName, Media.MediaDirectory)
 
@@ -350,6 +368,7 @@ Module FileHandling
                         Dim fpath As New FileInfo(spath)
                         CreateLink(m.FullName, fpath.Directory.FullName)
                     Case StateHandler.StateOptions.ExchangeLink
+                        'Only works on links
                         Dim sh As New ShortcutHandler
 
                         If m.Extension = ".lnk" Then
@@ -367,6 +386,7 @@ Module FileHandling
                 End Select
             End With
         Next
+        '    RaiseEvent FileMoved(files, MainForm.lbxFiles)
     End Sub
     ''' <summary>
     ''' Checks to see if f is in the favourite links, and if so, updates the link. 
@@ -388,71 +408,71 @@ Module FileHandling
         End If
     End Sub
 
-    Public Sub MoveFiles(filelist As List(Of String), lbx1 As ListBox)
+    'Public Sub MoveFiles(filelist As List(Of String), lbx1 As ListBox)
 
-        Dim ind As Long = lbx1.SelectedIndex
+    '    Dim ind As Long = lbx1.SelectedIndex
 
-        Dim fd As String
-        For Each fd In filelist
-            Dim fds() As String
-            fds = fd.Split("|")
-            Dim file As String = fds(0)
-            Dim s As String = fds(1)
-            If Len(file) > 250 Then
-                'TODO deal with too long file names
-            End If
-            Dim m As New FileInfo(file)
-            With My.Computer.FileSystem
-                Dim i As Long = 0
-                Dim spath As String
-                If InStr(s, "\") = s.Length - 1 Or s = "" Then
-                    spath = s & m.Name
+    '    Dim fd As String
+    '    For Each fd In filelist
+    '        Dim fds() As String
+    '        fds = fd.Split("|")
+    '        Dim file As String = fds(0)
+    '        Dim s As String = fds(1)
+    '        If Len(file) > 250 Then
+    '            'TODO deal with too long file names
+    '        End If
+    '        Dim m As New FileInfo(file)
+    '        With My.Computer.FileSystem
+    '            Dim i As Long = 0
+    '            Dim spath As String
+    '            If InStr(s, "\") = s.Length - 1 Or s = "" Then
+    '                spath = s & m.Name
 
-                Else
-                    spath = s & "\" & m.Name
+    '            Else
+    '                spath = s & "\" & m.Name
 
-                End If
-                While .FileExists(spath) 'Existing path - add a bracketed number
-                    Dim x = m.Extension
-                    Dim b = InStr(spath, "(")
-                    If b = 0 Then
-                        spath = Replace(spath, x, "(" & i & ")" & x)
-                    Else
-                        spath = Left(spath, b - 1) & "(" & i & ")" & x
-                    End If
+    '            End If
+    '            While .FileExists(spath) 'Existing path - add a bracketed number
+    '                Dim x = m.Extension
+    '                Dim b = InStr(spath, "(")
+    '                If b = 0 Then
+    '                    spath = Replace(spath, x, "(" & i & ")" & x)
+    '                Else
+    '                    spath = Left(spath, b - 1) & "(" & i & ")" & x
+    '                End If
 
-                    i += 1
-                End While
+    '                i += 1
+    '            End While
 
-                'Exit For
-                Select Case NavigateMoveState.State
-                    Case StateHandler.StateOptions.Copy
-                        .CopyFile(m.FullName, spath)
-                    Case StateHandler.StateOptions.Move
-                        If Not currentPicBox.Image Is Nothing Then DisposePic(currentPicBox)
-                        lbx1.Items.Remove(m.FullName)
-                        If s = "" Then
-                            Deletefile(m.FullName)
-                        Else
-                            Try
-                                .MoveFile(m.FullName, spath, FileIO.UIOption.OnlyErrorDialogs, FileIO.UICancelOption.ThrowException)
-                                Movelink(New IO.FileInfo(spath & "\" & m.Name), spath)
+    '            'Exit For
+    '            Select Case NavigateMoveState.State
+    '                Case StateHandler.StateOptions.Copy
+    '                    .CopyFile(m.FullName, spath)
+    '                Case StateHandler.StateOptions.Move
+    '                    If Not currentPicBox.Image Is Nothing Then DisposePic(currentPicBox)
+    '                    lbx1.Items.Remove(m.FullName)
+    '                    If s = "" Then
+    '                        Deletefile(m.FullName)
+    '                    Else
+    '                        Try
+    '                            .MoveFile(m.FullName, spath, FileIO.UIOption.OnlyErrorDialogs, FileIO.UICancelOption.ThrowException)
+    '                            Movelink(New IO.FileInfo(spath & "\" & m.Name), spath)
 
-                            Catch ex As Exception
-                                Exit For
-                            End Try
-                        End If
-                    Case StateHandler.StateOptions.MoveLeavingLink
-                    Case StateHandler.StateOptions.CopyLink
-                    Case StateHandler.StateOptions.Navigate
+    '                        Catch ex As Exception
+    '                            Exit For
+    '                        End Try
+    '                    End If
+    '                Case StateHandler.StateOptions.MoveLeavingLink
+    '                Case StateHandler.StateOptions.CopyLink
+    '                Case StateHandler.StateOptions.Navigate
 
-                End Select
-            End With
-        Next
-        lbx1.SelectionMode = SelectionMode.One
-        'If lbx1.Items.Count <> 0 Then lbx1.SetSelected(Math.Max(Math.Min(ind, lbx1.Items.Count - 1), 0), True)
+    '            End Select
+    '        End With
+    '    Next
+    '    lbx1.SelectionMode = SelectionMode.One
+    '    'If lbx1.Items.Count <> 0 Then lbx1.SetSelected(Math.Max(Math.Min(ind, lbx1.Items.Count - 1), 0), True)
 
-    End Sub
+    'End Sub
     Public Sub MoveFiles(list As List(Of String), Destination As String)
         With My.Computer.FileSystem
             For Each f In list
@@ -491,14 +511,7 @@ Module FileHandling
                 tv.RefreshTree(strDest)
             Catch ex As IO.DirectoryNotFoundException
             End Try
-            'If MsgBox("Assign new folder to button?", MsgBoxStyle.YesNo, "Assign folder") = MsgBoxResult.Yes Then '
-            '    Dim i As Integer = -1
-            '    While i > 4 + 8 Or i < 5
-            '        i = InputBox("Number?",, "f")
-            '    End While
-            '    i = i - 5
-            '    AssignButton(i, iCurrentAlpha, 1, s, True)
-            'End If
+
         End If
         Return s
     End Function
@@ -705,7 +718,12 @@ Module FileHandling
         If d.EnumerateDirectories.Count = 0 And d.EnumerateFiles.Count = 0 Then
             Dim s As String = d.Parent.FullName
             MainForm.tvMain2.RemoveNode(d.FullName)
-            d.Delete()
+            Try
+                d.Delete()
+
+            Catch ex As Exception
+                Exit Function
+            End Try
             ' MainForm.tvMain2.RefreshTree(s)
         End If
 
