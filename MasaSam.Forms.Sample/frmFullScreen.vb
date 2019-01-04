@@ -58,7 +58,7 @@ Public Class FullScreen
     Private Sub fullScreenPicBox_MouseDown(sender As Object, e As MouseEventArgs) Handles fullScreenPicBox.MouseDown
         Select Case e.Button
             Case MouseButtons.XButton1, MouseButtons.XButton2
-                MainForm.AdvanceFile(e.Button = MouseButtons.XButton2, True)
+                MainForm.AdvanceFile(e.Button = MouseButtons.XButton2)
                 e = Nothing
 
             Case Else

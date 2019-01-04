@@ -8,6 +8,7 @@ Module MovieHandler
     Public Property FromFinish As Long = 65
     Public Sub MediaJumpToMarker()
         'ReportTime("Jumpto Marker")
+        If Media.MediaPath = "" Then Exit Sub
         If MediaMarker <> 0 Then
             NewPosition = MediaMarker
             ' Media.Bookmark = MediaMarker
@@ -16,7 +17,7 @@ Module MovieHandler
             'ReportTime("Jump to Marker " & NewPosition / Media.Duration)
 
 
-            Console.WriteLine(":New position is " & NewPosition & " of " & MediaDuration)
+            Console.WriteLine("New position is " & NewPosition & " of ")
         End If
 
         MainForm.tmrJumpVideo.Enabled = True
@@ -34,11 +35,12 @@ Module MovieHandler
         Select Case e.newState
             Case WMPLib.WMPPlayState.wmppsMediaEnded
                 If Not MainForm.tmrAutoTrail.Enabled Then
-                    MainForm.AdvanceFile(True, True)
+                    MainForm.AdvanceFile(True, False)
                 End If
 
             Case WMPLib.WMPPlayState.wmppsPlaying
                 'ReportTime("Playing")
+                Media.Duration = currentWMP.currentMedia.duration
                 MainForm.StartPoint.Duration = Media.Duration
                 MainForm.SwitchSound(False)
                 wmp.Visible = True
@@ -90,5 +92,11 @@ Module MovieHandler
         ' WMServerVersion
 
         AttributeName = ""
+    End Sub
+    Public Sub MediaAdvance(wmp As AxWMPLib.AxWindowsMediaPlayer, stp As Long)
+        wmp.Ctlcontrols.step(stp)
+        wmp.Refresh()
+        Media.Position = wmp.Ctlcontrols.currentPosition
+
     End Sub
 End Module

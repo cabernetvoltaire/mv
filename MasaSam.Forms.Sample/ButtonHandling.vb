@@ -45,7 +45,6 @@ Module ButtonHandling
     Private Sub showPreview(sender As Object, e As EventArgs)
         'Exit Sub
 
-        MainForm.tbLastFile.Text = "Entered Button"
 
         Dim index As Byte = Val(sender.Name.ToString(3))
         FolderSelect.Show()

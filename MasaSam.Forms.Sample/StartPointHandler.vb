@@ -64,7 +64,11 @@
             Dim b As Long = mAbsolute
 
             mAbsolute = value
-            If b <> mAbsolute Then RaiseEvent StartPointChanged(Me, Nothing)
+            If b <> mAbsolute Then
+                '   mPercentage = mAbsolute / mDuration * 100
+
+                RaiseEvent StartPointChanged(Me, Nothing)
+            End If
         End Set
     End Property
     Private mPercentage As Byte
@@ -75,6 +79,7 @@
         Set(ByVal value As Byte)
             Dim b As Byte = mPercentage
             mPercentage = value
+            'mAbsolute = mPercentage / 100 * mDuration
             If b <> mPercentage Then RaiseEvent StartPointChanged(Me, Nothing)
         End Set
     End Property

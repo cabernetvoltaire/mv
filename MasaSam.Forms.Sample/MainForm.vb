@@ -145,10 +145,12 @@ Public Class MainForm
         'blnJumpToMark = True
         MediaMarker = 0
         tbxAbsolute.Text = New TimeSpan(0, 0, StartPoint.StartPoint).ToString("hh\:mm\:ss")
-        tbxPercentage.Text = Int(100 * StartPoint.StartPoint / StartPoint.Duration).ToString & "%"
+        'StartPoint.Percentage = StartPoint.StartPoint / StartPoint.Duration * 100
+
+        tbxPercentage.Text = Int(100 * StartPoint.Absolute / StartPoint.Duration) & "%"
         tbPercentage.Value = StartPoint.Percentage
         tbAbsolute.Maximum = StartPoint.Duration
-        '    tbAbsolute.Value = StartPoint.StartPoint
+        tbAbsolute.Value = StartPoint.StartPoint
         Select Case StartPoint.State
             Case StartPointHandler.StartTypes.ParticularAbsolute
                 tbxPercentage.Enabled = False
@@ -509,7 +511,7 @@ Public Class MainForm
     End Sub
 
 
-    Public Sub AdvanceFile(blnForward As Boolean, blnTest As Boolean)
+    Public Sub AdvanceFile(blnForward As Boolean, Optional Random As Boolean = False)
         'Advance using whichever control has focus 
         'Unless control pressed, in which case, always advance lbxfiles. 
         Dim diff As Integer
@@ -538,7 +540,7 @@ Public Class MainForm
         Else
             If count > 0 Then
 
-                If Random.NextSelect Then
+                If Random Then
 
                     Dim i As Int32
                     i = Int(Rnd() * (count))
@@ -607,7 +609,7 @@ Public Class MainForm
 
     End Sub
     Public Sub JumpRandom(blnAutoTrail As Boolean)
-        If Media.MediaType = Filetype.Movie Then
+        If Media.MediaType = Filetype.Movie Or Media.IsLink Then
 
             If Not blnAutoTrail Then
                 'Random.StartPoint = True
@@ -620,6 +622,8 @@ Public Class MainForm
                 'MsgBox("Autotrail")
                 ToggleAutoTrail()
             End If
+        ElseIf Media.MediaType = Filetype.Pic Then
+            AdvanceFile(True, True)
         Else
         End If
 
@@ -681,7 +685,10 @@ Public Class MainForm
                 Else
                     Select Case e.KeyCode
                         Case Keys.I
-                            CreateNewDirectory(Media.MediaDirectory)
+                            AddFolders.Show()
+                            AddFolders.Folder = Media.MediaDirectory
+                            tvMain2.RefreshTree(Media.MediaDirectory)
+
 
                     End Select
                 End If
@@ -716,7 +723,7 @@ Public Class MainForm
                 If PFocus <> CtrlFocus.ShowList Then
                     ControlSetFocus(lbxFiles)
                 End If
-                AdvanceFile(e.KeyCode = KeyNextFile, e.Control)
+                AdvanceFile(e.KeyCode = KeyNextFile, Random.NextSelect)
                 e.SuppressKeyPress = True
                 tmrSlideShow.Enabled = False
 
@@ -1159,7 +1166,7 @@ Public Class MainForm
 
     Private Sub tmrSlideShow_Tick(sender As Object, e As EventArgs) Handles tmrSlideShow.Tick
         'SP.Slideshow = True
-        AdvanceFile(True, False)
+        AdvanceFile(True, Random.NextSelect)
     End Sub
 
     Private Sub RotatePic(currentPicBox As PictureBox, blnLeft As Boolean)
@@ -1712,11 +1719,14 @@ Public Class MainForm
 
     End Sub
     Private Sub Groupfiles(ByVal m As FileNamesGrouper)
+        blnSuppressCreate = True
         For i As Integer = 0 To m.Groups.Count - 1
             If lbxGroups.SelectedIndices.Contains(i) Then
                 MoveFiles(m.Groups.Item(i), Media.MediaDirectory & "\" & m.GroupNames.Item(i), lbxFiles)
             End If
         Next
+        blnSuppressCreate = False
+
         tvMain2.RefreshTree(Media.MediaDirectory)
         tmrUpdateFileList.Enabled = True
     End Sub
@@ -1755,10 +1765,6 @@ Public Class MainForm
     End Sub
 
 
-
-    Private Sub lbxFiles_MouseHover(sender As Object, e As EventArgs) Handles lbxFiles.MouseHover
-        MouseHoverInfo(lbxFiles, ToolTip1)
-    End Sub
 
     Private Sub tmrAutoTrail_Tick(sender As Object, e As EventArgs) Handles tmrAutoTrail.Tick
         Dim trail As New TrailMode
@@ -2001,7 +2007,8 @@ Public Class MainForm
                     'CancelDisplay()
                     tvMain2.SelectedFolder = Media.MediaDirectory
                 ElseIf Random.OnDirChange Then
-                    AdvanceFile(True, True)
+                    AdvanceFile(True, True) 'TODO: Whaat?
+
 
                 End If
             ElseIf e.Shift Then
@@ -2057,7 +2064,7 @@ Public Class MainForm
     Private Sub frmMain_MouseDown(sender As Object, e As MouseEventArgs) Handles PictureBox1.MouseDown
         Select Case e.Button
             Case MouseButtons.XButton1, MouseButtons.XButton2
-                AdvanceFile(e.Button = MouseButtons.XButton2, True)
+                AdvanceFile(e.Button = MouseButtons.XButton2)
                 e = Nothing
             Case Else
                 PicClick(PictureBox1)
@@ -2131,8 +2138,8 @@ Public Class MainForm
 
 
 
-    Private Sub AbsoluteTrackBar_ValueChanged(sender As Object, e As EventArgs)
-        tbAbsolute.Maximum = MediaDuration
+    Private Sub AbsoluteTrackBar_ValueChanged(sender As Object, e As EventArgs) Handles tbAbsolute.ValueChanged
+        tbAbsolute.Maximum = Media.Duration
         tbAbsolute.TickFrequency = tbAbsolute.Maximum / 25
         StartPoint.Absolute = tbAbsolute.Value
 
@@ -2221,18 +2228,22 @@ Public Class MainForm
 
     Private Sub tbAbsolute_MouseUp(sender As Object, e As MouseEventArgs) Handles tbAbsolute.MouseUp
         StartPoint.State = StartPointHandler.StartTypes.ParticularAbsolute
-        StartPoint.StartPoint = tbAbsolute.Value
+        StartPoint.Absolute = tbAbsolute.Value
         tbxAbsolute.Text = New TimeSpan(0, 0, tbAbsolute.Value).ToString("hh\:mm\:ss")
         tbxPercentage.Text = Str(StartPoint.Percentage) & "%"
-        ' MediaJumpToMarker()
+        tbPercentage.Value = StartPoint.Percentage
+        MediaJumpToMarker()
 
     End Sub
 
     Private Sub tbPercentage_MouseUp(sender As Object, e As MouseEventArgs) Handles tbPercentage.MouseUp
         StartPoint.State = StartPointHandler.StartTypes.ParticularPercentage
-        StartPoint.StartPoint = tbPercentage.Value
+        StartPoint.Percentage = tbPercentage.Value
         tbxAbsolute.Text = New TimeSpan(0, 0, tbAbsolute.Value).ToString("hh\:mm\:ss")
         tbxPercentage.Text = Str(StartPoint.Percentage) & "%"
+        tbPercentage.Value = StartPoint.Percentage
+
+        MediaJumpToMarker()
 
     End Sub
 
@@ -2422,6 +2433,10 @@ Public Class MainForm
 
     Private Sub tmrMovieSlideShow_Tick(sender As Object, e As EventArgs) Handles tmrMovieSlideShow.Tick
         tmrMovieSlideShow.Interval = Int(Rnd() * 3000) + 3000
-        AdvanceFile(True, True)
+        AdvanceFile(True, False)
+    End Sub
+
+    Private Sub cbxStartPoint_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbxStartPoint.SelectedIndexChanged
+        StartPoint.State = cbxStartPoint.SelectedIndex
     End Sub
 End Class

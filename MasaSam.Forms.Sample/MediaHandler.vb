@@ -57,11 +57,14 @@
     End Property
 
     Private mDuration As Long
-    Public ReadOnly Property Duration() As Long
+    Public Property Duration() As Long
         Get
-            mDuration = mPlayer.currentMedia.duration
+            ' mDuration = mPlayer.currentMedia.duration
             Return mDuration
         End Get
+        Set(value As Long)
+            mDuration = value
+        End Set
     End Property
     Private mFrameRate As Int32
     Public Property FrameRate() As Int32

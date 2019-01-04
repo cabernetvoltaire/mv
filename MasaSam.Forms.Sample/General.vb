@@ -363,15 +363,7 @@ Public Module General
     End Function
 
 
-    Public Sub MouseHoverInfo(lbx As ListBox, tt As ToolTip)
-        'Dim cc, sc As Point
-        'cc = New Point
-        'sc = New Point
-        'sc = lbx.MousePosition()
-        'cc = lbx.PointToClient(sc)
-        'Dim i As Int32 = lbx.IndexFromPoint(cc)
-        'If i >= 0 AndAlso i < lbx.Items.Count - 1 Then tt.SetToolTip(lbx, New FileInfo(lbx.Items(i)).Length)
-    End Sub
+
     Public Function SetPlayOrder(Order As Byte, ByVal List As List(Of String)) As List(Of String)
         Dim NewListS As New SortedList(Of String, String)
         Dim NewListL As New SortedList(Of Long, String)
@@ -484,12 +476,7 @@ Public Module General
 
 
 
-    Public Sub MediaAdvance(wmp As AxWMPLib.AxWindowsMediaPlayer, stp As Long)
-        wmp.Ctlcontrols.step(stp)
-        wmp.Refresh()
-        Media.Position = wmp.Ctlcontrols.currentPosition
 
-    End Sub
     Public Function LoadImage(fname As String) As Image
         Dim FileStream1 As New System.IO.FileStream(fname, IO.FileMode.Open, IO.FileAccess.Read)
         Try

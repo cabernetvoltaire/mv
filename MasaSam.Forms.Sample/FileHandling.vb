@@ -10,6 +10,7 @@ Module FileHandling
     Public Random As RandomHandler = MainForm.Random
     Public NavigateMoveState As StateHandler = MainForm.NavigateMoveState
     ' Public FP As New FilePump
+    Public Listbox As ListBox = MainForm.lbxFiles
     Public Event FolderMoved(Path As String)
     Public Event FileMoved(Files As List(Of String), lbx As ListBox)
     Public t As Thread
@@ -197,11 +198,7 @@ Module FileHandling
         Next
     End Sub
 
-    Public Sub PromoteFolder(folder As DirectoryInfo)
-        MainForm.CancelDisplay()
-        folder.MoveTo(folder.Parent.Parent.FullName & "\" & folder.Name)
-        MainForm.tvMain2.RefreshTree(folder.FullName)
-    End Sub
+
     Public Sub MoveFolderNew(Dir As String, Dest As String)
         Dim TargetDir As New DirectoryInfo(Dest)
         Dim SourceDir As New DirectoryInfo(Dir)
@@ -212,7 +209,7 @@ Module FileHandling
             flist.Add(f.FullName)
         Next
         blnSuppressCreate = True
-        MoveFiles(flist, TargetDir.FullName & "\" & SourceDir.Name, MainForm.lbxFiles)
+        MoveFiles(flist, TargetDir.FullName & "\" & SourceDir.Name, Listbox)
 
     End Sub
 
@@ -311,10 +308,13 @@ Module FileHandling
     ''' 
     ''' <returns></returns>
     Private Sub MovingFiles(files As List(Of String), strDest As String, s As String)
-
+        If strDest <> "" Then
+            Dim dinfo As New IO.DirectoryInfo(strDest)
+        If dinfo.Exists = False Then dinfo.Create()
+        End If
         Dim file As String = ""
 
-        For Each file In files
+            For Each file In files
             '   If Media.Player.URL = file Then Media.Player.URL = ""
 
             If Not FileLengthCheck(file) Then Continue For
@@ -408,71 +408,7 @@ Module FileHandling
         End If
     End Sub
 
-    'Public Sub MoveFiles(filelist As List(Of String), lbx1 As ListBox)
 
-    '    Dim ind As Long = lbx1.SelectedIndex
-
-    '    Dim fd As String
-    '    For Each fd In filelist
-    '        Dim fds() As String
-    '        fds = fd.Split("|")
-    '        Dim file As String = fds(0)
-    '        Dim s As String = fds(1)
-    '        If Len(file) > 250 Then
-    '            'TODO deal with too long file names
-    '        End If
-    '        Dim m As New FileInfo(file)
-    '        With My.Computer.FileSystem
-    '            Dim i As Long = 0
-    '            Dim spath As String
-    '            If InStr(s, "\") = s.Length - 1 Or s = "" Then
-    '                spath = s & m.Name
-
-    '            Else
-    '                spath = s & "\" & m.Name
-
-    '            End If
-    '            While .FileExists(spath) 'Existing path - add a bracketed number
-    '                Dim x = m.Extension
-    '                Dim b = InStr(spath, "(")
-    '                If b = 0 Then
-    '                    spath = Replace(spath, x, "(" & i & ")" & x)
-    '                Else
-    '                    spath = Left(spath, b - 1) & "(" & i & ")" & x
-    '                End If
-
-    '                i += 1
-    '            End While
-
-    '            'Exit For
-    '            Select Case NavigateMoveState.State
-    '                Case StateHandler.StateOptions.Copy
-    '                    .CopyFile(m.FullName, spath)
-    '                Case StateHandler.StateOptions.Move
-    '                    If Not currentPicBox.Image Is Nothing Then DisposePic(currentPicBox)
-    '                    lbx1.Items.Remove(m.FullName)
-    '                    If s = "" Then
-    '                        Deletefile(m.FullName)
-    '                    Else
-    '                        Try
-    '                            .MoveFile(m.FullName, spath, FileIO.UIOption.OnlyErrorDialogs, FileIO.UICancelOption.ThrowException)
-    '                            Movelink(New IO.FileInfo(spath & "\" & m.Name), spath)
-
-    '                        Catch ex As Exception
-    '                            Exit For
-    '                        End Try
-    '                    End If
-    '                Case StateHandler.StateOptions.MoveLeavingLink
-    '                Case StateHandler.StateOptions.CopyLink
-    '                Case StateHandler.StateOptions.Navigate
-
-    '            End Select
-    '        End With
-    '    Next
-    '    lbx1.SelectionMode = SelectionMode.One
-    '    'If lbx1.Items.Count <> 0 Then lbx1.SetSelected(Math.Max(Math.Min(ind, lbx1.Items.Count - 1), 0), True)
-
-    'End Sub
     Public Sub MoveFiles(list As List(Of String), Destination As String)
         With My.Computer.FileSystem
             For Each f In list
@@ -488,12 +424,7 @@ Module FileHandling
             Next
         End With
     End Sub
-    Public Sub CreateNewDirectory(strDir As String)
-        AddFolders.Show()
-        AddFolders.Folder = strDir
-        MainForm.tvMain2.RefreshTree(strDir)
 
-    End Sub
     Public Function CreateNewDirectory(tv As FileSystemTree, strDest As String, blnAsk As Boolean) As String
         Dim blnCreate As Boolean = True
         Dim blnAssign As Boolean = False
@@ -519,10 +450,6 @@ Module FileHandling
         AddFilesToCollection(Showlist, strFilterExtensions(CurrentfilterState.State), Recurse)
         FillShowbox(MainForm.lbxShowList, FilterHandler.FilterState.All, Showlist)
 
-    End Sub
-    Public Sub Addpics(Recurse As Boolean)
-        AddFilesToCollection(Showlist, PICEXTENSIONS, Recurse)
-        FillShowbox(MainForm.lbxShowList, CurrentfilterState.State, Showlist)
     End Sub
     Public Sub AddFilesToCollection(ByVal list As List(Of String), extensions As String, blnRecurse As Boolean)
         Dim s As String
@@ -684,29 +611,7 @@ Module FileHandling
             Next
         End If
     End Sub
-    ''' <summary>
-    ''' Moves all the files in d to its parent, if it exists. Returns true if successful
-    ''' </summary>
-    ''' <param name="d"></param>
-    Public Function Promotefiles(d As DirectoryInfo) As Boolean
-        If Not IO.Directory.Exists(d.FullName) Then
-            Return False
-        End If
-        For Each file In d.EnumerateFiles
-            If Len(file.FullName) <= 247 Then
-                Try
-                    My.Computer.FileSystem.MoveFile(file.FullName, d.Parent.FullName & "\" & file.Name)
-                Catch ex As IOException
-                    Continue For
 
-
-                End Try
-            End If
-
-        Next
-
-        Return True
-    End Function
     Public Function DeleteEmptyFolders(d As DirectoryInfo, blnRecurse As Boolean) As Boolean
 
         If blnRecurse Then
@@ -810,16 +715,6 @@ Module FileHandling
     ''' <param name="d"></param>
     ''' <param name="icount"></param>
     ''' <returns></returns>
-    Private Function AppendToListFromFolder(ByVal s As List(Of String), d As DirectoryInfo, icount As Short) As List(Of String)
-        Dim l As New List(Of String)
-        l = s
-        If d.EnumerateFiles.Count <= icount Or icount = 0 Then
-            For Each file In d.EnumerateFiles
-                l.Add(file.FullName)
-            Next
-        End If
-        Return s
-    End Function
 
     Public Sub BurstFolder(d As DirectoryInfo)
         HarvestFolder(d, True, True)
