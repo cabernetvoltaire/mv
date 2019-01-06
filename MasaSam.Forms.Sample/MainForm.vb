@@ -117,7 +117,7 @@ Public Class MainForm
 
 
     Public Sub OnFileListChanged() Handles FM.FilesMoved
-        UpdatePlayOrder(False)
+        'UpdatePlayOrder(False)
 
     End Sub
     Public Sub OnRandomChanged() Handles Random.RandomChanged
@@ -2141,7 +2141,7 @@ Public Class MainForm
     Private Sub AbsoluteTrackBar_ValueChanged(sender As Object, e As EventArgs) Handles tbAbsolute.ValueChanged
         tbAbsolute.Maximum = Media.Duration
         tbAbsolute.TickFrequency = tbAbsolute.Maximum / 25
-        StartPoint.Absolute = tbAbsolute.Value
+        ' StartPoint.Absolute = tbAbsolute.Value
 
 
     End Sub
