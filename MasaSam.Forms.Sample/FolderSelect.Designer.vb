@@ -49,7 +49,7 @@ Partial Class FolderSelect
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 400.0!))
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 82.5!))
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 17.5!))
-        Me.TableLayoutPanel1.Size = New System.Drawing.Size(638, 997)
+        Me.TableLayoutPanel1.Size = New System.Drawing.Size(634, 993)
         Me.TableLayoutPanel1.TabIndex = 0
         '
         'fst1
@@ -62,7 +62,7 @@ Partial Class FolderSelect
         Me.fst1.Name = "fst1"
         Me.fst1.RootDrive = Nothing
         Me.fst1.SelectedFolder = Nothing
-        Me.fst1.Size = New System.Drawing.Size(626, 480)
+        Me.fst1.Size = New System.Drawing.Size(622, 477)
         Me.fst1.TabIndex = 0
         Me.fst1.TrackDriveState = True
         '
@@ -72,9 +72,9 @@ Partial Class FolderSelect
         Me.Panel1.Controls.Add(Me.TextBox1)
         Me.Panel1.Controls.Add(Me.Label1)
         Me.Panel1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.Panel1.Location = New System.Drawing.Point(3, 895)
+        Me.Panel1.Location = New System.Drawing.Point(3, 892)
         Me.Panel1.Name = "Panel1"
-        Me.Panel1.Size = New System.Drawing.Size(632, 99)
+        Me.Panel1.Size = New System.Drawing.Size(628, 98)
         Me.Panel1.TabIndex = 1
         '
         'btnAssign
@@ -109,14 +109,14 @@ Partial Class FolderSelect
         Me.PreviewWMP.Location = New System.Drawing.Point(3, 3)
         Me.PreviewWMP.Name = "PreviewWMP"
         Me.PreviewWMP.OcxState = CType(resources.GetObject("PreviewWMP.OcxState"), System.Windows.Forms.AxHost.State)
-        Me.PreviewWMP.Size = New System.Drawing.Size(632, 394)
+        Me.PreviewWMP.Size = New System.Drawing.Size(628, 394)
         Me.PreviewWMP.TabIndex = 4
         '
         'FolderSelect
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(11.0!, 24.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(638, 997)
+        Me.ClientSize = New System.Drawing.Size(634, 993)
         Me.ControlBox = False
         Me.Controls.Add(Me.TableLayoutPanel1)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle

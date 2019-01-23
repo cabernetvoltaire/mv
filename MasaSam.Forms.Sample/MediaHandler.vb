@@ -14,7 +14,10 @@
                 mType = FindType(mMediaPath)
             End If
             If mType = Filetype.Link Then
-                IsLink = True
+                mIsLink = True
+                mLinkPath = LinkTarget(mMediaPath)
+                mType = FindType(mLinkPath)
+
             Else
                 IsLink = False
             End If
@@ -84,7 +87,6 @@
             mMarkers = value
         End Set
     End Property
-
     Private mMediaPath As String
     Public Property MediaPath() As String
         Get
@@ -126,6 +128,8 @@
 
         End Set
     End Property
+
+
     Private Function Findfile(f As IO.FileInfo, dir As IO.DirectoryInfo) As IO.FileInfo
 
         'If f doesn't exist
@@ -259,7 +263,7 @@
             s = mMediaPath.Split("%")
             mBookmark = Val(s(1))
         Else
-            mBookmark = 0
+            mBookmark = -1
         End If
 
     End Sub
@@ -270,4 +274,19 @@
         End Get
 
     End Property
+    Public Function UpdateBookmark(path As String, time As String) As String
+        If Right(path, 4) <> ".lnk" Then
+            Return path
+            Exit Function
+        End If
+        If InStr(path, "%") <> 0 Then
+            Dim m() As String = path.Split("%")
+            path = m(0) & "%" & time & "%" & m(m.Length - 1)
+        Else
+            path = path.Replace(".lnk", "%" & time & "%.lnk")
+        End If
+        mMediaPath = path
+        Return path
+
+    End Function
 End Class

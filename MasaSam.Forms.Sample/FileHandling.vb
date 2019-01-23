@@ -4,7 +4,7 @@ Imports MasaSam.Forms.Controls
 Module FileHandling
     Public blnSuppressCreate As Boolean = False
     Public blnChooseOne As Boolean = False
-    Public VIDEOEXTENSIONS = ".divx.vob.webm.avi.flv.mov.m4p.mpeg.mpg.m4a.m4v.mkv.mp4.rm.ram.wmv.wav.mp3.3gp .lnk"
+    Public VIDEOEXTENSIONS = ".divx.vob.webm.avi.flv.mov.m4p.mpeg.f4v.mpg.m4a.m4v.mkv.mp4.rm.ram.wmv.wav.mp3.3gp .lnk"
     Public PICEXTENSIONS = "arw.jpeg.png.jpg.bmp.gif.lnk"
     Public CurrentfilterState As FilterHandler = MainForm.CurrentFilterState
     Public Random As RandomHandler = MainForm.Random
@@ -14,7 +14,12 @@ Module FileHandling
     Public Event FolderMoved(Path As String)
     Public Event FileMoved(Files As List(Of String), lbx As ListBox)
     Public t As Thread
-    Public fm As New FavouritesMinder("Q:\Favourites")
+    Friend fm As New FavouritesMinder("Q:\Favourites")
+
+
+    Public Sub OnfileMoved(f As List(Of String), lbx As ListBox)
+        MainForm.OnFileMoved(f, lbx)
+    End Sub
 
     Dim strFilterExtensions(6) As String
     Public Sub AssignExtensionFilters()
@@ -35,15 +40,13 @@ Module FileHandling
     ''' <param name="blnRandom"></param>
     Public Sub FillListbox(lbx As ListBox, e As DirectoryInfo, blnRandom As Boolean)
         If Not e.Exists Then Exit Sub
-        Dim flist As New List(Of String)
-        For Each m In e.GetFiles
-            flist.Add(m.FullName)
-        Next
         If e.Name = "My Computer" Then Exit Sub
-
+        'clear listbox
         lbx.Items.Clear()
+        'clear list we just created?
+        Dim flist = MainForm.CurrentFileList
         flist.Clear()
-
+        'for empty lists
         If e.EnumerateFiles.Count = 0 Then
             lbx.Items.Add("If there is nothing showing here, check your filters")
             Exit Sub
@@ -52,22 +55,26 @@ Module FileHandling
             FilterListBoxList(e, flist)
             flist = SetPlayOrder(MainForm.PlayOrder.State, flist)
 
-            MainForm.FNG.Filenames = flist
+            ' MainForm.FNG.Filenames = flist
             FillShowbox(lbx, MainForm.CurrentFilterState.State, flist)
 
             lbx.Tag = e
 
 
             If lbx.Items.Count <> 0 Then
-                If Random.OnDirChange Or Random.NextSelect Then
+                If blnRandom Then
                     Dim s As Long = lbx.Items.Count - 1
                     lbx.SelectedIndex = Rnd() * s
                 Else
-                    lbx.SelectedIndex = lbx.FindString(Media.MediaPath)
-                    If lbx.SelectedIndex = -1 Then lbx.SelectedIndex = 0
+                    If lbx.FindString(Media.MediaPath) = -1 Then
+                        lbx.SelectedItem = lbx.FindString(Media.LinkPath)
+
+                    Else
+                        lbx.SelectedItem = lbx.FindString(Media.MediaPath)
+
+                    End If
+
                 End If
-            Else
-                'MainForm.CancelDisplay()
             End If
 
         Catch ex As IOException
@@ -76,7 +83,62 @@ Module FileHandling
 
 
     End Sub
+    Private Function FilterLBList(e As DirectoryInfo, ByRef lst As List(Of String)) As List(Of String)
+        lst.Clear()
+
+        For Each f In e.EnumerateFiles
+            lst.Add(f.FullName)
+        Next
+
+        Select Case CurrentfilterState.State
+            Case FilterHandler.FilterState.All
+            Case FilterHandler.FilterState.NoPicVid
+                For Each f In e.EnumerateFiles
+                    If InStr(PICEXTENSIONS & VIDEOEXTENSIONS, f.Extension) = 0 And Len(f.Extension) <> 0 Then
+                    Else
+                        lst.Remove(f.FullName)
+                    End If
+                Next
+            Case FilterHandler.FilterState.LinkOnly
+
+                For Each f In e.EnumerateFiles
+                    If f.Extension = ".lnk" Then
+                    Else
+                        lst.Remove(f.FullName)
+                    End If
+                Next
+            Case FilterHandler.FilterState.Piconly
+
+                For Each f In e.EnumerateFiles
+                    If InStr(PICEXTENSIONS, f.Extension) = 0 And Len(f.Extension) <> 0 Then
+                        lst.Remove(f.FullName)
+                    Else
+                    End If
+                Next
+            Case FilterHandler.FilterState.PicVid
+
+                For Each f In e.EnumerateFiles
+                    If InStr(PICEXTENSIONS & VIDEOEXTENSIONS, f.Extension) = 0 And Len(f.Extension) <> 0 Then
+                        lst.Remove(f.FullName)
+                    Else
+                    End If
+                Next
+            Case FilterHandler.FilterState.Vidonly
+
+                For Each f In e.EnumerateFiles
+                    If InStr(VIDEOEXTENSIONS, f.Extension) = 0 And Len(f.Extension) <> 0 Then
+                        lst.Remove(f.FullName)
+                    Else
+                    End If
+                Next
+
+        End Select
+        Return lst
+    End Function
+
     Private Function FilterListBoxList(e As DirectoryInfo, ByVal lst As List(Of String))
+        lst = FilterLBList(e, lst)
+        Exit Function
         'Dim l As New List(Of String)
         For Each f In e.EnumerateFiles
             Dim s As String = LCase(f.Extension)
@@ -86,6 +148,7 @@ Module FileHandling
 
                     lst.Add(f.FullName)
                 Case FilterHandler.FilterState.NoPicVid
+
 
                     If InStr(VIDEOEXTENSIONS & PICEXTENSIONS, s) <> 0 And Len(s) > 0 Then
                     Else
@@ -293,7 +356,7 @@ Module FileHandling
         t.Start()
 
         'Deal with the list box
-        RaiseEvent FileMoved(files, lbx1)
+        'RaiseEvent FileMoved(files, lbx1)
 
 
     End Sub
@@ -361,12 +424,12 @@ Module FileHandling
                         fm.DestinationPath = spath
                         fm.CheckFile(f)
                         m.MoveTo(spath)
-                        CreateLink(m.FullName, Media.MediaDirectory)
+                        CreateLink(m.FullName, Media.MediaDirectory, f.Name)
 
                     Case StateHandler.StateOptions.CopyLink
                         'Paste a link in destination
                         Dim fpath As New FileInfo(spath)
-                        CreateLink(m.FullName, fpath.Directory.FullName)
+                        CreateLink(m.FullName, fpath.Directory.FullName, m.Name)
                     Case StateHandler.StateOptions.ExchangeLink
                         'Only works on links
                         Dim sh As New ShortcutHandler
@@ -375,7 +438,7 @@ Module FileHandling
                             Dim f As New IO.FileInfo(LinkTarget(m.FullName))
                             spath = f.FullName
                             f.MoveTo(Media.MediaDirectory & "\" & f.Name)
-                            CreateLink(f.FullName, New FileInfo(spath).Directory.FullName)
+                            CreateLink(f.FullName, New FileInfo(spath).Directory.FullName, m.Name)
                             m.Delete()
                         End If
                         'Move link target here. 
@@ -386,7 +449,7 @@ Module FileHandling
                 End Select
             End With
         Next
-        '    RaiseEvent FileMoved(files, MainForm.lbxFiles)
+        RaiseEvent FileMoved(files, MainForm.lbxFiles)
     End Sub
     ''' <summary>
     ''' Checks to see if f is in the favourite links, and if so, updates the link. 
@@ -472,13 +535,14 @@ Module FileHandling
     End Sub
     Public Sub Deletefile(s As String)
 
+
         With My.Computer.FileSystem
             If .FileExists(s) Then
                 Try
                     .DeleteFile(s, FileIO.UIOption.OnlyErrorDialogs, FileIO.RecycleOption.SendToRecycleBin)
-                    If MainForm.lbxFiles.Items.Contains(s) Then
-                        MainForm.lbxFiles.Items.Remove(s)
-                    End If
+                    'If MainForm.lbxFiles.FindString(s) <> -1 Then
+                    'MainForm.lbxFiles.Items.Remove(s)
+                    'End If
                 Catch ex As Exception
                     'Exit Sub
                     'Catch ex As
@@ -527,8 +591,13 @@ Module FileHandling
     ''' <param name="blnRecurse"></param>
     Public Sub FindAllFilesBelow(d As DirectoryInfo, list As List(Of String), extensions As String, blnRemove As Boolean, strSearch As String, blnRecurse As Boolean, blnOneOnly As Boolean)
         '  MsgBox(CountSubFiles(d.FullName) & " files below")
-
-        For Each file In d.EnumerateFiles
+        Dim x As IEnumerable(Of FileInfo)
+        If blnRecurse Then
+            x = d.EnumerateFiles("*", SearchOption.AllDirectories)
+        Else
+            x = d.EnumerateFiles()
+        End If
+        For Each file In x
             Application.DoEvents()
             ProgressIncrement(1)
             Try
@@ -556,19 +625,19 @@ Module FileHandling
 
             ProgressIncrement(1)
         Next
-        If blnRecurse Then
+        'If blnRecurse Then
 
-            For Each di In d.EnumerateDirectories
-                Try
+        '    For Each di In d.EnumerateDirectories
+        '        Try
 
-                    FindAllFilesBelow(di, list, extensions, blnRemove, strSearch, blnRecurse, blnOneOnly)
-                Catch ex As UnauthorizedAccessException
-                    Continue For
-                Catch ex As DirectoryNotFoundException
-                    Continue For
-                End Try
-            Next
-        End If
+        '            FindAllFilesBelow(di, list, extensions, blnRemove, strSearch, blnRecurse, blnOneOnly)
+        '        Catch ex As UnauthorizedAccessException
+        '            Continue For
+        '        Catch ex As DirectoryNotFoundException
+        '            Continue For
+        '        End Try
+        '    Next
+        'End If
     End Sub
 
     Private Sub AddRemove(list As List(Of String), blnRemove As Boolean, strSearch As String, file As FileInfo)

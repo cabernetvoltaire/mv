@@ -817,6 +817,8 @@ Public Class FileSystemTree
                 OnDriveSelected(drive)
             Case FileSystemNodeType.Directory
                 Dim directory As DirectoryInfo = CType(node, DirectoryNode).Directory
+               ' RaiseEvent DirectorySelected(Me, New DirectoryInfoEventArgs(directory))
+                'SelectedFolder = directory.FullName
                 'OnDirectorySelected(directory)
             Case FileSystemNodeType.File
                 Dim file As FileInfo = CType(node, FileNode).File
@@ -1033,7 +1035,6 @@ Public Class FileSystemTree
     End Sub
 
     Private Sub tvFiles_NodeMouseClick(sender As Object, e As TreeNodeMouseClickEventArgs) Handles tvFiles.NodeMouseClick
-
         If (e.Button = Windows.Forms.MouseButtons.Left) Then
             Dim node As FileSystemNode = CType(e.Node, FileSystemNode)
 

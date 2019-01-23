@@ -63,22 +63,23 @@ Module Shortcuts
             End Set
         End Property
 
-        Public Sub Create_ShortCut(Optional bkmk As Long = 0)
+
+        Public Function Create_ShortCut(Optional bkmk As Long = -1) As String
 
             Dim sName As String
             oShell = New WshShell
             Dim f As IO.FileInfo
-            f = New IO.FileInfo(sShortcutPath)
+            f = New IO.FileInfo(sShortcutPath & "\" & sShortcutName)
             If f.Extension <> ".lnk" Then
                 sName = sShortcutPath & "\" & sShortcutName & ".lnk"
             Else
-                sName = sShortcutPath
+                sName = f.FullName
 
             End If
             Dim exf As New IO.FileInfo(sName)
             If exf.Exists Then exf.Delete()
 
-            If bkmk <> 0 Then
+            If bkmk <> -1 Then
                 sName = Replace(sName, ".lnk", "%" & Str(bkmk - MarkOffset) & "%.lnk")
             End If
 
@@ -101,7 +102,8 @@ Module Shortcuts
 
             oShortcut = Nothing
             oShell = Nothing
-        End Sub
+            Return sName
+        End Function
 
 
     End Class
@@ -110,8 +112,9 @@ Module Shortcuts
 
 
     Public Sub ReAssign_ShortCutPath(ByVal sTargetPath As String, sShortCutPath As String)
-        Dim d As New DirectoryInfo(sShortCutPath)
-        CreateLink(sTargetPath, d.Parent.FullName)
+        Dim d As New FileInfo(sShortCutPath)
+
+        CreateLink(sTargetPath, d.Directory.FullName, d.Name)
     End Sub
     Public Function LinkTargetExists(Linkfile As String) As Boolean
         Dim f As String

@@ -170,7 +170,9 @@
     <Compile Include="MediaHandler.vb" />
     <Compile Include="MVButton.vb" />
     <Compile Include="My Project\Class1.vb" />
+    <Compile Include="NextFile.vb" />
     <Compile Include="OrphanFinder.vb" />
+    <Compile Include="PlayListHandler.vb" />
     <Compile Include="Preferences.Designer.vb">
       <DependentUpon>Preferences.vb</DependentUpon>
     </Compile>

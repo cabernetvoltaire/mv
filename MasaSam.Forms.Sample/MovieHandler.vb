@@ -2,22 +2,23 @@
 Module MovieHandler
     Public Event MediaEnded()
 
-    Public Property MediaMarker As Long = 0
+    Public Property MediaMarker As Long = -1
     Public Property MediaDuration As Long ' = lngMediaDuration
     Public Property NewPosition As Long
     Public Property FromFinish As Long = 65
     Public Sub MediaJumpToMarker()
         'ReportTime("Jumpto Marker")
         If Media.MediaPath = "" Then Exit Sub
-        If MediaMarker <> 0 Then
+        If MediaMarker <> -1 Then
             NewPosition = MediaMarker
+            Debug.Print("MediaMarker is " & MediaMarker)
             ' Media.Bookmark = MediaMarker
         Else
             NewPosition = MainForm.StartPoint.StartPoint
             'ReportTime("Jump to Marker " & NewPosition / Media.Duration)
 
 
-            Console.WriteLine("New position is " & NewPosition & " of ")
+            Console.WriteLine("New position is " & NewPosition & " of " & Media.Duration)
         End If
 
         MainForm.tmrJumpVideo.Enabled = True
@@ -34,16 +35,15 @@ Module MovieHandler
         'MsgBox(e.newState.ToString)
         Select Case e.newState
             Case WMPLib.WMPPlayState.wmppsMediaEnded
+                'wmp.Visible = False
                 If Not MainForm.tmrAutoTrail.Enabled Then
                     MainForm.AdvanceFile(True, False)
                 End If
-
             Case WMPLib.WMPPlayState.wmppsPlaying
                 'ReportTime("Playing")
                 Media.Duration = currentWMP.currentMedia.duration
                 MainForm.StartPoint.Duration = Media.Duration
                 MainForm.SwitchSound(False)
-                wmp.Visible = True
                 If Justpaused Then
                     Justpaused = False
                     Exit Sub
@@ -54,8 +54,10 @@ Module MovieHandler
                     MainForm.tmrJumpVideo.Enabled = True
                 Else
                     ' ReportFault("MHPSCHange", "Just before MJ2M", True)
-                    MediaJumpToMarker()
+                    ' MediaJumpToMarker()
+                    MainForm.OnStartChanged()
                 End If
+                wmp.Visible = True
                 '  GetAttributes(sender)
                 Justpaused = False
             Case WMPLib.WMPPlayState.wmppsPaused ', WMPLib.WMPPlayState.wmppsTransitioning

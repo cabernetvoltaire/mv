@@ -8,7 +8,9 @@
             mFavesList = value
         End Set
     End Property
-
+    ''' <summary>
+    ''' Where the favourite will be moved to
+    ''' </summary>
     Private mDestPath As String
     Public Property DestinationPath() As String
         Get
@@ -44,9 +46,13 @@
     End Sub
 
     Public Sub Check(f As IO.FileInfo, destinationpath As String)
-        Dim m As String = FavesList.Find(Function(x) x.Contains(f.Name))
+        Dim m As String = "a"
+        'm is a file in the favourites, and we have to update its target to the new destination.
         Dim bk As Long = 0
-        If m <> "" Then
+        While m IsNot Nothing
+
+            m = FavesList.Find(Function(x) x.Contains(f.Name))
+            If m Is Nothing Then Exit While
             Dim minfo As New IO.FileInfo(m)
 
             If InStr(m, "%") <> 0 Then
@@ -58,8 +64,9 @@
                 bk = 0
             End If
             Dim sch As New ShortcutHandler(destinationpath, minfo.Directory.FullName, f.Name)
-            sch.Create_ShortCut(bk)
-
-        End If
+            sch.MarkOffset = 0
+            Dim fn As String = sch.Create_ShortCut(bk)
+            FavesList.Remove(fn)
+        End While
     End Sub
 End Class

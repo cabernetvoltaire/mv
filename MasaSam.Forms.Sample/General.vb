@@ -82,6 +82,8 @@ Public Module General
         Return deadlinks
     End Function
     Public Sub CreateFavourite(Filepath As String)
+        CreateLink(Filepath, FavesFolderPath, "")
+        Exit Sub
         Dim sh As New ShortcutHandler()
         Dim f As New FileInfo(Filepath)
         sh.Bookmark = Media.Position
@@ -89,16 +91,22 @@ Public Module General
         sh.ShortcutPath = FavesFolderPath
         sh.ShortcutName = f.Name
         sh.Create_ShortCut(sh.Bookmark)
+
     End Sub
-    Public Sub CreateLink(Filepath As String, DestinationDirectory As String)
+    Public Sub CreateLink(Filepath As String, DestinationDirectory As String, Name As String)
         Dim sh As New ShortcutHandler
         Dim f As New FileInfo(Filepath)
         sh.Bookmark = Media.Position
 
         sh.TargetPath = Filepath
         sh.ShortcutPath = DestinationDirectory
-        sh.ShortcutName = f.Name
+        If Name = "" Then
+            sh.ShortcutName = f.Name
+        Else
+            sh.ShortcutName = Name
+        End If
         sh.Create_ShortCut(sh.Bookmark)
+        If DestinationDirectory = Media.MediaDirectory Then MainForm.UpdatePlayOrder(False)
     End Sub
 
     Public Function GetAllFilesBelow(DirectoryPath As String, ByVal FileList As List(Of String))
@@ -282,7 +290,7 @@ Public Module General
 
         For Each s In lst
             lbx.Items.Add(s)
-            ProgressIncrement(1)
+            'ProgressIncrement(1)
         Next
         '        lbx.TabStop = True
         ProgressBarOff()
@@ -310,7 +318,7 @@ Public Module General
     End Sub
 
     Public Sub ReportTime(str As String)
-        Debug.Print(str & " " & Int(Now().Millisecond))
+        Debug.Print(Int(Now().Second) & "." & Int(Now().Millisecond) & " " & str)
     End Sub
 
     Public Sub ChangeFolder(strPath As String)
@@ -364,7 +372,10 @@ Public Module General
 
 
 
-    Public Function SetPlayOrder(Order As Byte, ByVal List As List(Of String)) As List(Of String)
+    Public Function SetPlayOrderOld(Order As Byte, ByVal List As List(Of String)) As List(Of String)
+        'Return SetPlayOrderNew(Order, List)
+        Exit Function
+
         Dim NewListS As New SortedList(Of String, String)
         Dim NewListL As New SortedList(Of Long, String)
         Dim NewListD As New SortedList(Of DateTime, String)
@@ -432,6 +443,7 @@ Public Module General
 
                         End While
                         NewListS.Add(Str(l), file.FullName)
+                    Case Else
 
                 End Select
             Catch ex As System.ArgumentException 'TODO could do better than this. 
@@ -446,12 +458,128 @@ Public Module General
 
         If NewListD.Count <> 0 Then
             CopyList(List, NewListD)
-
         ElseIf NewListS.Count <> 0 Then
             CopyList(List, NewListS)
         ElseIf NewListL.Count <> 0 Then
             CopyList(List, NewListL)
+        End If
 
+        If MainForm.PlayOrder.ReverseOrder Then
+            List = ReverseListOrder(List)
+        End If
+
+        Return List
+
+
+
+
+    End Function
+
+    Public Function SetPlayOrder(Order As Byte, ByVal List As List(Of String)) As List(Of String)
+        Dim NewListS As New SortedList(Of String, String)
+        Dim NewListL As New SortedList(Of Long, String)
+        Dim NewListD As New SortedList(Of DateTime, String)
+        'frmMain.ListBox1.BringToFront()
+        Try
+            Select Case Order
+                Case SortHandler.Order.Name
+                    For Each f In List
+                        If Len(f) > 247 Then Continue For
+                        Dim file As New FileInfo(f)
+
+                        Dim l As Long = 0
+                        Dim s As String
+                        s = file.Name & Str(l)
+                        While NewListS.ContainsKey(s)
+                            l += 1
+                            s = file.Name & Str(l)
+                            '               frmMain.ListBox1.Items.Add(s)
+
+                        End While
+                        NewListS.Add(s, file.FullName)
+                    Next
+                Case SortHandler.Order.Size
+                    For Each f In List
+                        If Len(f) > 247 Then Continue For
+                        Dim file As New FileInfo(f)
+                        Try
+                            Dim l As Long
+                            l = file.Length
+                            While NewListL.ContainsKey(l)
+                                l += 1
+                                'MsgBox(l)
+                            End While
+                            NewListL.Add(l, file.FullName)
+
+                        Catch ex As ArgumentException
+                            MsgBox("Fail")
+
+                        End Try
+                    Next
+
+                Case SortHandler.Order.DateTime
+                    For Each f In List
+                        If Len(f) > 247 Then Continue For
+                        Dim file As New FileInfo(f)
+                        'MsgBox(time)
+                        Dim time = GetDate(file)
+                        While NewListD.ContainsKey(time)
+                            time = time.AddSeconds(1)
+                        End While
+                        NewListD.Add(time, file.FullName)
+                    Next
+                Case SortHandler.Order.PathName
+                    For Each f In List
+                        If Len(f) > 247 Then Continue For
+                        Dim file As New FileInfo(f)
+                        Dim l As Long = 0
+                        Dim s As String
+                        s = file.FullName & Str(l)
+                        While NewListS.ContainsKey(s)
+                            l += 1
+                            s = file.FullName & Str(l)
+                            '               frmMain.ListBox1.Items.Add(s)
+
+                        End While
+                        '                        MsgBox(file.FullName)
+                        NewListS.Add(s, file.FullName)
+                    Next
+
+                Case SortHandler.Order.Type
+                    For Each f In List
+                        If Len(f) > 247 Then Continue For
+                        Dim file As New FileInfo(f)
+                        NewListS.Add(file.Extension & file.Name & Str(Rnd() * (100)), file.FullName)
+                    Next
+
+                Case SortHandler.Order.Random
+                    For Each f In List
+                        If Len(f) > 247 Then Continue For
+                        Dim file As New FileInfo(f)
+
+                        Dim l As Long
+                        l = Int(Rnd() * (100 * List.Count))
+                        While NewListS.ContainsKey(Str(l))
+                            l = Int(Rnd() * (100 * List.Count))
+                            '                       frmMain.ListBox1.Items.Add(l)
+
+                        End While
+                        NewListS.Add(Str(l), file.FullName)
+                    Next
+
+                Case Else
+
+            End Select
+        Catch ex As System.ArgumentException 'TODO could do better than this. 
+            ReportFault("General.SetPlayOrder", ex.Message)
+        End Try
+
+        If NewListD.Count <> 0 Then
+            CopyList(List, NewListD)
+        ElseIf NewListS.Count <> 0 Then
+            CopyList(List, NewListS)
+        ElseIf NewListL.Count <> 0 Then
+            CopyList(List, NewListL)
         End If
 
         If MainForm.PlayOrder.ReverseOrder Then

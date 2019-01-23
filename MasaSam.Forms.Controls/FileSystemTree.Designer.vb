@@ -77,10 +77,16 @@ Partial Class FileSystemTree
     End Sub
 
     Private Sub tvFiles_NodeMouseHover(sender As Object, e As TreeNodeMouseHoverEventArgs) Handles tvFiles.NodeMouseHover
+
         If AutoExpandNodes Then
             e.Node.Expand()
             'e.Node.BackColor = Color.Azure
         End If
+
+    End Sub
+
+    Private Sub tvFiles_MouseDown(sender As Object, e As MouseEventArgs) Handles tvFiles.MouseDown
+        tvFiles.DoDragDrop(tvFiles.SelectedNode.FullPath, DragDropEffects.Copy)
 
     End Sub
 

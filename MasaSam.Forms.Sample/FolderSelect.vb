@@ -1,4 +1,5 @@
 ﻿Imports System.ComponentModel
+Imports AxWMPLib
 Imports MasaSam.Forms.Controls
 
 Public Class FolderSelect
@@ -114,5 +115,13 @@ Public Class FolderSelect
 
     Private Sub fst1_DirectorySelected(sender As Object, e As DirectoryInfoEventArgs) Handles fst1.DirectorySelected
         Folder = e.Directory.FullName
+    End Sub
+
+    Private Sub FolderSelect_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+
+    End Sub
+
+    Private Sub PreviewWMP_PlayStateChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent) Handles PreviewWMP.PlayStateChange
+        MovieHandler.PlaystateChange(sender, e)
     End Sub
 End Class
