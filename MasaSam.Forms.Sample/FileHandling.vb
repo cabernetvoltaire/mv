@@ -14,7 +14,9 @@ Module FileHandling
     Public Event FolderMoved(Path As String)
     Public Event FileMoved(Files As List(Of String), lbx As ListBox)
     Public t As Thread
-    Friend fm As New FavouritesMinder("Q:\Favourites")
+    Public WithEvents MS As New MovieSwapper(MainForm.MainWMP, MainForm.MainWMP2)
+
+    Public fm As New FavouritesMinder("Q:\Favourites")
 
 
     Public Sub OnfileMoved(f As List(Of String), lbx As ListBox)
@@ -38,51 +40,7 @@ Module FileHandling
     ''' <param name="e"></param>
     ''' <param name="flist"></param>
     ''' <param name="blnRandom"></param>
-    Public Sub FillListbox(lbx As ListBox, e As DirectoryInfo, blnRandom As Boolean)
-        If Not e.Exists Then Exit Sub
-        If e.Name = "My Computer" Then Exit Sub
-        'clear listbox
-        lbx.Items.Clear()
-        'clear list we just created?
-        Dim flist = MainForm.CurrentFileList
-        flist.Clear()
-        'for empty lists
-        If e.EnumerateFiles.Count = 0 Then
-            lbx.Items.Add("If there is nothing showing here, check your filters")
-            Exit Sub
-        End If
-        Try
-            FilterListBoxList(e, flist)
-            flist = SetPlayOrder(MainForm.PlayOrder.State, flist)
 
-            ' MainForm.FNG.Filenames = flist
-            FillShowbox(lbx, MainForm.CurrentFilterState.State, flist)
-
-            lbx.Tag = e
-
-
-            If lbx.Items.Count <> 0 Then
-                If blnRandom Then
-                    Dim s As Long = lbx.Items.Count - 1
-                    lbx.SelectedIndex = Rnd() * s
-                Else
-                    If lbx.FindString(Media.MediaPath) = -1 Then
-                        lbx.SelectedItem = lbx.FindString(Media.LinkPath)
-
-                    Else
-                        lbx.SelectedItem = lbx.FindString(Media.MediaPath)
-
-                    End If
-
-                End If
-            End If
-
-        Catch ex As IOException
-            Exit Try
-        End Try
-
-
-    End Sub
     Private Function FilterLBList(e As DirectoryInfo, ByRef lst As List(Of String)) As List(Of String)
         lst.Clear()
 
@@ -136,7 +94,7 @@ Module FileHandling
         Return lst
     End Function
 
-    Private Function FilterListBoxList(e As DirectoryInfo, ByVal lst As List(Of String))
+    Public Function FilterListBoxList(e As DirectoryInfo, ByVal lst As List(Of String))
         lst = FilterLBList(e, lst)
         Exit Function
         'Dim l As New List(Of String)
@@ -356,7 +314,7 @@ Module FileHandling
         t.Start()
 
         'Deal with the list box
-        'RaiseEvent FileMoved(files, lbx1)
+        RaiseEvent FileMoved(files, lbx1)
 
 
     End Sub
@@ -373,11 +331,11 @@ Module FileHandling
     Private Sub MovingFiles(files As List(Of String), strDest As String, s As String)
         If strDest <> "" Then
             Dim dinfo As New IO.DirectoryInfo(strDest)
-        If dinfo.Exists = False Then dinfo.Create()
+            If dinfo.Exists = False Then dinfo.Create()
         End If
         Dim file As String = ""
 
-            For Each file In files
+        For Each file In files
             '   If Media.Player.URL = file Then Media.Player.URL = ""
 
             If Not FileLengthCheck(file) Then Continue For
@@ -449,7 +407,7 @@ Module FileHandling
                 End Select
             End With
         Next
-        RaiseEvent FileMoved(files, MainForm.lbxFiles)
+        'RaiseEvent FileMoved(files, MainForm.lbxFiles)
     End Sub
     ''' <summary>
     ''' Checks to see if f is in the favourite links, and if so, updates the link. 

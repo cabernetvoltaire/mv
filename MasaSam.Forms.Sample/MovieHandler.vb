@@ -6,7 +6,7 @@ Module MovieHandler
     Public Property MediaDuration As Long ' = lngMediaDuration
     Public Property NewPosition As Long
     Public Property FromFinish As Long = 65
-    Public Sub MediaJumpToMarker()
+    Public Sub MediaJumpToMarker(SP As StartPointHandler)
         'ReportTime("Jumpto Marker")
         If Media.MediaPath = "" Then Exit Sub
         If MediaMarker <> -1 Then
@@ -14,17 +14,17 @@ Module MovieHandler
             Debug.Print("MediaMarker is " & MediaMarker)
             ' Media.Bookmark = MediaMarker
         Else
-            NewPosition = MainForm.StartPoint.StartPoint
+            NewPosition = SP.StartPoint
             'ReportTime("Jump to Marker " & NewPosition / Media.Duration)
 
 
             Console.WriteLine("New position is " & NewPosition & " of " & Media.Duration)
         End If
-
         MainForm.tmrJumpVideo.Enabled = True
         'Else
         'End If
     End Sub
+
     Public Sub PlaystateChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent)
         Dim wmp As AxWindowsMediaPlayer = CType(sender, AxWindowsMediaPlayer)
 
@@ -41,7 +41,7 @@ Module MovieHandler
                 End If
             Case WMPLib.WMPPlayState.wmppsPlaying
                 'ReportTime("Playing")
-                Media.Duration = currentWMP.currentMedia.duration
+                Media.Duration = MainForm.currentWMP.currentMedia.duration
                 MainForm.StartPoint.Duration = Media.Duration
                 MainForm.SwitchSound(False)
                 If Justpaused Then
@@ -50,14 +50,14 @@ Module MovieHandler
                 End If
                 '                MediaDuration = currentWMP.currentMedia.duration
                 If FullScreen.Changing Or MainForm.SP.Unpause Then 'Hold current position if switching to FS or back. 
-                    NewPosition = currentWMP.Ctlcontrols.currentPosition
+                    NewPosition = MainForm.currentWMP.Ctlcontrols.currentPosition
                     MainForm.tmrJumpVideo.Enabled = True
                 Else
                     ' ReportFault("MHPSCHange", "Just before MJ2M", True)
                     ' MediaJumpToMarker()
                     MainForm.OnStartChanged()
                 End If
-                wmp.Visible = True
+                WMP.Visible = True
                 '  GetAttributes(sender)
                 Justpaused = False
             Case WMPLib.WMPPlayState.wmppsPaused ', WMPLib.WMPPlayState.wmppsTransitioning
@@ -69,7 +69,59 @@ Module MovieHandler
                     Justpaused = True
                 End If
 
-                wmp.Visible = True
+                WMP.Visible = True
+            Case Else
+                WMP.Visible = False
+        End Select
+    End Sub
+    Public Sub PlaystateChangeNew(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent, SP As StartPointHandler, MH As MediaHandler)
+        Dim wmp As AxWindowsMediaPlayer = CType(sender, AxWindowsMediaPlayer)
+        MainForm.currentWMP = wmp
+
+        'ReportTime("Playstate " & e.newState)
+
+        Static Justpaused As Boolean
+        'MsgBox(e.newState.ToString)
+        Select Case e.newState
+            Case WMPLib.WMPPlayState.wmppsMediaEnded
+                'wmp.Visible = False
+                If Not MainForm.tmrAutoTrail.Enabled Then
+                    MainForm.AdvanceFile(True, False)
+                End If
+            Case WMPLib.WMPPlayState.wmppsPlaying
+                'ReportTime("Playing")
+                MH.Duration = wmp.currentMedia.duration
+                SP.Duration = MH.Duration
+                MainForm.SwitchSound(False)
+                If Justpaused Then
+                    Justpaused = False
+                    Exit Sub
+                End If
+                '                MediaDuration = currentWMP.currentMedia.duration
+                If FullScreen.Changing Or MainForm.SP.Unpause Then 'Hold current position if switching to FS or back. 
+                    NewPosition = wmp.Ctlcontrols.currentPosition
+                    MainForm.tmrJumpVideo.Enabled = True
+
+                Else
+                    ' ReportFault("MHPSCHange", "Just before MJ2M", True)
+                    ' MediaJumpToMarker()
+                    wmp.Ctlcontrols.currentPosition = SP.StartPoint
+
+                    MainForm.OnStartChanged()
+                End If
+                'wmp.Visible = True
+                '  GetAttributes(sender)
+                Justpaused = False
+            Case WMPLib.WMPPlayState.wmppsPaused ', WMPLib.WMPPlayState.wmppsTransitioning
+                '                MediaJumpToMarker()
+                If MainForm.tmrSlowMo.Enabled Then
+                    Justpaused = False
+                    MainForm.SwitchSound(True)
+                Else
+                    Justpaused = True
+                End If
+
+                'wmp.Visible = True
             Case Else
                 wmp.Visible = False
         End Select

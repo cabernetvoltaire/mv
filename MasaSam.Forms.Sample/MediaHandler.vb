@@ -227,7 +227,7 @@
 
             End If
 
-        Catch ex As IO.PathTooLongException
+        Catch ex As Exception
             Return Filetype.Unknown
         End Try
 

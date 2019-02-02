@@ -12,7 +12,7 @@
     End Property
 
     Public Property CurrentItem As String
-    Public Property Forwards As Boolean
+    Public Property Forwards As Boolean = True
     Private mCurrentIndex As Integer
     Public Property CurrentIndex() As Integer
         Get
@@ -20,7 +20,7 @@
         End Get
         Set(ByVal value As Integer)
             mCurrentIndex = value
-            CurrentItem = Listbox.Items(mCurrentIndex)
+            CurrentItem = mListbox.Items(mCurrentIndex)
         End Set
     End Property
     Private Property mNextItem As String

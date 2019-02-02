@@ -137,7 +137,8 @@ Public Module General
     ''' <returns></returns>
     Public Function LinkTarget(str As String) As String
         Try
-            Return CreateObject("WScript.Shell").CreateShortcut(str).TargetPath
+            str = CreateObject("WScript.Shell").CreateShortcut(str).TargetPath
+            Return str
         Catch ex As Exception
             Return str
         End Try
@@ -297,7 +298,7 @@ Public Module General
 
         'frmMain.FilterShowBox()
 
-        MainForm.UpdateFileInfo()
+        'MainForm.UpdateFileInfo()
     End Sub
     Private Sub CopyList(list As List(Of String), list2 As SortedList(Of Date, String))
         list.Clear()
@@ -335,7 +336,7 @@ Public Module General
 
             ReDim FBCShown(0)
             NofShown = 0
-            My.Computer.Registry.CurrentUser.SetValue("File", Media.MediaPath)
+            '   My.Computer.Registry.CurrentUser.SetValue("File", Media.MediaPath)
         End If
 
     End Sub

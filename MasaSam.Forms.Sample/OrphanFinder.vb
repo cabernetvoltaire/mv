@@ -50,37 +50,42 @@
         For Each m In mOrphanList
             FoundParent = False
             'Where should it point?
-            Dim f As New IO.FileInfo(LinkTarget(m))
-            Dim StartDest = New IO.DirectoryInfo(f.Directory.FullName)
-            While Not StartDest.Exists
-                StartDest = StartDest.Parent
-            End While
-            While Not FoundParent
-                'Check all the files in startdest, and put matches in Names
-                If Split(StartDest.FullName, "\").Length > 2 Then
-                    Dim Names As New Dictionary(Of String, String)
-                    Dim FilesToCheck As IO.FileInfo() = StartDest.GetFiles("*", IO.SearchOption.AllDirectories)
-                    For Each xx In FilesToCheck
-                        If Names.ContainsKey(xx.Name) Then
-                        Else
-                            Names.Add(xx.Name, xx.FullName)
+            Dim s As String = LinkTarget(m)
+            If s <> "" Then
+
+                Dim f As New IO.FileInfo(s)
+
+                Dim StartDest = New IO.DirectoryInfo(f.Directory.FullName)
+                While Not StartDest.Exists
+                    StartDest = StartDest.Parent
+                End While
+                While Not FoundParent
+                    'Check all the files in startdest, and put matches in Names
+                    If Split(StartDest.FullName, "\").Length > 2 Then
+                        Dim Names As New Dictionary(Of String, String)
+                        Dim FilesToCheck As IO.FileInfo() = StartDest.GetFiles("*", IO.SearchOption.AllDirectories)
+                        For Each xx In FilesToCheck
+                            If Names.ContainsKey(xx.Name) Then
+                            Else
+                                Names.Add(xx.Name, xx.FullName)
+                            End If
+                        Next
+                        'add names to foundparents
+                        If Names.ContainsKey(f.Name) Then
+                            If mFoundParents.ContainsKey(Names(f.Name)) Then
+                                mFoundParents.Add(Names(f.Name) & "#" & Format(Int(Rnd() * 1000000), "######"), m)
+                            Else
+                                mFoundParents.Add(Names(f.Name), m)
+                            End If
+                            FoundParent = True
+                            Exit While
                         End If
-                    Next
-                    'add names to foundparents
-                    If Names.ContainsKey(f.Name) Then
-                        If mFoundParents.ContainsKey(Names(f.Name)) Then
-                            mFoundParents.Add(Names(f.Name) & "#" & Format(Int(Rnd() * 1000000), "######"), m)
-                        Else
-                            mFoundParents.Add(Names(f.Name), m)
-                        End If
-                        FoundParent = True
+                    Else
                         Exit While
                     End If
-                Else
-                    Exit While
-                End If
-                StartDest = StartDest.Parent 'Broaden the hierarchy (could we somehow avoid checking the already checked files?) 
-            End While
+                    StartDest = StartDest.Parent 'Broaden the hierarchy (could we somehow avoid checking the already checked files?) 
+                End While
+            End If
         Next
         If mFoundParents.Count <> 0 Then
             RaiseEvent FoundParent(Me, Nothing)

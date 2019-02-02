@@ -209,13 +209,15 @@ Partial Class MainForm
         Me.SelectDeadLinksToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ReclaimDeadLinksToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.RefreshSelectedLinksToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator11 = New System.Windows.Forms.ToolStripSeparator()
+        Me.SelectNonFavouritsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ButtonFormToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ShowlistToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.DashboardToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ExperimentToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.PositionUpdater = New System.Windows.Forms.Timer(Me.components)
         Me.tmrMovieSlideShow = New System.Windows.Forms.Timer(Me.components)
-        Me.SelectNonFavouritsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ToolStripSeparator11 = New System.Windows.Forms.ToolStripSeparator()
+        Me.BackgroundWorker1 = New System.ComponentModel.BackgroundWorker()
         Me.StatusStrip1.SuspendLayout()
         Me.TableLayoutPanel2.SuspendLayout()
         CType(Me.ctrMainFrame, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -658,7 +660,7 @@ Partial Class MainForm
         'MainWMP2
         '
         Me.MainWMP2.Enabled = True
-        Me.MainWMP2.Location = New System.Drawing.Point(90, 46)
+        Me.MainWMP2.Location = New System.Drawing.Point(77, 46)
         Me.MainWMP2.Margin = New System.Windows.Forms.Padding(4)
         Me.MainWMP2.Name = "MainWMP2"
         Me.MainWMP2.OcxState = CType(resources.GetObject("MainWMP2.OcxState"), System.Windows.Forms.AxHost.State)
@@ -681,7 +683,7 @@ Partial Class MainForm
         'MainWMP
         '
         Me.MainWMP.Enabled = True
-        Me.MainWMP.Location = New System.Drawing.Point(1181, 79)
+        Me.MainWMP.Location = New System.Drawing.Point(407, 180)
         Me.MainWMP.Margin = New System.Windows.Forms.Padding(4)
         Me.MainWMP.Name = "MainWMP"
         Me.MainWMP.OcxState = CType(resources.GetObject("MainWMP.OcxState"), System.Windows.Forms.AxHost.State)
@@ -1324,7 +1326,7 @@ Partial Class MainForm
         'MenuStrip2
         '
         Me.MenuStrip2.ImageScalingSize = New System.Drawing.Size(28, 28)
-        Me.MenuStrip2.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FileToolStripMenuItem2, Me.ToolStripMenuItem10, Me.HarvestFolderToolStripMenuItem, Me.FullScreenToolStripMenuItem1, Me.OptionsToolStripMenuItem, Me.DuplicatesToolStripMenuItem, Me.ButtonFormToolStripMenuItem, Me.ShowlistToolStripMenuItem, Me.DashboardToolStripMenuItem})
+        Me.MenuStrip2.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FileToolStripMenuItem2, Me.ToolStripMenuItem10, Me.HarvestFolderToolStripMenuItem, Me.FullScreenToolStripMenuItem1, Me.OptionsToolStripMenuItem, Me.DuplicatesToolStripMenuItem, Me.ButtonFormToolStripMenuItem, Me.ShowlistToolStripMenuItem, Me.DashboardToolStripMenuItem, Me.ExperimentToolStripMenuItem})
         Me.MenuStrip2.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip2.Name = "MenuStrip2"
         Me.MenuStrip2.Size = New System.Drawing.Size(2850, 38)
@@ -1820,6 +1822,17 @@ Partial Class MainForm
         Me.RefreshSelectedLinksToolStripMenuItem.Size = New System.Drawing.Size(391, 34)
         Me.RefreshSelectedLinksToolStripMenuItem.Text = "Refresh Selected Links"
         '
+        'ToolStripSeparator11
+        '
+        Me.ToolStripSeparator11.Name = "ToolStripSeparator11"
+        Me.ToolStripSeparator11.Size = New System.Drawing.Size(388, 6)
+        '
+        'SelectNonFavouritsToolStripMenuItem
+        '
+        Me.SelectNonFavouritsToolStripMenuItem.Name = "SelectNonFavouritsToolStripMenuItem"
+        Me.SelectNonFavouritsToolStripMenuItem.Size = New System.Drawing.Size(391, 34)
+        Me.SelectNonFavouritsToolStripMenuItem.Text = "Select Non-Favourites"
+        '
         'ButtonFormToolStripMenuItem
         '
         Me.ButtonFormToolStripMenuItem.Name = "ButtonFormToolStripMenuItem"
@@ -1838,6 +1851,12 @@ Partial Class MainForm
         Me.DashboardToolStripMenuItem.Size = New System.Drawing.Size(126, 34)
         Me.DashboardToolStripMenuItem.Text = "Dashboard"
         '
+        'ExperimentToolStripMenuItem
+        '
+        Me.ExperimentToolStripMenuItem.Name = "ExperimentToolStripMenuItem"
+        Me.ExperimentToolStripMenuItem.Size = New System.Drawing.Size(129, 34)
+        Me.ExperimentToolStripMenuItem.Text = "Experiment"
+        '
         'PositionUpdater
         '
         Me.PositionUpdater.Enabled = True
@@ -1846,17 +1865,6 @@ Partial Class MainForm
         'tmrMovieSlideShow
         '
         Me.tmrMovieSlideShow.Interval = 5000
-        '
-        'SelectNonFavouritsToolStripMenuItem
-        '
-        Me.SelectNonFavouritsToolStripMenuItem.Name = "SelectNonFavouritsToolStripMenuItem"
-        Me.SelectNonFavouritsToolStripMenuItem.Size = New System.Drawing.Size(391, 34)
-        Me.SelectNonFavouritsToolStripMenuItem.Text = "Select Non-Favourites"
-        '
-        'ToolStripSeparator11
-        '
-        Me.ToolStripSeparator11.Name = "ToolStripSeparator11"
-        Me.ToolStripSeparator11.Size = New System.Drawing.Size(388, 6)
         '
         'MainForm
         '
@@ -2128,4 +2136,6 @@ Partial Class MainForm
     Friend WithEvents CloneToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator11 As ToolStripSeparator
     Friend WithEvents SelectNonFavouritsToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents BackgroundWorker1 As System.ComponentModel.BackgroundWorker
+    Friend WithEvents ExperimentToolStripMenuItem As ToolStripMenuItem
 End Class
