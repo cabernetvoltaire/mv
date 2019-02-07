@@ -4,8 +4,7 @@ Imports MasaSam.Forms.Controls
 Module FileHandling
     Public blnSuppressCreate As Boolean = False
     Public blnChooseOne As Boolean = False
-    Public VIDEOEXTENSIONS = ".divx.vob.webm.avi.flv.mov.m4p.mpeg.f4v.mpg.m4a.m4v.mkv.mp4.rm.ram.wmv.wav.mp3.3gp .lnk"
-    Public PICEXTENSIONS = "arw.jpeg.png.jpg.bmp.gif.lnk"
+
     Public CurrentfilterState As FilterHandler = MainForm.CurrentFilterState
     Public Random As RandomHandler = MainForm.Random
     Public NavigateMoveState As StateHandler = MainForm.NavigateMoveState
@@ -15,10 +14,21 @@ Module FileHandling
     Public Event FileMoved(Files As List(Of String), lbx As ListBox)
     Public t As Thread
     Public WithEvents MS As New MovieSwapper(MainForm.MainWMP, MainForm.MainWMP2)
-
+    Public Media As MediaHandler = MainForm.Media
     Public fm As New FavouritesMinder("Q:\Favourites")
 
+    Public Sub OnMediaShown(MP As AxWMPLib.AxWindowsMediaPlayer, M As MediaHandler) Handles MS.MediaShown
+        MainForm.currentWMP = MP
+        Media = M
+        '        MainForm.tmrJumpVideo.Enabled = True
 
+    End Sub
+    Public Sub OnMediaLoaded(MP As AxWMPLib.AxWindowsMediaPlayer, M As MediaHandler) Handles MS.LoadedMedia
+        MainForm.currentWMP = MP
+        Media = M
+        MediaJumpToMarker(MainForm.StartPoint)
+        '        MainForm.tmrJumpVideo.Enabled = True
+    End Sub
     Public Sub OnfileMoved(f As List(Of String), lbx As ListBox)
         MainForm.OnFileMoved(f, lbx)
     End Sub

@@ -13,7 +13,8 @@ Public Module General
         RightBottom = 7
         LeftBottom = 8
     End Enum
-
+    Public VIDEOEXTENSIONS = ".divx.vob.webm.avi.flv.mov.m4p.mpeg.f4v.mpg.m4a.m4v.mkv.mp4.rm.ram.wmv.wav.mp3.3gp .lnk"
+    Public PICEXTENSIONS = "arw.jpeg.png.jpg.bmp.gif.lnk"
     Public Enum CtrlFocus As Byte
         Tree = 0
         Files = 1
@@ -331,8 +332,8 @@ Public Module General
             End If
             MainForm.FNG.Clear()
 
-            Media.MediaDirectory = strPath 'Switch to this folder
-            ChangeWatcherPath(Media.MediaDirectory)
+            MainForm.tvMain2.SelectedFolder = strPath
+            ChangeWatcherPath(strPath)
 
             ReDim FBCShown(0)
             NofShown = 0
@@ -373,108 +374,6 @@ Public Module General
 
 
 
-    Public Function SetPlayOrderOld(Order As Byte, ByVal List As List(Of String)) As List(Of String)
-        'Return SetPlayOrderNew(Order, List)
-        Exit Function
-
-        Dim NewListS As New SortedList(Of String, String)
-        Dim NewListL As New SortedList(Of Long, String)
-        Dim NewListD As New SortedList(Of DateTime, String)
-        For Each f In List
-            If Len(f) > 247 Then Continue For
-            Dim file As New FileInfo(f)
-            'frmMain.ListBox1.BringToFront()
-
-            Try
-                Select Case Order
-                    Case SortHandler.Order.Name
-                        Dim l As Long = 0
-                        Dim s As String
-                        s = file.Name & Str(l)
-                        While NewListS.ContainsKey(s)
-                            l += 1
-                            s = file.Name & Str(l)
-                            '               frmMain.ListBox1.Items.Add(s)
-
-                        End While
-                        NewListS.Add(s, file.FullName)
-                    Case SortHandler.Order.Size
-                        Try
-                            Dim l As Long
-                            l = file.Length
-                            While NewListL.ContainsKey(l)
-                                l += 1
-                                'MsgBox(l)
-                            End While
-                            NewListL.Add(l, file.FullName)
-
-                        Catch ex As ArgumentException
-                            MsgBox("Fail")
-
-                        End Try
-                    Case SortHandler.Order.DateTime
-                        'MsgBox(time)
-                        Dim time = GetDate(file)
-                        While NewListD.ContainsKey(time)
-                            time = time.AddSeconds(1)
-                        End While
-                        NewListD.Add(time, file.FullName)
-                    Case SortHandler.Order.PathName
-                        Dim l As Long = 0
-                        Dim s As String
-                        s = file.FullName & Str(l)
-                        While NewListS.ContainsKey(s)
-                            l += 1
-                            s = file.FullName & Str(l)
-                            '               frmMain.ListBox1.Items.Add(s)
-
-                        End While
-                        '                        MsgBox(file.FullName)
-                        NewListS.Add(s, file.FullName)
-
-                    Case SortHandler.Order.Type
-                        NewListS.Add(file.Extension & file.Name & Str(Rnd() * (100)), file.FullName)
-
-                    Case SortHandler.Order.Random
-                        Dim l As Long
-                        l = Int(Rnd() * (100 * List.Count))
-                        While NewListS.ContainsKey(Str(l))
-                            l = Int(Rnd() * (100 * List.Count))
-                            '                       frmMain.ListBox1.Items.Add(l)
-
-                        End While
-                        NewListS.Add(Str(l), file.FullName)
-                    Case Else
-
-                End Select
-            Catch ex As System.ArgumentException 'TODO could do better than this. 
-                ReportFault("General.SetPlayOrder", ex.Message)
-                Continue For
-            Catch ex As IO.FileNotFoundException
-                Continue For
-            Catch ex As System.IO.PathTooLongException
-                Continue For
-            End Try
-        Next
-
-        If NewListD.Count <> 0 Then
-            CopyList(List, NewListD)
-        ElseIf NewListS.Count <> 0 Then
-            CopyList(List, NewListS)
-        ElseIf NewListL.Count <> 0 Then
-            CopyList(List, NewListL)
-        End If
-
-        If MainForm.PlayOrder.ReverseOrder Then
-            List = ReverseListOrder(List)
-        End If
-
-        Return List
-
-
-
-
-    End Function
 
     Public Function SetPlayOrder(Order As Byte, ByVal List As List(Of String)) As List(Of String)
         Dim NewListS As New SortedList(Of String, String)
@@ -624,8 +523,8 @@ Public Module General
     Public Function SelectFromListbox(lbx As ListBox, s As String, blnRegex As Boolean) As List(Of String)
         Dim ls As New List(Of String)
         Dim i As Long
-        lbx.SelectedItem = Nothing
         lbx.SelectionMode = SelectionMode.MultiExtended
+        lbx.SelectedItem = Nothing
         For i = 0 To lbx.Items.Count - 1
             If blnRegex Then
                 Dim r As New System.Text.RegularExpressions.Regex(s)

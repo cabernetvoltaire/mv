@@ -78,7 +78,7 @@
     Public Sub SetDefaults()
         With My.Computer.Registry.CurrentUser
             Dim s As String = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures)
-            Media.MediaDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures)
+            'Media.MediaDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures)
             Dim fol As New IO.DirectoryInfo(Media.MediaDirectory)
 
 

@@ -5,8 +5,6 @@ Friend Module Mysettings
     Public PFocus As Byte = CtrlFocus.Tree
     Public Property ZoneSize As Decimal = 0.4
     Public Const OrientationId As Integer = &H112
-    Public alternateWMP As New AxWMPLib.AxWindowsMediaPlayer
-    Public WithEvents Media As New MediaHandler
     Public strButtonfile As String
 
     Public LastPlayed As New Stack(Of String)
@@ -83,19 +81,11 @@ Friend Module Mysettings
             Try
                 MainForm.ctrFileBoxes.SplitterDistance = .GetValue("VertSplit", MainForm.ctrFileBoxes.Height / 4)
                 MainForm.ctrMainFrame.SplitterDistance = .GetValue("HorSplit", MainForm.ctrFileBoxes.Width / 2)
-
-
-
-                Dim s = .GetValue("File", "")
-                If s = "" Then s = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures)
-                'Media.MediaDirectory = .GetValue("Folder", System.Environment.GetFolderPath(Environment.SpecialFolder.MyPictures))
-                Media.MediaPath = .GetValue("File", s)
-                MainForm.CurrentFilterState.State = .GetValue("Filter", 0)
-
+                strButtonfile = .GetValue("LastButtonFile", "")
                 MainForm.PlayOrder.State = .GetValue("SortOrder", 0)
+                MainForm.CurrentFilterState.State = .GetValue("Filter", 0)
                 MainForm.StartPoint.State = .GetValue("StartPoint", 0)
                 MainForm.NavigateMoveState.State = .GetValue("State", 0)
-                strButtonfile = .GetValue("LastButtonFile", "")
                 iCurrentAlpha = .GetValue("LastAlpha", 0)
                 FavesFolderPath = .GetValue("Favourites", Media.MediaDirectory)
                 Dim fol As New IO.DirectoryInfo(FavesFolderPath)
@@ -103,8 +93,14 @@ Friend Module Mysettings
                     MainForm.FavouritesFolderToolStripMenuItem.PerformClick()
                 End If
 
+                Dim s As String = .GetValue("File", "")
+                If s = "" Then s = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures)
+                'Media.MediaDirectory = .GetValue("Folder", System.Environment.GetFolderPath(Environment.SpecialFolder.MyPictures))
+                Media.MediaPath = s
+
             Catch ex As Exception
-                PreferencesReset()
+                MsgBox(ex.Message)
+                'PreferencesReset()
             End Try
 
 
@@ -114,7 +110,7 @@ Friend Module Mysettings
     Public Sub PreferencesReset()
         With My.Computer.Registry.CurrentUser
             Dim s As String = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures)
-            Media.MediaDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures)
+            'Media.MediaDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures)
             Dim fol As New IO.DirectoryInfo(Media.MediaDirectory)
 
 
@@ -135,11 +131,6 @@ Friend Module Mysettings
             '.SetValue("LastButtonFolder", strButtonfile)
         End With
         PreferencesSave()
-    End Sub
-    Public Sub OnMediaChanged(sender As Object, e As EventArgs) Handles Media.MediaChanged
-        ChangeFolder(Media.MediaDirectory)
-        MainForm.UpdateFileInfo()
-
     End Sub
 
 End Module

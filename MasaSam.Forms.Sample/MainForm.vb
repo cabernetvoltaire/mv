@@ -31,11 +31,15 @@ Public Class MainForm
     Public DraggedFolder As String
     Public CurrentFileList As New List(Of String)
     Public T As Thread
-
+    Public WithEvents Media As New MediaHandler
     ' Public WithEvents MS As New MovieSwapper(lbxFiles, MainWMP, MainWMP2)
+    Public Sub OnMediaChanged(sender As Object, e As EventArgs) Handles Media.MediaChanged
+        '  ChangeFolder(Media.MediaDirectory)
+        UpdateFileInfo()
 
-    Public Sub OnMediaShown(Media As AxWindowsMediaPlayer)
     End Sub
+
+
     Public Sub OnFolderMoved(ByVal path As String)
         tvMain2.RemoveNode(path)
         'Dim dir As New IO.DirectoryInfo(path)
@@ -148,8 +152,7 @@ Public Class MainForm
     End Sub
 
     Public Sub OnStartChanged() Handles StartPoint.StateChanged, StartPoint.StartPointChanged
-        'blnJumpToMark = True
-        MediaMarker = -1
+        'Media.Bookmark = -1
         tbxAbsolute.Text = New TimeSpan(0, 0, StartPoint.StartPoint).ToString("hh\:mm\:ss")
         'StartPoint.Percentage = StartPoint.StartPoint / StartPoint.Duration * 100
 
@@ -174,8 +177,10 @@ Public Class MainForm
         cbxStartPoint.SelectedIndex = StartPoint.State
         tbStartpoint.Text = "START:" & StartPoint.Description
         ' MS.SH = StartPoint
-
-        MediaJumpToMarker(StartPoint)
+        Media.StartPoint = StartPoint
+        '        MS.SH = StartPoint
+        Media.MediaJumpToMarker(StartPoint)
+        '        MediaJumpToMarker(StartPoint)
     End Sub
     Public Sub OnStateChanged(sender As Object, e As EventArgs) Handles NavigateMoveState.StateChanged, CurrentFilterState.StateChanged, PlayOrder.StateChanged
         'If StartingUpFlag Then Exit Sub
@@ -214,13 +219,13 @@ Public Class MainForm
     ''' Switches between picbox and movie
     ''' </summary>
     ''' <param name="img"></param>
-    Private Sub MovietoPic(img As Image)
+    Public Sub MovietoPic(img As Image)
         PreparePic(currentPicBox, pbxBlanker, img)
         currentPicBox.Visible = True
         currentPicBox.BringToFront()
         '   currentWMP.Visible = False
-        currentWMP.URL = ""
-        currentWMP.Visible = False
+        'currentWMP.URL = ""
+        '  currentWMP.Visible = False
         SwitchSound(False)
         tbState.Text = ""
         tmrJumpVideo.Enabled = False
@@ -237,7 +242,7 @@ Public Class MainForm
 
 
 
-    Private Sub OrientPic(img As Image)
+    Public Sub OrientPic(img As Image)
         tbZoom.Text = UCase("Orientation -" & Orientation(ImageOrientation(img)))
         Select Case ImageOrientation(img)
             Case ExifOrientations.BottomRight
@@ -256,7 +261,7 @@ Public Class MainForm
         'If it is to jump to a random point, do not show first.
         ' If blnRandom Then currentWMP.Visible = False
         If URL <> LastURL Then
-            currentWMP.Visible = False
+            '      currentWMP.Visible = False
             currentWMP.URL = URL
             LastURL = URL
         End If
@@ -672,7 +677,7 @@ Public Class MainForm
 
 
         End If
-        FBCShown(lbx.SelectedIndex) = True
+        'FBCShown(lbx.SelectedIndex) = True
         NofShown += 1
         If NofShown >= count Then 'Re-sets when all shown. Quite nice. 
             ReDim FBCShown(count)
@@ -720,7 +725,7 @@ Public Class MainForm
         End If
 
         With currentWMP
-            NewPosition = Math.Min(.currentMedia.duration, .Ctlcontrols.currentPosition + .currentMedia.duration * Math.Sign(e.KeyCode - (KeyBigJumpOn + KeyBigJumpBack) / 2) / (iJumpFactor * SP.FractionalJump))
+            NewPosition = Math.Min(.currentMedia.duration, .Ctlcontrols.currentPosition + Media.Duration * Math.Sign(e.KeyCode - (KeyBigJumpOn + KeyBigJumpBack) / 2) / (iJumpFactor * SP.FractionalJump))
         End With
         tmrJumpVideo.Enabled = True
 
@@ -902,7 +907,7 @@ Public Class MainForm
                 If MediaMarker = -1 Then
 
                     MediaMarker = currentWMP.Ctlcontrols.currentPosition
-                    '  Media.Bookmark = MediaMarker
+                    Media.Bookmark = MediaMarker
                 Else
                     MediaMarker = -1
                 End If
@@ -1000,10 +1005,7 @@ Public Class MainForm
 #End Region
             Case KeyBackUndo
                 If LastFolder.Count > 0 Then
-
-                    Media.MediaDirectory = LastFolder.Pop
-
-                    tvMain2.SelectedFolder = Media.MediaDirectory
+                    tvMain2.SelectedFolder = LastFolder.Pop '= Media.MediaDirectory
                 End If
 
             Case KeyReStartSS
@@ -1159,7 +1161,7 @@ Public Class MainForm
         For Each s In StartPoint.Descriptions
             cbxStartPoint.Items.Add(s)
         Next
-        PreferencesGet()
+        PositionUpdater.Enabled = False
         tmrPicLoad.Interval = lngInterval * 15
         AssignExtensionFilters()
 
@@ -1169,20 +1171,22 @@ Public Class MainForm
 
 
         currentWMP = MainWMP
-        alternateWMP = MainWMP2
-        currentWMP.stretchToFit = True
-        alternateWMP.stretchToFit = True
+        'alternateWMP = MainWMP2
+        MainWMP.stretchToFit = True
+        '        currentWMP.stretchToFit = True
+        MainWMP2.stretchToFit = True
         currentWMP.uiMode = "FULL"
-        'currentWMP.Dock = DockStyle.Fill 'Swapper
+        MainWMP.Dock = DockStyle.Fill 'Swapper
+        MainWMP2.Dock = DockStyle.Fill
         'alternateWMP.Dock = DockStyle.Fill 'Swapper
         currentWMP.settings.volume = 100
 
-        Media.Player = currentWMP
-
         currentPicBox = PictureBox1
         Media.Picture = currentPicBox
+        Media.Player = currentWMP
         tbPercentage.Enabled = True
 
+        PreferencesGet()
 
 
         AddHandler FileHandling.FolderMoved, AddressOf OnFolderMoved
@@ -1277,32 +1281,33 @@ Public Class MainForm
     End Sub
 
     Private Sub Listbox_SelectedIndexChanged(sender As Object, e As EventArgs) 'Handles lbxShowList.SelectedIndexChanged, lbxFiles.SelectedIndexChanged 'TODO Swapper
-        With sender
-            Dim i As Long = .SelectedIndex
-            MS.Listbox = sender
-            MS.ListIndex = i
-            '   tmrPicLoad.Enabled = True
-            '            If i >= 0 Then
-            '    If i = 0 And InStr(.items(i), "filter") Then Exit Sub
-            '        Media.MediaPath = .items(i)
 
-            '        tmrPicLoad.Enabled = True
-            '    End If
-        End With
     End Sub
     Private Sub IndexHandler(sender As Object, e As EventArgs) Handles lbxShowList.SelectedIndexChanged, lbxFiles.SelectedIndexChanged 'TODO Swapper
+        PositionUpdater.Enabled = True
+        If False Then
 
-        With sender
-            Dim i As Long = .SelectedIndex
-
-            tmrPicLoad.Enabled = True
-            If i >= 0 Then
-                If i = 0 And InStr(.items(i), "filter") Then Exit Sub
-                Media.MediaPath = .items(i)
+            With sender
+                Dim lbx As ListBox = CType(sender, ListBox)
+                If lbx.SelectionMode = SelectionMode.One Then
+                    Dim i As Long = .SelectedIndex
+                    MS.Listbox = sender
+                    MS.ListIndex = i
+                End If
+            End With
+        Else
+            With sender
+                Dim i As Long = .SelectedIndex
 
                 tmrPicLoad.Enabled = True
-            End If
-        End With
+                If i >= 0 Then
+                    If i = 0 And InStr(.items(i), "filter") Then Exit Sub
+                    Media.MediaPath = .items(i)
+
+                    tmrPicLoad.Enabled = True
+                End If
+            End With
+        End If
 
     End Sub
 
@@ -1384,7 +1389,7 @@ Public Class MainForm
     '    If strnew <> "" Then lbxShowList.Items.Add(strnew)
     'End Sub
     Private Sub tmrLoadLastFolder_Tick(sender As Object, e As EventArgs) Handles tmrLoadLastFolder.Tick
-        Exit Sub
+        'Exit Sub
         tmrLoadLastFolder.Enabled = False
         'MsgBox("LLF")
         If Media.MediaPath = "" Then Exit Sub
@@ -1423,7 +1428,7 @@ Public Class MainForm
 
 
 
-    Private Sub MainWMP_PlayStateChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent) Handles MainWMP.PlayStateChange
+    Private Sub MainWMP_PlayStateChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent) 'Handles MainWMP.PlayStateChange 'Swapper
         PlaystateChange(sender, e)
 
         ' SoundWMP.settings.mute = True
@@ -1442,7 +1447,7 @@ Public Class MainForm
         '  If T.IsAlive Then Exit Sub
         Debug.Print("")
         ReportTime("PicLoadTick")
-        'HighlightCurrent(Media.MediaPath)
+        '        HighlightCurrent(Media.MediaPath) 'Swapper
         fType = Media.MediaType
 
         Select Case fType
@@ -1483,7 +1488,7 @@ Public Class MainForm
                 Exit Sub
         End Select
         'MainWMP.fullScreen = blnFullScreen
-        If Media.MediaPath <> "" Then PreferencesSave()
+        If Media.MediaPath <> "" Then My.Computer.Registry.CurrentUser.SetValue("File", Media.MediaPath)
         tmrPicLoad.Enabled = False
         'If FullScreen.Changing Then FullScreen.Changing = False
     End Sub
@@ -1519,8 +1524,8 @@ Public Class MainForm
         tmrJumpVideo.Enabled = False
 
 
-        currentWMP.Ctlcontrols.currentPosition = NewPosition
-        alternateWMP.Ctlcontrols.currentPosition = NewPosition
+        currentWMP.Ctlcontrols.currentPosition = Media.Position
+        'alternateWMP.Ctlcontrols.currentPosition = NewPosition
         SoundWMP.Ctlcontrols.currentPosition = NewPosition
         ReportTime("New position given:" & NewPosition)
 
@@ -1760,9 +1765,9 @@ Public Class MainForm
     Private Sub OnDirectorySelected(sender As Object, e As DirectoryInfoEventArgs) Handles tvMain2.DirectorySelected
         'PreferencesSave()
         lbxGroups.Items.Clear()
-        Media.MediaDirectory = e.Directory.FullName
+        'Media.MediaDirectory = e.Directory.FullName
 
-        FillListbox(lbxFiles, New DirectoryInfo(Media.MediaDirectory), Random.OnDirChange)
+        FillListbox(lbxFiles, New DirectoryInfo(e.Directory.FullName), Random.OnDirChange)
     End Sub
 
     Private Sub OnFilenamesParsed() Handles FNG.WordsParsed
@@ -1810,7 +1815,7 @@ Public Class MainForm
 
         End If
         't.LayoutPanel = Thumbnails.FlowLayoutPanel1
-        t.Text = Media.MediaDirectory
+        t.Text = MainForm.Media.MediaDirectory
         t.SetBounds(0, 0, 750, 900)
         t.Show()
 
@@ -2096,7 +2101,11 @@ Public Class MainForm
 
     End Sub
 
-
+    Public Sub MediaAdvance(wmp As AxWMPLib.AxWindowsMediaPlayer, stp As Long)
+        wmp.Ctlcontrols.step(stp)
+        wmp.Refresh()
+        Media.Position = wmp.Ctlcontrols.currentPosition
+    End Sub
 
 
 
@@ -2503,8 +2512,10 @@ Public Class MainForm
     End Sub
 
     Private Sub PositionUpdater_Tick(sender As Object, e As EventArgs) Handles PositionUpdater.Tick
+        ' Exit Sub
+        ' If currentWMP Is Nothing Then Exit Sub
         If currentWMP.URL <> "" Then
-            Media.Position = currentWMP.Ctlcontrols.currentPosition
+            ' Media.Position = currentWMP.Ctlcontrols.currentPosition
         End If
         '       End If
     End Sub
@@ -2600,7 +2611,7 @@ Public Class MainForm
         FNG.Filenames = CurrentFileList
     End Sub
 
-    Private Sub MainWMP2_PlayStateChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent) Handles MainWMP2.PlayStateChange
+    Private Sub MainWMP2_PlayStateChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent) 'Handles MainWMP2.PlayStateChange
         PlaystateChange(sender, e)
     End Sub
 

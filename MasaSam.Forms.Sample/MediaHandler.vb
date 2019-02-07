@@ -1,9 +1,13 @@
-﻿Public Class MediaHandler
+﻿Imports AxWMPLib
+Public Class MediaHandler
 
     Public Event MediaFinished(ByVal sender As Object, ByVal e As EventArgs)
     Public Event MediaClosed(ByVal sender As Object, ByVal e As EventArgs)
     Public Event MediaChanged(ByVal sender As Object, ByVal e As EventArgs)
     Private DefaultFile As String = "C:\exiftools.exe"
+    Private mPaused As Boolean
+    Public WithEvents StartPoint As New StartPointHandler
+    Public Property Speed As New SpeedHandler
 
     Private mType As Filetype
     Public Property MediaType() As Filetype
@@ -28,7 +32,7 @@
         End Set
     End Property
 
-    Private mPicBox As PictureBox
+    Private mPicBox As New PictureBox
     Public Property Picture() As PictureBox
         Get
             Return mPicBox
@@ -38,13 +42,15 @@
         End Set
     End Property
 
-    Private mPlayer As New AxWMPLib.AxWindowsMediaPlayer
+    Private WithEvents mPlayer As New AxWMPLib.AxWindowsMediaPlayer
     Public Property Player() As AxWMPLib.AxWindowsMediaPlayer
         Get
             Return mPlayer
         End Get
         Set(ByVal value As AxWMPLib.AxWindowsMediaPlayer)
             mPlayer = value
+            mPlayer.settings.enableErrorDialogs = False
+
         End Set
     End Property
     Private mPlayPosition As Long
@@ -55,7 +61,7 @@
         End Get
         Set(ByVal value As Long)
             mPlayPosition = value
-            '    mPlayer.Ctlcontrols.currentPosition = mPlayPosition
+            ' mPlayer.Ctlcontrols.currentPosition = mPlayPosition
         End Set
     End Property
 
@@ -116,9 +122,11 @@
                         mIsLink = False
                         mLinkPath = ""
                     End If
+                    LoadMedia()
+
                     mMediaDirectory = f.Directory.FullName
-                Else
-                    mMediaPath = DefaultFile
+                    Else
+                        mMediaPath = DefaultFile
                     mMediaDirectory = New IO.FileInfo(mMediaPath).Directory.FullName
                 End If
 
@@ -128,63 +136,82 @@
 
         End Set
     End Property
-
-
-    Private Function Findfile(f As IO.FileInfo, dir As IO.DirectoryInfo) As IO.FileInfo
-
-        'If f doesn't exist
-        'Split the path up into bits
-        'Progressively check the existence of each path
-        'When a part doesn't exist, choose the first file in that directory
-        While Not f.Exists
-            Dim directoryNames As New List(Of String)(f.FullName.Split(System.IO.Path.DirectorySeparatorChar))
-            Dim path As String = ""
-            For i = 0 To directoryNames.Count - 1
-                If i = 0 Then
-                    path = directoryNames(i) & IO.Path.DirectorySeparatorChar
-                Else
-                    path = path & directoryNames(i) & IO.Path.DirectorySeparatorChar
-                End If
-                Dim subdir As New IO.DirectoryInfo(path)
-                If subdir.Exists Then
-                    Findfile(f, subdir)
-                Else
-                    f = Nothing
-                End If
-            Next
-            Try
-                If Not f.Exists Then
-                    Try
-                        f = dir.GetFiles.First
-                    Catch ex As IO.DirectoryNotFoundException
-                        f = Nothing
-                    Catch ex As Exception
-                    End Try
-                End If
-            Catch ex As System.NullReferenceException
-                f = Nothing
-            End Try
-        End While
-        Return f
-    End Function
-
     Public Sub New()
-
     End Sub
     Private mMediaDirectory As String
-    Public Property MediaDirectory() As String
+    Public ReadOnly Property MediaDirectory() As String
         Get
             'Dim f As New IO.FileInfo(mMediaPath)
             ' mMediaDirectory = f.Directory.FullName
             Return mMediaDirectory
         End Get
-        Set(ByVal value As String)
-            If value <> mMediaDirectory Then
-                mMediaDirectory = value
-                RaiseEvent MediaChanged(Me, New EventArgs)
+        'Set(ByVal value As String)
+        '    If value <> mMediaDirectory Then
+        '        mMediaDirectory = value
+        '        RaiseEvent MediaChanged(Me, New EventArgs)
+        '    End If
+        'End Set
+    End Property
+
+    Private mIsLink As Boolean = False
+    Public Property IsLink() As Boolean
+        Get
+            Return mIsLink
+        End Get
+        Set(ByVal value As Boolean)
+            mIsLink = value
+            If mIsLink Then
+                GetBookmark()
+            Else
+                mLinkPath = ""
             End If
         End Set
     End Property
+    Private mBookmark As Long = -1
+    Public Property Bookmark() As Long
+        Get
+            Return mBookmark
+        End Get
+        Set(ByVal value As Long)
+            mBookmark = value
+        End Set
+    End Property
+    Public Sub GetBookmark()
+        If InStr(mMediaPath, "%") <> 0 Then
+
+            Dim s As String()
+            s = mMediaPath.Split("%")
+            mBookmark = Val(s(1))
+        Else
+            mBookmark = -1
+        End If
+
+    End Sub
+    Public Function UpdateBookmark(path As String, time As String) As String
+        If Right(path, 4) <> ".lnk" Then
+            Return path
+            Exit Function
+        End If
+        If InStr(path, "%") <> 0 Then
+            Dim m() As String = path.Split("%")
+            path = m(0) & "%" & time & "%" & m(m.Length - 1)
+        Else
+            path = path.Replace(".lnk", "%" & time & "%.lnk")
+        End If
+        mMediaPath = path
+        Return path
+
+    End Function
+    Private mLinkPath As String
+
+    Public ReadOnly Property LinkPath() As String
+
+        Get
+    Return mLinkPath
+        End Get
+
+    End Property
+
     Private Function FindType(file As String) As Filetype
         Try
             Dim info As New IO.FileInfo(file)
@@ -194,24 +221,7 @@
                 Case ".lnk"
                     mIsLink = True
                     IsLink = True
-
-                    'mMediaPath = LinkTarget(info.FullName) ' CreateObject("WScript.Shell").CreateShortcut(info.FullName).TargetPath
-                    'mLinkPath = info.FullName
-                    'MediaDirectory = info.Directory.FullName
-                    'MainForm.Text = "Metavisua - " & Media.MediaPath
-
-                    'Try
-                    'If My.Computer.FileSystem.FileExists(mMediaPath) Then
-                    'info = New IO.FileInfo(mMediaPath)
-                    'Else
-                    'Return Filetype.Unknown
-                    'Exit Function
-                    'End If
-
-                    'Catch ex As Exception
-                    'End Try
                     Return Filetype.Link
-                    '           Exit Function
             End Select
 
             Dim strExt = LCase(info.Extension)
@@ -232,61 +242,117 @@
         End Try
 
     End Function
-
-    Private mIsLink As Boolean = False
-    Public Property IsLink() As Boolean
-        Get
-            Return mIsLink
-        End Get
-        Set(ByVal value As Boolean)
-            mIsLink = value
-            If mIsLink Then
-                GetBookmark()
-            Else
-                mLinkPath = ""
-            End If
-        End Set
-    End Property
-    Private mBookmark As Long
-    Public Property Bookmark() As Long
-        Get
-            Return mBookmark
-        End Get
-        Set(ByVal value As Long)
-            mBookmark = value
-        End Set
-    End Property
-    Public Sub GetBookmark()
-        If InStr(mMediaPath, "%") <> 0 Then
-
-            Dim s As String()
-            s = mMediaPath.Split("%")
-            mBookmark = Val(s(1))
+    Public Sub MediaJumpToMarker(SP As StartPointHandler)
+        If mBookmark <> -1 Then
+            mPlayPosition = mBookmark
         Else
-            mBookmark = -1
+            mPlayPosition = SP.StartPoint
         End If
-
+        ' mPlayer.Ctlcontrols.currentPosition = mPlayPosition '
+        MainForm.tmrJumpVideo.Enabled = True
     End Sub
-    Private mLinkPath As String
-    Public ReadOnly Property LinkPath() As String
-        Get
-            Return mLinkPath
-        End Get
+#Region "Event Handlers"
 
-    End Property
-    Public Function UpdateBookmark(path As String, time As String) As String
-        If Right(path, 4) <> ".lnk" Then
-            Return path
-            Exit Function
-        End If
-        If InStr(path, "%") <> 0 Then
-            Dim m() As String = path.Split("%")
-            path = m(0) & "%" & time & "%" & m(m.Length - 1)
-        Else
-            path = path.Replace(".lnk", "%" & time & "%.lnk")
-        End If
-        mMediaPath = path
-        Return path
+    Private Sub PlaystateChangeNew(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent) Handles mPlayer.PlayStateChange
+        'TODO Move to MediaHandler
+        Dim wmp As AxWindowsMediaPlayer = CType(sender, AxWindowsMediaPlayer)
+        'ReportTime("Playstate " & e.newState)
 
-    End Function
+        'MsgBox(e.newState.ToString)
+        Select Case e.newState
+            Case WMPLib.WMPPlayState.wmppsMediaEnded
+                'wmp.Visible = False
+
+                If Not MainForm.tmrAutoTrail.Enabled And wmp.Visible Then
+                    MainForm.AdvanceFile(True, False)
+                End If
+            Case WMPLib.WMPPlayState.wmppsPlaying
+                'ReportTime("Playing")
+                mDuration = wmp.currentMedia.duration
+                StartPoint.Duration = mDuration
+                MainForm.SwitchSound(False)
+                If mPaused Then
+                    mPaused = False
+                    Exit Sub
+                End If
+                If FullScreen.Changing Or Speed.Unpause Then 'Hold current position if switching to FS or back. 
+                    NewPosition = wmp.Ctlcontrols.currentPosition
+                Else
+                    'wmp.Ctlcontrols.currentPosition = NewPosition
+                    'MainForm.OnStartChanged()
+                End If
+                'wmp.Visible = True
+                '  GetAttributes(sender)
+                mPaused = False
+            Case WMPLib.WMPPlayState.wmppsPaused ', WMPLib.WMPPlayState.wmppsTransitioning
+                '                MediaJumpToMarker()
+                If Not Speed.Fullspeed Then
+                    mPaused = False
+                    MainForm.SwitchSound(True)
+                Else
+                    mPaused = True
+                End If
+
+        End Select
+    End Sub
+    Private Sub HandleMovie(URL As String)
+        Static LastURL As String
+        'If URL <> LastURL Then
+        If mPlayer Is Nothing Then
+            Else
+
+
+            mPlayer.URL = URL
+            '   MediaJumpToMarker(StartPoint)
+            ' mPlayer.Ctlcontrols.pause()
+            LastURL = URL
+            End If
+        'End If
+    End Sub
+    Private Sub LoadMedia()
+
+        Select Case mType
+            Case Filetype.Doc
+
+            Case Filetype.Link
+                Select Case FindType(mLinkPath)
+                    Case Filetype.Movie
+                        If mBookmark <> -1 Then
+                            If StartPoint.State = StartPointHandler.StartTypes.ParticularAbsolute Then StartPoint.Absolute = mBookmark
+                        End If
+                        HandleMovie(mLinkPath)
+                    Case Filetype.Pic
+                        HandlePic(mLinkPath)
+                End Select
+            Case Filetype.Movie
+                HandleMovie(mMediaPath)
+            Case Filetype.Pic
+                HandlePic(mMediaPath)
+            Case Filetype.Unknown
+                'tbLastFile.Text = "Unhandled file:" & Media.MediaPath
+
+                Exit Sub
+        End Select
+        If mMediaPath <> "" Then My.Computer.Registry.CurrentUser.SetValue("File", Media.MediaPath)
+    End Sub
+    Public Sub HandlePic(path As String)
+
+        Dim img As Image
+        If Not Picture.Image Is Nothing Then
+            DisposePic(Picture)
+        End If
+        img = GetImage(path)
+        If img Is Nothing Then
+            Exit Sub
+        End If
+        MainForm.OrientPic(img)
+        'Resume if in middle of slideshow
+        'If blnRestartSlideShowFlag Then
+        '    tmrSlideShow.Enabled = True
+        '    blnRestartSlideShowFlag = False
+        'End If
+        MainForm.MovietoPic(img)
+    End Sub
+
+#End Region
 End Class

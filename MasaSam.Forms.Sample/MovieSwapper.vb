@@ -9,8 +9,9 @@ Public Class MovieSwapper
     Private mFileList As New List(Of String)
     Private mListIndex As Integer
     Private mListbox As New ListBox
-    Public Event LoadedMedia(Media As AxWindowsMediaPlayer)
-    Public Event MediaShown(Media As AxWindowsMediaPlayer)
+    Public Event LoadedMedia(Media As AxWindowsMediaPlayer, MH As MediaHandler)
+
+    Public Event MediaShown(Media As AxWindowsMediaPlayer, MH As MediaHandler)
 
     Public Property Listbox() As ListBox
         Get
@@ -45,23 +46,27 @@ Public Class MovieSwapper
         mMedia2.Player = MP2
     End Sub
 
-    Private Sub PSChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent) Handles Media1.PlayStateChange, Media2.PlayStateChange 'Swapper
-        'Static WMP As AxWindowsMediaPlayer
-        'WMP = currentWMP
-        MainForm.currentWMP = sender
-        If sender Is Media1 Then
-            ' Media = mMedia1
-            MovieHandler.PlaystateChangeNew(sender, e, SH, mMedia1)
-            RaiseEvent LoadedMedia(Media1)
-        Else
-            'Media = mMedia2
+    'Private Sub PSChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent) ' Handles Media1.PlayStateChange, Media2.PlayStateChange 'Swapper
 
-            MovieHandler.PlaystateChangeNew(sender, e, SH, mMedia2)
-            RaiseEvent LoadedMedia(Media2)
+    '    If sender Is Media1 Then
+    '        MovieHandler.PlaystateChangeNew(sender, e, SH, mMedia1)
+    '        If e.newState = WMPLib.WMPPlayState.wmppsPlaying Then
+    '            RaiseEvent LoadedMedia(Media1, mMedia1)
+    '            RaiseEvent MediaShown(Media2, mMedia2)
 
-        End If
-        'currentWMP = WMP
-    End Sub
+    '        End If
+
+    '    Else
+
+    '        MovieHandler.PlaystateChangeNew(sender, e, SH, mMedia2)
+    '        If e.newState = WMPLib.WMPPlayState.wmppsPlaying Then
+    '            RaiseEvent LoadedMedia(Media2, mMedia2)
+    '            RaiseEvent MediaShown(Media1, mMedia1)
+
+    '        End If
+
+    '    End If
+    'End Sub
     Private Sub SetIndex(index As Integer)
         Dim Current As String
         Dim Nxt As String
@@ -74,44 +79,40 @@ Public Class MovieSwapper
         mNext.CurrentIndex = index
         Current = mNext.CurrentItem
         Nxt = mNext.NextItem
-        If Media1.URL = "" Then
-            Media1.URL = Current
-            Media1.BringToFront()
-            Media2.URL = Nxt
+        Select Case Current
+            Case mMedia1.MediaPath
+                SwitchPlayers(Media2, Media1)
+                mMedia2.MediaPath = Nxt
+                MainForm.Media = mMedia1
+                'Media2.URL = Nxt
+           '     RaiseEvent MediaShown(Media1, mMedia1)
+            Case mMedia2.MediaPath
+                SwitchPlayers(Media1, Media2)
+                mMedia1.MediaPath = Nxt
+                MainForm.Media = mMedia2
+                'Media1.URL = Nxt
 
-        ElseIf Media1.URL = Current Then
-            Media2.URL = Nxt
-            mMedia2.MediaPath = Nxt
-            Mysettings.Media = mMedia1
-            SwitchPlayers(Media2, Media1)
+            Case Else
+                'Media2.URL = Nxt
+                'Media1.URL = Current
+                SwitchPlayers(Media2, Media1)
+                mMedia1.MediaPath = Current
+                mMedia2.MediaPath = Nxt
+                MainForm.Media = mMedia1
 
-        Else
-            Media1.URL = Nxt
-            mMedia1.MediaPath = Nxt
-            Mysettings.Media = mMedia1
-            '            MainForm.LoadMedia(Me, Nothing)
-            SwitchPlayers(Media1, Media2)
+        End Select
 
 
-        End If
+
         oldindex = index
     End Sub
     Private Sub SwitchPlayers(OldWMP As AxWindowsMediaPlayer, NewWMP As AxWindowsMediaPlayer)
         NewWMP.Visible = True
-        NewWMP.BringToFront()
-        'NewWMP.Ctlcontrols.play()
-        NewWMP.settings.mute = False
         OldWMP.Visible = False
+        NewWMP.BringToFront()
+        NewWMP.settings.mute = False
+        MainForm.currentWMP = NewWMP
         OldWMP.settings.mute = True
-        '        MainForm.currentWMP = NewWMP
-        If NewWMP Is Media1 Then
-            Mysettings.Media = mMedia1
-        Else
-            Mysettings.Media = mMedia2
-
-        End If
-        ' MainForm.tmrPicLoad.Enabled = True
-        RaiseEvent MediaShown(NewWMP)
     End Sub
 
 End Class

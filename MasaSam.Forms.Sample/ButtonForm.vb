@@ -59,7 +59,7 @@ Public Class ButtonForm
                 Else
                     Dim s As String = buttons.CurrentRow.Row(e.KeyCode - Keys.F5).Path
                     If s <> "" Then
-                        Media.MediaDirectory = s
+                        'Media.MediaDirectory = s
                     Else
                         Exit Sub
                     End If

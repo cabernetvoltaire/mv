@@ -2,6 +2,7 @@
 
 Public Class FullScreen
     Public Shared Property Changing As Boolean
+    Public Event FullScreenClosing()
 
     Private Sub FullScreen_Shown(sender As Object, e As EventArgs) Handles Me.Shown
         FSWMP.uiMode = "None"
@@ -15,7 +16,7 @@ Public Class FullScreen
 
         If e.KeyCode = Keys.Escape Then
             MainForm.GoFullScreen(False)
-
+            ' RaiseEvent FullScreenClosing()
         End If
 
         MainForm.HandleKeys(Me, e)

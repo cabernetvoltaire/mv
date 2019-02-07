@@ -660,11 +660,11 @@ Partial Class MainForm
         'MainWMP2
         '
         Me.MainWMP2.Enabled = True
-        Me.MainWMP2.Location = New System.Drawing.Point(77, 46)
+        Me.MainWMP2.Location = New System.Drawing.Point(287, 197)
         Me.MainWMP2.Margin = New System.Windows.Forms.Padding(4)
         Me.MainWMP2.Name = "MainWMP2"
         Me.MainWMP2.OcxState = CType(resources.GetObject("MainWMP2.OcxState"), System.Windows.Forms.AxHost.State)
-        Me.MainWMP2.Size = New System.Drawing.Size(690, 568)
+        Me.MainWMP2.Size = New System.Drawing.Size(999, 518)
         Me.MainWMP2.TabIndex = 4
         Me.MainWMP2.TabStop = False
         Me.MainWMP2.UseWaitCursor = True
@@ -683,14 +683,13 @@ Partial Class MainForm
         'MainWMP
         '
         Me.MainWMP.Enabled = True
-        Me.MainWMP.Location = New System.Drawing.Point(407, 180)
+        Me.MainWMP.Location = New System.Drawing.Point(0, 0)
         Me.MainWMP.Margin = New System.Windows.Forms.Padding(4)
         Me.MainWMP.Name = "MainWMP"
         Me.MainWMP.OcxState = CType(resources.GetObject("MainWMP.OcxState"), System.Windows.Forms.AxHost.State)
-        Me.MainWMP.Size = New System.Drawing.Size(940, 654)
+        Me.MainWMP.Size = New System.Drawing.Size(959, 491)
         Me.MainWMP.TabIndex = 2
         Me.MainWMP.TabStop = False
-        Me.MainWMP.UseWaitCursor = True
         '
         'PictureBox1
         '

@@ -1,28 +1,22 @@
 ﻿Imports AxWMPLib
 Module MovieHandler
-    Public Event MediaEnded()
+    ' Public Event MediaEnded()
 
     Public Property MediaMarker As Long = -1
-    Public Property MediaDuration As Long ' = lngMediaDuration
     Public Property NewPosition As Long
-    Public Property FromFinish As Long = 65
     Public Sub MediaJumpToMarker(SP As StartPointHandler)
+        'TODO Move to MediaHandler
         'ReportTime("Jumpto Marker")
         If Media.MediaPath = "" Then Exit Sub
         If MediaMarker <> -1 Then
             NewPosition = MediaMarker
             Debug.Print("MediaMarker is " & MediaMarker)
-            ' Media.Bookmark = MediaMarker
         Else
             NewPosition = SP.StartPoint
-            'ReportTime("Jump to Marker " & NewPosition / Media.Duration)
-
-
             Console.WriteLine("New position is " & NewPosition & " of " & Media.Duration)
         End If
         MainForm.tmrJumpVideo.Enabled = True
-        'Else
-        'End If
+
     End Sub
 
     Public Sub PlaystateChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent)
@@ -57,7 +51,7 @@ Module MovieHandler
                     ' MediaJumpToMarker()
                     MainForm.OnStartChanged()
                 End If
-                WMP.Visible = True
+                wmp.Visible = True
                 '  GetAttributes(sender)
                 Justpaused = False
             Case WMPLib.WMPPlayState.wmppsPaused ', WMPLib.WMPPlayState.wmppsTransitioning
@@ -69,15 +63,14 @@ Module MovieHandler
                     Justpaused = True
                 End If
 
-                WMP.Visible = True
+                wmp.Visible = True
             Case Else
-                WMP.Visible = False
+                wmp.Visible = False
         End Select
     End Sub
-    Public Sub PlaystateChangeNew(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent, SP As StartPointHandler, MH As MediaHandler)
+    Public Sub PlaystateChangeNew(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent, ByRef SP As StartPointHandler, ByRef MH As MediaHandler)
+        'TODO Move to MediaHandler
         Dim wmp As AxWindowsMediaPlayer = CType(sender, AxWindowsMediaPlayer)
-        MainForm.currentWMP = wmp
-
         'ReportTime("Playstate " & e.newState)
 
         Static Justpaused As Boolean
@@ -123,34 +116,9 @@ Module MovieHandler
 
                 'wmp.Visible = True
             Case Else
-                wmp.Visible = False
+                '         wmp.Visible = False
         End Select
     End Sub
+    'TODO Move to MediaHandler
 
-    Private Sub GetAttributes(sender As Object)
-        Dim AttributeName As String = ""
-        'This routine returns each of the attributes within the Media File
-        For i As Integer = 0 To sender.currentMedia.attributeCount - 1
-
-            AttributeName += sender.currentMedia.getAttributeName(i) & vbTab & sender.currentMedia.getItemInfo(sender.currentMedia.getAttributeName(i)) & vbCrLf
-        Next
-        MainForm.lblAttributes.Text = AttributeName
-        'The Attributes returned are:
-        ' Duration
-        ' FileType
-        ' Is_Trusted
-        ' MediaType
-        ' SourceURL
-        ' Streams
-        ' Title
-        ' WMServerVersion
-
-        AttributeName = ""
-    End Sub
-    Public Sub MediaAdvance(wmp As AxWMPLib.AxWindowsMediaPlayer, stp As Long)
-        wmp.Ctlcontrols.step(stp)
-        wmp.Refresh()
-        Media.Position = wmp.Ctlcontrols.currentPosition
-
-    End Sub
 End Module
