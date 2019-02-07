@@ -242,14 +242,14 @@ Public Class MediaHandler
         End Try
 
     End Function
-    Public Sub MediaJumpToMarker(SP As StartPointHandler)
+    Public Sub MediaJumpToMarker(ByRef SP As StartPointHandler)
         If mBookmark <> -1 Then
             mPlayPosition = mBookmark
         Else
             mPlayPosition = SP.StartPoint
         End If
         ' mPlayer.Ctlcontrols.currentPosition = mPlayPosition '
-        MainForm.tmrJumpVideo.Enabled = True
+        MainForm.JumpVideo(mPlayer, MainForm.SoundWMP)
     End Sub
 #Region "Event Handlers"
 
@@ -276,7 +276,7 @@ Public Class MediaHandler
                     Exit Sub
                 End If
                 If FullScreen.Changing Or Speed.Unpause Then 'Hold current position if switching to FS or back. 
-                    NewPosition = wmp.Ctlcontrols.currentPosition
+                    Media.Position = wmp.Ctlcontrols.currentPosition
                 Else
                     'wmp.Ctlcontrols.currentPosition = NewPosition
                     'MainForm.OnStartChanged()
@@ -303,7 +303,7 @@ Public Class MediaHandler
 
 
             mPlayer.URL = URL
-            '   MediaJumpToMarker(StartPoint)
+            MediaJumpToMarker(StartPoint)
             ' mPlayer.Ctlcontrols.pause()
             LastURL = URL
             End If

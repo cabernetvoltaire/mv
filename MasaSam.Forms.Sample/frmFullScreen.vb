@@ -24,7 +24,7 @@ Public Class FullScreen
     End Sub
 
     Public Sub FSWMP_PlayStateChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent) Handles FSWMP.PlayStateChange
-        PlaystateChange(sender, e)
+        'PlaystateChange(sender, e)
 
     End Sub
 

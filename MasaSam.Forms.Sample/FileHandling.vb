@@ -26,7 +26,8 @@ Module FileHandling
     Public Sub OnMediaLoaded(MP As AxWMPLib.AxWindowsMediaPlayer, M As MediaHandler) Handles MS.LoadedMedia
         MainForm.currentWMP = MP
         Media = M
-        MediaJumpToMarker(MainForm.StartPoint)
+        Media.StartPoint = MainForm.StartPoint
+        Media.MediaJumpToMarker(MainForm.StartPoint)
         '        MainForm.tmrJumpVideo.Enabled = True
     End Sub
     Public Sub OnfileMoved(f As List(Of String), lbx As ListBox)

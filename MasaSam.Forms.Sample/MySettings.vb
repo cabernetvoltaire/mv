@@ -96,6 +96,7 @@ Friend Module Mysettings
                 Dim s As String = .GetValue("File", "")
                 If s = "" Then s = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures)
                 'Media.MediaDirectory = .GetValue("Folder", System.Environment.GetFolderPath(Environment.SpecialFolder.MyPictures))
+
                 Media.MediaPath = s
 
             Catch ex As Exception

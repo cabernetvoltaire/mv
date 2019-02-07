@@ -4,6 +4,8 @@ Imports MasaSam.Forms.Controls
 
 Public Class FolderSelect
     Private newAlpha As Int16
+    Private PreMH As New MediaHandler
+
     Public Property Alpha() As Int16
         Get
             Return newAlpha
@@ -44,7 +46,6 @@ Public Class FolderSelect
     Public Property Button As Button
     Private Sub PlayMedia(value As String)
         Dim x As New IO.DirectoryInfo(value)
-        Dim PreMH As New MediaHandler
         Dim count As Integer = x.GetFiles.Count
         If count = 0 Then
 
@@ -122,6 +123,7 @@ Public Class FolderSelect
     End Sub
 
     Private Sub PreviewWMP_PlayStateChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent) Handles PreviewWMP.PlayStateChange
-        MovieHandler.PlaystateChange(sender, e)
+        'PreMH.
+        ' MovieHandler.PlaystateChangeNew(sender, e)
     End Sub
 End Class

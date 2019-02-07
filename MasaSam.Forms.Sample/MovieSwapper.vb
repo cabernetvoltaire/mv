@@ -3,7 +3,7 @@ Public Class MovieSwapper
     Private mNext As New NextFile
     Private mMedia1 As New MediaHandler
     Private mMedia2 As New MediaHandler
-    Public SH As New StartPointHandler
+    '  Public SH As New StartPointHandler
     Public WithEvents Media1 As New AxWindowsMediaPlayer
     Public WithEvents Media2 As New AxWindowsMediaPlayer
     Private mFileList As New List(Of String)
@@ -84,17 +84,23 @@ Public Class MovieSwapper
                 SwitchPlayers(Media2, Media1)
                 mMedia2.MediaPath = Nxt
                 MainForm.Media = mMedia1
-                'Media2.URL = Nxt
-           '     RaiseEvent MediaShown(Media1, mMedia1)
+                Media2.URL = Nxt
+                RaiseEvent LoadedMedia(Media2, mMedia2)
             Case mMedia2.MediaPath
                 SwitchPlayers(Media1, Media2)
                 mMedia1.MediaPath = Nxt
                 MainForm.Media = mMedia2
-                'Media1.URL = Nxt
+                Media1.URL = Nxt
+                RaiseEvent LoadedMedia(Media1, mMedia1)
+
 
             Case Else
-                'Media2.URL = Nxt
-                'Media1.URL = Current
+                Media2.URL = Nxt
+                RaiseEvent LoadedMedia(Media2, mMedia2)
+
+                Media1.URL = Current
+                RaiseEvent LoadedMedia(Media1, mMedia1)
+
                 SwitchPlayers(Media2, Media1)
                 mMedia1.MediaPath = Current
                 mMedia2.MediaPath = Nxt
@@ -112,6 +118,7 @@ Public Class MovieSwapper
         NewWMP.BringToFront()
         NewWMP.settings.mute = False
         MainForm.currentWMP = NewWMP
+        'MainForm.SwitchSound(False)
         OldWMP.settings.mute = True
     End Sub
 
