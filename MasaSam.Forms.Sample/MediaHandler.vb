@@ -243,13 +243,14 @@ Public Class MediaHandler
 
     End Function
     Public Sub MediaJumpToMarker(ByRef SP As StartPointHandler)
-        If mBookmark <> -1 Then
+        If mBookmark <> -1 And SP.State = StartPointHandler.StartTypes.ParticularAbsolute Then
             mPlayPosition = mBookmark
+
         Else
             mPlayPosition = SP.StartPoint
         End If
-        ' mPlayer.Ctlcontrols.currentPosition = mPlayPosition '
-        MainForm.JumpVideo(mPlayer, MainForm.SoundWMP)
+        mPlayer.Ctlcontrols.currentPosition = mPlayPosition '
+        ' MainForm.JumpVideo(mPlayer, MainForm.SoundWMP)
     End Sub
 #Region "Event Handlers"
 
