@@ -1531,8 +1531,10 @@ Public Class MainForm
     End Sub
 
     Public Sub JumpVideo(wmp As AxWindowsMediaPlayer, swmp As AxWindowsMediaPlayer)
-        wmp.Ctlcontrols.currentPosition = Media.Position
-        ' swmp.Ctlcontrols.currentPosition = NewPosition
+        tmrJumpVideo.Enabled = True
+        Exit Sub
+        wmp.Ctlcontrols.currentPosition = StartPoint.StartPoint
+        swmp.Ctlcontrols.currentPosition = StartPoint.StartPoint
 
     End Sub
 
@@ -2510,7 +2512,8 @@ Public Class MainForm
         ' Exit Sub
         ' If currentWMP Is Nothing Then Exit Sub
         If currentWMP.URL <> "" Then
-            ' Media.Position = currentWMP.Ctlcontrols.currentPosition
+            '    Media.Position = currentWMP.Ctlcontrols.currentPosition
+            '   Media.Duration = currentWMP.currentMedia.duration
         End If
         '       End If
     End Sub

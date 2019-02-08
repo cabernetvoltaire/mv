@@ -27,7 +27,7 @@ Module FileHandling
         MainForm.currentWMP = MP
         Media = M
         Media.StartPoint = MainForm.StartPoint
-        Media.MediaJumpToMarker(MainForm.StartPoint)
+        Media.MediaJumpToMarker(Media.StartPoint)
         '        MainForm.tmrJumpVideo.Enabled = True
     End Sub
     Public Sub OnfileMoved(f As List(Of String), lbx As ListBox)

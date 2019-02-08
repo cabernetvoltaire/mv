@@ -270,7 +270,7 @@ Public Class MediaHandler
                 'ReportTime("Playing")
                 mDuration = wmp.currentMedia.duration
                 StartPoint.Duration = mDuration
-                MainForm.SwitchSound(False)
+                ' MainForm.SwitchSound(False)
                 If mPaused Then
                     mPaused = False
                     Exit Sub
@@ -292,6 +292,7 @@ Public Class MediaHandler
                 Else
                     mPaused = True
                 End If
+            Case Else
 
         End Select
     End Sub
@@ -302,7 +303,7 @@ Public Class MediaHandler
             Else
 
 
-            mPlayer.URL = URL
+            ' mPlayer.URL = URL
             MediaJumpToMarker(StartPoint)
             ' mPlayer.Ctlcontrols.pause()
             LastURL = URL
