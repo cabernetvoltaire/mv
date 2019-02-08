@@ -122,7 +122,7 @@ Public Class MediaHandler
                         mIsLink = False
                         mLinkPath = ""
                     End If
-                    LoadMedia()
+                    Me.LoadMedia()
 
                     mMediaDirectory = f.Directory.FullName
                     Else
