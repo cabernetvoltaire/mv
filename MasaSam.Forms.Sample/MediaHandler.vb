@@ -61,7 +61,7 @@ Public Class MediaHandler
         End Get
         Set(ByVal value As Long)
             mPlayPosition = value
-            ' mPlayer.Ctlcontrols.currentPosition = mPlayPosition
+            mPlayer.Ctlcontrols.currentPosition = mPlayPosition
         End Set
     End Property
 
@@ -255,7 +255,7 @@ Public Class MediaHandler
 
     Private Sub PlaystateChangeNew(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent) Handles mPlayer.PlayStateChange
         'TODO Move to MediaHandler
-        Dim wmp As AxWindowsMediaPlayer = CType(sender, AxWindowsMediaPlayer)
+        'Dim wmp As AxWindowsMediaPlayer = CType(sender, AxWindowsMediaPlayer)
         'ReportTime("Playstate " & e.newState)
 
         'MsgBox(e.newState.ToString)
@@ -263,12 +263,12 @@ Public Class MediaHandler
             Case WMPLib.WMPPlayState.wmppsMediaEnded
                 'wmp.Visible = False
 
-                If Not MainForm.tmrAutoTrail.Enabled And wmp.Visible Then
+                If Not MainForm.tmrAutoTrail.Enabled And mPlayer.Visible Then
                     MainForm.AdvanceFile(True, False)
                 End If
             Case WMPLib.WMPPlayState.wmppsPlaying
                 'ReportTime("Playing")
-                mDuration = wmp.currentMedia.duration
+                mDuration = mPlayer.currentMedia.duration
                 StartPoint.Duration = mDuration
                 ' MainForm.SwitchSound(False)
                 If mPaused Then
@@ -276,7 +276,7 @@ Public Class MediaHandler
                     Exit Sub
                 End If
                 If FullScreen.Changing Or Speed.Unpause Then 'Hold current position if switching to FS or back. 
-                    Media.Position = wmp.Ctlcontrols.currentPosition
+                    Media.Position = mPlayer.Ctlcontrols.currentPosition
                 Else
                     'wmp.Ctlcontrols.currentPosition = NewPosition
                     'MainForm.OnStartChanged()
@@ -303,7 +303,7 @@ Public Class MediaHandler
             Else
 
 
-            ' mPlayer.URL = URL
+            mPlayer.URL = URL
             MediaJumpToMarker(StartPoint)
             ' mPlayer.Ctlcontrols.pause()
             LastURL = URL

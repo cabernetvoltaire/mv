@@ -724,7 +724,7 @@ Public Class MainForm
         With currentWMP
             Media.Position = Math.Min(Media.Duration, Media.Position + Media.Duration * Math.Sign(e.KeyCode - (KeyBigJumpOn + KeyBigJumpBack) / 2) / (iJumpFactor * SP.FractionalJump))
         End With
-        JumpVideo(Media.Player, SoundWMP)
+        '        JumpVideo(Media.Player, SoundWMP)
 
     End Sub
     Public Sub JumpRandom(blnAutoTrail As Boolean)
@@ -732,8 +732,8 @@ Public Class MainForm
 
             If Not blnAutoTrail Then
                 'Random.StartPoint = True
-                Media.Position = (Rnd(1) * (currentWMP.currentMedia.duration))
-                JumpVideo(Media.Player, SoundWMP)
+                Media.Position = (Rnd(1) * (Media.Duration))
+                ' JumpVideo(Media.Player, SoundWMP)
 
                 tbStartpoint.Text = "START:RANDOM"
 
