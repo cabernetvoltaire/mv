@@ -46,27 +46,6 @@ Public Class MovieSwapper
         mMedia2.Player = MP2
     End Sub
 
-    'Private Sub PSChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent) ' Handles Media1.PlayStateChange, Media2.PlayStateChange 'Swapper
-
-    '    If sender Is Media1 Then
-    '        MovieHandler.PlaystateChangeNew(sender, e, SH, mMedia1)
-    '        If e.newState = WMPLib.WMPPlayState.wmppsPlaying Then
-    '            RaiseEvent LoadedMedia(Media1, mMedia1)
-    '            RaiseEvent MediaShown(Media2, mMedia2)
-
-    '        End If
-
-    '    Else
-
-    '        MovieHandler.PlaystateChangeNew(sender, e, SH, mMedia2)
-    '        If e.newState = WMPLib.WMPPlayState.wmppsPlaying Then
-    '            RaiseEvent LoadedMedia(Media2, mMedia2)
-    '            RaiseEvent MediaShown(Media1, mMedia1)
-
-    '        End If
-
-    '    End If
-    'End Sub
     Private Sub SetIndex(index As Integer)
         Dim Current As String
         Dim Nxt As String

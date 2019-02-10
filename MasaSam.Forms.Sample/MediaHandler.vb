@@ -271,6 +271,7 @@ Public Class MediaHandler
                 'ReportTime("Playing")
                 mDuration = mPlayer.currentMedia.duration
                 StartPoint.Duration = mDuration
+                '    RaiseEvent MediaChanged(Me, New EventArgs)
                 ' MainForm.SwitchSound(False)
                 If mPaused Then
                     mPaused = False
@@ -299,17 +300,18 @@ Public Class MediaHandler
     End Sub
     Private Sub HandleMovie(URL As String)
         Static LastURL As String
-        'If URL <> LastURL Then
-        If mPlayer Is Nothing Then
+        If URL <> LastURL Then
+            If mPlayer Is Nothing Then
             Else
 
-
-            mPlayer.URL = URL
-            MediaJumpToMarker(StartPoint)
-            ' mPlayer.Ctlcontrols.pause()
-            LastURL = URL
+                ' While mPlayer.currentMedia Is Nothing
+                mPlayer.URL = URL
+                'End While
+                MediaJumpToMarker(StartPoint)
+                ' mPlayer.Ctlcontrols.pause()
+                LastURL = URL
             End If
-        'End If
+        End If
     End Sub
     Private Sub LoadMedia()
 

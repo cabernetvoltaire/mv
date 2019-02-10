@@ -33,7 +33,7 @@ Public Class MainForm
     Public T As Thread
     Public WithEvents Media As New MediaHandler
     ' Public WithEvents MS As New MovieSwapper(lbxFiles, MainWMP, MainWMP2)
-    Public Sub OnMediaChanged(sender As Object, e As EventArgs) Handles Media.MediaChanged
+    Public Sub OnMediaChanged()
         '  ChangeFolder(Media.MediaDirectory)
         UpdateFileInfo()
 
@@ -708,7 +708,7 @@ Public Class MainForm
             Media.Position = Media.Position + SP.AbsoluteJump / iJumpFactor
         End If
         ' blnRandomStartPoint = False
-        JumpVideo(Media.Player, SoundWMP)
+        '   JumpVideo(Media.Player, SoundWMP)
         'tmrJumpVideo.Enabled = True
     End Sub
 
@@ -893,12 +893,12 @@ Public Class MainForm
                 If Media.Bookmark = -1 Or StartPoint.State <> StartPointHandler.StartTypes.ParticularAbsolute Then
 
                     m.State = StartPointHandler.StartTypes.NearEnd
-                    Media.Position = m.StartPoint
+                    Media.MediaJumpToMarker(m)
                 Else
-                    Media.Position = Media.Bookmark
+                    Media.MediaJumpToMarker(StartPoint)
                 End If
 
-                JumpVideo(Media.Player, SoundWMP)
+                '                JumpVideo(Media.Player, SoundWMP)
 
                 e.SuppressKeyPress = True
             Case KeyMarkPoint, LKeyMarkPoint
@@ -1022,7 +1022,7 @@ Public Class MainForm
         ' e.suppresskeypress = True
     End Sub
 
-   Private Sub SpeedIncrease(e As KeyEventArgs)
+    Private Sub SpeedIncrease(e As KeyEventArgs)
         If e.KeyCode = KeySmallJumpUp Then
             SP.IncreaseSpeed()
         Else
@@ -1291,8 +1291,12 @@ Public Class MainForm
                 Dim lbx As ListBox = CType(sender, ListBox)
                 If lbx.SelectionMode = SelectionMode.One Then
                     Dim i As Long = .SelectedIndex
-                    MS.Listbox = sender
-                    MS.ListIndex = i
+                    If i = -1 Then
+                    Else
+
+                        MS.Listbox = sender
+                        MS.ListIndex = i
+                    End If
                 End If
             End With
         Else
@@ -1444,6 +1448,7 @@ Public Class MainForm
         tmrInitialise.Enabled = False
     End Sub
     Public Sub LoadMedia(sender As Object, e As EventArgs) Handles tmrPicLoad.Tick
+
         '  If T.IsAlive Then Exit Sub
         Debug.Print("")
         ReportTime("PicLoadTick")
@@ -2129,8 +2134,8 @@ Public Class MainForm
             'Assign button
             AssignButton(i, iCurrentAlpha, 1, Media.MediaDirectory, True) 'Just assign in all modes when all three control buttons held
             'Always update the button file. 
-            If My.Computer.FileSystem.FileExists(strButtonFile) Then
-                KeyAssignmentsStore(strButtonFile)
+            If My.Computer.FileSystem.FileExists(strButtonfile) Then
+                KeyAssignmentsStore(strButtonfile)
             Else
                 SaveButtonlist()
             End If
