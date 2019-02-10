@@ -242,11 +242,11 @@ Public Class MediaHandler
         End Try
 
     End Function
-    Public Sub MediaJumpToMarker(ByRef SP As StartPointHandler)
+    Public Sub MediaJumpToMarker()
         If mBookmark <> -1 Then
             mPlayPosition = mBookmark
         Else
-            mPlayPosition = SP.StartPoint
+            mPlayPosition = StartPoint.StartPoint
         End If
         ' mPlayer.Ctlcontrols.currentPosition = mPlayPosition '
         MainForm.JumpVideo(mPlayer, MainForm.SoundWMP)
@@ -271,6 +271,8 @@ Public Class MediaHandler
                 mDuration = mPlayer.currentMedia.duration
                 StartPoint.Duration = mDuration
                 ' MainForm.SwitchSound(False)
+                MediaJumpToMarker()
+
                 If mPaused Then
                     mPaused = False
                     Exit Sub
@@ -304,7 +306,6 @@ Public Class MediaHandler
 
 
             mPlayer.URL = URL
-            MediaJumpToMarker(StartPoint)
             ' mPlayer.Ctlcontrols.pause()
             LastURL = URL
             End If

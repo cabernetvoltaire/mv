@@ -174,7 +174,7 @@ Public Class MainForm
         ' MS.SH = StartPoint
         '        MS.SH = StartPoint
         If Not Initialising Then
-            Media.MediaJumpToMarker(StartPoint)
+            Media.MediaJumpToMarker()
         End If
         '        MediaJumpToMarker(StartPoint)
     End Sub
@@ -1022,7 +1022,7 @@ Public Class MainForm
         ' e.suppresskeypress = True
     End Sub
 
-   Private Sub SpeedIncrease(e As KeyEventArgs)
+    Private Sub SpeedIncrease(e As KeyEventArgs)
         If e.KeyCode = KeySmallJumpUp Then
             SP.IncreaseSpeed()
         Else
@@ -2129,8 +2129,8 @@ Public Class MainForm
             'Assign button
             AssignButton(i, iCurrentAlpha, 1, Media.MediaDirectory, True) 'Just assign in all modes when all three control buttons held
             'Always update the button file. 
-            If My.Computer.FileSystem.FileExists(strButtonFile) Then
-                KeyAssignmentsStore(strButtonFile)
+            If My.Computer.FileSystem.FileExists(strButtonfile) Then
+                KeyAssignmentsStore(strButtonfile)
             Else
                 SaveButtonlist()
             End If
@@ -2371,7 +2371,7 @@ Public Class MainForm
         tbxAbsolute.Text = New TimeSpan(0, 0, tbAbsolute.Value).ToString("hh\:mm\:ss")
         tbxPercentage.Text = Str(StartPoint.Percentage) & "%"
         tbPercentage.Value = StartPoint.Percentage
-        Media.MediaJumpToMarker(StartPoint)
+        Media.MediaJumpToMarker()
 
     End Sub
 
@@ -2382,7 +2382,7 @@ Public Class MainForm
         tbxPercentage.Text = Str(StartPoint.Percentage) & "%"
         tbPercentage.Value = StartPoint.Percentage
 
-        Media.MediaJumpToMarker(StartPoint)
+        Media.MediaJumpToMarker()
 
     End Sub
 
