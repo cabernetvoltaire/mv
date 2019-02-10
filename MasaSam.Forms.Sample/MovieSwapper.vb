@@ -83,13 +83,13 @@ Public Class MovieSwapper
             Case mMedia1.MediaPath
                 SwitchPlayers(Media2, Media1)
                 mMedia2.MediaPath = Nxt
-                MainForm.Media = mMedia1
+                Media = mMedia1
                 '   Media2.URL = Nxt
                 RaiseEvent LoadedMedia(Media2, mMedia2)
             Case mMedia2.MediaPath
                 SwitchPlayers(Media1, Media2)
                 mMedia1.MediaPath = Nxt
-                MainForm.Media = mMedia2
+                Media = mMedia2
                 '  Media1.URL = Nxt
                 RaiseEvent LoadedMedia(Media1, mMedia1)
 
@@ -104,7 +104,7 @@ Public Class MovieSwapper
                 SwitchPlayers(Media2, Media1)
                 mMedia1.MediaPath = Current
                 mMedia2.MediaPath = Nxt
-                MainForm.Media = mMedia1
+                Media = mMedia1
 
         End Select
 

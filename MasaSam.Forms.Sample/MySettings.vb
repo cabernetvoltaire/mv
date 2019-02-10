@@ -64,14 +64,14 @@ Friend Module Mysettings
         With My.Computer.Registry.CurrentUser
             .SetValue("VertSplit", MainForm.ctrFileBoxes.SplitterDistance)
             .SetValue("HorSplit", MainForm.ctrMainFrame.SplitterDistance)
-            .SetValue("File", Media.MediaPath)
-            .SetValue("Filter", MainForm.CurrentFilterState.State)
+            .SetValue("LastButtonFile", strButtonfile)
             .SetValue("SortOrder", MainForm.PlayOrder.State)
+            .SetValue("Filter", MainForm.CurrentFilterState.State)
             .SetValue("StartPoint", MainForm.StartPoint.State)
             .SetValue("State", MainForm.NavigateMoveState.State)
-            .SetValue("LastButtonFile", strButtonfile)
             .SetValue("LastAlpha", iCurrentAlpha)
             .SetValue("Favourites", FavesFolderPath)
+            .SetValue("File", Media.MediaPath)
         End With
 
     End Sub

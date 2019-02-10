@@ -14,18 +14,18 @@ Module FileHandling
     Public Event FileMoved(Files As List(Of String), lbx As ListBox)
     Public t As Thread
     Public WithEvents MS As New MovieSwapper(MainForm.MainWMP, MainForm.MainWMP2)
-    Public Media As MediaHandler = MainForm.Media
+    Public Media As MediaHandler = MainForm.TMedia
     Public fm As New FavouritesMinder("Q:\Favourites")
 
     Public Sub OnMediaShown(MP As AxWMPLib.AxWindowsMediaPlayer, M As MediaHandler) Handles MS.MediaShown
         MainForm.currentWMP = MP
         Media = M
-        Media.MediaJumpToMarker(Media.StartPoint)
-
+        MainForm.OnMediaChanged(M, New EventArgs)
     End Sub
     Public Sub OnMediaLoaded(MP As AxWMPLib.AxWindowsMediaPlayer, M As MediaHandler) Handles MS.LoadedMedia
         MainForm.currentWMP = MP
         Media.StartPoint = MainForm.StartPoint
+        ' Media.MediaJumpToMarker(Media.StartPoint)
 
     End Sub
     Public Sub OnfileMoved(f As List(Of String), lbx As ListBox)
