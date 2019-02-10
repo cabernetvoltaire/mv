@@ -119,14 +119,7 @@ Public Class MovieSwapper
         NewWMP.settings.mute = False
         MainForm.currentWMP = NewWMP
         'MainForm.SwitchSound(False)
-
         OldWMP.settings.mute = True
-        If NewWMP Is Media1 Then
-            RaiseEvent MediaShown(Media1, mMedia1)
-        Else
-            RaiseEvent MediaShown(Media2, mMedia2)
-
-        End If
     End Sub
 
 End Class

@@ -1174,8 +1174,8 @@ Public Class MainForm
         '        currentWMP.stretchToFit = True
         MainWMP2.stretchToFit = True
         currentWMP.uiMode = "FULL"
-        MainWMP.Dock = DockStyle.Fill 'Swapper
-        MainWMP2.Dock = DockStyle.Fill
+        '  MainWMP.Dock = DockStyle.Fill 'Swapper
+        ' MainWMP2.Dock = DockStyle.Fill
         'alternateWMP.Dock = DockStyle.Fill 'Swapper
         currentWMP.settings.volume = 100
 
