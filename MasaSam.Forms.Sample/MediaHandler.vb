@@ -32,7 +32,15 @@ Public Class MediaHandler
         End Set
     End Property
 
-    Public Property Picture() As New PictureBox
+    Private mPicBox As New PictureBox
+    Public Property Picture() As PictureBox
+        Get
+            Return mPicBox
+        End Get
+        Set(ByVal value As PictureBox)
+            mPicBox = value
+        End Set
+    End Property
 
     Private WithEvents mPlayer As New AxWMPLib.AxWindowsMediaPlayer
     Public Property Player() As AxWMPLib.AxWindowsMediaPlayer
@@ -114,7 +122,6 @@ Public Class MediaHandler
                         mIsLink = False
                         mLinkPath = ""
                     End If
-
                     Me.LoadMedia()
 
                     mMediaDirectory = f.Directory.FullName
@@ -242,7 +249,6 @@ Public Class MediaHandler
         Else
             mPlayPosition = SP.StartPoint
         End If
-        If mPlayPosition > mDuration Then Debug.Print(mPlayPosition & " exceeds " & mDuration)
         mPlayer.Ctlcontrols.currentPosition = mPlayPosition '
         ' MainForm.JumpVideo(mPlayer, MainForm.SoundWMP)
     End Sub
@@ -288,8 +294,7 @@ Public Class MediaHandler
                     mPaused = True
                 End If
             Case Else
-                '      mDuration = mPlayer.currentMedia.duration
-           '     StartPoint.Duration = mDuration
+
         End Select
     End Sub
     Private Sub HandleMovie(URL As String)
@@ -297,12 +302,9 @@ Public Class MediaHandler
         'If URL <> LastURL Then
         If mPlayer Is Nothing Then
             Else
-            'Dim t As New Threading.Thread
 
 
             mPlayer.URL = URL
-            '            mDuration = mPlayer.currentMedia.duration
-            '           StartPoint.Duration = mDuration
             MediaJumpToMarker(StartPoint)
             ' mPlayer.Ctlcontrols.pause()
             LastURL = URL

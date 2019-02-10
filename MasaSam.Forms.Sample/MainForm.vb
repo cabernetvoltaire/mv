@@ -31,9 +31,9 @@ Public Class MainForm
     Public DraggedFolder As String
     Public CurrentFileList As New List(Of String)
     Public T As Thread
-    Public WithEvents TMedia As New MediaHandler
+    Public WithEvents Media As New MediaHandler
     ' Public WithEvents MS As New MovieSwapper(lbxFiles, MainWMP, MainWMP2)
-    Public Sub OnMediaChanged(M As MediaHandler, e As EventArgs)
+    Public Sub OnMediaChanged(sender As Object, e As EventArgs) Handles Media.MediaChanged
         '  ChangeFolder(Media.MediaDirectory)
         UpdateFileInfo()
 
@@ -893,12 +893,12 @@ Public Class MainForm
                 If Media.Bookmark = -1 Or StartPoint.State <> StartPointHandler.StartTypes.ParticularAbsolute Then
 
                     m.State = StartPointHandler.StartTypes.NearEnd
-                    Media.MediaJumpToMarker(m)
-                    'Media.Position = m.StartPoint
+                    Media.Position = m.StartPoint
                 Else
-                    Media.MediaJumpToMarker(StartPoint)
+                    Media.Position = Media.Bookmark
                 End If
 
+                JumpVideo(Media.Player, SoundWMP)
 
                 e.SuppressKeyPress = True
             Case KeyMarkPoint, LKeyMarkPoint
@@ -1022,7 +1022,7 @@ Public Class MainForm
         ' e.suppresskeypress = True
     End Sub
 
-    Private Sub SpeedIncrease(e As KeyEventArgs)
+   Private Sub SpeedIncrease(e As KeyEventArgs)
         If e.KeyCode = KeySmallJumpUp Then
             SP.IncreaseSpeed()
         Else
@@ -1163,6 +1163,7 @@ Public Class MainForm
         tmrPicLoad.Interval = lngInterval * 15
         AssignExtensionFilters()
 
+
         Randomize()
         '  tmrLoadLastFolder.Enabled = True
 
@@ -1176,8 +1177,7 @@ Public Class MainForm
         MainWMP.Dock = DockStyle.Fill 'Swapper
         MainWMP2.Dock = DockStyle.Fill
         'alternateWMP.Dock = DockStyle.Fill 'Swapper
-        MainWMP.settings.volume = 100
-        MainWMP2.settings.volume = 100
+        currentWMP.settings.volume = 100
 
         currentPicBox = PictureBox1
         Media.Picture = currentPicBox
@@ -1531,8 +1531,7 @@ Public Class MainForm
     End Sub
 
     Public Sub JumpVideo(wmp As AxWindowsMediaPlayer, swmp As AxWindowsMediaPlayer)
-        Media.MediaJumpToMarker(StartPoint)
-        'tmrJumpVideo.Enabled = True
+        tmrJumpVideo.Enabled = True
         Exit Sub
         wmp.Ctlcontrols.currentPosition = StartPoint.StartPoint
         swmp.Ctlcontrols.currentPosition = StartPoint.StartPoint
@@ -1813,7 +1812,7 @@ Public Class MainForm
 
         End If
         't.LayoutPanel = Thumbnails.FlowLayoutPanel1
-        t.Text = FileHandling.Media.MediaDirectory
+        t.Text = MainForm.Media.MediaDirectory
         t.SetBounds(0, 0, 750, 900)
         t.Show()
 
@@ -2130,8 +2129,8 @@ Public Class MainForm
             'Assign button
             AssignButton(i, iCurrentAlpha, 1, Media.MediaDirectory, True) 'Just assign in all modes when all three control buttons held
             'Always update the button file. 
-            If My.Computer.FileSystem.FileExists(strButtonfile) Then
-                KeyAssignmentsStore(strButtonfile)
+            If My.Computer.FileSystem.FileExists(strButtonFile) Then
+                KeyAssignmentsStore(strButtonFile)
             Else
                 SaveButtonlist()
             End If
