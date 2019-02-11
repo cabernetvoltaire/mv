@@ -49,8 +49,9 @@ Public Class MediaHandler
         End Get
         Set(ByVal value As AxWMPLib.AxWindowsMediaPlayer)
             mPlayer = value
-            mPlayer.settings.enableErrorDialogs = False
 
+            mPlayer.settings.enableErrorDialogs = False
+            mPlayer.settings.autoStart = True
         End Set
     End Property
     Private mPlayPosition As Long
@@ -303,15 +304,11 @@ Public Class MediaHandler
         If URL <> LastURL Then
             If mPlayer Is Nothing Then
             Else
-
-                ' While mPlayer.currentMedia Is Nothing
                 mPlayer.URL = URL
-                'End While
-                MediaJumpToMarker(StartPoint)
-                ' mPlayer.Ctlcontrols.pause()
                 LastURL = URL
             End If
         End If
+        MediaJumpToMarker(StartPoint)
     End Sub
     Private Sub LoadMedia()
 

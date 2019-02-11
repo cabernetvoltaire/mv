@@ -61,21 +61,20 @@
                 mPreviousItem = Listbox.Items(Int(Rnd() * (mListCount - 1)))
             Else
                 If mListCount > 1 Then
-                    If Forwards Then
-                        mPreviousItem = Listbox.Items((mCurrentIndex - 1) Mod (mListCount - 1))
+                    If Not Forwards Then
+                        mPreviousItem = Listbox.Items((mCurrentIndex + 1) Mod (mListCount - 1))
                     Else
                         If mCurrentIndex = 0 Then
                             mCurrentIndex = mListCount - 1
-                        Else
-                            mPreviousItem = Listbox.Items((mCurrentIndex + 1) Mod (mListCount - 1))
                         End If
+                        mPreviousItem = Listbox.Items((mCurrentIndex - 1) Mod (mListCount - 1))
                     End If
                 Else
                     mPreviousItem = Listbox.Items(0)
 
                 End If
             End If
-            Return mNextItem
+            Return mPreviousItem
         End Get
         Set(value As String)
 

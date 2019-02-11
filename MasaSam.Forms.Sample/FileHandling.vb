@@ -13,28 +13,28 @@ Module FileHandling
     Public Event FolderMoved(Path As String)
     Public Event FileMoved(Files As List(Of String), lbx As ListBox)
     Public t As Thread
-    Public WithEvents MS As New MovieSwapper(MainForm.MainWMP, MainForm.MainWMP2)
+    Public WithEvents MSFiles As New MovieSwapper(MainForm.MainWMP, MainForm.MainWMP2, MainForm.MainWMP3)
+    '   Public WithEvents MSShow As New MovieSwapper(MainForm.MainWMP, MainForm.MainWMP2)
+
     Public WithEvents Media As MediaHandler = MainForm.Media
     Public fm As New FavouritesMinder("Q:\Favourites")
     Public Sub OnMediaChanged() Handles Media.MediaChanged
         '  MainForm.StartPoint.Duration = Media.Duration
 
     End Sub
-    Public Sub OnMediaShown(MP As AxWMPLib.AxWindowsMediaPlayer, M As MediaHandler) Handles MS.MediaShown
-        MainForm.currentWMP = MP
+    Public Sub OnMediaShown(M As MediaHandler) Handles MSFiles.MediaShown
         Media = M
-        'Media.StartPoint = MainForm.StartPoint
-
+        MainForm.currentWMP = Media.Player
+        'Media.StartPoint.State = MainForm.StartPoint.State
+        'Media.Player.Ctlcontrols.play()
         MainForm.UpdateFileInfo()
 
     End Sub
-    Public Sub OnMediaLoaded(MP As AxWMPLib.AxWindowsMediaPlayer, M As MediaHandler) Handles MS.LoadedMedia
-        MainForm.currentWMP = MP
-        ' MainForm.StartPoint.Duration = Media.Duration
+    Public Sub OnMediaLoaded(M As MediaHandler) Handles MSFiles.LoadedMedia
         Media = M
-        Media.StartPoint = MainForm.StartPoint
+        Media.StartPoint.State = MainForm.StartPoint.State
         Media.MediaJumpToMarker(Media.StartPoint)
-
+        ' Media.Player.Ctlcontrols.pause()
     End Sub
     Public Sub OnfileMoved(f As List(Of String), lbx As ListBox)
         MainForm.OnFileMoved(f, lbx)

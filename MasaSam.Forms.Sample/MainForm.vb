@@ -137,6 +137,9 @@ Public Class MainForm
         If Random.StartPoint Then
             StartPoint.State = StartPointHandler.StartTypes.Random
         End If
+        If Random.NextSelect Then
+            MSFiles.NextF.Randomised = True
+        End If
         ToggleRandomAdvanceToolStripMenuItem.Checked = Random.NextSelect
         ToggleRandomSelectToolStripMenuItem.Checked = Random.OnDirChange
         ToggleRandomStartToolStripMenuItem.Checked = Random.StartPoint
@@ -273,7 +276,7 @@ Public Class MainForm
     'Private Sub HandleMovieNew(URL As String)
     '    Static NF As New NextFile
     '    NF.Listbox = lbxFiles
-    '    NF.Randomised = Random.NextSelect
+    '    NF.d = Random.NextSelect
     '    Dim NextURL As String = NF.NextItem
     '    Static LastURL As String
     '    'IF URL is same as current, do nothing. 
@@ -1173,9 +1176,14 @@ Public Class MainForm
         MainWMP.stretchToFit = True
         '        currentWMP.stretchToFit = True
         MainWMP2.stretchToFit = True
+        MainWMP3.stretchToFit = True
         currentWMP.uiMode = "FULL"
-        MainWMP.Dock = DockStyle.Fill 'Swapper
-        MainWMP2.Dock = DockStyle.Fill
+        If False Then
+            MainWMP.Dock = DockStyle.Fill 'Swapper
+            MainWMP2.Dock = DockStyle.Fill
+            MainWMP3.Dock = DockStyle.Fill
+        End If
+
         'alternateWMP.Dock = DockStyle.Fill 'Swapper
         currentWMP.settings.volume = 100
 
@@ -1294,8 +1302,8 @@ Public Class MainForm
                     If i = -1 Then
                     Else
 
-                        MS.Listbox = sender
-                        MS.ListIndex = i
+                        MSFiles.Listbox = sender
+                        MSFiles.ListIndex = i
                     End If
                 End If
             End With
@@ -2655,6 +2663,6 @@ Public Class MainForm
     End Sub
 
     Private Sub ExperimentToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ExperimentToolStripMenuItem.Click
-        MovieSwapTest.Show()
+        'MovieSwapTest.Show()
     End Sub
 End Class

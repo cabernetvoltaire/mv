@@ -218,6 +218,7 @@ Partial Class MainForm
         Me.PositionUpdater = New System.Windows.Forms.Timer(Me.components)
         Me.tmrMovieSlideShow = New System.Windows.Forms.Timer(Me.components)
         Me.BackgroundWorker1 = New System.ComponentModel.BackgroundWorker()
+        Me.MainWMP3 = New AxWMPLib.AxWindowsMediaPlayer()
         Me.StatusStrip1.SuspendLayout()
         Me.TableLayoutPanel2.SuspendLayout()
         CType(Me.ctrMainFrame, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -258,6 +259,7 @@ Partial Class MainForm
         Me.GroupBox1.SuspendLayout()
         CType(Me.FileSystemWatcher1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.MenuStrip2.SuspendLayout()
+        CType(Me.MainWMP3, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'FileToolStripMenuItem
@@ -641,6 +643,7 @@ Partial Class MainForm
         'ctrPicAndButtons.Panel1
         '
         Me.ctrPicAndButtons.Panel1.BackColor = System.Drawing.Color.Black
+        Me.ctrPicAndButtons.Panel1.Controls.Add(Me.MainWMP3)
         Me.ctrPicAndButtons.Panel1.Controls.Add(Me.MainWMP2)
         Me.ctrPicAndButtons.Panel1.Controls.Add(Me.SoundWMP)
         Me.ctrPicAndButtons.Panel1.Controls.Add(Me.MainWMP)
@@ -1865,6 +1868,17 @@ Partial Class MainForm
         '
         Me.tmrMovieSlideShow.Interval = 5000
         '
+        'MainWMP3
+        '
+        Me.MainWMP3.Enabled = True
+        Me.MainWMP3.Location = New System.Drawing.Point(609, 150)
+        Me.MainWMP3.Margin = New System.Windows.Forms.Padding(4)
+        Me.MainWMP3.Name = "MainWMP3"
+        Me.MainWMP3.OcxState = CType(resources.GetObject("MainWMP3.OcxState"), System.Windows.Forms.AxHost.State)
+        Me.MainWMP3.Size = New System.Drawing.Size(959, 491)
+        Me.MainWMP3.TabIndex = 5
+        Me.MainWMP3.TabStop = False
+        '
         'MainForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(11.0!, 24.0!)
@@ -1934,6 +1948,7 @@ Partial Class MainForm
         CType(Me.FileSystemWatcher1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.MenuStrip2.ResumeLayout(False)
         Me.MenuStrip2.PerformLayout()
+        CType(Me.MainWMP3, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -2137,4 +2152,5 @@ Partial Class MainForm
     Friend WithEvents SelectNonFavouritsToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents BackgroundWorker1 As System.ComponentModel.BackgroundWorker
     Friend WithEvents ExperimentToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents MainWMP3 As AxWMPLib.AxWindowsMediaPlayer
 End Class
