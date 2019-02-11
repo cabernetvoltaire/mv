@@ -10,7 +10,7 @@ Imports MasaSam.Forms.Controls
 Public Class MainForm
 
     Public Shared ReadOnly Property MyPictures As String
-    Public currentWMP As New AxWindowsMediaPlayer
+    ' Public CurrentWMP As New AxWindowsMediaPlayer
 
     Public Initialising As Boolean = True
     Public defaultcolour As Color = Color.Aqua
@@ -31,13 +31,8 @@ Public Class MainForm
     Public DraggedFolder As String
     Public CurrentFileList As New List(Of String)
     Public T As Thread
-    Public WithEvents Media As New MediaHandler
-    ' Public WithEvents MS As New MovieSwapper(lbxFiles, MainWMP, MainWMP2)
-    Public Sub OnMediaChanged()
-        '  ChangeFolder(Media.MediaDirectory)
-        UpdateFileInfo()
+    '    Public WithEvents Media As New MediaHandler
 
-    End Sub
 
 
     Public Sub OnFolderMoved(ByVal path As String)
@@ -101,14 +96,14 @@ Public Class MainForm
     End Sub
     Public Sub SwitchSound(slow As Boolean)
         If slow Then
-            currentWMP.settings.mute = True
+            Media.Player.settings.mute = True
             SoundWMP.settings.mute = False
-            SoundWMP.URL = currentWMP.URL
+            SoundWMP.URL = Media.Player.URL
             SoundWMP.Ctlcontrols.currentPosition = Media.Position
             SoundWMP.settings.rate = SP.FrameRate / 30
         Else
             SoundWMP.URL = ""
-            currentWMP.settings.mute = False
+            Media.Player.settings.mute = False
 
         End If
     End Sub
@@ -222,9 +217,9 @@ Public Class MainForm
         PreparePic(currentPicBox, pbxBlanker, img)
         currentPicBox.Visible = True
         currentPicBox.BringToFront()
-        '   currentWMP.Visible = False
-        'currentWMP.URL = ""
-        '  currentWMP.Visible = False
+        '   Media.Player.Visible = False
+        'Media.Player.URL = ""
+        '  Media.Player.Visible = False
         SwitchSound(False)
         tbState.Text = ""
         tmrJumpVideo.Enabled = False
@@ -233,7 +228,7 @@ Public Class MainForm
         'PreparePic(currentPicBox, pbxBlanker, img)
         currentPicBox.Visible = False
         currentPicBox.SendToBack()
-        'currentWMP.Visible = True
+        'Media.Player.Visible = True
         'SwitchSound(True)
         tbState.Text = ""
         'tmrJumpVideo.Enabled = False
@@ -258,13 +253,13 @@ Public Class MainForm
         Static LastURL As String
 
         'If it is to jump to a random point, do not show first.
-        ' If blnRandom Then currentWMP.Visible = False
+        ' If blnRandom Then Media.Player.Visible = False
         If URL <> LastURL Then
-            '      currentWMP.Visible = False
-            currentWMP.URL = URL
+            '      Media.Player.Visible = False
+            Media.Player.URL = URL
             LastURL = URL
         End If
-        '  currentWMP.BringToFront()
+        '  Media.Player.BringToFront()
         PicToMovie()
 
         If tmrSlideShow.Enabled Then
@@ -289,30 +284,30 @@ Public Class MainForm
     '            alternateWMP.BringToFront()
 
     '        Else
-    '            currentWMP.Visible = False
-    '            currentWMP.URL = URL
+    '            Media.Player.Visible = False
+    '            Media.Player.URL = URL
     '            LastURL = URL
     '        End If
     '    End If
-    '    If currentWMP Is MainWMP Then
-    '        SetWMP(MainWMP2, currentWMP)
-    '        currentWMP = MainWMP2
+    '    If Media.Player Is MainWMP Then
+    '        SetWMP(MainWMP2, Media.Player)
+    '        Media.Player = MainWMP2
     '        SetWMP(MainWMP, alternateWMP)
     '        alternateWMP = MainWMP
     '    Else
-    '        SetWMP(MainWMP, currentWMP)
-    '        currentWMP = MainWMP
+    '        SetWMP(MainWMP, Media.Player)
+    '        Media.Player = MainWMP
     '        SetWMP(MainWMP2, alternateWMP)
     '        alternateWMP = MainWMP2
     '    End If
     '    ' If NextURL <> LastURL Then
-    '    'currentWMP.Visible = False
-    '    '    currentWMP.URL = NextURL
-    '    'currentWMP.Ctlcontrols.pause()
+    '    'Media.Player.Visible = False
+    '    '    Media.Player.URL = NextURL
+    '    'Media.Player.Ctlcontrols.pause()
     '    'LastURL = URL
     '    'End If
 
-    '    currentWMP.BringToFront()
+    '    Media.Player.BringToFront()
     '    PicToMovie()
 
     '    If tmrSlideShow.Enabled Then
@@ -379,9 +374,9 @@ Public Class MainForm
     End Sub
 
     Public Sub CancelDisplay()
-        If currentWMP.Visible Then
-            'currentWMP.Ctlcontrols.pause()
-            currentWMP.URL = ""
+        If Media.Player.Visible Then
+            'Media.Player.Ctlcontrols.pause()
+            Media.Player.URL = ""
         End If
         If currentPicBox.Visible Then
             currentPicBox.Image = Nothing
@@ -510,7 +505,7 @@ Public Class MainForm
     'End Function
     Private Function SpeedChange(e As KeyEventArgs) As KeyEventArgs
 
-        Dim blnPlaying As Boolean = currentWMP.URL <> ""
+        Dim blnPlaying As Boolean = Media.Player.URL <> ""
         If Not blnPlaying Then
             SP.SSSpeed = e.KeyCode - KeySpeed1 'Set slideshow speed if pic showing, and start slideshow
             'PlaybackSpeed = 30
@@ -524,14 +519,14 @@ Public Class MainForm
 
         If e.KeyCode = KeyToggleSpeed Then
             If blnPlaying Then
-                If currentWMP.playState = WMPLib.WMPPlayState.wmppsPaused And tmrSlowMo.Enabled = False Then
-                    Media.Position = currentWMP.Ctlcontrols.currentPosition
-                    currentWMP.settings.rate = 1
-                    currentWMP.Ctlcontrols.play()
+                If Media.Player.playState = WMPLib.WMPPlayState.wmppsPaused And tmrSlowMo.Enabled = False Then
+                    Media.Position = Media.Player.Ctlcontrols.currentPosition
+                    Media.Player.settings.rate = 1
+                    Media.Player.Ctlcontrols.play()
                     tmrSlowMo.Enabled = False
                     SP.Fullspeed = True
                 Else
-                    currentWMP.Ctlcontrols.pause()
+                    Media.Player.Ctlcontrols.pause()
                     SP.Fullspeed = False
                 End If
             Else
@@ -543,7 +538,7 @@ Public Class MainForm
 
                 tmrSlowMo.Interval = 1000 / SP.FrameRate
                 tmrSlowMo.Enabled = True
-                currentWMP.Ctlcontrols.pause()
+                Media.Player.Ctlcontrols.pause()
             Else
             End If
         End If
@@ -592,7 +587,7 @@ Public Class MainForm
         FullScreen.Changing = True
         If blnGo Then
 
-            SetWMP(FullScreen.FSWMP, currentWMP)
+            SetWMP(FullScreen.FSWMP, Media.Player)
             SetPB(FullScreen.fullScreenPicBox)
             Dim screen As Screen
             If blnSecondScreen Then
@@ -605,13 +600,13 @@ Public Class MainForm
             FullScreen.StartPosition = FormStartPosition.CenterScreen
 
             FullScreen.Location = screen.Bounds.Location + New Point(100, 100)
-            currentWMP.Size = screen.Bounds.Size
+            Media.Player.Size = screen.Bounds.Size
 
             FullScreen.Show()
 
         Else
             SplitterPlace(0.25)
-            SetWMP(MainWMP, currentWMP)
+            SetWMP(MainWMP, Media.Player)
             SetPB(PictureBox1)
             FullScreen.Close()
             FullScreen.Changing = False
@@ -724,7 +719,7 @@ Public Class MainForm
             iJumpFactor = 1
         End If
 
-        With currentWMP
+        With Media.Player
             Media.Position = Math.Min(Media.Duration, Media.Position + Media.Duration * Math.Sign(e.KeyCode - (KeyBigJumpOn + KeyBigJumpBack) / 2) / (iJumpFactor * SP.FractionalJump))
         End With
         '        JumpVideo(Media.Player, SoundWMP)
@@ -764,8 +759,8 @@ Public Class MainForm
             SwitchSound(False)
             Debug.Print("Normal")
             tmrSlowMo.Enabled = False
-            currentWMP.settings.rate = 1
-            currentWMP.Ctlcontrols.play()
+            Media.Player.settings.rate = 1
+            Media.Player.Ctlcontrols.play()
         End If
     End Sub
     Public Sub HandleKeys(sender As Object, e As KeyEventArgs)
@@ -908,14 +903,14 @@ Public Class MainForm
                 'Addmarker(Media.MediaPath)
                 If Media.Bookmark = -1 Then
 
-                    Media.Bookmark = currentWMP.Ctlcontrols.currentPosition
+                    Media.Bookmark = Media.Player.Ctlcontrols.currentPosition
                 Else
                     Media.Bookmark = -1
                 End If
                 e.SuppressKeyPress = True
 
             Case KeyMuteToggle
-                currentWMP.settings.mute = Not currentWMP.settings.mute
+                Media.Player.settings.mute = Not Media.Player.settings.mute
                 e.SuppressKeyPress = True
 
             Case KeyLoopToggle
@@ -931,7 +926,7 @@ Public Class MainForm
                 End If
 
             Case KeyToggleSpeed
-                With currentWMP
+                With Media.Player
                     If .URL <> "" Then
                         If .playState = WMPLib.WMPPlayState.wmppsPaused Then
                             SP.Unpause = True
@@ -998,7 +993,7 @@ Public Class MainForm
                 End If
 
             Case KeyLoopToggle
-                currentWMP.settings.setMode("loop", Not currentWMP.settings.getMode("loop"))
+                Media.Player.settings.setMode("loop", Not Media.Player.settings.getMode("loop"))
                 e.SuppressKeyPress = True
             Case KeyTrueSize
                 PicClick(currentPicBox)
@@ -1045,7 +1040,7 @@ Public Class MainForm
 
     Private Sub LoopToggle()
         blnLoopPlay = Not blnLoopPlay
-        'currentWMP.= blnLoopPlay
+        'Media.Player.= blnLoopPlay
     End Sub
     Private Sub SetFilterState()
 
@@ -1075,8 +1070,8 @@ Public Class MainForm
         tPB.Image = currentPicBox.Image
         'currentPicBox.Image.Dispose()
         currentPicBox.Visible = False
-        currentWMP.Visible = False
-        currentWMP.URL = ""
+        Media.Player.Visible = False
+        Media.Player.URL = ""
         tPB.Visible = True
         currentPicBox = tPB
         Media.Picture = currentPicBox
@@ -1171,25 +1166,25 @@ Public Class MainForm
         '  tmrLoadLastFolder.Enabled = True
 
 
-        currentWMP = MainWMP
+        Media.Player = MainWMP
         'alternateWMP = MainWMP2
         MainWMP.stretchToFit = True
-        '        currentWMP.stretchToFit = True
+        '        Media.Player.stretchToFit = True
         MainWMP2.stretchToFit = True
         MainWMP3.stretchToFit = True
-        currentWMP.uiMode = "FULL"
-        If False Then
+        Media.Player.uiMode = "FULL"
+        If True Then
             MainWMP.Dock = DockStyle.Fill 'Swapper
             MainWMP2.Dock = DockStyle.Fill
             MainWMP3.Dock = DockStyle.Fill
         End If
 
         'alternateWMP.Dock = DockStyle.Fill 'Swapper
-        currentWMP.settings.volume = 100
+        Media.Player.settings.volume = 100
 
         currentPicBox = PictureBox1
         Media.Picture = currentPicBox
-        Media.Player = currentWMP
+        Media.Player = Media.Player
         tbPercentage.Enabled = True
 
         PreferencesGet()
@@ -1423,7 +1418,7 @@ Public Class MainForm
     Public Sub SetMotion(KeyCode As Integer)
 
         Dim intSpeed As Integer
-        currentWMP.Ctlcontrols.pause()
+        Media.Player.Ctlcontrols.pause()
         tmrMediaSpeed.Enabled = True
         Select Case KeyCode
             Case KeySpeed1
@@ -1447,7 +1442,7 @@ Public Class MainForm
     End Sub
 
     Private Sub tmrMediaSpeed_Tick(sender As Object, e As EventArgs) Handles tmrMediaSpeed.Tick
-        currentWMP.Ctlcontrols.step(1)
+        Media.Player.Ctlcontrols.step(1)
     End Sub
 
     Private Sub tmrInitialise_Tick(sender As Object, e As EventArgs) Handles tmrInitialise.Tick
@@ -1532,14 +1527,14 @@ Public Class MainForm
         tmrJumpVideo.Enabled = False
 
 
-        currentWMP.Ctlcontrols.currentPosition = Media.Position
+        Media.Player.Ctlcontrols.currentPosition = Media.Position
         'alternateWMP.Ctlcontrols.currentPosition = Media.Position
         SoundWMP.Ctlcontrols.currentPosition = Media.Position
         ReportTime("New position given:" & Media.Position)
 
-        ' currentWMP.Visible = True
+        ' Media.Player.Visible = True
         ReportTime("Made visible")
-        'currentWMP.BringToFront()
+        'Media.Player.BringToFront()
 
     End Sub
 
@@ -1796,7 +1791,7 @@ Public Class MainForm
 
     End Sub
     Private Sub tmrSlowMo_Tick(sender As Object, e As EventArgs) Handles tmrSlowMo.Tick
-        MediaAdvance(currentWMP, 1)
+        MediaAdvance(Media.Player, 1)
         'Throw New Exception
 
     End Sub
@@ -1825,7 +1820,7 @@ Public Class MainForm
 
         End If
         't.LayoutPanel = Thumbnails.FlowLayoutPanel1
-        t.Text = MainForm.Media.MediaDirectory
+        t.Text = Media.MediaDirectory
         t.SetBounds(0, 0, 750, 900)
         t.Show()
 
@@ -1947,8 +1942,8 @@ Public Class MainForm
                 'Normal
                 Debug.Print("Normal")
                 tmrSlowMo.Enabled = False
-                currentWMP.settings.rate = 1
-                currentWMP.Ctlcontrols.play()
+                Media.Player.settings.rate = 1
+                Media.Player.Ctlcontrols.play()
                 '      AT.Probability = DurBinParam
 
                 tmrAutoTrail.Interval = Int(Rnd() * AT.RandomTimes(AT.Duration) * 500) + 500
@@ -2523,10 +2518,10 @@ Public Class MainForm
 
     Private Sub PositionUpdater_Tick(sender As Object, e As EventArgs) Handles PositionUpdater.Tick
         ' Exit Sub
-        ' If currentWMP Is Nothing Then Exit Sub
-        If currentWMP.URL <> "" Then
-            '    Media.Position = currentWMP.Ctlcontrols.currentPosition
-            '   Media.Duration = currentWMP.currentMedia.duration
+        ' If Media.Player Is Nothing Then Exit Sub
+        If Media.Player.URL <> "" Then
+            '    Media.Position = Media.Player.Ctlcontrols.currentPosition
+            '   Media.Duration = Media.Player.currentMedia.duration
         End If
         '       End If
     End Sub

@@ -104,7 +104,7 @@ Public Class MovieSwapper
     End Sub
 
 
-    Private Sub ShowPlayer(NewMediaHandler As MediaHandler)
+    Private Sub ShowPlayer(ByRef NewMediaHandler As MediaHandler)
         Media1.settings.mute = True
         Media2.settings.mute = True
         Media3.settings.mute = True

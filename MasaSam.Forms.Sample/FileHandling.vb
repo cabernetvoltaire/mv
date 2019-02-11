@@ -16,7 +16,7 @@ Module FileHandling
     Public WithEvents MSFiles As New MovieSwapper(MainForm.MainWMP, MainForm.MainWMP2, MainForm.MainWMP3)
     '   Public WithEvents MSShow As New MovieSwapper(MainForm.MainWMP, MainForm.MainWMP2)
 
-    Public WithEvents Media As MediaHandler = MainForm.Media
+    Public WithEvents Media As New MediaHandler
     Public fm As New FavouritesMinder("Q:\Favourites")
     Public Sub OnMediaChanged() Handles Media.MediaChanged
         '  MainForm.StartPoint.Duration = Media.Duration
@@ -24,8 +24,8 @@ Module FileHandling
     End Sub
     Public Sub OnMediaShown(M As MediaHandler) Handles MSFiles.MediaShown
         Media = M
-        MainForm.currentWMP = Media.Player
-        'Media.StartPoint.State = MainForm.StartPoint.State
+        '  MainForm.Media.Player = Media.Player
+        Media.StartPoint.State = MainForm.StartPoint.State
         'Media.Player.Ctlcontrols.play()
         MainForm.UpdateFileInfo()
 
