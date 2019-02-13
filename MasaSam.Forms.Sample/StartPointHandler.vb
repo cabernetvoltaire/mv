@@ -65,7 +65,6 @@
 
             mAbsolute = value
             If b <> mAbsolute Then
-                '   mPercentage = mAbsolute / mDuration * 100
 
                 RaiseEvent StartPointChanged(Me, Nothing)
             End If
@@ -92,6 +91,7 @@
         Set(ByVal value As Long)
             GetStartPoint()
             mStartPoint = value
+            RaiseEvent StartPointChanged(Me, New EventArgs)
         End Set
     End Property
     Private mState As Byte

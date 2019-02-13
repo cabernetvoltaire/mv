@@ -4,6 +4,7 @@ Imports MasaSam.Forms.Controls
 Module FileHandling
     Public blnSuppressCreate As Boolean = False
     Public blnChooseOne As Boolean = False
+    Public WithEvents StartPoint As New StartPointHandler
 
     Public CurrentfilterState As FilterHandler = MainForm.CurrentFilterState
     Public Random As RandomHandler = MainForm.Random
@@ -16,11 +17,17 @@ Module FileHandling
     Public WithEvents MSFiles As New MovieSwapper(MainForm.MainWMP, MainForm.MainWMP2, MainForm.MainWMP3)
     '   Public WithEvents MSShow As New MovieSwapper(MainForm.MainWMP, MainForm.MainWMP2)
 
-    Public WithEvents Media As New MediaHandler
+    Public WithEvents Media As New MediaHandler()
     Public fm As New FavouritesMinder("Q:\Favourites")
+
+    Public Sub OnMediaStartChanged(sender As Object, e As EventArgs) Handles Media.StartChanged
+        '   MainForm.OnStartChanged(sender, e)
+
+    End Sub
 
     Public Sub OnMediaShown(ByRef M As MediaHandler) Handles MSFiles.MediaShown
         Media = M
+        ' MainForm.StartPoint = M.StartPoint
         Debug.Print("Playing....:")
         DebugStartpoint(M)
         '   Media.MediaJumpToMarker()
@@ -28,7 +35,7 @@ Module FileHandling
         MainForm.UpdateFileInfo()
     End Sub
     Public Sub OnMediaLoaded(ByRef M As MediaHandler) Handles MSFiles.LoadedMedia
-        M.StartPoint.State = MainForm.StartPoint.State
+        Media.StartPoint = M.StartPoint
         DebugStartpoint(M)
         Media.MediaJumpToMarker()
         '  M.Player.Ctlcontrols.pause()

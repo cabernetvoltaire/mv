@@ -4,7 +4,7 @@ Imports MasaSam.Forms.Controls
 
 Public Class FolderSelect
     Private newAlpha As Int16
-    Private PreMH As New MediaHandler
+    Private PreMH As New MediaHandler()
 
     Public Property Alpha() As Int16
         Get

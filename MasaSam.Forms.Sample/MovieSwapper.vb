@@ -4,11 +4,6 @@ Public Class MovieSwapper
     Private mMedia1 As New MediaHandler
     Private mMedia2 As New MediaHandler
     Private mMedia3 As New MediaHandler
-    'Public WithEvents Medias As New AxWindowsMediaPlayer()
-    '  Public SH As New StartPointHandler
-    Public WithEvents Media1 As New AxWindowsMediaPlayer
-    Public WithEvents Media2 As New AxWindowsMediaPlayer
-    Public WithEvents Media3 As New AxWindowsMediaPlayer
 
     Private mFileList As New List(Of String)
     Private mListIndex As Integer
@@ -41,12 +36,6 @@ Public Class MovieSwapper
         End Set
     End Property
     Public Sub New(MP1 As AxWindowsMediaPlayer, MP2 As AxWindowsMediaPlayer, MP3 As AxWindowsMediaPlayer)
-        '  Listbox = Lbox
-        ' mNext.Listbox = Lbox
-        Media1 = MP1
-        Media2 = MP2
-        Media3 = MP3
-        '  Medias = (MP1, MP2, MP3)
 
         mMedia1.Player = MP1
         mMedia2.Player = MP2
@@ -64,7 +53,6 @@ Public Class MovieSwapper
         Current = NextF.CurrentItem
         Nxt = NextF.NextItem
         Prev = NextF.PreviousItem
-
         Console.WriteLine()
         Console.WriteLine("Previous:" & Prev)
         Console.WriteLine("Current:" & Current)
@@ -102,11 +90,19 @@ Public Class MovieSwapper
         End If
 
     End Sub
+    Public Sub SetStartpoints(SH As StartPointHandler)
+        mMedia1.StartPoint.State = SH.State
+        mMedia2.StartPoint.State = SH.State
+        mMedia3.StartPoint.State = SH.State
+        mMedia1.StartPoint.StartPoint = SH.StartPoint
+        mMedia2.StartPoint.StartPoint = SH.StartPoint
+        mMedia3.StartPoint.StartPoint = SH.StartPoint
 
+    End Sub
     Private Sub ShowPlayer(ByRef MHX As MediaHandler)
-        Media1.settings.mute = True
-        Media2.settings.mute = True
-        Media3.settings.mute = True
+        mMedia1.Player.settings.mute = True
+        mMedia2.Player.settings.mute = True
+        mMedia3.Player.settings.mute = True
         With MHX.Player
             .Visible = True
             .BringToFront()

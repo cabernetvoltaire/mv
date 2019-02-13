@@ -92,12 +92,12 @@
 
             .CurrentFilterState.State = 0
             .PlayOrder.State = 0
-            .StartPoint.State = 0
             .NavigateMoveState.State = 0
             iCurrentAlpha = 0
             strButtonfile = ""
             '.SetValue("LastButtonFolder", strButtonfile)
         End With
+        Media.StartPoint.State = 0
         PreferencesSave()
     End Sub
 

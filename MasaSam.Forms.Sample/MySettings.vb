@@ -67,7 +67,7 @@ Friend Module Mysettings
             .SetValue("File", Media.MediaPath)
             .SetValue("Filter", MainForm.CurrentFilterState.State)
             .SetValue("SortOrder", MainForm.PlayOrder.State)
-            .SetValue("StartPoint", MainForm.StartPoint.State)
+            .SetValue("StartPoint", Media.StartPoint.State)
             .SetValue("State", MainForm.NavigateMoveState.State)
             .SetValue("LastButtonFile", strButtonfile)
             .SetValue("LastAlpha", iCurrentAlpha)
@@ -84,7 +84,7 @@ Friend Module Mysettings
                 strButtonfile = .GetValue("LastButtonFile", "")
                 MainForm.PlayOrder.State = .GetValue("SortOrder", 0)
                 MainForm.CurrentFilterState.State = .GetValue("Filter", 0)
-                MainForm.StartPoint.State = .GetValue("StartPoint", 0)
+                Media.StartPoint.State = .GetValue("StartPoint", 0)
                 MainForm.NavigateMoveState.State = .GetValue("State", 0)
                 iCurrentAlpha = .GetValue("LastAlpha", 0)
                 FavesFolderPath = .GetValue("Favourites", Media.MediaDirectory)
@@ -125,12 +125,12 @@ Friend Module Mysettings
 
             .CurrentFilterState.State = .0
             .PlayOrder.State = 0
-            .StartPoint.State = 0
             .NavigateMoveState.State = 0
             iCurrentAlpha = 0
             strButtonfile = ""
             '.SetValue("LastButtonFolder", strButtonfile)
         End With
+        Media.StartPoint.State = 0
         PreferencesSave()
     End Sub
 

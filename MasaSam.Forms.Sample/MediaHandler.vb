@@ -2,7 +2,7 @@
 Public Class MediaHandler
 
     Public Event MediaFinished(ByVal sender As Object, ByVal e As EventArgs)
-    Public Event MediaClosed(ByVal sender As Object, ByVal e As EventArgs)
+    Public Event StartChanged(ByVal sender As Object, ByVal e As EventArgs)
     Public Event MediaChanged(ByVal sender As Object, ByVal e As EventArgs)
     Public WithEvents PositionUpdater As New Timer
     Private DefaultFile As String = "C:\exiftools.exe"
@@ -75,6 +75,7 @@ Public Class MediaHandler
         End Get
         Set(value As Long)
             mDuration = value
+            StartPoint.Duration = value
         End Set
     End Property
     Private mFrameRate As Int32
@@ -127,8 +128,8 @@ Public Class MediaHandler
                     Me.LoadMedia()
 
                     mMediaDirectory = f.Directory.FullName
-                    Else
-                        mMediaPath = DefaultFile
+                Else
+                    mMediaPath = DefaultFile
                     mMediaDirectory = New IO.FileInfo(mMediaPath).Directory.FullName
                 End If
 
@@ -140,6 +141,8 @@ Public Class MediaHandler
     End Property
     Public Sub New()
         PositionUpdater.Interval = 500
+        PositionUpdater.Enabled = False
+        StartPoint = Media.StartPoint
     End Sub
     Private mMediaDirectory As String
     Public ReadOnly Property MediaDirectory() As String
@@ -210,7 +213,7 @@ Public Class MediaHandler
     Public ReadOnly Property LinkPath() As String
 
         Get
-    Return mLinkPath
+            Return mLinkPath
         End Get
 
     End Property
@@ -246,64 +249,22 @@ Public Class MediaHandler
 
     End Function
     Public Sub MediaJumpToMarker()
-        If mBookmark <> -1 And StartPoint.State = StartPointHandler.StartTypes.ParticularAbsolute Then
-            mPlayPosition = mBookmark
+        If mBookmark <> -1 Then
+            If StartPoint.State = StartPointHandler.StartTypes.ParticularAbsolute Then
+                mPlayPosition = mBookmark
+            Else
+                Dim m As New StartPointHandler With {
+                    .State = StartPointHandler.StartTypes.NearEnd
+                }
+                mPlayPosition = m.StartPoint
+            End If
 
         Else
             mPlayPosition = StartPoint.StartPoint
         End If
         mPlayer.Ctlcontrols.currentPosition = mPlayPosition
         '     mPlayer.Ctlcontrols.play()
-        mPlayer.Refresh()
-    End Sub
-#Region "Event Handlers"
-    Private Sub PlaystateChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent) Handles mPlayer.PlayStateChange
-        Select Case e.newState
-
-            Case WMPLib.WMPPlayState.wmppsStopped
-                MediaJumpToMarker()
-
-            Case WMPLib.WMPPlayState.wmppsMediaEnded
-                'Debug.Print("Ended:" & StartPoint.StartPoint & " " & StartPoint.Duration)
-                If Not MainForm.tmrAutoTrail.Enabled And mPlayer.Visible Then
-                    MainForm.AdvanceFile(True, False)
-                Else
-                    MediaJumpToMarker()
-                End If
-            Case WMPLib.WMPPlayState.wmppsPlaying
-                'ReportTime("Playing")
-                mDuration = mPlayer.currentMedia.duration
-                StartPoint.Duration = mDuration
-                MainForm.SwitchSound(False)
-                If mPaused Then
-                    mPaused = False
-                    Exit Sub
-                End If
-                If FullScreen.Changing Or Speed.Unpause Then 'Hold current position if switching to FS or back. 
-                End If
-                mPaused = False
-            Case WMPLib.WMPPlayState.wmppsPaused ', WMPLib.WMPPlayState.wmppsTransitioning
-                If Not Speed.Fullspeed Then
-                    mPaused = False
-                    MainForm.SwitchSound(True)
-                Else
-                    mPaused = True
-
-                End If
-            Case Else
-
-        End Select
-    End Sub
-    Private Sub HandleMovie(URL As String)
-        Static LastURL As String
-        If URL <> LastURL Then
-            If mPlayer Is Nothing Then
-            Else
-                mPlayer.URL = URL
-                LastURL = URL
-            End If
-        End If
-        MediaJumpToMarker()
+        '  mPlayer.Refresh()
     End Sub
     Private Sub LoadMedia()
 
@@ -325,7 +286,6 @@ Public Class MediaHandler
             Case Filetype.Pic
                 HandlePic(mMediaPath)
             Case Filetype.Unknown
-                'tbLastFile.Text = "Unhandled file:" & Media.MediaPath
 
                 Exit Sub
         End Select
@@ -349,8 +309,64 @@ Public Class MediaHandler
         'End If
         MainForm.MovietoPic(img)
     End Sub
+
+    Private Sub HandleMovie(URL As String)
+        Static LastURL As String
+        If URL <> LastURL Then
+            If mPlayer Is Nothing Then
+            Else
+                mPlayer.URL = URL
+                LastURL = URL
+            End If
+        End If
+        'MediaJumpToMarker()
+    End Sub
+#Region "Event Handlers"
+    Private Sub PlaystateChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent) Handles mPlayer.PlayStateChange
+        Select Case e.newState
+
+            Case WMPLib.WMPPlayState.wmppsStopped
+                'MediaJumpToMarker()
+
+            Case WMPLib.WMPPlayState.wmppsMediaEnded
+                'Debug.Print("Ended:" & StartPoint.StartPoint & " " & StartPoint.Duration)
+                If Not MainForm.tmrAutoTrail.Enabled And mPlayer.Visible Then
+                    MainForm.AdvanceFile(True, False)
+                Else
+                    ' MediaJumpToMarker()
+                End If
+            Case WMPLib.WMPPlayState.wmppsPlaying
+                'ReportTime("Playing")
+                MainForm.SwitchSound(False)
+                PositionUpdater.Enabled = True
+                If mPaused Then
+                    mPaused = False
+                    Exit Sub
+                End If
+                If FullScreen.Changing Or Speed.Unpause Then 'Hold current position if switching to FS or back. 
+                End If
+                mPaused = False
+            Case WMPLib.WMPPlayState.wmppsPaused ', WMPLib.WMPPlayState.wmppsTransitioning
+                If Not Speed.Fullspeed Then
+                    mPaused = False
+                    MainForm.SwitchSound(True)
+                Else
+                    mPaused = True
+
+                End If
+            Case Else
+
+        End Select
+    End Sub
+    Private Sub OnStartChange(sender As Object, e As EventArgs) Handles StartPoint.StartPointChanged, StartPoint.StateChanged
+        RaiseEvent StartChanged(sender, e)
+
+    End Sub
     Private Sub UpdatePosition() Handles PositionUpdater.Tick
         mPlayPosition = mPlayer.Ctlcontrols.currentPosition
+        Duration = mPlayer.currentMedia.duration
+
     End Sub
+
 #End Region
 End Class
