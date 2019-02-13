@@ -78,9 +78,9 @@ Public Class MovieSwapper
     Private Sub RotateMedia(ByRef ThisMH As MediaHandler, ByRef NextMH As MediaHandler, ByRef PrevMH As MediaHandler, nxt As String, prev As String)
 
         NextMH.MediaPath = nxt
-        NextMH.Player.Visible = True
+        NextMH.Player.Visible = False
         PrevMH.MediaPath = prev
-        PrevMH.Player.Visible = True
+        PrevMH.Player.Visible = False
         RaiseEvent LoadedMedia(NextMH)
         RaiseEvent LoadedMedia(PrevMH)
         If ThisMH.MediaType = Filetype.Movie Then

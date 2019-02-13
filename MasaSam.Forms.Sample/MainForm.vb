@@ -1155,7 +1155,7 @@ Public Class MainForm
         MainWMP2.stretchToFit = True
         MainWMP3.stretchToFit = True
         Media.Player.uiMode = "FULL"
-        If False Then
+        If True Then
             MainWMP.Dock = DockStyle.Fill 'Swapper
             MainWMP2.Dock = DockStyle.Fill
             MainWMP3.Dock = DockStyle.Fill

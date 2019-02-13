@@ -18,7 +18,7 @@
         mPercentage = 50
         mDuration = 100
         mAbsolute = 65
-        mDistance = 65
+        mDistance = 40
     End Sub
     Public ReadOnly Property Descriptions As List(Of String)
         Get
