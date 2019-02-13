@@ -78,9 +78,9 @@ Public Class MovieSwapper
     Private Sub RotateMedia(ByRef ThisMH As MediaHandler, ByRef NextMH As MediaHandler, ByRef PrevMH As MediaHandler, nxt As String, prev As String)
 
         NextMH.MediaPath = nxt
-        NextMH.Player.Visible = False
+        NextMH.Player.Visible = True
         PrevMH.MediaPath = prev
-        PrevMH.Player.Visible = False
+        PrevMH.Player.Visible = True
         RaiseEvent LoadedMedia(NextMH)
         RaiseEvent LoadedMedia(PrevMH)
         If ThisMH.MediaType = Filetype.Movie Then
@@ -94,9 +94,7 @@ Public Class MovieSwapper
         mMedia1.StartPoint.State = SH.State
         mMedia2.StartPoint.State = SH.State
         mMedia3.StartPoint.State = SH.State
-        mMedia1.StartPoint.StartPoint = SH.StartPoint
-        mMedia2.StartPoint.StartPoint = SH.StartPoint
-        mMedia3.StartPoint.StartPoint = SH.StartPoint
+       
 
     End Sub
     Private Sub ShowPlayer(ByRef MHX As MediaHandler)

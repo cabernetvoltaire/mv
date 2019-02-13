@@ -22,24 +22,21 @@ Module FileHandling
 
     Public Sub OnMediaStartChanged(sender As Object, e As EventArgs) Handles Media.StartChanged
         MainForm.OnStartChanged(sender, e)
+        'MSFiles.SetStartpoints(Media.StartPoint)
 
     End Sub
 
     Public Sub OnMediaShown(ByRef M As MediaHandler) Handles MSFiles.MediaShown
         Media = M
-        ' MainForm.StartPoint = M.StartPoint
         Debug.Print("Playing....:")
         DebugStartpoint(M)
-        '   Media.MediaJumpToMarker()
-        ' Media.Player.Ctlcontrols.play()
         MainForm.UpdateFileInfo()
     End Sub
     Public Sub OnMediaLoaded(ByRef M As MediaHandler) Handles MSFiles.LoadedMedia
-        Media.StartPoint = M.StartPoint
+        M.StartPoint.State = Media.StartPoint.State
         DebugStartpoint(M)
-        Media.MediaJumpToMarker()
-        '  M.Player.Ctlcontrols.pause()
-        'Media = M
+        M.MediaJumpToMarker()
+        '  MainForm.OnStartChanged(M.StartPoint, New EventArgs)
     End Sub
 
     Private Sub DebugStartpoint(ByRef M As MediaHandler)

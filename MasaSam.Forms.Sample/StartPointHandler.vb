@@ -86,6 +86,7 @@
     Public Property StartPoint() As Long
         Get
             GetStartPoint()
+
             Return mStartPoint
         End Get
         Set(ByVal value As Long)
@@ -102,7 +103,10 @@
         Set(ByVal value As Byte)
             Dim b As Byte = mState
             mState = value
-            If b <> mState Then RaiseEvent StateChanged(Me, New EventArgs)
+            If b <> mState Then
+                GetStartPoint()
+                RaiseEvent StateChanged(Me, New EventArgs)
+            End If
         End Set
     End Property
     Private mSavedState As Byte
@@ -144,7 +148,6 @@
 
             Case StartTypes.ParticularPercentage
                 mStartPoint = mPercentage / 100 * mDuration
-                ReportTime("Startpoint is " & mStartPoint)
             Case StartTypes.Random
                 mStartPoint = Rnd() * mDuration
         End Select
@@ -157,6 +160,7 @@
         If mStartPoint > mDuration Then
             mStartPoint = mDuration / 2 'If we overshoot, re-locate to halfway point. 
         End If
+        Debug.Print("Startpoint is " & mStartPoint)
         Return mStartPoint
     End Function
 End Class

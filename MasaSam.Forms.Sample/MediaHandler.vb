@@ -263,6 +263,7 @@ Public Class MediaHandler
             mPlayPosition = StartPoint.StartPoint
         End If
         mPlayer.Ctlcontrols.currentPosition = mPlayPosition
+        Debug.Print("MediaJumpMarker set position to " & mPlayPosition)
         '     mPlayer.Ctlcontrols.play()
         '  mPlayer.Refresh()
     End Sub
@@ -319,7 +320,7 @@ Public Class MediaHandler
                 LastURL = URL
             End If
         End If
-        'MediaJumpToMarker()
+        MediaJumpToMarker()
     End Sub
 #Region "Event Handlers"
     Private Sub PlaystateChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent) Handles mPlayer.PlayStateChange
@@ -338,7 +339,7 @@ Public Class MediaHandler
             Case WMPLib.WMPPlayState.wmppsPlaying
                 'ReportTime("Playing")
                 MainForm.SwitchSound(False)
-                PositionUpdater.Enabled = True
+                Duration = mPlayer.currentMedia.duration
                 If mPaused Then
                     mPaused = False
                     Exit Sub
@@ -364,7 +365,7 @@ Public Class MediaHandler
     End Sub
     Private Sub UpdatePosition() Handles PositionUpdater.Tick
         mPlayPosition = mPlayer.Ctlcontrols.currentPosition
-        Duration = mPlayer.currentMedia.duration
+        'Duration = mPlayer.currentMedia.duration
 
     End Sub
 
