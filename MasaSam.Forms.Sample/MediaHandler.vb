@@ -327,7 +327,7 @@ Public Class MediaHandler
         Select Case e.newState
 
             Case WMPLib.WMPPlayState.wmppsStopped
-                'MediaJumpToMarker()
+                reportStartpoint(StartPoint)
 
             Case WMPLib.WMPPlayState.wmppsMediaEnded
                 'Debug.Print("Ended:" & StartPoint.StartPoint & " " & StartPoint.Duration)
@@ -361,6 +361,7 @@ Public Class MediaHandler
     End Sub
     Private Sub OnStartChange(sender As Object, e As EventArgs) Handles StartPoint.StartPointChanged, StartPoint.StateChanged
         MediaJumpToMarker()
+        reportStartpoint(StartPoint)
         RaiseEvent StartChanged(sender, e)
 
     End Sub
@@ -369,6 +370,7 @@ Public Class MediaHandler
         'Duration = mPlayer.currentMedia.duration
 
     End Sub
+
 
 #End Region
 End Class

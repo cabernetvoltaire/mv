@@ -166,7 +166,7 @@ Public Class MainForm
         cbxStartPoint.SelectedIndex = Media.StartPoint.State
         tbStartpoint.Text = "START:" & Media.StartPoint.Description
         If Not Initialising Then
-            Media.MediaJumpToMarker()
+            ' Media.MediaJumpToMarker()
         End If
     End Sub
     Public Sub OnStateChanged(sender As Object, e As EventArgs) Handles NavigateMoveState.StateChanged, CurrentFilterState.StateChanged, PlayOrder.StateChanged
@@ -462,7 +462,7 @@ Public Class MainForm
             Exit Sub
         End If
         Try
-            FilterListBoxList(e, flist)
+            FilterLBList(e, flist)
             flist = SetPlayOrder(PlayOrder.State, flist)
 
             ' MainForm.FNG.Filenames = flist
@@ -1429,7 +1429,6 @@ Public Class MainForm
         tmrInitialise.Enabled = False
     End Sub
     Public Sub LoadMedia(sender As Object, e As EventArgs) Handles tmrPicLoad.Tick
-
         '  If T.IsAlive Then Exit Sub
         Debug.Print("")
         ReportTime("PicLoadTick")
@@ -1751,6 +1750,7 @@ Public Class MainForm
         'Media.MediaDirectory = e.Directory.FullName
 
         FillListbox(lbxFiles, New DirectoryInfo(e.Directory.FullName), Random.OnDirChange)
+
     End Sub
 
     Private Sub OnFilenamesParsed() Handles FNG.WordsParsed
@@ -2160,7 +2160,7 @@ Public Class MainForm
                 If strVisibleButtons(i) <> Media.MediaDirectory Then
                     ChangeFolder(strVisibleButtons(i))
                     'CancelDisplay()
-                    tvMain2.SelectedFolder = Media.MediaDirectory
+                    tvMain2.SelectedFolder = strVisibleButtons(i)
 
                 ElseIf Random.OnDirChange Then
                     AdvanceFile(True, True)
@@ -2639,5 +2639,9 @@ Public Class MainForm
 
     Private Sub ExperimentToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ExperimentToolStripMenuItem.Click
         'MovieSwapTest.Show()
+    End Sub
+
+    Private Sub chbNextFile_Click(sender As Object, e As EventArgs) Handles chbNextFile.Click
+
     End Sub
 End Class

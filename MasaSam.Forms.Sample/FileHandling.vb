@@ -30,12 +30,13 @@ Module FileHandling
         Media = M
         Debug.Print("Playing....:")
         DebugStartpoint(M)
+        reportStartpoint(M.StartPoint)
         MainForm.UpdateFileInfo()
     End Sub
     Public Sub OnMediaLoaded(ByRef M As MediaHandler) Handles MSFiles.LoadedMedia
         M.StartPoint.State = Media.StartPoint.State
         DebugStartpoint(M)
-        M.MediaJumpToMarker()
+        'M.MediaJumpToMarker()
         '  MainForm.OnStartChanged(M.StartPoint, New EventArgs)
     End Sub
 
@@ -60,7 +61,7 @@ Module FileHandling
         strFilterExtensions(FilterHandler.FilterState.NoPicVid) = PICEXTENSIONS & VIDEOEXTENSIONS & "NOT"
     End Sub
 
-    Private Function FilterLBList(e As DirectoryInfo, ByRef lst As List(Of String)) As List(Of String)
+    Public Function FilterLBList(e As DirectoryInfo, ByRef lst As List(Of String)) As List(Of String)
         lst.Clear()
 
         For Each f In e.EnumerateFiles
@@ -116,46 +117,7 @@ Module FileHandling
     Public Function FilterListBoxList(e As DirectoryInfo, ByVal lst As List(Of String))
         lst = FilterLBList(e, lst)
         Exit Function
-        'Dim l As New List(Of String)
-        For Each f In e.EnumerateFiles
-            Dim s As String = LCase(f.Extension)
 
-            Select Case CurrentfilterState.State
-                Case FilterHandler.FilterState.All
-
-                    lst.Add(f.FullName)
-                Case FilterHandler.FilterState.NoPicVid
-
-
-                    If InStr(VIDEOEXTENSIONS & PICEXTENSIONS, s) <> 0 And Len(s) > 0 Then
-                    Else
-                        lst.Add(f.FullName)
-
-                    End If
-
-                Case FilterHandler.FilterState.Piconly
-                    If InStr(PICEXTENSIONS, s) <> 0 And Len(s) > 0 Then
-
-                        lst.Add(f.FullName)
-                    Else
-                    End If
-                Case FilterHandler.FilterState.LinkOnly
-                    If s = ".lnk" Then
-                        lst.Add(f.FullName)
-                    End If
-
-                Case FilterHandler.FilterState.Vidonly
-                    If InStr(VIDEOEXTENSIONS, s) <> 0 And Len(s) > 0 Then
-                        lst.Add(f.FullName)
-                    End If
-
-                Case FilterHandler.FilterState.PicVid
-                    If InStr(VIDEOEXTENSIONS & PICEXTENSIONS, s) <> 0 And Len(s) > 0 Then
-                        lst.Add(f.FullName)
-                    End If
-            End Select
-
-        Next
     End Function
 
 
@@ -659,6 +621,7 @@ Module FileHandling
                 d.Delete()
 
             Catch ex As Exception
+                Return False
                 Exit Function
             End Try
             ' MainForm.tvMain2.RefreshTree(s)

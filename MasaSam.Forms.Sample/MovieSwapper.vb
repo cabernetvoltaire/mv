@@ -71,7 +71,7 @@ Public Class MovieSwapper
                 RaiseEvent LoadedMedia(mMedia2)
                 RaiseEvent LoadedMedia(mMedia1)
                 RaiseEvent LoadedMedia(mMedia3)
-                ShowPlayer(mMedia2)
+                ShowPlayer(mMedia1)
         End Select
         oldindex = index
     End Sub
@@ -85,6 +85,8 @@ Public Class MovieSwapper
         RaiseEvent LoadedMedia(PrevMH)
         If ThisMH.MediaType = Filetype.Movie Then
             ShowPlayer(ThisMH)
+            reportStartpoint(ThisMH.StartPoint)
+
         ElseIf ThisMH.MediaType = Filetype.Pic Then
             ShowPicture(ThisMH)
         End If

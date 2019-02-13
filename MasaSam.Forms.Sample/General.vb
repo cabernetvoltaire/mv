@@ -322,7 +322,11 @@ Public Module General
     Public Sub ReportTime(str As String)
         Debug.Print(Int(Now().Second) & "." & Int(Now().Millisecond) & " " & str)
     End Sub
-
+    Public Sub reportStartpoint(Sh As StartPointHandler)
+        Dim s As String
+        s = "Duration: " & Sh.Duration & vbCrLf & "Percentage:" & Sh.Percentage & vbCrLf & " Absolute:" & Sh.Absolute & vbCrLf & " Startpoint:" & Sh.StartPoint & vbCrLf & " Player:" & Media.Player.Name
+        MainForm.lblNavigateState.Text = s
+    End Sub
     Public Sub ChangeFolder(strPath As String)
         If strPath = Media.MediaDirectory Then
         Else
@@ -331,7 +335,6 @@ Public Module General
 
             End If
             MainForm.FNG.Clear()
-
             MainForm.tvMain2.SelectedFolder = strPath
             ChangeWatcherPath(strPath)
 

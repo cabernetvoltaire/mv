@@ -92,7 +92,6 @@
         Set(ByVal value As Long)
             GetStartPoint()
             mStartPoint = value
-            RaiseEvent StartPointChanged(Me, New EventArgs)
         End Set
     End Property
     Private mState As Byte
@@ -128,7 +127,7 @@
 
 
     Private Function GetStartPoint() As Long
-
+        Dim oldstartpoint As Long = mStartPoint
         Select Case mState
             Case StartTypes.Beginning
                 mStartPoint = 0
@@ -161,6 +160,10 @@
             mStartPoint = mDuration / 2 'If we overshoot, re-locate to halfway point. 
         End If
         Debug.Print("Startpoint is " & mStartPoint)
+        If mStartPoint <> oldstartpoint Then
+            RaiseEvent StartPointChanged(Me, New EventArgs)
+
+        End If
         Return mStartPoint
     End Function
 End Class
