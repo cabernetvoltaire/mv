@@ -90,11 +90,18 @@ Public Class MovieSwapper
         End If
 
     End Sub
-    Public Sub SetStartpoints(SH As StartPointHandler)
+    Public Sub SetStartStates(SH As StartPointHandler)
         mMedia1.StartPoint.State = SH.State
         mMedia2.StartPoint.State = SH.State
         mMedia3.StartPoint.State = SH.State
-       
+
+
+    End Sub
+    Public Sub SetStartPoints(SH As StartPointHandler)
+        mMedia1.StartPoint.StartPoint = SH.StartPoint
+        mMedia2.StartPoint.StartPoint = SH.StartPoint
+        mMedia3.StartPoint.StartPoint = SH.StartPoint
+
 
     End Sub
     Private Sub ShowPlayer(ByRef MHX As MediaHandler)

@@ -360,6 +360,7 @@ Public Class MediaHandler
         End Select
     End Sub
     Private Sub OnStartChange(sender As Object, e As EventArgs) Handles StartPoint.StartPointChanged, StartPoint.StateChanged
+        MediaJumpToMarker()
         RaiseEvent StartChanged(sender, e)
 
     End Sub

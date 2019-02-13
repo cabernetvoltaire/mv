@@ -71,6 +71,7 @@ Partial Class MainForm
         Me.lbxShowList = New System.Windows.Forms.ListBox()
         Me.pbxBlanker = New System.Windows.Forms.PictureBox()
         Me.ctrPicAndButtons = New System.Windows.Forms.SplitContainer()
+        Me.MainWMP3 = New AxWMPLib.AxWindowsMediaPlayer()
         Me.MainWMP2 = New AxWMPLib.AxWindowsMediaPlayer()
         Me.SoundWMP = New AxWMPLib.AxWindowsMediaPlayer()
         Me.MainWMP = New AxWMPLib.AxWindowsMediaPlayer()
@@ -218,7 +219,6 @@ Partial Class MainForm
         Me.PositionUpdater = New System.Windows.Forms.Timer(Me.components)
         Me.tmrMovieSlideShow = New System.Windows.Forms.Timer(Me.components)
         Me.BackgroundWorker1 = New System.ComponentModel.BackgroundWorker()
-        Me.MainWMP3 = New AxWMPLib.AxWindowsMediaPlayer()
         Me.StatusStrip1.SuspendLayout()
         Me.TableLayoutPanel2.SuspendLayout()
         CType(Me.ctrMainFrame, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -238,6 +238,7 @@ Partial Class MainForm
         Me.ctrPicAndButtons.Panel1.SuspendLayout()
         Me.ctrPicAndButtons.Panel2.SuspendLayout()
         Me.ctrPicAndButtons.SuspendLayout()
+        CType(Me.MainWMP3, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.MainWMP2, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.SoundWMP, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.MainWMP, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -259,7 +260,6 @@ Partial Class MainForm
         Me.GroupBox1.SuspendLayout()
         CType(Me.FileSystemWatcher1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.MenuStrip2.SuspendLayout()
-        CType(Me.MainWMP3, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'FileToolStripMenuItem
@@ -659,6 +659,17 @@ Partial Class MainForm
         Me.ctrPicAndButtons.SplitterWidth = 7
         Me.ctrPicAndButtons.TabIndex = 6
         Me.ctrPicAndButtons.TabStop = False
+        '
+        'MainWMP3
+        '
+        Me.MainWMP3.Enabled = True
+        Me.MainWMP3.Location = New System.Drawing.Point(609, 150)
+        Me.MainWMP3.Margin = New System.Windows.Forms.Padding(4)
+        Me.MainWMP3.Name = "MainWMP3"
+        Me.MainWMP3.OcxState = CType(resources.GetObject("MainWMP3.OcxState"), System.Windows.Forms.AxHost.State)
+        Me.MainWMP3.Size = New System.Drawing.Size(959, 491)
+        Me.MainWMP3.TabIndex = 5
+        Me.MainWMP3.TabStop = False
         '
         'MainWMP2
         '
@@ -1868,17 +1879,6 @@ Partial Class MainForm
         '
         Me.tmrMovieSlideShow.Interval = 5000
         '
-        'MainWMP3
-        '
-        Me.MainWMP3.Enabled = True
-        Me.MainWMP3.Location = New System.Drawing.Point(609, 150)
-        Me.MainWMP3.Margin = New System.Windows.Forms.Padding(4)
-        Me.MainWMP3.Name = "MainWMP3"
-        Me.MainWMP3.OcxState = CType(resources.GetObject("MainWMP3.OcxState"), System.Windows.Forms.AxHost.State)
-        Me.MainWMP3.Size = New System.Drawing.Size(959, 491)
-        Me.MainWMP3.TabIndex = 5
-        Me.MainWMP3.TabStop = False
-        '
         'MainForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(11.0!, 24.0!)
@@ -1915,6 +1915,7 @@ Partial Class MainForm
         Me.ctrPicAndButtons.Panel2.ResumeLayout(False)
         CType(Me.ctrPicAndButtons, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ctrPicAndButtons.ResumeLayout(False)
+        CType(Me.MainWMP3, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.MainWMP2, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.SoundWMP, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.MainWMP, System.ComponentModel.ISupportInitialize).EndInit()
@@ -1948,7 +1949,6 @@ Partial Class MainForm
         CType(Me.FileSystemWatcher1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.MenuStrip2.ResumeLayout(False)
         Me.MenuStrip2.PerformLayout()
-        CType(Me.MainWMP3, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 

@@ -2359,7 +2359,7 @@ Public Class MainForm
         tbxPercentage.Text = Str(Media.Startpoint.Percentage) & "%"
         tbPercentage.Value = Media.Startpoint.Percentage
         Media.MediaJumpToMarker()
-
+        '   MSFiles.SetStartPoints(Media.StartPoint)
     End Sub
 
     Private Sub tbPercentage_MouseUp(sender As Object, e As MouseEventArgs) Handles tbPercentage.MouseUp
@@ -2370,6 +2370,7 @@ Public Class MainForm
         tbPercentage.Value = Media.Startpoint.Percentage
 
         Media.MediaJumpToMarker()
+        '  MSFiles.SetStartPoints(Media.StartPoint)
 
     End Sub
 
