@@ -142,7 +142,7 @@ Public Class MediaHandler
     Public Sub New()
         PositionUpdater.Interval = 500
         PositionUpdater.Enabled = False
-        StartPoint = Media.StartPoint
+        '     StartPoint = Media.StartPoint
     End Sub
     Private mMediaDirectory As String
     Public ReadOnly Property MediaDirectory() As String

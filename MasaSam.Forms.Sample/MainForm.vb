@@ -143,32 +143,32 @@ Public Class MainForm
 
 
     End Sub
-    'Public Sub OnStartChanged(Sender As Object, e As EventArgs) Handles Media.Startpoint.StateChanged, Media.Startpoint.StartPointChanged
-    '    'Media.Bookmark = -1
-    '    tbxAbsolute.Text = New TimeSpan(0, 0, Media.Startpoint.StartPoint).ToString("hh\:mm\:ss")
-    '    tbxPercentage.Text = Int(100 * Media.Startpoint.Absolute / Media.Startpoint.Duration) & "%"
-    '    tbPercentage.Value = Media.Startpoint.Percentage
-    '    tbAbsolute.Maximum = Media.Startpoint.Duration
-    '    tbAbsolute.Value = Media.Startpoint.StartPoint
-    '    Select Case Media.Startpoint.State
-    '        Case StartPointHandler.StartTypes.ParticularAbsolute
-    '            tbxPercentage.Enabled = False
-    '            tbxAbsolute.Enabled = True
-    '        Case StartPointHandler.StartTypes.ParticularPercentage
-    '            tbxAbsolute.Enabled = False
-    '            tbxPercentage.Enabled = True
-    '        Case Else
-    '            tbxAbsolute.Enabled = False
-    '            tbxPercentage.Enabled = False
-    '    End Select
-    '    '  MSFiles.SetStartpoints(StartPoint)
-    '    FullScreen.Changing = False
-    '    cbxStartPoint.SelectedIndex = Media.Startpoint.State
-    '    tbStartpoint.Text = "START:" & Media.Startpoint.Description
-    '    If Not Initialising Then
-    '        Media.MediaJumpToMarker()
-    '    End If
-    'End Sub
+    Public Sub OnStartChanged(Sender As Object, e As EventArgs)
+        'Media.Bookmark = -1
+        tbxAbsolute.Text = New TimeSpan(0, 0, Media.StartPoint.StartPoint).ToString("hh\:mm\:ss")
+        tbxPercentage.Text = Int(100 * Media.StartPoint.Absolute / Media.StartPoint.Duration) & "%"
+        tbPercentage.Value = Media.StartPoint.Percentage
+        tbAbsolute.Maximum = Media.StartPoint.Duration
+        tbAbsolute.Value = Media.StartPoint.StartPoint
+        Select Case Media.StartPoint.State
+            Case StartPointHandler.StartTypes.ParticularAbsolute
+                tbxPercentage.Enabled = False
+                tbxAbsolute.Enabled = True
+            Case StartPointHandler.StartTypes.ParticularPercentage
+                tbxAbsolute.Enabled = False
+                tbxPercentage.Enabled = True
+            Case Else
+                tbxAbsolute.Enabled = False
+                tbxPercentage.Enabled = False
+        End Select
+        '  MSFiles.SetStartpoints(StartPoint)
+        FullScreen.Changing = False
+        cbxStartPoint.SelectedIndex = Media.StartPoint.State
+        tbStartpoint.Text = "START:" & Media.StartPoint.Description
+        If Not Initialising Then
+            Media.MediaJumpToMarker()
+        End If
+    End Sub
     Public Sub OnStateChanged(sender As Object, e As EventArgs) Handles NavigateMoveState.StateChanged, CurrentFilterState.StateChanged, PlayOrder.StateChanged
         'If StartingUpFlag Then Exit Sub
         ReportAction(NavigateMoveState.Instructions)

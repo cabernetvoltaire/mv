@@ -21,7 +21,7 @@ Module FileHandling
     Public fm As New FavouritesMinder("Q:\Favourites")
 
     Public Sub OnMediaStartChanged(sender As Object, e As EventArgs) Handles Media.StartChanged
-        '   MainForm.OnStartChanged(sender, e)
+        MainForm.OnStartChanged(sender, e)
 
     End Sub
 
