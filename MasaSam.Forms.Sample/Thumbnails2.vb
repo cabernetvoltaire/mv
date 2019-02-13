@@ -84,7 +84,7 @@ Public Class Thumbnails
         Dim pb = DirectCast(sender, PictureBox)
 
         ToolTip1.SetToolTip(pb, pb.Tag)
-        Media.MediaPath = pb.Tag
+        MainForm.Media.MediaPath = pb.Tag
         MainForm.lbxFiles.SelectionMode = SelectionMode.One
         MainForm.tmrPicLoad.Enabled = True
 
