@@ -41,7 +41,7 @@
         End Get
         Set(ByVal value As Long)
             mDuration = value
-            ReportTime("Duration:" & mDuration)
+            ' ReportTime("Duration:" & mDuration)
         End Set
     End Property
     Private mDistance As Long
@@ -86,11 +86,11 @@
     Private mStartPoint As Long
     Public Property StartPoint() As Long
         Get
-
             GetStartPoint()
             Return mStartPoint
         End Get
         Set(ByVal value As Long)
+            GetStartPoint()
             mStartPoint = value
         End Set
     End Property

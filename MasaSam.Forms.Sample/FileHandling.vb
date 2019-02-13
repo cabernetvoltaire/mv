@@ -18,23 +18,29 @@ Module FileHandling
 
     Public WithEvents Media As New MediaHandler
     Public fm As New FavouritesMinder("Q:\Favourites")
-    Public Sub OnMediaChanged() Handles Media.MediaChanged
-        '  MainForm.StartPoint.Duration = Media.Duration
 
-    End Sub
-    Public Sub OnMediaShown(M As MediaHandler) Handles MSFiles.MediaShown
+    Public Sub OnMediaShown(ByRef M As MediaHandler) Handles MSFiles.MediaShown
         Media = M
-        '  MainForm.Media.Player = Media.Player
-        Media.StartPoint.State = MainForm.StartPoint.State
-        'Media.Player.Ctlcontrols.play()
+        Debug.Print("Playing....:")
+        DebugStartpoint(M)
+        '   Media.MediaJumpToMarker()
+        ' Media.Player.Ctlcontrols.play()
         MainForm.UpdateFileInfo()
-
     End Sub
-    Public Sub OnMediaLoaded(M As MediaHandler) Handles MSFiles.LoadedMedia
-        Media = M
-        Media.StartPoint.State = MainForm.StartPoint.State
-        Media.MediaJumpToMarker(Media.StartPoint)
-        ' Media.Player.Ctlcontrols.pause()
+    Public Sub OnMediaLoaded(ByRef M As MediaHandler) Handles MSFiles.LoadedMedia
+        M.StartPoint.State = MainForm.StartPoint.State
+        DebugStartpoint(M)
+        Media.MediaJumpToMarker()
+        '  M.Player.Ctlcontrols.pause()
+        'Media = M
+    End Sub
+
+    Private Sub DebugStartpoint(ByRef M As MediaHandler)
+        Debug.Print(M.MediaPath & " loaded into " & M.Player.Name)
+        Debug.Print(M.StartPoint.StartPoint & " startpoint")
+        Debug.Print(M.StartPoint.State & " State")
+        Debug.Print(M.StartPoint.Duration & " Duration")
+        Debug.Print("")
     End Sub
     Public Sub OnfileMoved(f As List(Of String), lbx As ListBox)
         MainForm.OnFileMoved(f, lbx)
@@ -49,14 +55,6 @@ Module FileHandling
         strFilterExtensions(FilterHandler.FilterState.Vidonly) = VIDEOEXTENSIONS
         strFilterExtensions(FilterHandler.FilterState.NoPicVid) = PICEXTENSIONS & VIDEOEXTENSIONS & "NOT"
     End Sub
-
-    ''' <summary>
-    ''' Fills the listbox with files from a given folder, in a given filter state
-    ''' </summary>
-    ''' <param name="lbx"></param>
-    ''' <param name="e"></param>
-    ''' <param name="flist"></param>
-    ''' <param name="blnRandom"></param>
 
     Private Function FilterLBList(e As DirectoryInfo, ByRef lst As List(Of String)) As List(Of String)
         lst.Clear()
@@ -159,11 +157,6 @@ Module FileHandling
 
 
 
-    ''' <summary>
-    ''' Actually saves the store list
-    ''' </summary>
-    ''' <param name="list"></param>
-    ''' <param name="Dest"></param>
     Public Sub StoreList(list As List(Of String), Dest As String)
         If Dest = "" Then Exit Sub
         Dim fs As New StreamWriter(New FileStream(Dest, FileMode.Create, FileAccess.Write))
@@ -336,15 +329,6 @@ Module FileHandling
 
     End Sub
 
-
-    ''' <summary>
-    ''' Moves files to strDest, creating a subfolder s if specified, unless strDest is empty in which case, they are deleted.
-    ''' </summary>
-    ''' <param name="files"></param>
-    ''' <param name="strDest"></param>
-    ''' <param name="s"></param>
-    ''' 
-    ''' <returns></returns>
     Private Sub MovingFiles(files As List(Of String), strDest As String, s As String)
         If strDest <> "" Then
             Dim dinfo As New IO.DirectoryInfo(strDest)
@@ -751,14 +735,6 @@ Module FileHandling
         'Next
         DeleteEmptyFolders(d, True)
     End Sub
-    ''' <summary>
-    ''' Adds all the files in d to s, provided there are no more than icount, or icount is zero
-    ''' If icount is zero, then all files are added.
-    ''' </summary>
-    ''' <param name="s"></param>
-    ''' <param name="d"></param>
-    ''' <param name="icount"></param>
-    ''' <returns></returns>
 
     Public Sub BurstFolder(d As DirectoryInfo)
         HarvestFolder(d, True, True)

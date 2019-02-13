@@ -86,11 +86,12 @@ Public Class MainForm
         'if it is, change the link to point to the new position.
     End Sub
     Public Sub OnSpeedChange() Handles SP.SpeedChanged
+
         If SP.Slideshow Then
             tbSpeed.Text = "Slide Interval=" & SP.Interval
         Else
             tbSpeed.Text = "Speed:" & SP.FrameRate & "fps"
-            SwitchSound(Not SP.Fullspeed)
+            SwitchSound(Not Media.Speed.Fullspeed)
 
         End If
     End Sub
@@ -172,7 +173,7 @@ Public Class MainForm
         ' MS.SH = StartPoint
         '        MS.SH = StartPoint
         If Not Initialising Then
-            Media.MediaJumpToMarker(StartPoint)
+            Media.MediaJumpToMarker()
         End If
         '        MediaJumpToMarker(StartPoint)
     End Sub
@@ -507,14 +508,14 @@ Public Class MainForm
 
         Dim blnPlaying As Boolean = Media.Player.URL <> ""
         If Not blnPlaying Then
-            SP.SSSpeed = e.KeyCode - KeySpeed1 'Set slideshow speed if pic showing, and start slideshow
+            Media.Speed.SSSpeed = e.KeyCode - KeySpeed1 'Set slideshow speed if pic showing, and start slideshow
             'PlaybackSpeed = 30
             tmrSlideShow.Enabled = True
-            tmrSlideShow.Interval = SP.Interval
+            tmrSlideShow.Interval = Media.Speed.Interval
         Else
-            SP.Speed = e.KeyCode - KeySpeed1
-            PlaybackSpeed = 1000 / SP.FrameRate 'Otherwise, set playback speed 'TODO Options
-            SP.Fullspeed = False
+            Media.Speed.Speed = e.KeyCode - KeySpeed1
+            PlaybackSpeed = 1000 / Media.Speed.FrameRate 'Otherwise, set playback speed 'TODO Options
+            Media.Speed.Fullspeed = False
         End If
 
         If e.KeyCode = KeyToggleSpeed Then
@@ -524,10 +525,10 @@ Public Class MainForm
                     Media.Player.settings.rate = 1
                     Media.Player.Ctlcontrols.play()
                     tmrSlowMo.Enabled = False
-                    SP.Fullspeed = True
+                    Media.Speed.Fullspeed = True
                 Else
                     Media.Player.Ctlcontrols.pause()
-                    SP.Fullspeed = False
+                    Media.Speed.Fullspeed = False
                 End If
             Else
                 tmrSlideShow.Enabled = Not tmrSlideShow.Enabled
@@ -536,7 +537,7 @@ Public Class MainForm
         Else
             If blnPlaying Then
 
-                tmrSlowMo.Interval = 1000 / SP.FrameRate
+                tmrSlowMo.Interval = 1000 / Media.Speed.FrameRate
                 tmrSlowMo.Enabled = True
                 Media.Player.Ctlcontrols.pause()
             Else
@@ -546,7 +547,7 @@ Public Class MainForm
         'End If
         'Report
         'blnSpeedRestart = True
-        '  tbSpeed.Text = "SPEED (" & SP.FrameRate & " fps)"
+        '  tbSpeed.Text = "SPEED (" & Media.Speed.FrameRate & " fps)"
         e.SuppressKeyPress = True
         Return e
     End Function
@@ -701,9 +702,9 @@ Public Class MainForm
             iJumpFactor = 1
         End If
         If blnBack Then
-            Media.Position = Media.Position - SP.AbsoluteJump / iJumpFactor
+            Media.Position = Media.Position - Media.Speed.AbsoluteJump / iJumpFactor
         Else
-            Media.Position = Media.Position + SP.AbsoluteJump / iJumpFactor
+            Media.Position = Media.Position + Media.Speed.AbsoluteJump / iJumpFactor
         End If
         ' blnRandomStartPoint = False
         '   JumpVideo(Media.Player, SoundWMP)
@@ -720,7 +721,7 @@ Public Class MainForm
         End If
 
         With Media.Player
-            Media.Position = Math.Min(Media.Duration, Media.Position + Media.Duration * Math.Sign(e.KeyCode - (KeyBigJumpOn + KeyBigJumpBack) / 2) / (iJumpFactor * SP.FractionalJump))
+            Media.Position = Math.Min(Media.Duration, Media.Position + Media.Duration * Math.Sign(e.KeyCode - (KeyBigJumpOn + KeyBigJumpBack) / 2) / (iJumpFactor * Media.Speed.FractionalJump))
         End With
         '        JumpVideo(Media.Player, SoundWMP)
 
@@ -891,9 +892,9 @@ Public Class MainForm
                 If Media.Bookmark = -1 Or StartPoint.State <> StartPointHandler.StartTypes.ParticularAbsolute Then
 
                     m.State = StartPointHandler.StartTypes.NearEnd
-                    Media.MediaJumpToMarker(m)
+                    Media.MediaJumpToMarker()
                 Else
-                    Media.MediaJumpToMarker(StartPoint)
+                    Media.MediaJumpToMarker()
                 End If
 
                 '                JumpVideo(Media.Player, SoundWMP)
@@ -929,20 +930,21 @@ Public Class MainForm
                 With Media.Player
                     If .URL <> "" Then
                         If .playState = WMPLib.WMPPlayState.wmppsPaused Then
-                            SP.Unpause = True
+                            Media.Speed.Unpause = True
                             tmrSlowMo.Enabled = False
-                            .Ctlcontrols.currentPosition = Media.Position
+                            '                            .Ctlcontrols.currentPosition = Media.Position
                             '.settings.rate = 1
                             .Ctlcontrols.play()
-                            SP.Fullspeed = True
+                            Media.Speed.Fullspeed = True
+                            SwitchSound(False)
                         Else
-                            SP.Unpause = False
+                            Media.Speed.Unpause = False
                             .Ctlcontrols.pause()
-                            SP.Fullspeed = False
+                            Media.Speed.Fullspeed = False
                         End If
                     Else
                         tmrSlideShow.Enabled = Not tmrSlideShow.Enabled
-                        SP.Slideshow = tmrSlideShow.Enabled
+                        Media.Speed.Slideshow = tmrSlideShow.Enabled
                     End If
                     'blnSpeedRestart = True
                     '  tbSpeed.Text = "SPEED (" & PlaybackSpeed * 100 & "%)"
@@ -1435,11 +1437,7 @@ Public Class MainForm
 
 
 
-    Private Sub MainWMP_PlayStateChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent) 'Handles MainWMP.PlayStateChange 'Swapper
-        'PlaystateChange(sender, e)
 
-        ' SoundWMP.settings.mute = True
-    End Sub
 
     Private Sub tmrMediaSpeed_Tick(sender As Object, e As EventArgs) Handles tmrMediaSpeed.Tick
         Media.Player.Ctlcontrols.step(1)
@@ -1791,7 +1789,7 @@ Public Class MainForm
 
     End Sub
     Private Sub tmrSlowMo_Tick(sender As Object, e As EventArgs) Handles tmrSlowMo.Tick
-        MediaAdvance(Media.Player, 1)
+        Media.Player.Ctlcontrols.step(1)
         'Throw New Exception
 
     End Sub
@@ -2106,10 +2104,11 @@ Public Class MainForm
 
     End Sub
 
-    Public Sub MediaAdvance(wmp As AxWMPLib.AxWindowsMediaPlayer, stp As Long)
+    Public Sub MediaAdvance(ByRef wmp As AxWMPLib.AxWindowsMediaPlayer, stp As Long)
         wmp.Ctlcontrols.step(stp)
-        wmp.Refresh()
-        Media.Position = wmp.Ctlcontrols.currentPosition
+        ' Media.Position = wmp.Ctlcontrols.currentPosition
+        '  wmp.Refresh()
+        ' Console.WriteLine(Media.Position)
     End Sub
 
 
@@ -2379,7 +2378,7 @@ Public Class MainForm
         tbxAbsolute.Text = New TimeSpan(0, 0, tbAbsolute.Value).ToString("hh\:mm\:ss")
         tbxPercentage.Text = Str(StartPoint.Percentage) & "%"
         tbPercentage.Value = StartPoint.Percentage
-        Media.MediaJumpToMarker(StartPoint)
+        Media.MediaJumpToMarker()
 
     End Sub
 
@@ -2390,7 +2389,7 @@ Public Class MainForm
         tbxPercentage.Text = Str(StartPoint.Percentage) & "%"
         tbPercentage.Value = StartPoint.Percentage
 
-        Media.MediaJumpToMarker(StartPoint)
+        Media.MediaJumpToMarker()
 
     End Sub
 

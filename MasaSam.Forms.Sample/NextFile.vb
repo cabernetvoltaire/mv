@@ -34,12 +34,12 @@
             Else
                 If mListCount > 1 Then
                     If Forwards Then
-                        mNextItem = Listbox.Items((mCurrentIndex + 1) Mod (mListCount - 1))
+                        mNextItem = Listbox.Items((mCurrentIndex + 1) Mod (mListCount))
                     Else
                         If mCurrentIndex = 0 Then
-                            mCurrentIndex = mListCount - 1
+                            mCurrentIndex = mListCount
                         Else
-                            mNextItem = Listbox.Items((mCurrentIndex - 1) Mod (mListCount - 1))
+                            mNextItem = Listbox.Items((mCurrentIndex - 1) Mod (mListCount))
                         End If
                     End If
                 Else
@@ -62,12 +62,12 @@
             Else
                 If mListCount > 1 Then
                     If Not Forwards Then
-                        mPreviousItem = Listbox.Items((mCurrentIndex + 1) Mod (mListCount - 1))
+                        mPreviousItem = Listbox.Items((mCurrentIndex + 1) Mod (mListCount))
                     Else
                         If mCurrentIndex = 0 Then
-                            mCurrentIndex = mListCount - 1
+                            mCurrentIndex = mListCount
                         End If
-                        mPreviousItem = Listbox.Items((mCurrentIndex - 1) Mod (mListCount - 1))
+                        mPreviousItem = Listbox.Items((mCurrentIndex - 1) Mod (mListCount))
                     End If
                 Else
                     mPreviousItem = Listbox.Items(0)

@@ -266,40 +266,7 @@ Module ButtonHandling
         End If
         Return asc
     End Function
-    ''' <summary>
-    ''' Loads just the current row of buttons
-    ''' </summary>
-    'Public Sub LoadCurrentButtonSet(layer As Byte)
-    '    For i = 0 To 7
-    '        MainForm.lblAlpha.Text = Chr(AscfromButt(iCurrentAlpha)).ToString
-    '        Dim s As String
-    '        Dim f As String = strButtonFilePath(i, iCurrentAlpha, layer)
 
-    '        strVisibleButtons(i) = f
-    '        s = strButtonCaptions(i, iCurrentAlpha, 1)
-    '        If s <> "" Then
-    '            lblDest(i).Text = s
-    '            If My.Computer.FileSystem.DirectoryExists(f) Then
-    '                If CtrlDown Then
-    '                    lblDest(i).ForeColor = Color.Red
-    '                ElseIf ShiftDown Then
-    '                    lblDest(i).ForeColor = Color.Blue
-
-    '                Else
-    '                    lblDest(i).ForeColor = Color.Black
-    '                End If
-
-    '            Else
-    '                lblDest(i).ForeColor = Color.Gray
-
-    '            End If
-
-    '        Else
-    '            lblDest(i).Text = "ABCDEFGH"(i)
-
-    '        End If
-    '    Next
-    'End Sub
     ''' <summary>
     ''' This is for when we hold down CTRL or SHIFT and the appearance of the buttons schanges. 
     ''' </summary>
