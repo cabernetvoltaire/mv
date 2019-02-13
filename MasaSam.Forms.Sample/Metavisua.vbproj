@@ -169,6 +169,12 @@
     <Compile Include="KeyHandler.vb" />
     <Compile Include="MediaHandler.vb" />
     <Compile Include="MovieSwapper.vb" />
+    <Compile Include="MovieSwapTest.Designer.vb">
+      <DependentUpon>MovieSwapTest.vb</DependentUpon>
+    </Compile>
+    <Compile Include="MovieSwapTest.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="MVButton.vb" />
     <Compile Include="My Project\Class1.vb" />
     <Compile Include="NextFile.vb" />
@@ -264,6 +270,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GroupingForm.resx">
       <DependentUpon>GroupingForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MovieSwapTest.resx">
+      <DependentUpon>MovieSwapTest.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Preferences.resx">
       <DependentUpon>Preferences.vb</DependentUpon>
