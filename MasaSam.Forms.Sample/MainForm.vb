@@ -1155,7 +1155,7 @@ Public Class MainForm
         MainWMP2.stretchToFit = True
         MainWMP3.stretchToFit = True
         Media.Player.uiMode = "FULL"
-        If True Then
+        If seperate Then
             MainWMP.Dock = DockStyle.Fill 'Swapper
             MainWMP2.Dock = DockStyle.Fill
             MainWMP3.Dock = DockStyle.Fill
@@ -1269,7 +1269,7 @@ Public Class MainForm
 
     End Sub
     Private Sub IndexHandler(sender As Object, e As EventArgs) Handles lbxShowList.SelectedIndexChanged, lbxFiles.SelectedIndexChanged 'TODO Swapper
-        PositionUpdater.Enabled = True
+        '   PositionUpdater.Enabled = True
         If True Then
 
             With sender
@@ -1515,13 +1515,13 @@ Public Class MainForm
 
     End Sub
 
-    Public Sub JumpVideo(wmp As AxWindowsMediaPlayer, swmp As AxWindowsMediaPlayer)
-        tmrJumpVideo.Enabled = True
-        Exit Sub
-        wmp.Ctlcontrols.currentPosition = Media.Startpoint.StartPoint
-        swmp.Ctlcontrols.currentPosition = Media.Startpoint.StartPoint
+    'Public Sub JumpVideo(wmp As AxWindowsMediaPlayer, swmp As AxWindowsMediaPlayer)
+    '    tmrJumpVideo.Enabled = True
+    '    Exit Sub
+    '    wmp.Ctlcontrols.currentPosition = Media.Startpoint.StartPoint
+    '    swmp.Ctlcontrols.currentPosition = Media.Startpoint.StartPoint
 
-    End Sub
+    'End Sub
 
 
     Private Sub btn1_MouseDown(sender As Object, e As MouseEventArgs) Handles btn8.MouseDown, btn7.MouseDown, btn6.MouseDown, btn5.MouseDown, btn4.MouseDown, btn3.MouseDown, btn2.MouseDown, btn1.MouseDown

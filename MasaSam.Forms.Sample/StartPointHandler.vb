@@ -86,7 +86,6 @@
     Public Property StartPoint() As Long
         Get
             GetStartPoint()
-
             Return mStartPoint
         End Get
         Set(ByVal value As Long)
@@ -161,7 +160,7 @@
         End If
         Debug.Print("Startpoint is " & mStartPoint)
         If mStartPoint <> oldstartpoint Then
-            RaiseEvent StartPointChanged(Me, New EventArgs)
+            'RaiseEvent StartPointChanged(Me, New EventArgs)
 
         End If
         Return mStartPoint

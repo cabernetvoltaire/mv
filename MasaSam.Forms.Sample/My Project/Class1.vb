@@ -16,8 +16,8 @@
     Public Property Fullspeed As Boolean = True
     Public Property Unpause As Boolean = False
     Public Property Paused As Boolean = False
-    Public Property AbsoluteJump As Integer = 20
-    Public Property FractionalJump As Integer = 5
+    Public Property AbsoluteJump As Integer = 35
+    Public Property FractionalJump As Integer = 8
     Public Property Speed() As Byte
         Get
             Return mSpeed
