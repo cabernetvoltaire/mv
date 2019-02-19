@@ -27,6 +27,8 @@ Module FileHandling
     End Sub
 
     Public Sub OnMediaShown(ByRef M As MediaHandler) Handles MSFiles.MediaShown
+
+        Debug.Print("MediaShown" & M.Player.Name)
         Media = M
         Debug.Print("Playing....:")
         DebugStartpoint(M)
@@ -35,6 +37,7 @@ Module FileHandling
     End Sub
     Public Sub OnMediaLoaded(ByRef M As MediaHandler) Handles MSFiles.LoadedMedia
         M.StartPoint.State = Media.StartPoint.State
+        M.Pause(True)
         DebugStartpoint(M)
         'M.MediaJumpToMarker()
         '  MainForm.OnStartChanged(M.StartPoint, New EventArgs)

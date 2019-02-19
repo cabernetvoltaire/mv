@@ -1159,10 +1159,13 @@ Public Class MainForm
             MainWMP.Dock = DockStyle.Fill 'Swapper
             MainWMP2.Dock = DockStyle.Fill
             MainWMP3.Dock = DockStyle.Fill
+
         End If
 
         'alternateWMP.Dock = DockStyle.Fill 'Swapper
-        Media.Player.settings.volume = 100
+        MainWMP.settings.volume = 100
+        MainWMP2.settings.volume = 100
+        MainWMP3.settings.volume = 100
 
         currentPicBox = PictureBox1
         Media.Picture = currentPicBox
@@ -1278,7 +1281,7 @@ Public Class MainForm
                     Dim i As Long = .SelectedIndex
                     If i = -1 Then
                     Else
-
+                        Debug.Print(vbCrLf & vbCrLf & "NEXT SELECTION ---------------------------------------")
                         MSFiles.Listbox = sender
                         MSFiles.ListIndex = i
                     End If

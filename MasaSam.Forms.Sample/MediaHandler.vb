@@ -196,7 +196,14 @@ Public Class MediaHandler
 #End Region
 
 #Region "Methods"
+    Public Sub Pause(Pause As Boolean)
+        If Pause Then
+            mPlayer.Ctlcontrols.pause()
+        Else
+            mPlayer.Ctlcontrols.play()
+        End If
 
+    End Sub
     Private Sub GetBookmark()
         If InStr(mMediaPath, "%") <> 0 Then
 
@@ -335,19 +342,66 @@ Public Class MediaHandler
 
     Private Sub HandleMovie(URL As String)
         Static LastURL As String
-        If URL <> LastURL Then
-            If mPlayer Is Nothing Then
-            Else
-                mPlayer.URL = URL
-                LastURL = URL
+        ' If URL <> LastURL Then
+        If mPlayer Is Nothing Then
+        Else
+            mPlayer.URL = URL
+            LastURL = URL
             End If
-        End If
+        'End If
         MediaJumpToMarker()
     End Sub
 #End Region
 
 #Region "Event Handlers"
     Private Sub PlaystateChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent) Handles mPlayer.PlayStateChange
+        Dim lbl As New Label
+        lbl = MainForm.lblNavigateState
+        Select Case e.newState
+
+            Case 0 ' Undefined
+                lbl.Text = lbl.Text & vbCrLf & "Undefined"
+
+            Case 1 ' Stopped
+                lbl.Text = lbl.Text & vbCrLf & "Stopped"
+
+            Case 2 ' Paused
+                lbl.Text = lbl.Text & vbCrLf & "Paused"
+
+            Case 3 ' Playing
+                lbl.Text = lbl.Text & vbCrLf & "Playing"
+
+            Case 4 ' ScanForward
+                lbl.Text = lbl.Text & vbCrLf & "ScanForward"
+
+            Case 5 ' ScanReverse
+                lbl.Text = lbl.Text & vbCrLf & "ScanReverse"
+
+            Case 6 ' Buffering
+                lbl.Text = lbl.Text & vbCrLf & "Buffering"
+
+            Case 7 ' Waiting
+                lbl.Text = lbl.Text & vbCrLf & "Waiting"
+
+            Case 8 ' MediaEnded
+                lbl.Text = lbl.Text & vbCrLf & "MediaEnded"
+
+            Case 9 ' Transitioning
+                lbl.Text = lbl.Text & vbCrLf & "Transitioning"
+
+            Case 10 ' Ready
+                lbl.Text = lbl.Text & vbCrLf & "Ready"
+
+            Case 11 ' Reconnecting
+                lbl.Text = lbl.Text & vbCrLf & "Reconnecting"
+
+            Case 12 ' Last
+                lbl.Text = lbl.Text & vbCrLf & "Last"
+
+            Case Else
+                lbl.Text = lbl.Text & vbCrLf & ("Unknown State: " + e.newState.ToString())
+
+        End Select
         Select Case e.newState
 
             Case WMPLib.WMPPlayState.wmppsStopped
@@ -356,7 +410,7 @@ Public Class MediaHandler
             Case WMPLib.WMPPlayState.wmppsMediaEnded
                 'Debug.Print("Ended:" & StartPoint.StartPoint & " " & StartPoint.Duration)
                 If Not MainForm.tmrAutoTrail.Enabled And mPlayer.Visible Then
-                    MainForm.AdvanceFile(True, False)
+                    ' MainForm.AdvanceFile(True, False)
                 Else
                     ' MediaJumpToMarker()
                 End If
@@ -364,6 +418,7 @@ Public Class MediaHandler
                 'ReportTime("Playing")
                 MainForm.SwitchSound(False)
                 Duration = mPlayer.currentMedia.duration
+                Debug.Print(mPlayer.URL & " unpaused by playstatehandler")
                 If mPaused Then
                     mPaused = False
                     Exit Sub

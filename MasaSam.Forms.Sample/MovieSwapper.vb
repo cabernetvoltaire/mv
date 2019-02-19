@@ -35,7 +35,7 @@ Public Class MovieSwapper
             SetIndex(value)
         End Set
     End Property
-    Public Sub New(MP1 As AxWindowsMediaPlayer, MP2 As AxWindowsMediaPlayer, MP3 As AxWindowsMediaPlayer)
+    Public Sub New(ByRef MP1 As AxWindowsMediaPlayer, ByRef MP2 As AxWindowsMediaPlayer, ByRef MP3 As AxWindowsMediaPlayer)
 
         mMedia1.Player = MP1
         mMedia2.Player = MP2
@@ -99,14 +99,21 @@ Public Class MovieSwapper
         End Select
         oldindex = index
     End Sub
+
+    Private Sub Prepare(ByRef MH As MediaHandler, path As String)
+        Debug.Print("PREPARE: " & MH.Player.Name)
+        MH.MediaPath = path
+        MH.Player.Visible = separate
+        MH.Pause(True)
+        Debug.Print(vbCrLf & "PAUSED:")
+        Debug.Print(MH.Player.URL & " paused")
+    End Sub
     Private Sub RotateMedia(ByRef ThisMH As MediaHandler, ByRef NextMH As MediaHandler, ByRef PrevMH As MediaHandler, nxt As String, prev As String)
-        NextMH.MediaPath = nxt
-        NextMH.Player.Visible = separate
-        PrevMH.MediaPath = prev
-        PrevMH.Player.Visible = separate
-        RaiseEvent LoadedMedia(NextMH)
-        RaiseEvent LoadedMedia(PrevMH)
-        RaiseEvent LoadedMedia(ThisMH)
+        '   SetStartStates(Media.StartPoint)
+        Prepare(PrevMH, prev)
+        Prepare(NextMH, nxt)
+        PrevMH.Pause(True)
+        NextMH.Pause(True)
         If ThisMH.MediaType = Filetype.Movie Then
             ShowPlayer(ThisMH)
             '  reportStartpoint(ThisMH)
@@ -140,10 +147,13 @@ Public Class MovieSwapper
 
     End Sub
     Private Sub ShowPlayer(ByRef MHX As MediaHandler)
-        MuteAll()
 
+        Debug.Print("SHOWPLAYER" & MHX.Player.Name)
+        MuteAll()
+        MHX.Pause(False)
+        Debug.Print(MHX.Player.URL & " unpaused")
         With MHX.Player
-            'MHX.MediaJumpToMarker()
+
             .Visible = True
             .BringToFront()
             .settings.mute = False
