@@ -129,15 +129,15 @@ Public Class MainForm
             '       StartPoint.State = StartPointHandler.StartTypes.NearBeginning
         End If
 
-        If Random.StartPoint Then
-            Media.Startpoint.State = StartPointHandler.StartTypes.Random
+        If Random.StartPointFlag Then
+            Media.StartPoint.State = StartPointHandler.StartTypes.Random
         End If
         If Random.NextSelect Then
             MSFiles.NextF.Randomised = True
         End If
         ToggleRandomAdvanceToolStripMenuItem.Checked = Random.NextSelect
         ToggleRandomSelectToolStripMenuItem.Checked = Random.OnDirChange
-        ToggleRandomStartToolStripMenuItem.Checked = Random.StartPoint
+        ToggleRandomStartToolStripMenuItem.Checked = Random.StartPointFlag
         chbNextFile.Checked = Random.NextSelect
         chbInDir.Checked = Random.OnDirChange
 
@@ -161,7 +161,7 @@ Public Class MainForm
                 tbxAbsolute.Enabled = False
                 tbxPercentage.Enabled = False
         End Select
-        '  MSFiles.SetStartpoints(StartPoint)
+        MSFiles.SetStartStates(Media.StartPoint)
         FullScreen.Changing = False
         cbxStartPoint.SelectedIndex = Media.StartPoint.State
         tbStartpoint.Text = "START:" & Media.StartPoint.Description
@@ -572,7 +572,7 @@ Public Class MainForm
     'End Sub
 
     Private Sub ToggleRandomStartPoint()
-        Random.StartPoint = Not Random.StartPoint
+        Random.StartPointFlag = Not Random.StartPointFlag
         'StartAlways is when the random start has been selected for all files
         'StartPoint is just a flag telling the video to jump to 
     End Sub
@@ -744,11 +744,11 @@ Public Class MainForm
         tmrAutoTrail.Enabled = Not tmrAutoTrail.Enabled
         TrailerModeToolStripMenuItem.Checked = tmrAutoTrail.Enabled
         If tmrAutoTrail.Enabled Then
-            m = Media.Startpoint
-            Media.Startpoint.State = StartPointHandler.StartTypes.Random
+            m = Media.StartPoint
+            Media.StartPoint.State = StartPointHandler.StartTypes.Random
             SwitchSound(True)
         Else
-            Media.Startpoint = m
+            Media.StartPoint = m
             SwitchSound(False)
             Debug.Print("Normal")
             tmrSlowMo.Enabled = False
@@ -900,7 +900,7 @@ Public Class MainForm
 
             Case KeyJumpAutoT
                 If e.Shift Then
-                    Media.Startpoint.IncrementState()
+                    Media.StartPoint.IncrementState()
                 Else
                     JumpRandom(e.Control And e.Shift)
                 End If
@@ -1155,7 +1155,7 @@ Public Class MainForm
         MainWMP2.stretchToFit = True
         MainWMP3.stretchToFit = True
         Media.Player.uiMode = "FULL"
-        If seperate Then
+        If Not separate Then
             MainWMP.Dock = DockStyle.Fill 'Swapper
             MainWMP2.Dock = DockStyle.Fill
             MainWMP3.Dock = DockStyle.Fill
@@ -1200,7 +1200,7 @@ Public Class MainForm
         '    HighlightCurrent(Media.MediaPath)
 
         tmrPicLoad.Enabled = True
-        ReportAction("Startpoint state=" & Media.Startpoint.State)
+        ReportAction("Startpoint state=" & Media.StartPoint.State)
 
     End Sub
     Public Sub WatchStart(path As String)
@@ -1442,8 +1442,8 @@ Public Class MainForm
 
                 If Media.IsLink Then
                     If Media.Bookmark <> -1 Then
-                        If Media.Startpoint.State = StartPointHandler.StartTypes.ParticularAbsolute Then
-                            Media.Startpoint.Absolute = Media.Bookmark
+                        If Media.StartPoint.State = StartPointHandler.StartTypes.ParticularAbsolute Then
+                            Media.StartPoint.Absolute = Media.Bookmark
                         End If
 
                     End If
@@ -1590,7 +1590,7 @@ Public Class MainForm
         '   tbSpeed.Text = tbSpeed.Text = "SPEED (" & PlaybackSpeed & "fps)"
         tbButton.Text = "BUTTONFILE: " & strButtonfile
         tbZoom.Text = iZoomFactor
-        If Random.StartPoint Then
+        If Random.StartPointFlag Then
             tbStartpoint.Text = "START:RANDOM"
         Else
             tbStartpoint.Text = "START:NORMAL"
@@ -2052,7 +2052,7 @@ Public Class MainForm
     End Sub
 
     Private Sub ToggleRandomStartToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ToggleRandomStartToolStripMenuItem.Click
-        Random.StartPoint = Not Random.StartPoint
+        Random.StartPointFlag = Not Random.StartPointFlag
     End Sub
 
     Private Sub BundleToolStripMenuItem_Click_1(sender As Object, e As EventArgs) Handles BundleToolStripMenuItem.Click
@@ -2359,7 +2359,8 @@ Public Class MainForm
         tbxPercentage.Text = Str(Media.Startpoint.Percentage) & "%"
         tbPercentage.Value = Media.Startpoint.Percentage
         Media.MediaJumpToMarker()
-        '   MSFiles.SetStartPoints(Media.StartPoint)
+        MSFiles.SetStartStates(Media.StartPoint)
+        '   MSFiles.SetStartpoints(Media.StartPoint)
     End Sub
 
     Private Sub tbPercentage_MouseUp(sender As Object, e As MouseEventArgs) Handles tbPercentage.MouseUp
@@ -2370,7 +2371,8 @@ Public Class MainForm
         tbPercentage.Value = Media.Startpoint.Percentage
 
         Media.MediaJumpToMarker()
-        '  MSFiles.SetStartPoints(Media.StartPoint)
+        MSFiles.SetStartStates(Media.StartPoint)
+        '  MSFiles.SetStartpoints(Media.StartPoint)
 
     End Sub
 
@@ -2643,5 +2645,13 @@ Public Class MainForm
 
     Private Sub chbNextFile_Click(sender As Object, e As EventArgs) Handles chbNextFile.Click
 
+    End Sub
+
+    Private Sub ByTimeToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ByTimeToolStripMenuItem.Click
+
+    End Sub
+
+    Private Sub ByLinkFolderToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ByLinkFolderToolStripMenuItem.Click
+        DM.FilterByLinkFolder(Media.MediaDirectory)
     End Sub
 End Class

@@ -28,7 +28,7 @@
         End Set
     End Property
     Private mStartPoint As Boolean
-    Public Property StartPoint() As Boolean
+    Public Property StartPointFlag() As Boolean
         Get
             Return mStartPoint
         End Get
@@ -46,7 +46,7 @@
         Set(ByVal value As Boolean)
             OnDirChange = value
             NextSelect = value
-            StartPoint = value
+            StartPointFlag = value
             mAll = value
             RaiseEvent RandomChanged(Me, New EventArgs)
 

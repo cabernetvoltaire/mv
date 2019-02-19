@@ -4,7 +4,7 @@ Imports MasaSam.Forms.Controls
 Module FileHandling
     Public blnSuppressCreate As Boolean = False
     Public blnChooseOne As Boolean = False
-    Public WithEvents StartPoint As New StartPointHandler
+    '  Public WithEvents StartPoint As New StartPointHandler
 
     Public CurrentfilterState As FilterHandler = MainForm.CurrentFilterState
     Public Random As RandomHandler = MainForm.Random
@@ -22,7 +22,7 @@ Module FileHandling
 
     Public Sub OnMediaStartChanged(sender As Object, e As EventArgs) Handles Media.StartChanged
         MainForm.OnStartChanged(sender, e)
-        MSFiles.SetStartStates(Media.StartPoint)
+        'MSFiles.SetStartStates(Media.StartPoint)
 
     End Sub
 
@@ -30,7 +30,7 @@ Module FileHandling
         Media = M
         Debug.Print("Playing....:")
         DebugStartpoint(M)
-        reportStartpoint(M.StartPoint)
+        reportStartpoint(M)
         MainForm.UpdateFileInfo()
     End Sub
     Public Sub OnMediaLoaded(ByRef M As MediaHandler) Handles MSFiles.LoadedMedia

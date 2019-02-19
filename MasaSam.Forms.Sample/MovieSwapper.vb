@@ -42,7 +42,28 @@ Public Class MovieSwapper
         mMedia3.Player = MP3
 
     End Sub
-
+    Private Function FindMH(path As String) As MediaHandler
+        If mMedia1.MediaPath = path Then
+            Return mMedia1
+        ElseIf mMedia2.MediaPath = path Then
+            Return mMedia2
+        ElseIf mMedia3.MediaPath = path Then
+            Return mMedia3
+        Else
+            Return Nothing
+        End If
+    End Function
+    Private Function FreeMH(c As String, p As String, n As String) As MediaHandler
+        If mMedia1.MediaPath <> c And mMedia1.MediaPath <> p And mMedia1.MediaPath <> n Then
+            Return mMedia1
+        ElseIf mMedia2.MediaPath <> c And mMedia2.MediaPath <> p And mMedia2.MediaPath <> n Then
+            Return mMedia2
+        ElseIf mMedia3.MediaPath <> c And mMedia3.MediaPath <> p And mMedia3.MediaPath <> n Then
+            Return mMedia3
+        Else
+            Return Nothing
+        End If
+    End Function
     Private Sub SetIndex(index As Integer)
         Dim Current As String
         Dim Nxt As String
@@ -57,6 +78,8 @@ Public Class MovieSwapper
         Console.WriteLine("Previous:" & Prev)
         Console.WriteLine("Current:" & Current)
         Console.WriteLine("Next:" & Nxt)
+
+        '        RotateMedia(FindMH(Current), FindMH(Nxt), FindMH(Prev), Nxt, Prev)
         Select Case Current
             Case mMedia1.MediaPath
                 RotateMedia(mMedia1, mMedia2, mMedia3, Nxt, Prev)
@@ -69,45 +92,47 @@ Public Class MovieSwapper
                 mMedia2.MediaPath = Nxt
                 mMedia3.MediaPath = Prev
                 RotateMedia(mMedia1, mMedia2, mMedia3, Nxt, Prev)
-                RaiseEvent LoadedMedia(mMedia2)
-                RaiseEvent LoadedMedia(mMedia1)
-                RaiseEvent LoadedMedia(mMedia3)
+                'RaiseEvent LoadedMedia(mMedia2)
+                'RaiseEvent LoadedMedia(mMedia1)
+                'RaiseEvent LoadedMedia(mMedia3)
                 '    ShowPlayer(mMedia1)
         End Select
         oldindex = index
     End Sub
     Private Sub RotateMedia(ByRef ThisMH As MediaHandler, ByRef NextMH As MediaHandler, ByRef PrevMH As MediaHandler, nxt As String, prev As String)
-
         NextMH.MediaPath = nxt
-        NextMH.Player.Visible = Not seperate
+        NextMH.Player.Visible = separate
         PrevMH.MediaPath = prev
-        PrevMH.Player.Visible = Not seperate
+        PrevMH.Player.Visible = separate
         RaiseEvent LoadedMedia(NextMH)
         RaiseEvent LoadedMedia(PrevMH)
         RaiseEvent LoadedMedia(ThisMH)
         If ThisMH.MediaType = Filetype.Movie Then
             ShowPlayer(ThisMH)
-            reportStartpoint(ThisMH.StartPoint)
+            '  reportStartpoint(ThisMH)
 
         ElseIf ThisMH.MediaType = Filetype.Pic Then
             ShowPicture(ThisMH)
         End If
 
     End Sub
-    Public Sub SetStartStates(SH As StartPointHandler)
+    Public Sub SetStartStates(ByRef SH As StartPointHandler)
         mMedia1.StartPoint.State = SH.State
         mMedia2.StartPoint.State = SH.State
         mMedia3.StartPoint.State = SH.State
 
 
     End Sub
-    Public Sub SetStartPoints(SH As StartPointHandler)
-        mMedia1.StartPoint.StartPoint = SH.StartPoint
-        mMedia2.StartPoint.StartPoint = SH.StartPoint
-        mMedia3.StartPoint.StartPoint = SH.StartPoint
+    Public Sub SetStartpoints(ByRef SH As StartPointHandler)
+        'mMedia1.StartPoint.StartPoint = SH.StartPoint
+        'mMedia2.StartPoint.StartPoint = SH.StartPoint
+        'mMedia3.StartPoint.StartPoint = SH.StartPoint
 
 
     End Sub
+
+
+
     Private Sub MuteAll()
         mMedia1.Player.settings.mute = True
         mMedia2.Player.settings.mute = True
@@ -118,6 +143,7 @@ Public Class MovieSwapper
         MuteAll()
 
         With MHX.Player
+            'MHX.MediaJumpToMarker()
             .Visible = True
             .BringToFront()
             .settings.mute = False

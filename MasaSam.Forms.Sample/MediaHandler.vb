@@ -1,5 +1,6 @@
 ﻿Imports AxWMPLib
 Public Class MediaHandler
+#Region "Members"
 
     Public Event MediaFinished(ByVal sender As Object, ByVal e As EventArgs)
     Public Event StartChanged(ByVal sender As Object, ByVal e As EventArgs)
@@ -64,6 +65,7 @@ Public Class MediaHandler
         Set(ByVal value As Long)
             mPlayPosition = value
             mPlayer.Ctlcontrols.currentPosition = mPlayPosition
+            Debug.Print("Position was set to " & mPlayPosition)
         End Set
     End Property
 
@@ -106,14 +108,13 @@ Public Class MediaHandler
             'And raise a media changed event. 
             Dim b As String = mMediaPath
             If value = b Then
+                'Path hasn't changed, so nothing to do. 
             ElseIf value = "" Then
+                'Deals with absent file
                 mMediaPath = DefaultFile
                 mMediaDirectory = New IO.FileInfo(mMediaPath).Directory.FullName
-
                 RaiseEvent MediaChanged(Me, New EventArgs)
-
             Else
-
                 mMediaPath = value
                 mType = FindType(value)
                 Dim f As New IO.FileInfo(value)
@@ -182,7 +183,21 @@ Public Class MediaHandler
             mBookmark = value
         End Set
     End Property
-    Public Sub GetBookmark()
+
+    Private mLinkPath As String
+
+    Public ReadOnly Property LinkPath() As String
+
+        Get
+            Return mLinkPath
+        End Get
+
+    End Property
+#End Region
+
+#Region "Methods"
+
+    Private Sub GetBookmark()
         If InStr(mMediaPath, "%") <> 0 Then
 
             Dim s As String()
@@ -208,15 +223,6 @@ Public Class MediaHandler
         Return path
 
     End Function
-    Private mLinkPath As String
-
-    Public ReadOnly Property LinkPath() As String
-
-        Get
-            Return mLinkPath
-        End Get
-
-    End Property
 
     Private Function FindType(file As String) As Filetype
         Try
@@ -249,13 +255,31 @@ Public Class MediaHandler
 
     End Function
     Public Sub MediaJumpToMarker()
-        If mBookmark <> -1 Then
+        'If mBookmark = -1 Then
+        '    Dim m As New StartPointHandler With {
+        '        .Duration = mDuration,
+        '            .State = StartPointHandler.StartTypes.NearEnd
+        '        }
+        '    mPlayPosition = m.StartPoint
+        'Else
+        '    If StartPoint.State = StartPointHandler.StartTypes.ParticularAbsolute Then
+        '        mPlayPosition = mBookmark
+        '    Else
+        '        mPlayPosition = StartPoint.StartPoint
+        '    End If
+        'End If
+        'mPlayer.Ctlcontrols.currentPosition = mPlayPosition
+        'Debug.Print("MediaJumpMarker set position of " & mMediaPath & " to " & mPlayPosition)
+        ''     mPlayer.Ctlcontrols.play()
+        ''  mPlayer.Refresh()
+        If mBookmark > -1 Then
             If StartPoint.State = StartPointHandler.StartTypes.ParticularAbsolute Then
                 mPlayPosition = mBookmark
             Else
                 Dim m As New StartPointHandler With {
-                    .State = StartPointHandler.StartTypes.NearEnd
-                }
+                    .Duration = mDuration,
+                .State = StartPointHandler.StartTypes.NearEnd
+                                }
                 mPlayPosition = m.StartPoint
             End If
 
@@ -264,8 +288,6 @@ Public Class MediaHandler
         End If
         mPlayer.Ctlcontrols.currentPosition = mPlayPosition
         Debug.Print("MediaJumpMarker set position to " & mPlayPosition)
-        '     mPlayer.Ctlcontrols.play()
-        '  mPlayer.Refresh()
     End Sub
     Private Sub LoadMedia()
 
@@ -275,7 +297,7 @@ Public Class MediaHandler
             Case Filetype.Link
                 Select Case FindType(mLinkPath)
                     Case Filetype.Movie
-                        If mBookmark <> -1 Then
+                        If mBookmark > -1 Then
                             If StartPoint.State = StartPointHandler.StartTypes.ParticularAbsolute Then StartPoint.Absolute = mBookmark
                         End If
                         HandleMovie(mLinkPath)
@@ -322,12 +344,14 @@ Public Class MediaHandler
         End If
         MediaJumpToMarker()
     End Sub
+#End Region
+
 #Region "Event Handlers"
     Private Sub PlaystateChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent) Handles mPlayer.PlayStateChange
         Select Case e.newState
 
             Case WMPLib.WMPPlayState.wmppsStopped
-                reportStartpoint(StartPoint)
+                'reportStartpoint(Me)
 
             Case WMPLib.WMPPlayState.wmppsMediaEnded
                 'Debug.Print("Ended:" & StartPoint.StartPoint & " " & StartPoint.Duration)
@@ -360,17 +384,18 @@ Public Class MediaHandler
         End Select
     End Sub
     Private Sub OnStartChange(sender As Object, e As EventArgs) Handles StartPoint.StartPointChanged, StartPoint.StateChanged
-        MediaJumpToMarker()
-        reportStartpoint(StartPoint)
+        '  MediaJumpToMarker()
+        '  reportStartpoint(Me)
         RaiseEvent StartChanged(sender, e)
 
     End Sub
     Private Sub UpdatePosition() Handles PositionUpdater.Tick
         mPlayPosition = mPlayer.Ctlcontrols.currentPosition
-        'Duration = mPlayer.currentMedia.duration
+        Duration = mPlayer.currentMedia.duration
 
     End Sub
 
 
 #End Region
+
 End Class

@@ -219,6 +219,7 @@ Partial Class MainForm
         Me.PositionUpdater = New System.Windows.Forms.Timer(Me.components)
         Me.tmrMovieSlideShow = New System.Windows.Forms.Timer(Me.components)
         Me.BackgroundWorker1 = New System.ComponentModel.BackgroundWorker()
+        Me.ByLinkFolderToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.StatusStrip1.SuspendLayout()
         Me.TableLayoutPanel2.SuspendLayout()
         CType(Me.ctrMainFrame, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -1621,7 +1622,7 @@ Partial Class MainForm
         '
         'GroupToolStripMenuItem
         '
-        Me.GroupToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ByMonthToolStripMenuItem, Me.ByDateToolStripMenuItem, Me.ByYearToolStripMenuItem, Me.ByTimeToolStripMenuItem, Me.BySizeToolStripMenuItem, Me.CalendarToolStripMenuItem, Me.ToolStripSeparator6, Me.ByNameToolStripMenuItem, Me.ByExtToolStripMenuItem})
+        Me.GroupToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ByMonthToolStripMenuItem, Me.ByDateToolStripMenuItem, Me.ByYearToolStripMenuItem, Me.ByTimeToolStripMenuItem, Me.BySizeToolStripMenuItem, Me.CalendarToolStripMenuItem, Me.ToolStripSeparator6, Me.ByNameToolStripMenuItem, Me.ByExtToolStripMenuItem, Me.ByLinkFolderToolStripMenuItem})
         Me.GroupToolStripMenuItem.Name = "GroupToolStripMenuItem"
         Me.GroupToolStripMenuItem.Size = New System.Drawing.Size(426, 34)
         Me.GroupToolStripMenuItem.Text = "&Group..."
@@ -1878,6 +1879,12 @@ Partial Class MainForm
         'tmrMovieSlideShow
         '
         Me.tmrMovieSlideShow.Interval = 5000
+        '
+        'ByLinkFolderToolStripMenuItem
+        '
+        Me.ByLinkFolderToolStripMenuItem.Name = "ByLinkFolderToolStripMenuItem"
+        Me.ByLinkFolderToolStripMenuItem.Size = New System.Drawing.Size(319, 34)
+        Me.ByLinkFolderToolStripMenuItem.Text = "By Link Folder"
         '
         'MainForm
         '
@@ -2153,4 +2160,5 @@ Partial Class MainForm
     Friend WithEvents BackgroundWorker1 As System.ComponentModel.BackgroundWorker
     Friend WithEvents ExperimentToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents MainWMP3 As AxWMPLib.AxWindowsMediaPlayer
+    Friend WithEvents ByLinkFolderToolStripMenuItem As ToolStripMenuItem
 End Class

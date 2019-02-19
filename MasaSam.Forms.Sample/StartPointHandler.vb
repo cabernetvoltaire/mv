@@ -41,6 +41,7 @@
         End Get
         Set(ByVal value As Long)
             mDuration = value
+            GetStartPoint()
             ' ReportTime("Duration:" & mDuration)
         End Set
     End Property
@@ -78,20 +79,20 @@
         Set(ByVal value As Byte)
             Dim b As Byte = mPercentage
             mPercentage = value
-            'mAbsolute = mPercentage / 100 * mDuration
+            mAbsolute = mPercentage / 100 * mDuration
             If b <> mPercentage Then RaiseEvent StartPointChanged(Me, Nothing)
         End Set
     End Property
     Private mStartPoint As Long
-    Public Property StartPoint() As Long
+    Public ReadOnly Property StartPoint() As Long
         Get
             GetStartPoint()
             Return mStartPoint
         End Get
-        Set(ByVal value As Long)
-            GetStartPoint()
-            mStartPoint = value
-        End Set
+        '        Set(ByVal value As Long)
+        '  GetStartPoint()
+        '           mStartPoint = value
+        '  End Set
     End Property
     Private mState As Byte
     Public Property State() As Byte
@@ -137,6 +138,7 @@
                 End If
 
             Case StartTypes.NearEnd
+
                 mStartPoint = mDuration - mDistance
                 If mStartPoint < mDuration / 2 Then
                     mStartPoint = mDuration * 0.9
@@ -158,11 +160,8 @@
         If mStartPoint > mDuration Then
             mStartPoint = mDuration / 2 'If we overshoot, re-locate to halfway point. 
         End If
-        Debug.Print("Startpoint is " & mStartPoint)
-        If mStartPoint <> oldstartpoint Then
-            'RaiseEvent StartPointChanged(Me, New EventArgs)
 
-        End If
+        If mStartPoint > mDuration Then MsgBox("Too far")
         Return mStartPoint
     End Function
 End Class

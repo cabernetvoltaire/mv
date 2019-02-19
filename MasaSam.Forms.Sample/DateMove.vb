@@ -119,6 +119,23 @@ Class DateMove
         RaiseEvent FilesMoved(Nothing, Nothing)
 
     End Sub
+    Public Sub FilterByLinkFolder(FolderName As String)
+        Dim s As New IO.DirectoryInfo(FolderName)
+        For Each f In s.GetFiles
+            If f.Extension = ".lnk" Then
+
+                Dim tgt As New IO.FileInfo(LinkTarget(f.FullName))
+                Dim parentname As String = tgt.Directory.Name
+                Dim m As New IO.DirectoryInfo(f.Directory.FullName & "\" & parentname)
+                If Not m.Exists Then
+                    m.Create()
+                End If
+                f.MoveTo(m.FullName & "\" & f.Name)
+
+            End If
+        Next
+        RaiseEvent FilesMoved(Nothing, Nothing)
+    End Sub
     Public Sub FilterByType(FolderName As String)
         Dim s As New IO.DirectoryInfo(FolderName)
 

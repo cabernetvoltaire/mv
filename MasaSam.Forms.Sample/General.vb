@@ -15,7 +15,7 @@ Public Module General
     End Enum
     Public VIDEOEXTENSIONS = ".divx.vob.webm.avi.flv.mov.m4p.mpeg.f4v.mpg.m4a.m4v.mkv.mp4.rm.ram.wmv.wav.mp3.3gp .lnk"
     Public PICEXTENSIONS = "arw.jpeg.png.jpg.bmp.gif.lnk"
-    Public seperate As Boolean = True
+    Public separate As Boolean = False
     Public Enum CtrlFocus As Byte
         Tree = 0
         Files = 1
@@ -324,9 +324,14 @@ Public Module General
     Public Sub ReportTime(str As String)
         Debug.Print(Int(Now().Second) & "." & Int(Now().Millisecond) & " " & str)
     End Sub
-    Public Sub reportStartpoint(Sh As StartPointHandler)
+    Public Sub reportStartpoint(ByRef MH As MediaHandler)
+        If MH.MediaPath = "" Then Exit Sub
         Dim s As String
-        s = "Duration: " & Sh.Duration & vbCrLf & "Percentage:" & Sh.Percentage & vbCrLf & " Absolute:" & Sh.Absolute & vbCrLf & " Startpoint:" & Sh.StartPoint & vbCrLf & " Player:" & Media.Player.Name
+        Dim sh As StartPointHandler = MH.StartPoint
+        s = MH.MediaPath & vbCrLf
+        s = s & "Duration: " & sh.Duration & vbCrLf & "Percentage:" & sh.Percentage & vbCrLf & " Absolute:" & sh.Absolute & vbCrLf & " Startpoint:" & sh.StartPoint & vbCrLf & " Player:" & Media.Player.Name
+        s = s & vbCrLf & sh.Description
+        Debug.Print(s)
         MainForm.lblNavigateState.Text = s
     End Sub
     Public Sub ChangeFolder(strPath As String)
