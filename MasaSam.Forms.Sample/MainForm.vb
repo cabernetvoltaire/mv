@@ -162,6 +162,7 @@ Public Class MainForm
                 tbxPercentage.Enabled = False
         End Select
         MSFiles.SetStartStates(Media.StartPoint)
+        MSFiles.SetStartpoints(Media.StartPoint)
         FullScreen.Changing = False
         cbxStartPoint.SelectedIndex = Media.StartPoint.State
         tbStartpoint.Text = "START:" & Media.StartPoint.Description
@@ -2364,7 +2365,7 @@ Public Class MainForm
         tbPercentage.Value = Media.Startpoint.Percentage
         Media.MediaJumpToMarker()
         MSFiles.SetStartStates(Media.StartPoint)
-        '   MSFiles.SetStartpoints(Media.StartPoint)
+        MSFiles.SetStartpoints(Media.StartPoint)
     End Sub
 
     Private Sub tbPercentage_MouseUp(sender As Object, e As MouseEventArgs) Handles tbPercentage.MouseUp
@@ -2377,7 +2378,7 @@ Public Class MainForm
 
         Media.MediaJumpToMarker()
         MSFiles.SetStartStates(Media.StartPoint)
-        '  MSFiles.SetStartpoints(Media.StartPoint)
+        MSFiles.SetStartpoints(Media.StartPoint)
 
     End Sub
 
@@ -2562,7 +2563,8 @@ Public Class MainForm
     End Sub
 
     Private Sub tmrMovieSlideShow_Tick(sender As Object, e As EventArgs) Handles tmrMovieSlideShow.Tick
-        tmrMovieSlideShow.Interval = Int(Rnd() * 3000) + 3000
+        tmrMovieSlideShow.Interval = Rnd() * 2000 + 1000
+        Media.Speed.Speed = Int(Rnd() * 2) + 1
         AdvanceFile(True, False)
     End Sub
 

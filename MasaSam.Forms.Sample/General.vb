@@ -327,7 +327,7 @@ Public Module General
         s = s & vbCrLf & sh.Description
         Debug.Print(s)
         MainForm.lblNavigateState.Text = s
-        Media.MediaJumpToMarker()
+        '  Media.MediaJumpToMarker()
     End Sub
     Public Sub ChangeFolder(strPath As String)
         If strPath = Media.MediaDirectory Then

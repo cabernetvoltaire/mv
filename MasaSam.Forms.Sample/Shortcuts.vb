@@ -80,7 +80,12 @@ Module Shortcuts
             If exf.Exists Then exf.Delete()
 
             If bkmk <> -1 Then
-                sName = Replace(sName, ".lnk", "%" & Str(bkmk - MarkOffset) & "%.lnk")
+                If InStr(sName, "%") <> 0 Then
+                    Dim m() As String = sName.Split("%")
+                    sName = m(0) & "%" & Str(bkmk - MarkOffset) & "%" & m(m.Length - 1)
+                Else
+                    sName = sName.Replace(".lnk", "%" & Str(bkmk - MarkOffset) & "%.lnk")
+                End If
             End If
 
             oShortcut = oShell.CreateShortcut(sName)

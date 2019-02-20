@@ -22,7 +22,6 @@ Module FileHandling
 
     Public Sub OnMediaStartChanged(sender As Object, e As EventArgs) Handles Media.StartChanged
         MainForm.OnStartChanged(sender, e)
-        'MSFiles.SetStartStates(Media.StartPoint)
 
     End Sub
 

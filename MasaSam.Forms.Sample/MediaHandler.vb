@@ -5,12 +5,15 @@ Public Class MediaHandler
     Public Event MediaFinished(ByVal sender As Object, ByVal e As EventArgs)
     Public Event StartChanged(ByVal sender As Object, ByVal e As EventArgs)
     Public Event MediaChanged(ByVal sender As Object, ByVal e As EventArgs)
+    ' Public Event SpeedChanged(ByVal sender As Object, ByVal e As EventArgs)
+
     Public WithEvents PositionUpdater As New Timer
     Private DefaultFile As String = "C:\exiftools.exe"
-    Private mPaused As Boolean
     Public WithEvents StartPoint As New StartPointHandler
-    Public Property Speed As New SpeedHandler
+    Public WithEvents Speed As New SpeedHandler
 
+    Private mPaused As Boolean
+    Private mLoop As Boolean = True
     Private mType As Filetype
     Public Property MediaType() As Filetype
         Get
@@ -41,6 +44,14 @@ Public Class MediaHandler
         End Get
         Set(ByVal value As PictureBox)
             mPicBox = value
+        End Set
+    End Property
+    Public Property LoopMovie As Boolean
+        Get
+            Return mLoop
+        End Get
+        Set(value As Boolean)
+            mLoop = value
         End Set
     End Property
 
@@ -142,7 +153,7 @@ Public Class MediaHandler
     End Property
     Public Sub New()
         PositionUpdater.Interval = 500
-        PositionUpdater.Enabled = True
+        PositionUpdater.Enabled = False
         '     StartPoint = Media.StartPoint
     End Sub
     Private mMediaDirectory As String
@@ -200,11 +211,16 @@ Public Class MediaHandler
         Exit Sub
         If Pause Then
             mPlayer.Ctlcontrols.pause()
+            Speed.Paused = True
+            Speed.Fullspeed = False
         Else
             mPlayer.Ctlcontrols.play()
+            Speed.Fullspeed = True
+            Speed.Paused = False
         End If
 
     End Sub
+
     Private Sub GetBookmark()
         If InStr(mMediaPath, "%") <> 0 Then
 
@@ -306,7 +322,10 @@ Public Class MediaHandler
                 Select Case FindType(mLinkPath)
                     Case Filetype.Movie
                         If mBookmark > -1 Then
-                            If StartPoint.State = StartPointHandler.StartTypes.ParticularAbsolute Then StartPoint.Absolute = mBookmark
+                            If StartPoint.State = StartPointHandler.StartTypes.ParticularAbsolute Then
+
+                                StartPoint.Absolute = mBookmark
+                            End If
                         End If
                         HandleMovie(mLinkPath)
                     Case Filetype.Pic
@@ -410,6 +429,9 @@ Public Class MediaHandler
 
             Case WMPLib.WMPPlayState.wmppsMediaEnded
                 'Debug.Print("Ended:" & StartPoint.StartPoint & " " & StartPoint.Duration)
+                '  If mLoop Then
+                ' mPlayer.Ctlcontrols.play()
+                'End If
                 If Not MainForm.tmrAutoTrail.Enabled And mPlayer.Visible Then
                     ' MainForm.AdvanceFile(True, False)
                 Else
@@ -418,7 +440,9 @@ Public Class MediaHandler
             Case WMPLib.WMPPlayState.wmppsPlaying
                 'ReportTime("Playing")
                 MainForm.SwitchSound(False)
+                PositionUpdater.Enabled = True
                 Duration = mPlayer.currentMedia.duration
+                MediaJumpToMarker()
                 Debug.Print(mPlayer.URL & " unpaused by playstatehandler")
                 If mPaused Then
                     mPaused = False
@@ -439,12 +463,17 @@ Public Class MediaHandler
 
         End Select
     End Sub
+    Private Sub OnSpeedChange() Handles Speed.SpeedChanged
+        MainForm.OnSpeedChange()
+    End Sub
+
     Private Sub OnStartChange(sender As Object, e As EventArgs) Handles StartPoint.StartPointChanged, StartPoint.StateChanged
         '  MediaJumpToMarker()
         '  reportStartpoint(Me)
         RaiseEvent StartChanged(sender, e)
 
     End Sub
+
     Private Sub UpdatePosition() Handles PositionUpdater.Tick
         mPlayPosition = mPlayer.Ctlcontrols.currentPosition
         Duration = mPlayer.currentMedia.duration
