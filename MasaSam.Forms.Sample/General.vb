@@ -318,7 +318,7 @@ Public Module General
     Public Sub ReportTime(str As String)
         Debug.Print(Int(Now().Second) & "." & Int(Now().Millisecond) & " " & str)
     End Sub
-    Public Sub reportStartpoint(ByRef MH As MediaHandler)
+    Public Sub LabelStartPoint(ByRef MH As MediaHandler)
         If MH.MediaPath = "" Then Exit Sub
         Dim s As String
         Dim sh As StartPointHandler = MH.StartPoint

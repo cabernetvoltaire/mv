@@ -2357,7 +2357,8 @@ Public Class MainForm
 
     Private Sub tbAbsolute_MouseUp(sender As Object, e As MouseEventArgs) Handles tbAbsolute.MouseUp
         Media.Startpoint.State = StartPointHandler.StartTypes.ParticularAbsolute
-        Media.Startpoint.Absolute = tbAbsolute.Value
+        Media.StartPoint.Absolute = tbAbsolute.Value
+        MSFiles.SetStartpoints(Media.StartPoint)
         tbxAbsolute.Text = New TimeSpan(0, 0, tbAbsolute.Value).ToString("hh\:mm\:ss")
         tbxPercentage.Text = Str(Media.Startpoint.Percentage) & "%"
         tbPercentage.Value = Media.Startpoint.Percentage

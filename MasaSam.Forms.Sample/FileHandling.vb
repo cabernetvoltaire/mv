@@ -32,7 +32,7 @@ Module FileHandling
         Media = M
         Debug.Print("Playing....:")
         DebugStartpoint(M)
-        reportStartpoint(M)
+        LabelStartPoint(M)
         MainForm.UpdateFileInfo()
     End Sub
     Public Sub OnMediaLoaded(ByRef M As MediaHandler) Handles MSFiles.LoadedMedia

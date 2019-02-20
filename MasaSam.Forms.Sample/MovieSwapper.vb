@@ -105,19 +105,12 @@ Public Class MovieSwapper
         MH.MediaPath = path
         MH.Player.Visible = separate
         MH.StartPoint.State = Media.StartPoint.State
-        ' MH.Pause(True)
-        Debug.Print(vbCrLf & "PAUSED:")
-        Debug.Print(MH.Player.URL & " paused")
     End Sub
     Private Sub RotateMedia(ByRef ThisMH As MediaHandler, ByRef NextMH As MediaHandler, ByRef PrevMH As MediaHandler, nxt As String, prev As String)
-        '   SetStartStates(Media.StartPoint)
         Prepare(PrevMH, prev)
         Prepare(NextMH, nxt)
-        PrevMH.Pause(True)
-        NextMH.Pause(True)
         If ThisMH.MediaType = Filetype.Movie Then
             ShowPlayer(ThisMH)
-            '  reportStartpoint(ThisMH)
 
         ElseIf ThisMH.MediaType = Filetype.Pic Then
             ShowPicture(ThisMH)
@@ -132,9 +125,17 @@ Public Class MovieSwapper
 
     End Sub
     Public Sub SetStartpoints(ByRef SH As StartPointHandler)
+        Dim dur As Long = mMedia1.StartPoint.Duration
+
         mMedia1.StartPoint = SH
+        mMedia1.StartPoint.Duration = dur
+        dur = mMedia2.StartPoint.Duration
         mMedia2.StartPoint = SH
+        mMedia2.StartPoint.Duration = dur
+
+        dur = mMedia3.StartPoint.Duration
         mMedia3.StartPoint = SH
+        mMedia3.StartPoint.Duration = dur
 
 
     End Sub
@@ -151,9 +152,7 @@ Public Class MovieSwapper
 
         Debug.Print("SHOWPLAYER" & MHX.Player.Name)
         MuteAll()
-        '   MHX.MediaJumpToMarker()
 
-        '    MHX.Pause(False)
         Debug.Print(MHX.Player.URL & " unpaused")
         With MHX.Player
 
