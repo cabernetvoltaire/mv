@@ -2258,7 +2258,7 @@ Public Class MainForm
 
     Private Sub tbPercentage_ValueChanged(sender As Object, e As EventArgs) Handles tbPercentage.ValueChanged
         'StartPoint.State = StartPointHandler.StartTypes.ParticularPercentage
-        If Not Initialising Then Media.StartPoint.Percentage = tbPercentage.Value
+        'If Not Initialising Then Media.StartPoint.Percentage = tbPercentage.Value
 
     End Sub
 
@@ -2367,10 +2367,11 @@ Public Class MainForm
     End Sub
 
     Private Sub tbPercentage_MouseUp(sender As Object, e As MouseEventArgs) Handles tbPercentage.MouseUp
-        Media.Startpoint.State = StartPointHandler.StartTypes.ParticularPercentage
-        Media.Startpoint.Percentage = tbPercentage.Value
+        Media.StartPoint.State = StartPointHandler.StartTypes.ParticularPercentage
+        Media.StartPoint.Percentage = tbPercentage.Value
+        MSFiles.SetStartpoints(Media.StartPoint)
         tbxAbsolute.Text = New TimeSpan(0, 0, tbAbsolute.Value).ToString("hh\:mm\:ss")
-        tbxPercentage.Text = Str(Media.Startpoint.Percentage) & "%"
+        tbxPercentage.Text = Str(Media.StartPoint.Percentage) & "%"
         tbPercentage.Value = Media.Startpoint.Percentage
 
         Media.MediaJumpToMarker()

@@ -15,7 +15,7 @@ Public Module General
     End Enum
     Public VIDEOEXTENSIONS = ".divx.vob.webm.avi.flv.mov.m4p.mpeg.f4v.mpg.m4a.m4v.mkv.mp4.rm.ram.wmv.wav.mp3.3gp .lnk"
     Public PICEXTENSIONS = "arw.jpeg.png.jpg.bmp.gif.lnk"
-    Public separate As Boolean = True
+    Public separate As Boolean = False
     Public Enum CtrlFocus As Byte
         Tree = 0
         Files = 1
@@ -86,13 +86,7 @@ Public Module General
     Public Sub CreateFavourite(Filepath As String)
         CreateLink(Filepath, FavesFolderPath, "")
         Exit Sub
-        Dim sh As New ShortcutHandler()
-        Dim f As New FileInfo(Filepath)
-        sh.Bookmark = Media.Position
-        sh.TargetPath = Filepath
-        sh.ShortcutPath = FavesFolderPath
-        sh.ShortcutName = f.Name
-        sh.Create_ShortCut(sh.Bookmark)
+
 
     End Sub
     Public Sub CreateLink(Filepath As String, DestinationDirectory As String, Name As String)
@@ -332,7 +326,8 @@ Public Module General
         s = s & "Duration: " & sh.Duration & vbCrLf & "Percentage:" & sh.Percentage & vbCrLf & " Absolute:" & sh.Absolute & vbCrLf & " Startpoint:" & sh.StartPoint & vbCrLf & " Player:" & Media.Player.Name
         s = s & vbCrLf & sh.Description
         Debug.Print(s)
-        MainForm.lblNavigateState.Text = ""
+        MainForm.lblNavigateState.Text = s
+        Media.MediaJumpToMarker()
     End Sub
     Public Sub ChangeFolder(strPath As String)
         If strPath = Media.MediaDirectory Then

@@ -95,7 +95,12 @@ Class DateMove
             'If f.Directory.EnumerateDirectories(Str(i)) Is Nothing Then
             f.Directory.CreateSubdirectory(folname & "\")
             'End If
-            f.MoveTo(f.DirectoryName & "\" & folname & "\" & f.Name)
+            Try
+                f.MoveTo(f.DirectoryName & "\" & folname & "\" & f.Name)
+
+            Catch ex As Exception
+
+            End Try
         Next
         RaiseEvent FilesMoved(Nothing, Nothing)
 

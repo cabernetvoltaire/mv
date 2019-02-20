@@ -142,7 +142,7 @@ Public Class MediaHandler
     End Property
     Public Sub New()
         PositionUpdater.Interval = 500
-        PositionUpdater.Enabled = False
+        PositionUpdater.Enabled = True
         '     StartPoint = Media.StartPoint
     End Sub
     Private mMediaDirectory As String
@@ -197,6 +197,7 @@ Public Class MediaHandler
 
 #Region "Methods"
     Public Sub Pause(Pause As Boolean)
+        Exit Sub
         If Pause Then
             mPlayer.Ctlcontrols.pause()
         Else
@@ -349,7 +350,7 @@ Public Class MediaHandler
             LastURL = URL
             End If
         'End If
-        MediaJumpToMarker()
+        '    MediaJumpToMarker()
     End Sub
 #End Region
 

@@ -104,7 +104,8 @@ Public Class MovieSwapper
         Debug.Print("PREPARE: " & MH.Player.Name)
         MH.MediaPath = path
         MH.Player.Visible = separate
-        MH.Pause(True)
+        MH.StartPoint.State = Media.StartPoint.State
+        ' MH.Pause(True)
         Debug.Print(vbCrLf & "PAUSED:")
         Debug.Print(MH.Player.URL & " paused")
     End Sub
@@ -131,9 +132,9 @@ Public Class MovieSwapper
 
     End Sub
     Public Sub SetStartpoints(ByRef SH As StartPointHandler)
-        'mMedia1.StartPoint.StartPoint = SH.StartPoint
-        'mMedia2.StartPoint.StartPoint = SH.StartPoint
-        'mMedia3.StartPoint.StartPoint = SH.StartPoint
+        mMedia1.StartPoint = SH
+        mMedia2.StartPoint = SH
+        mMedia3.StartPoint = SH
 
 
     End Sub
@@ -150,7 +151,9 @@ Public Class MovieSwapper
 
         Debug.Print("SHOWPLAYER" & MHX.Player.Name)
         MuteAll()
-        MHX.Pause(False)
+        '   MHX.MediaJumpToMarker()
+
+        '    MHX.Pause(False)
         Debug.Print(MHX.Player.URL & " unpaused")
         With MHX.Player
 
