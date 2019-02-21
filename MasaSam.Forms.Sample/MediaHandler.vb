@@ -416,7 +416,7 @@ Public Class MediaHandler
                 '  If mLoop Then
                 ' mPlayer.Ctlcontrols.play()
                 'End If
-                If Not MainForm.tmrAutoTrail.Enabled And mPlayer.BringToFront Then
+                If Not MainForm.tmrAutoTrail.Enabled And mPlayer.Visible Then
                     MainForm.AdvanceFile(True, False)
                 Else
                     ' MediaJumpToMarker()
