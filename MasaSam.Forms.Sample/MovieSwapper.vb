@@ -147,7 +147,7 @@ Public Class MovieSwapper
 
     End Sub
     Private Sub ShowPlayer(ByRef MHX As MediaHandler)
-        ' MHX.MediaJumpToMarker()
+        '  MHX.MediaJumpToMarker()
         Debug.Print("SHOWPLAYER" & MHX.Player.Name)
         MuteAll()
         'MHX.Pause(False)

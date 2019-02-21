@@ -30,6 +30,7 @@ Module FileHandling
         Debug.Print("MediaShown" & M.Player.Name)
         Media = M
         MSFiles.SetStartStates(Media.StartPoint)
+        '  Media.MediaJumpToMarker()
         Debug.Print("Playing....:")
         DebugStartpoint(M)
         LabelStartPoint(M)

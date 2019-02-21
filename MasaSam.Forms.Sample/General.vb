@@ -418,7 +418,7 @@ Public Module General
                             End While
                             NewListL.Add(l, file.FullName)
 
-                        Catch ex As ArgumentException
+                        Catch ex As Exception
                             MsgBox("Fail")
 
                         End Try
