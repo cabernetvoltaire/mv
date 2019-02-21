@@ -74,7 +74,6 @@ Partial Class MainForm
         Me.MainWMP3 = New AxWMPLib.AxWindowsMediaPlayer()
         Me.MainWMP2 = New AxWMPLib.AxWindowsMediaPlayer()
         Me.SoundWMP = New AxWMPLib.AxWindowsMediaPlayer()
-        Me.MainWMP = New AxWMPLib.AxWindowsMediaPlayer()
         Me.PictureBox1 = New System.Windows.Forms.PictureBox()
         Me.btnRow = New System.Windows.Forms.TableLayoutPanel()
         Me.Panel8 = New System.Windows.Forms.Panel()
@@ -220,6 +219,7 @@ Partial Class MainForm
         Me.PositionUpdater = New System.Windows.Forms.Timer(Me.components)
         Me.tmrMovieSlideShow = New System.Windows.Forms.Timer(Me.components)
         Me.BackgroundWorker1 = New System.ComponentModel.BackgroundWorker()
+        Me.MainWMP4 = New AxWMPLib.AxWindowsMediaPlayer()
         Me.StatusStrip1.SuspendLayout()
         Me.TableLayoutPanel2.SuspendLayout()
         CType(Me.ctrMainFrame, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -242,7 +242,6 @@ Partial Class MainForm
         CType(Me.MainWMP3, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.MainWMP2, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.SoundWMP, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.MainWMP, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.btnRow.SuspendLayout()
         Me.Panel8.SuspendLayout()
@@ -261,6 +260,7 @@ Partial Class MainForm
         Me.GroupBox1.SuspendLayout()
         CType(Me.FileSystemWatcher1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.MenuStrip2.SuspendLayout()
+        CType(Me.MainWMP4, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'FileToolStripMenuItem
@@ -644,10 +644,10 @@ Partial Class MainForm
         'ctrPicAndButtons.Panel1
         '
         Me.ctrPicAndButtons.Panel1.BackColor = System.Drawing.Color.Black
+        Me.ctrPicAndButtons.Panel1.Controls.Add(Me.MainWMP4)
         Me.ctrPicAndButtons.Panel1.Controls.Add(Me.MainWMP3)
         Me.ctrPicAndButtons.Panel1.Controls.Add(Me.MainWMP2)
         Me.ctrPicAndButtons.Panel1.Controls.Add(Me.SoundWMP)
-        Me.ctrPicAndButtons.Panel1.Controls.Add(Me.MainWMP)
         Me.ctrPicAndButtons.Panel1.Controls.Add(Me.PictureBox1)
         '
         'ctrPicAndButtons.Panel2
@@ -694,17 +694,6 @@ Partial Class MainForm
         Me.SoundWMP.Size = New System.Drawing.Size(572, 412)
         Me.SoundWMP.TabIndex = 3
         Me.SoundWMP.Visible = False
-        '
-        'MainWMP
-        '
-        Me.MainWMP.Enabled = True
-        Me.MainWMP.Location = New System.Drawing.Point(0, 0)
-        Me.MainWMP.Margin = New System.Windows.Forms.Padding(4)
-        Me.MainWMP.Name = "MainWMP"
-        Me.MainWMP.OcxState = CType(resources.GetObject("MainWMP.OcxState"), System.Windows.Forms.AxHost.State)
-        Me.MainWMP.Size = New System.Drawing.Size(959, 491)
-        Me.MainWMP.TabIndex = 2
-        Me.MainWMP.TabStop = False
         '
         'PictureBox1
         '
@@ -1886,6 +1875,17 @@ Partial Class MainForm
         '
         Me.tmrMovieSlideShow.Interval = 2000
         '
+        'MainWMP4
+        '
+        Me.MainWMP4.Enabled = True
+        Me.MainWMP4.Location = New System.Drawing.Point(0, 1)
+        Me.MainWMP4.Margin = New System.Windows.Forms.Padding(4)
+        Me.MainWMP4.Name = "MainWMP4"
+        Me.MainWMP4.OcxState = CType(resources.GetObject("MainWMP4.OcxState"), System.Windows.Forms.AxHost.State)
+        Me.MainWMP4.Size = New System.Drawing.Size(959, 491)
+        Me.MainWMP4.TabIndex = 6
+        Me.MainWMP4.TabStop = False
+        '
         'MainForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(11.0!, 24.0!)
@@ -1925,7 +1925,6 @@ Partial Class MainForm
         CType(Me.MainWMP3, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.MainWMP2, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.SoundWMP, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.MainWMP, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.btnRow.ResumeLayout(False)
         Me.Panel8.ResumeLayout(False)
@@ -1956,6 +1955,7 @@ Partial Class MainForm
         CType(Me.FileSystemWatcher1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.MenuStrip2.ResumeLayout(False)
         Me.MenuStrip2.PerformLayout()
+        CType(Me.MainWMP4, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -2018,7 +2018,6 @@ Partial Class MainForm
     Friend WithEvents tmrLoadLastFolder As Timer
     Friend WithEvents tbDate As ToolStripStatusLabel
     Friend WithEvents ctrPicAndButtons As SplitContainer
-    Friend WithEvents MainWMP As AxWMPLib.AxWindowsMediaPlayer
     Friend WithEvents PictureBox1 As PictureBox
     Friend WithEvents btnRow As TableLayoutPanel
     Friend WithEvents Panel8 As Panel
@@ -2161,4 +2160,5 @@ Partial Class MainForm
     Friend WithEvents ExperimentToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents MainWMP3 As AxWMPLib.AxWindowsMediaPlayer
     Friend WithEvents ByLinkFolderToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents MainWMP4 As AxWMPLib.AxWindowsMediaPlayer
 End Class

@@ -15,6 +15,7 @@ Public Class MediaHandler
     Private mPaused As Boolean
     Private mLoop As Boolean = True
     Private mType As Filetype
+    Public Name As String = Me.Name
     Public Property MediaType() As Filetype
         Get
             If mMediaPath = "" Then
@@ -137,7 +138,7 @@ Public Class MediaHandler
                         mIsLink = False
                         mLinkPath = ""
                     End If
-                    Me.LoadMedia()
+                    LoadMedia()
 
                     mMediaDirectory = f.Directory.FullName
                 Else
@@ -151,7 +152,8 @@ Public Class MediaHandler
 
         End Set
     End Property
-    Public Sub New()
+    Public Sub New(value As String)
+        Name = value
         PositionUpdater.Interval = 500
         PositionUpdater.Enabled = False
         '     StartPoint = Media.StartPoint
@@ -279,34 +281,17 @@ Public Class MediaHandler
 
     End Function
     Public Sub MediaJumpToMarker()
-        'If mBookmark = -1 Then
-        '    Dim m As New StartPointHandler With {
-        '        .Duration = mDuration,
-        '            .State = StartPointHandler.StartTypes.NearEnd
-        '        }
-        '    mPlayPosition = m.StartPoint
-        'Else
-        '    If StartPoint.State = StartPointHandler.StartTypes.ParticularAbsolute Then
-        '        mPlayPosition = mBookmark
-        '    Else
-        '        mPlayPosition = StartPoint.StartPoint
-        '    End If
-        'End If
-        'mPlayer.Ctlcontrols.currentPosition = mPlayPosition
-        'Debug.Print("MediaJumpMarker set position of " & mMediaPath & " to " & mPlayPosition)
-        ''     mPlayer.Ctlcontrols.play()
-        ''  mPlayer.Refresh()
         If mBookmark > -1 Then
+            ' If False Then
             If StartPoint.State = StartPointHandler.StartTypes.ParticularAbsolute Then
                 mPlayPosition = mBookmark
             Else
                 Dim m As New StartPointHandler With {
-                    .Duration = mDuration,
-                .State = StartPointHandler.StartTypes.NearEnd
-                                }
+                        .Duration = mDuration,
+                        .State = StartPointHandler.StartTypes.NearEnd
+                                    }
                 mPlayPosition = m.StartPoint
             End If
-
         Else
             mPlayPosition = StartPoint.StartPoint
         End If
@@ -339,7 +324,7 @@ Public Class MediaHandler
 
                 Exit Sub
         End Select
-        If mMediaPath <> "" Then My.Computer.Registry.CurrentUser.SetValue("File", Media.MediaPath)
+        If mMediaPath <> "" Then My.Computer.Registry.CurrentUser.SetValue("File", mMediaPath)
     End Sub
     Public Sub HandlePic(path As String)
 
@@ -368,8 +353,7 @@ Public Class MediaHandler
             mPlayer.URL = URL
             LastURL = URL
             End If
-        'End If
-        '        MediaJumpToMarker()
+
     End Sub
 #End Region
 
@@ -432,8 +416,8 @@ Public Class MediaHandler
                 '  If mLoop Then
                 ' mPlayer.Ctlcontrols.play()
                 'End If
-                If Not MainForm.tmrAutoTrail.Enabled And mPlayer.Visible Then
-                    ' MainForm.AdvanceFile(True, False)
+                If Not MainForm.tmrAutoTrail.Enabled And mPlayer.BringToFront Then
+                    MainForm.AdvanceFile(True, False)
                 Else
                     ' MediaJumpToMarker()
                 End If
@@ -475,10 +459,17 @@ Public Class MediaHandler
     End Sub
 
     Private Sub UpdatePosition() Handles PositionUpdater.Tick
-        mPlayPosition = mPlayer.Ctlcontrols.currentPosition
-        Duration = mPlayer.currentMedia.duration
+        Try
+            mPlayPosition = mPlayer.Ctlcontrols.currentPosition
+            Duration = mPlayer.currentMedia.duration
+
+        Catch ex As Exception
+
+        End Try
 
     End Sub
+
+
 
 
 #End Region

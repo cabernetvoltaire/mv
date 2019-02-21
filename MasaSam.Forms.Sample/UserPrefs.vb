@@ -38,7 +38,7 @@ Public Class UserPrefs
         State = mState
         Media = mMedia
     End Sub
-    Private mMedia As New MediaHandler
+    Private mMedia As New MediaHandler("mMedia")
     Public Property Media() As MediaHandler
         Get
             Return mMedia

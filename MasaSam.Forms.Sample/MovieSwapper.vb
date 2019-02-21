@@ -1,11 +1,11 @@
 ﻿Imports AxWMPLib
 Public Class MovieSwapper
     Public NextF As New NextFile
-    Private mMedia1 As New MediaHandler
-    Private mMedia2 As New MediaHandler
-    Private mMedia3 As New MediaHandler
+    Private mMedia1 As New MediaHandler("mMedia1")
+    Private mMedia2 As New MediaHandler("mMedia2")
+    Private mMedia3 As New MediaHandler("mMedia3")
 
-    Private mFileList As New List(Of String)
+    Private mFileList As New List(Of String) '
     Private mListIndex As Integer
     Private mListbox As New ListBox
     Public Event LoadedMedia(ByRef MH As MediaHandler)
@@ -30,7 +30,9 @@ Public Class MovieSwapper
             Return mListIndex
         End Get
         Set(ByVal value As Integer)
+            If value < 0 Then Exit Property
             mListIndex = value
+
             NextF.CurrentIndex = value
             SetIndex(value)
         End Set
@@ -120,19 +122,19 @@ Public Class MovieSwapper
 
     End Sub
     Public Sub SetStartpoints(ByRef SH As StartPointHandler)
-        Dim dur As Long
+        '  Dim dur As Long
 
-        dur = mMedia1.StartPoint.Duration
+        'dur = mMedia1.StartPoint.Duration
+        'dur = mMedia3.StartPoint.Duration
+        'dur = mMedia2.StartPoint.Duration
         mMedia1.StartPoint = SH
-        mMedia1.StartPoint.Duration = dur
 
-        dur = mMedia2.StartPoint.Duration
         mMedia2.StartPoint = SH
-        mMedia2.StartPoint.Duration = dur
 
-        dur = mMedia3.StartPoint.Duration
         mMedia3.StartPoint = SH
-        mMedia3.StartPoint.Duration = dur
+        'mMedia2.StartPoint.Duration = dur
+        ' mMedia1.StartPoint.Duration = dur
+        'mMedia3.StartPoint.Duration = dur
 
     End Sub
 

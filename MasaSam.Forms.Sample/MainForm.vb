@@ -161,14 +161,13 @@ Public Class MainForm
                 tbxAbsolute.Enabled = False
                 tbxPercentage.Enabled = False
         End Select
+        'MSFiles.ListIndex = lbxFiles.SelectedIndex
         MSFiles.SetStartStates(Media.StartPoint)
         MSFiles.SetStartpoints(Media.StartPoint)
         FullScreen.Changing = False
         cbxStartPoint.SelectedIndex = Media.StartPoint.State
         tbStartpoint.Text = "START:" & Media.StartPoint.Description
-        If Not Initialising Then
-            ' Media.MediaJumpToMarker()
-        End If
+
     End Sub
     Public Sub OnStateChanged(sender As Object, e As EventArgs) Handles NavigateMoveState.StateChanged, CurrentFilterState.StateChanged, PlayOrder.StateChanged
         'If StartingUpFlag Then Exit Sub
@@ -211,9 +210,7 @@ Public Class MainForm
         PreparePic(currentPicBox, pbxBlanker, img)
         currentPicBox.Visible = True
         currentPicBox.BringToFront()
-        '   Media.Player.Visible = False
-        'Media.Player.URL = ""
-        '  Media.Player.Visible = False
+
         SwitchSound(False)
         tbState.Text = ""
         tmrJumpVideo.Enabled = False
@@ -244,72 +241,24 @@ Public Class MainForm
     End Sub
     Private Sub HandleMovie(URL As String)
 
-        Static LastURL As String
+        'Static LastURL As String
 
-        'If it is to jump to a random point, do not show first.
-        ' If blnRandom Then Media.Player.Visible = False
-        If URL <> LastURL Then
-            '      Media.Player.Visible = False
-            Media.Player.URL = URL
-            LastURL = URL
-        End If
-        '  Media.Player.BringToFront()
-        PicToMovie()
+        ''If it is to jump to a random point, do not show first.
+        '' If blnRandom Then Media.Player.Visible = False
+        'If URL <> LastURL Then
+        '    '      Media.Player.Visible = False
+        '    Media.Player.URL = URL
+        '    LastURL = URL
+        'End If
+        ''  Media.Player.BringToFront()
+        'PicToMovie()
 
-        If tmrSlideShow.Enabled Then
-            blnRestartSlideShowFlag = True
-            tmrSlideShow.Enabled = False
+        'If tmrSlideShow.Enabled Then
+        '    blnRestartSlideShowFlag = True
+        '    tmrSlideShow.Enabled = False
 
-        End If
+        'End If
     End Sub
-    'Private Sub HandleMovieNew(URL As String)
-    '    Static NF As New NextFile
-    '    NF.Listbox = lbxFiles
-    '    NF.d = Random.NextSelect
-    '    Dim NextURL As String = NF.NextItem
-    '    Static LastURL As String
-    '    'IF URL is same as current, do nothing. 
-    '    'If URL is same as alternative, then switch and play
-    '    'Load NextURL into alternative, whatever that is and cue it. 
-
-    '    alternateWMP.URL = NextURL
-    '    If URL <> LastURL Then
-    '        If URL = alternateWMP.URL Then
-    '            alternateWMP.BringToFront()
-
-    '        Else
-    '            Media.Player.Visible = False
-    '            Media.Player.URL = URL
-    '            LastURL = URL
-    '        End If
-    '    End If
-    '    If Media.Player Is MainWMP Then
-    '        SetWMP(MainWMP2, Media.Player)
-    '        Media.Player = MainWMP2
-    '        SetWMP(MainWMP, alternateWMP)
-    '        alternateWMP = MainWMP
-    '    Else
-    '        SetWMP(MainWMP, Media.Player)
-    '        Media.Player = MainWMP
-    '        SetWMP(MainWMP2, alternateWMP)
-    '        alternateWMP = MainWMP2
-    '    End If
-    '    ' If NextURL <> LastURL Then
-    '    'Media.Player.Visible = False
-    '    '    Media.Player.URL = NextURL
-    '    'Media.Player.Ctlcontrols.pause()
-    '    'LastURL = URL
-    '    'End If
-
-    '    Media.Player.BringToFront()
-    '    PicToMovie()
-
-    '    If tmrSlideShow.Enabled Then
-    '        blnRestartSlideShowFlag = True
-    '        tmrSlideShow.Enabled = False
-
-    '    End If
-    'End Sub
     Private Sub SaveShowlist()
         Dim path As String
         With SaveFileDialog1
@@ -600,7 +549,7 @@ Public Class MainForm
 
         Else
             SplitterPlace(0.25)
-            SetWMP(MainWMP, Media.Player)
+            SetWMP(MainWMP4, Media.Player)
             SetPB(PictureBox1)
             FullScreen.Close()
             FullScreen.Changing = False
@@ -1149,28 +1098,28 @@ Public Class MainForm
         '  tmrLoadLastFolder.Enabled = True
 
 
-        Media.Player = MainWMP
+        Media.Player = MainWMP4
         'alternateWMP = MainWMP2
-        MainWMP.stretchToFit = True
+        MainWMP4.stretchToFit = True
         '        Media.Player.stretchToFit = True
         MainWMP2.stretchToFit = True
         MainWMP3.stretchToFit = True
         Media.Player.uiMode = "FULL"
         If Not separate Then
-            MainWMP.Dock = DockStyle.Fill 'Swapper
+            MainWMP4.Dock = DockStyle.Fill 'Swapper
             MainWMP2.Dock = DockStyle.Fill
             MainWMP3.Dock = DockStyle.Fill
 
         End If
 
         'alternateWMP.Dock = DockStyle.Fill 'Swapper
-        MainWMP.settings.volume = 100
+        MainWMP4.settings.volume = 100
         MainWMP2.settings.volume = 100
         MainWMP3.settings.volume = 100
 
         currentPicBox = PictureBox1
         Media.Picture = currentPicBox
-        Media.Player = Media.Player
+        'Media.Player = Media.Player
         tbPercentage.Enabled = True
 
         PreferencesGet()
@@ -1253,6 +1202,7 @@ Public Class MainForm
         UpdateButtonAppearance()
     End Sub
     Private Sub frmMain_Closing(sender As Object, e As CancelEventArgs) Handles MyBase.Closing
+
         PreferencesSave()
     End Sub
 
@@ -1274,9 +1224,9 @@ Public Class MainForm
     End Sub
     Private Sub IndexHandler(sender As Object, e As EventArgs) Handles lbxShowList.SelectedIndexChanged, lbxFiles.SelectedIndexChanged 'TODO Swapper
         '   PositionUpdater.Enabled = True
-        If True Then
+        '  If True Then
 
-            With sender
+        With sender
                 Dim lbx As ListBox = CType(sender, ListBox)
                 If lbx.SelectionMode = SelectionMode.One Then
                     Dim i As Long = .SelectedIndex
@@ -1288,19 +1238,19 @@ Public Class MainForm
                     End If
                 End If
             End With
-        Else
-            With sender
-                Dim i As Long = .SelectedIndex
+        'Else
+        'With sender
+        '    Dim i As Long = .SelectedIndex
 
-                tmrPicLoad.Enabled = True
-                If i >= 0 Then
-                    If i = 0 And InStr(.items(i), "filter") Then Exit Sub
-                    Media.MediaPath = .items(i)
+        '    tmrPicLoad.Enabled = True
+        '    If i >= 0 Then
+        '        If i = 0 And InStr(.items(i), "filter") Then Exit Sub
+        '        Media.MediaPath = .items(i)
 
-                    tmrPicLoad.Enabled = True
-                End If
-            End With
-        End If
+        '        tmrPicLoad.Enabled = True
+        '    End If
+        'End With
+        'End If
 
     End Sub
 
@@ -2359,7 +2309,7 @@ Public Class MainForm
     Private Sub tbAbsolute_MouseUp(sender As Object, e As MouseEventArgs) Handles tbAbsolute.MouseUp
         Media.Startpoint.State = StartPointHandler.StartTypes.ParticularAbsolute
         Media.StartPoint.Absolute = tbAbsolute.Value
-        MSFiles.SetStartpoints(Media.StartPoint)
+        '    MSFiles.SetStartpoints(Media.StartPoint)
         tbxAbsolute.Text = New TimeSpan(0, 0, tbAbsolute.Value).ToString("hh\:mm\:ss")
         tbxPercentage.Text = Str(Media.Startpoint.Percentage) & "%"
         tbPercentage.Value = Media.Startpoint.Percentage
@@ -2371,7 +2321,7 @@ Public Class MainForm
     Private Sub tbPercentage_MouseUp(sender As Object, e As MouseEventArgs) Handles tbPercentage.MouseUp
         Media.StartPoint.State = StartPointHandler.StartTypes.ParticularPercentage
         Media.StartPoint.Percentage = tbPercentage.Value
-        MSFiles.SetStartpoints(Media.StartPoint)
+        '  MSFiles.SetStartpoints(Media.StartPoint)
         tbxAbsolute.Text = New TimeSpan(0, 0, tbAbsolute.Value).ToString("hh\:mm\:ss")
         tbxPercentage.Text = Str(Media.StartPoint.Percentage) & "%"
         tbPercentage.Value = Media.Startpoint.Percentage

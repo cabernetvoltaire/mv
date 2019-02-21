@@ -33,7 +33,7 @@ Public Class Thumbnails
 
 
         For Each f In mList
-            Dim mMedia As New MediaHandler
+            Dim mMedia As New MediaHandler("mMedia")
             mMedia.MediaPath = f
             Try
                 If mMedia.MediaType = Filetype.Pic Then

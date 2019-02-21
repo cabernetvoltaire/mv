@@ -15,7 +15,7 @@
     Private mDescList As New List(Of String)
     Public Sub New(Optional ByVal StartPercentage As Byte = 50, Optional ByVal StartAbsolute As Byte = 65)
         mState = StartTypes.Beginning
-        mPercentage = 50
+        mPercentage = 25
         mDuration = 100
         mAbsolute = 65
         mDistance = 40
