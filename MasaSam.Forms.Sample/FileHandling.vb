@@ -29,13 +29,14 @@ Module FileHandling
 
         Debug.Print("MediaShown" & M.Player.Name)
         Media = M
+        MSFiles.SetStartStates(Media.StartPoint)
         Debug.Print("Playing....:")
         DebugStartpoint(M)
         LabelStartPoint(M)
         MainForm.UpdateFileInfo()
     End Sub
     Public Sub OnMediaLoaded(ByRef M As MediaHandler) Handles MSFiles.LoadedMedia
-        M.StartPoint.State = Media.StartPoint.State
+        '  M.StartPoint.State = Media.StartPoint.State
         M.Pause(True)
         DebugStartpoint(M)
         'M.MediaJumpToMarker()

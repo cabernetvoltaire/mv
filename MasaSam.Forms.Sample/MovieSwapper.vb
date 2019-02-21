@@ -96,7 +96,7 @@ Public Class MovieSwapper
     Private Sub Prepare(ByRef MH As MediaHandler, path As String)
         Debug.Print("PREPARE: " & MH.Player.Name)
         MH.MediaPath = path
-        MH.Player.Visible = False
+        MH.Player.Visible = True
         '        MH.StartPoint.State = Media.StartPoint.State
         '  MH.Pause(True)
     End Sub
@@ -154,7 +154,7 @@ Public Class MovieSwapper
         Debug.Print(MHX.Player.URL & " unpaused")
         With MHX.Player
 
-            .Visible = True
+            '.Visible = True
             .BringToFront()
             .settings.mute = False
         End With

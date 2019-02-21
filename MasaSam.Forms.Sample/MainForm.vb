@@ -1027,7 +1027,6 @@ Public Class MainForm
             Dim m As Int16 = lbxFiles.FindString(strPath)
             If m <> -1 Then lbxFiles.SelectedIndex = lbxFiles.FindString(strPath)
         End If
-
         Att.DestinationLabel = lblAttributes
         If Not tmrSlideShow.Enabled And CheckBox1.Checked Then
             Att.UpdateLabel(strPath)
@@ -1038,7 +1037,7 @@ Public Class MainForm
         If Not MasterContainer.Panel2Collapsed Then 'Showlist is visible
             'Select in the showlist unless CTRL held
             If PFocus = CtrlFocus.ShowList AndAlso Not CtrlDown Then
-                If lbxShowList.FindString(strPath) <> -1 Then lbxShowList.SelectedIndex = lbxShowList.FindString(strPath)
+                '    If lbxShowList.FindString(strPath) <> -1 Then lbxShowList.SelectedIndex = lbxShowList.FindString(strPath)
             End If
         End If
 
@@ -1234,8 +1233,9 @@ Public Class MainForm
                     Else
                         Debug.Print(vbCrLf & vbCrLf & "NEXT SELECTION ---------------------------------------")
                         MSFiles.Listbox = sender
-                        MSFiles.ListIndex = i
-                    End If
+                    MSFiles.ListIndex = i
+                    If sender.Equals(lbxShowList) Then HighlightCurrent(lbxFiles.SelectedItem)
+                End If
                 End If
             End With
         'Else
