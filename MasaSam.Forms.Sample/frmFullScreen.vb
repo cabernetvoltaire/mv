@@ -5,8 +5,15 @@ Public Class FullScreen
     Public Event FullScreenClosing()
 
     Private Sub FullScreen_Shown(sender As Object, e As EventArgs) Handles Me.Shown
-        FSWMP.uiMode = "None"
-        FSWMP.Dock = DockStyle.Fill
+        InitialisePlayer(FSWMP)
+        InitialisePlayer(FSWMP3)
+        InitialisePlayer(FSWMP2)
+        MSFiles.AssignPlayers(FSWMP, FSWMP2, FSWMP3)
+
+    End Sub
+    Private Sub InitialisePlayer(WMP As AxWindowsMediaPlayer)
+        WMP.uiMode = "None"
+        WMP.Dock = DockStyle.Fill
 
     End Sub
 

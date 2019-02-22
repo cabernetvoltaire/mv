@@ -100,7 +100,7 @@ Friend Module Mysettings
                 Media.MediaPath = s
 
             Catch ex As Exception
-                MsgBox(ex.Message)
+                'MsgBox(ex.Message)
                 'PreferencesReset()
             End Try
 

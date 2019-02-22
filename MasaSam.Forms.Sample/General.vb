@@ -320,9 +320,8 @@ Public Module General
     End Sub
     Public Sub LabelStartPoint(ByRef MH As MediaHandler)
         If MH.MediaPath = "" Then Exit Sub
-        Dim s As String
+        Dim s As String = ""
         Dim sh As StartPointHandler = MH.StartPoint
-
         s = s & MH.Name & vbCrLf
         s = s & MH.MediaPath & vbCrLf
         s = s & "Duration: " & sh.Duration & vbCrLf & "Percentage:" & sh.Percentage & vbCrLf & " Absolute:" & sh.Absolute & vbCrLf & " Startpoint:" & sh.StartPoint & vbCrLf & " Player:" & Media.Player.Name
@@ -513,16 +512,21 @@ Public Module General
 
 
     Public Function LoadImage(fname As String) As Image
-        Dim FileStream1 As New System.IO.FileStream(fname, IO.FileMode.Open, IO.FileAccess.Read)
         Try
-            Dim MyImage As Image = Image.FromStream(FileStream1)
-            FileStream1.Close()
-            FileStream1.Dispose()
-            Return MyImage
-        Catch ex As System.ArgumentException
-            FileStream1.Close()
-            FileStream1.Dispose()
-            Return Nothing
+            Dim FileStream1 As New System.IO.FileStream(fname, IO.FileMode.Open, IO.FileAccess.Read)
+
+
+            Try
+                Dim MyImage As Image = Image.FromStream(FileStream1)
+                FileStream1.Close()
+                FileStream1.Dispose()
+                Return MyImage
+            Catch ex As System.ArgumentException
+                FileStream1.Close()
+                FileStream1.Dispose()
+                Return Nothing
+            End Try
+        Catch ex As Exception
         End Try
 
 

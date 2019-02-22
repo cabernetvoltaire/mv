@@ -5,7 +5,7 @@ Public Class MediaHandler
     Public Event MediaFinished(ByVal sender As Object, ByVal e As EventArgs)
     Public Event StartChanged(ByVal sender As Object, ByVal e As EventArgs)
     Public Event MediaChanged(ByVal sender As Object, ByVal e As EventArgs)
-    ' Public Event SpeedChanged(ByVal sender As Object, ByVal e As EventArgs)
+    Public Event SpeedChanged(ByVal sender As Object, ByVal e As EventArgs)
 
     Public WithEvents PositionUpdater As New Timer
     Private DefaultFile As String = "C:\exiftools.exe"
@@ -286,14 +286,15 @@ Public Class MediaHandler
             If StartPoint.State = StartPointHandler.StartTypes.ParticularAbsolute Then
                 mPlayPosition = mBookmark
             Else
-                Dim m As New StartPointHandler With {
-                        .Duration = mDuration,
-                        .State = StartPointHandler.StartTypes.NearEnd
-                                    }
-                mPlayPosition = m.StartPoint
+                mPlayPosition = StartPoint.StartPoint
             End If
         Else
             mPlayPosition = StartPoint.StartPoint
+            'Dim m As New StartPointHandler With {
+            '            .Duration = mDuration,
+            '            .State = StartPointHandler.StartTypes.NearEnd
+            '                        }
+            'mPlayPosition = m.StartPoint
         End If
         mPlayer.Ctlcontrols.currentPosition = mPlayPosition
         Debug.Print("MediaJumpMarker set position to " & mPlayPosition)
@@ -347,12 +348,13 @@ Public Class MediaHandler
 
     Private Sub HandleMovie(URL As String)
         Static LastURL As String
-        ' If URL <> LastURL Then
-        If mPlayer Is Nothing Then
-        Else
-            mPlayer.URL = URL
-            LastURL = URL
+        If URL <> LastURL Then
+            If mPlayer Is Nothing Then
+            Else
+                mPlayer.URL = URL
+                LastURL = URL
             End If
+        End If
 
     End Sub
 #End Region
@@ -450,7 +452,7 @@ Public Class MediaHandler
         End Select
     End Sub
     Private Sub OnSpeedChange() Handles Speed.SpeedChanged
-        MainForm.OnSpeedChange()
+        '     MainForm.OnSpeedChange()
     End Sub
 
     Private Sub OnStartChange(sender As Object, e As EventArgs) Handles StartPoint.StartPointChanged, StartPoint.StateChanged

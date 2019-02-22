@@ -274,7 +274,12 @@ Module ButtonHandling
         MainForm.lblAlpha.Text = buttons.CurrentLetter
         For i = 0 To 7
             buttons.CurrentRow.Row(i).Path = strButtonFilePath(i, iCurrentAlpha, 1)
-            MainForm.ToolTip1.SetToolTip(btnDest(i), buttons.CurrentRow.Row(i).Path)
+            Try
+                MainForm.ToolTip1.SetToolTip(btnDest(i), buttons.CurrentRow.Row(i).Path)
+
+            Catch ex As Exception
+
+            End Try
         Next
         For i = 0 To 7
             MainForm.lblAlpha.Text = Chr(AscfromButt(iCurrentAlpha)).ToString

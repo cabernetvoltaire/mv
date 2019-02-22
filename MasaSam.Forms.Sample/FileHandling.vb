@@ -14,7 +14,7 @@ Module FileHandling
     Public Event FolderMoved(Path As String)
     Public Event FileMoved(Files As List(Of String), lbx As ListBox)
     Public t As Thread
-    Public WithEvents MSFiles As New MovieSwapper(MainForm.MainWMP4, MainForm.MainWMP2, MainForm.MainWMP3)
+    Public WithEvents MSFiles As New MediaSwapper(MainForm.MainWMP4, MainForm.MainWMP2, MainForm.MainWMP3)
     '   Public WithEvents MSShow As New MovieSwapper(MainForm.MainWMP, MainForm.MainWMP2)
 
     Public WithEvents Media As New MediaHandler("Media")

@@ -27,19 +27,22 @@ Partial Class FullScreen
         Me.FSBlanker = New System.Windows.Forms.PictureBox()
         Me.fullScreenPicBox = New System.Windows.Forms.PictureBox()
         Me.DirectoryEntry1 = New System.DirectoryServices.DirectoryEntry()
+        Me.FSWMP2 = New AxWMPLib.AxWindowsMediaPlayer()
+        Me.FSWMP3 = New AxWMPLib.AxWindowsMediaPlayer()
         CType(Me.FSWMP, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.FSBlanker, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.fullScreenPicBox, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.FSWMP2, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.FSWMP3, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'FSWMP
         '
-        Me.FSWMP.Dock = System.Windows.Forms.DockStyle.Fill
         Me.FSWMP.Enabled = True
         Me.FSWMP.Location = New System.Drawing.Point(0, 0)
         Me.FSWMP.Name = "FSWMP"
         Me.FSWMP.OcxState = CType(resources.GetObject("FSWMP.OcxState"), System.Windows.Forms.AxHost.State)
-        Me.FSWMP.Size = New System.Drawing.Size(1920, 1080)
+        Me.FSWMP.Size = New System.Drawing.Size(1123, 720)
         Me.FSWMP.TabIndex = 0
         Me.FSWMP.TabStop = False
         Me.FSWMP.UseWaitCursor = True
@@ -47,7 +50,7 @@ Partial Class FullScreen
         'FSBlanker
         '
         Me.FSBlanker.BackColor = System.Drawing.Color.Maroon
-        Me.FSBlanker.Location = New System.Drawing.Point(688, 457)
+        Me.FSBlanker.Location = New System.Drawing.Point(394, 310)
         Me.FSBlanker.Name = "FSBlanker"
         Me.FSBlanker.Size = New System.Drawing.Size(1193, 660)
         Me.FSBlanker.TabIndex = 19
@@ -58,8 +61,7 @@ Partial Class FullScreen
         '
         Me.fullScreenPicBox.BackColor = System.Drawing.Color.Black
         Me.fullScreenPicBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.fullScreenPicBox.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.fullScreenPicBox.Location = New System.Drawing.Point(0, 0)
+        Me.fullScreenPicBox.Location = New System.Drawing.Point(608, 637)
         Me.fullScreenPicBox.Margin = New System.Windows.Forms.Padding(0)
         Me.fullScreenPicBox.Name = "fullScreenPicBox"
         Me.fullScreenPicBox.Size = New System.Drawing.Size(1920, 1080)
@@ -68,6 +70,28 @@ Partial Class FullScreen
         Me.fullScreenPicBox.TabStop = False
         Me.fullScreenPicBox.Visible = False
         '
+        'FSWMP2
+        '
+        Me.FSWMP2.Enabled = True
+        Me.FSWMP2.Location = New System.Drawing.Point(399, 180)
+        Me.FSWMP2.Name = "FSWMP2"
+        Me.FSWMP2.OcxState = CType(resources.GetObject("FSWMP2.OcxState"), System.Windows.Forms.AxHost.State)
+        Me.FSWMP2.Size = New System.Drawing.Size(1123, 720)
+        Me.FSWMP2.TabIndex = 20
+        Me.FSWMP2.TabStop = False
+        Me.FSWMP2.UseWaitCursor = True
+        '
+        'FSWMP3
+        '
+        Me.FSWMP3.Enabled = True
+        Me.FSWMP3.Location = New System.Drawing.Point(671, 348)
+        Me.FSWMP3.Name = "FSWMP3"
+        Me.FSWMP3.OcxState = CType(resources.GetObject("FSWMP3.OcxState"), System.Windows.Forms.AxHost.State)
+        Me.FSWMP3.Size = New System.Drawing.Size(1123, 720)
+        Me.FSWMP3.TabIndex = 21
+        Me.FSWMP3.TabStop = False
+        Me.FSWMP3.UseWaitCursor = True
+        '
         'FullScreen
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(11.0!, 24.0!)
@@ -75,6 +99,8 @@ Partial Class FullScreen
         Me.AutoSize = True
         Me.BackColor = System.Drawing.Color.Black
         Me.ClientSize = New System.Drawing.Size(1920, 1080)
+        Me.Controls.Add(Me.FSWMP3)
+        Me.Controls.Add(Me.FSWMP2)
         Me.Controls.Add(Me.FSBlanker)
         Me.Controls.Add(Me.fullScreenPicBox)
         Me.Controls.Add(Me.FSWMP)
@@ -87,6 +113,8 @@ Partial Class FullScreen
         CType(Me.FSWMP, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.FSBlanker, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.fullScreenPicBox, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.FSWMP2, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.FSWMP3, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
@@ -95,4 +123,6 @@ Partial Class FullScreen
     Friend WithEvents fullScreenPicBox As PictureBox
     Friend WithEvents FSBlanker As PictureBox
     Friend WithEvents DirectoryEntry1 As DirectoryServices.DirectoryEntry
+    Friend WithEvents FSWMP2 As AxWMPLib.AxWindowsMediaPlayer
+    Friend WithEvents FSWMP3 As AxWMPLib.AxWindowsMediaPlayer
 End Class

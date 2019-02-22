@@ -146,7 +146,7 @@ Public Class MainForm
     Public Sub OnStartChanged(Sender As Object, e As EventArgs)
         'Media.Bookmark = -1
         tbxAbsolute.Text = New TimeSpan(0, 0, Media.StartPoint.StartPoint).ToString("hh\:mm\:ss")
-        tbxPercentage.Text = Int(100 * Media.StartPoint.Absolute / Media.StartPoint.Duration) & "%"
+        tbxPercentage.Text = Int(100 * Media.StartPoint.StartPoint/ Media.StartPoint.Duration) & "%"
         tbPercentage.Value = Media.StartPoint.Percentage
         tbAbsolute.Maximum = Media.StartPoint.Duration
         tbAbsolute.Value = Media.StartPoint.StartPoint
@@ -161,8 +161,7 @@ Public Class MainForm
                 tbxAbsolute.Enabled = False
                 tbxPercentage.Enabled = False
         End Select
-        'MSFiles.ListIndex = lbxFiles.SelectedIndex
-        MSFiles.SetStartStates(Media.StartPoint)
+        ' MSFiles.ListIndex = lbxFiles.SelectedIndex
         MSFiles.SetStartpoints(Media.StartPoint)
         FullScreen.Changing = False
         cbxStartPoint.SelectedIndex = Media.StartPoint.State
@@ -549,6 +548,7 @@ Public Class MainForm
 
         Else
             SplitterPlace(0.25)
+            MSFiles.AssignPlayers(MainWMP4, MainWMP2, MainWMP3)
             SetWMP(MainWMP4, Media.Player)
             SetPB(PictureBox1)
             FullScreen.Close()
@@ -787,6 +787,8 @@ Public Class MainForm
                 AdvanceFile(e.KeyCode = KeyNextFile, Random.NextSelect)
                 e.SuppressKeyPress = True
                 tmrSlideShow.Enabled = False
+                tmrMovieSlideShow.Enabled = False
+
 
 #End Region
 
@@ -829,6 +831,7 @@ Public Class MainForm
                 End If
 
             Case KeyJumpToPoint
+
                 Media.MediaJumpToMarker()
                 e.SuppressKeyPress = True
             Case KeyMarkPoint, LKeyMarkPoint
@@ -2314,7 +2317,7 @@ Public Class MainForm
         tbxPercentage.Text = Str(Media.Startpoint.Percentage) & "%"
         tbPercentage.Value = Media.Startpoint.Percentage
         Media.MediaJumpToMarker()
-        MSFiles.SetStartStates(Media.StartPoint)
+        'MSFiles.SetStartStates(Media.StartPoint)
         MSFiles.SetStartpoints(Media.StartPoint)
     End Sub
 
@@ -2327,7 +2330,7 @@ Public Class MainForm
         tbPercentage.Value = Media.Startpoint.Percentage
 
         Media.MediaJumpToMarker()
-        MSFiles.SetStartStates(Media.StartPoint)
+        ' MSFiles.SetStartStates(Media.StartPoint)
         MSFiles.SetStartpoints(Media.StartPoint)
 
     End Sub

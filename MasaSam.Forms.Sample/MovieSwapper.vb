@@ -1,5 +1,5 @@
 ﻿Imports AxWMPLib
-Public Class MovieSwapper
+Public Class MediaSwapper
     Public NextF As New NextFile
     Private mMedia1 As New MediaHandler("mMedia1")
     Private mMedia2 As New MediaHandler("mMedia2")
@@ -8,6 +8,7 @@ Public Class MovieSwapper
     Private mFileList As New List(Of String) '
     Private mListIndex As Integer
     Private mListbox As New ListBox
+    Private mListcount As Integer
     Public Event LoadedMedia(ByRef MH As MediaHandler)
 
     Public Event MediaShown(ByRef MH As MediaHandler)
@@ -38,7 +39,10 @@ Public Class MovieSwapper
         End Set
     End Property
     Public Sub New(ByRef MP1 As AxWindowsMediaPlayer, ByRef MP2 As AxWindowsMediaPlayer, ByRef MP3 As AxWindowsMediaPlayer)
+        AssignPlayers(MP1, MP2, MP3)
 
+    End Sub
+    Public Sub AssignPlayers(ByRef MP1 As AxWindowsMediaPlayer, ByRef MP2 As AxWindowsMediaPlayer, ByRef MP3 As AxWindowsMediaPlayer)
         mMedia1.Player = MP1
         mMedia2.Player = MP2
         mMedia3.Player = MP3
@@ -70,7 +74,9 @@ Public Class MovieSwapper
         Dim Current As String
         Dim Nxt As String
         Dim Prev As String
+        mListcount = Listbox.Items.Count
         Static oldindex As Integer
+
         NextF.Forwards = (mListIndex > oldindex) Or (mListIndex = 0)
         NextF.CurrentIndex = index
         Current = NextF.CurrentItem
@@ -132,6 +138,7 @@ Public Class MovieSwapper
         mMedia2.StartPoint = SH
 
         mMedia3.StartPoint = SH
+        '  SetIndex(ListIndex)
         'mMedia2.StartPoint.Duration = dur
         ' mMedia1.StartPoint.Duration = dur
         'mMedia3.StartPoint.Duration = dur

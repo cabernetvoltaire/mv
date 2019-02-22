@@ -20,7 +20,7 @@
         End Get
         Set(ByVal value As Integer)
             mCurrentIndex = value
-            If value >= 0 And value <= mListCount Then
+            If value >= 0 And value < mListCount Then
                 CurrentItem = mListbox.Items(mCurrentIndex)
             End If
 
