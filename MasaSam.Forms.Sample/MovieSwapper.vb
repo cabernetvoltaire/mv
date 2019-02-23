@@ -91,9 +91,9 @@ Public Class MediaSwapper
             Case mMedia3.MediaPath
                 RotateMedia(mMedia3, mMedia1, mMedia2)
             Case Else
-                mMedia1.MediaPath = Current
-                mMedia2.MediaPath = Nxt
-                mMedia3.MediaPath = Prev
+                'mMedia1.MediaPath = Current
+                'mMedia2.MediaPath = Nxt
+                'mMedia3.MediaPath = Prev
                 RotateMedia(mMedia1, mMedia2, mMedia3)
         End Select
         oldindex = index
@@ -112,12 +112,12 @@ Public Class MediaSwapper
         Prepare(NextMH, NextF.NextItem)
         Prepare(ThisMH, NextF.CurrentItem)
 
-        If ThisMH.MediaType = Filetype.Movie Then
-            ShowPlayer(ThisMH)
-
-        ElseIf ThisMH.MediaType = Filetype.Pic Then
-            ShowPicture(ThisMH)
-        End If
+        Select Case ThisMH.MediaType
+            Case Filetype.Movie
+                ShowPlayer(ThisMH)
+            Case Filetype.Pic
+                ShowPicture(ThisMH)
+        End Select
 
     End Sub
     Public Sub SetStartStates(ByRef SH As StartPointHandler)
@@ -155,6 +155,7 @@ Public Class MediaSwapper
     End Sub
     Private Sub ShowPlayer(ByRef MHX As MediaHandler)
         '  MHX.MediaJumpToMarker()
+
         Debug.Print("SHOWPLAYER" & MHX.Player.Name)
         MuteAll()
         'MHX.Pause(False)

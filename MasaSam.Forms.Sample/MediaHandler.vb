@@ -437,6 +437,7 @@ Public Class MediaHandler
                     Exit Sub
                 End If
                 If FullScreen.Changing Or Speed.Unpause Then 'Hold current position if switching to FS or back. 
+                    mPlayPosition = mPlayer.Ctlcontrols.currentPosition
                 End If
                 mPaused = False
             Case WMPLib.WMPPlayState.wmppsPaused ', WMPLib.WMPPlayState.wmppsTransitioning
