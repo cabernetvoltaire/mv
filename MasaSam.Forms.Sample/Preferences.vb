@@ -84,7 +84,7 @@
 
             '  Media.MediaPath = New IO.DirectoryInfo(Media.MediaDirectory).EnumerateFiles("*", IO.SearchOption.AllDirectories).First.FullName
             FavesFolderPath = s & "\Favourites\"
-            strButtonfile = Media.MediaPath
+            ButtonFilePath = Media.MediaPath
         End With
         With MainForm
             .ctrFileBoxes.SplitterDistance = .ctrFileBoxes.Height / 4
@@ -94,7 +94,7 @@
             .PlayOrder.State = 0
             .NavigateMoveState.State = 0
             iCurrentAlpha = 0
-            strButtonfile = ""
+            ButtonFilePath = ""
             '.SetValue("LastButtonFolder", strButtonfile)
         End With
         Media.StartPoint.State = 0

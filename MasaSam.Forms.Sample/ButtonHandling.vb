@@ -52,14 +52,14 @@ Module ButtonHandling
         If s = "" Then s = Media.MediaDirectory
         FolderSelect.Folder = s
         '        x.Show()
-        Dim control As Control = CType(sender, Control)
+        'Dim control As Control = CType(sender, Control)
 
-        Dim startpoint As Point
-        startpoint.X = control.Left
-        startpoint.Y = control.Top
-        startpoint = control.PointToScreen(startpoint)
-        FolderSelect.Left = startpoint.X - FolderSelect.Width / 2
-        FolderSelect.Top = startpoint.Y - FolderSelect.Height
+        'Dim startpoint As Point
+        'startpoint.X = control.Left
+        'startpoint.Y = control.Top
+        'startpoint = control.PointToScreen(startpoint)
+        'FolderSelect.Left = startpoint.X - FolderSelect.Width / 2
+        'FolderSelect.Top = startpoint.Y - FolderSelect.Height
 
     End Sub
 
@@ -107,7 +107,7 @@ Module ButtonHandling
             Next
         End If
 
-        KeyAssignmentsStore(strButtonFile)
+        KeyAssignmentsStore(ButtonFilePath)
 
     End Sub
     Public Sub AssignAlphabetic(blntest As Boolean)
@@ -138,7 +138,7 @@ Module ButtonHandling
             End If
 
         Next
-        KeyAssignmentsStore(strButtonFile)
+        KeyAssignmentsStore(ButtonFilePath)
     End Sub
     Public Sub AssignTree(strStart As String)
         If MsgBox("This will replace a large number of button assignments. Are you sure?", MsgBoxStyle.OkCancel) = MsgBoxResult.Cancel Then Exit Sub
@@ -180,7 +180,7 @@ Module ButtonHandling
         End While
 
 
-        KeyAssignmentsStore(strButtonFile)
+        KeyAssignmentsStore(ButtonFilePath)
     End Sub
     Public Function FindNextTier(tier As SortedList(Of String, DirectoryInfo)) As SortedList(Of String, DirectoryInfo)
         Dim i As Int16 = 0
@@ -221,7 +221,7 @@ Module ButtonHandling
         strButtonCaptions(i, j, k) = f.Name
         UpdateButtonAppearance()
         If blnStore Then
-            KeyAssignmentsStore(strButtonFile)
+            KeyAssignmentsStore(ButtonFilePath)
         End If
     End Sub
 
@@ -400,7 +400,7 @@ Module ButtonHandling
                 .Filter = "Metavisua button files|*.msb|All files|*.*"
                 If .ShowDialog() = System.Windows.Forms.DialogResult.OK Then
                     path = .FileName
-                    strButtonFile = path
+                    ButtonFilePath = path
                 Else
                     Exit Sub
 
@@ -418,7 +418,7 @@ Module ButtonHandling
                 End If
             Next
         Next
-        strButtonFile = path
+        ButtonFilePath = path
         fs.Close()
 
 

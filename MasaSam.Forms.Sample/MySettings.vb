@@ -5,7 +5,7 @@ Friend Module Mysettings
     Public PFocus As Byte = CtrlFocus.Tree
     Public Property ZoneSize As Decimal = 0.4
     Public Const OrientationId As Integer = &H112
-    Public strButtonfile As String
+    Public ButtonFilePath As String
 
     Public LastPlayed As New Stack(Of String)
     Public LastFolder As New Stack(Of String)
@@ -69,7 +69,7 @@ Friend Module Mysettings
             .SetValue("SortOrder", MainForm.PlayOrder.State)
             .SetValue("StartPoint", Media.StartPoint.State)
             .SetValue("State", MainForm.NavigateMoveState.State)
-            .SetValue("LastButtonFile", strButtonfile)
+            .SetValue("LastButtonFile", ButtonFilePath)
             .SetValue("LastAlpha", iCurrentAlpha)
             .SetValue("Favourites", FavesFolderPath)
         End With
@@ -81,7 +81,7 @@ Friend Module Mysettings
             Try
                 MainForm.ctrFileBoxes.SplitterDistance = .GetValue("VertSplit", MainForm.ctrFileBoxes.Height / 4)
                 MainForm.ctrMainFrame.SplitterDistance = .GetValue("HorSplit", MainForm.ctrFileBoxes.Width / 2)
-                strButtonfile = .GetValue("LastButtonFile", "")
+                ButtonFilePath = .GetValue("LastButtonFile", "")
                 MainForm.PlayOrder.State = .GetValue("SortOrder", 0)
                 MainForm.CurrentFilterState.State = .GetValue("Filter", 0)
                 Media.StartPoint.State = .GetValue("StartPoint", 0)
@@ -95,13 +95,11 @@ Friend Module Mysettings
 
                 Dim s As String = .GetValue("File", "")
                 If s = "" Then s = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures)
-                'Media.MediaDirectory = .GetValue("Folder", System.Environment.GetFolderPath(Environment.SpecialFolder.MyPictures))
-
                 Media.MediaPath = s
 
             Catch ex As Exception
                 'MsgBox(ex.Message)
-                'PreferencesReset()
+                PreferencesReset()
             End Try
 
 
@@ -109,29 +107,32 @@ Friend Module Mysettings
         MainForm.tssMoveCopy.Text = Media.MediaDirectory
     End Sub
     Public Sub PreferencesReset()
-        With My.Computer.Registry.CurrentUser
-            Dim s As String = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures)
-            'Media.MediaDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures)
-            Dim fol As New IO.DirectoryInfo(Media.MediaDirectory)
+        If MsgBox("Reset preferences?", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
+
+            With My.Computer.Registry.CurrentUser
+                Dim s As String = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures)
+                'Media.MediaDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures)
+                Dim fol As New IO.DirectoryInfo(Media.MediaDirectory)
 
 
-            Media.MediaPath = New IO.DirectoryInfo(Media.MediaDirectory).EnumerateFiles("*", IO.SearchOption.AllDirectories).First.FullName
-            FavesFolderPath = s & "\Favourites\"
-            '            strButtonfile=Media.MediaPath
-        End With
-        With MainForm
-            .ctrFileBoxes.SplitterDistance = .ctrFileBoxes.Height / 4
-            .ctrMainFrame.SplitterDistance = .ctrFileBoxes.Width / 2
+                Media.MediaPath = New IO.DirectoryInfo(Media.MediaDirectory).EnumerateFiles("*", IO.SearchOption.AllDirectories).First.FullName
+                FavesFolderPath = s & "\Favourites\"
+                '            strButtonfile=Media.MediaPath
+            End With
+            With MainForm
+                .ctrFileBoxes.SplitterDistance = .ctrFileBoxes.Height / 4
+                .ctrMainFrame.SplitterDistance = .ctrFileBoxes.Width / 2
 
-            .CurrentFilterState.State = .0
-            .PlayOrder.State = 0
-            .NavigateMoveState.State = 0
-            iCurrentAlpha = 0
-            strButtonfile = ""
-            '.SetValue("LastButtonFolder", strButtonfile)
-        End With
-        Media.StartPoint.State = 0
-        PreferencesSave()
+                .CurrentFilterState.State = .0
+                .PlayOrder.State = 0
+                .NavigateMoveState.State = 0
+                iCurrentAlpha = 0
+                ButtonFilePath = ""
+                '.SetValue("LastButtonFolder", strButtonfile)
+            End With
+            Media.StartPoint.State = 0
+            PreferencesSave()
+        End If
     End Sub
 
 End Module

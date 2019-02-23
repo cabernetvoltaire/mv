@@ -3,17 +3,9 @@ Imports AxWMPLib
 Imports MasaSam.Forms.Controls
 
 Public Class FolderSelect
-    Private newAlpha As Int16
     Private PreMH As New MediaHandler("PreMH")
 
     Public Property Alpha() As Int16
-        Get
-            Return newAlpha
-        End Get
-        Set(ByVal value As Int16)
-            newAlpha = value
-        End Set
-    End Property
     Private newButtonNumber As Byte
     Public KeepDisplaying As Boolean = True
     Public Property ButtonNumber() As Byte
@@ -45,6 +37,7 @@ Public Class FolderSelect
     End Property
     Public Property Button As Button
     Private Sub PlayMedia(value As String)
+        Exit Sub
         Dim x As New IO.DirectoryInfo(value)
         Dim count As Integer = x.GetFiles.Count
         If count = 0 Then
@@ -111,19 +104,12 @@ Public Class FolderSelect
     End Sub
 
     Private Sub FolderSelect_MouseLeave(sender As Object, e As EventArgs) Handles Me.MouseLeave
-        Me.Close()
+        'Me.Close()
     End Sub
 
     Private Sub fst1_DirectorySelected(sender As Object, e As DirectoryInfoEventArgs) Handles fst1.DirectorySelected
         Folder = e.Directory.FullName
     End Sub
 
-    Private Sub FolderSelect_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
-    End Sub
-
-    Private Sub PreviewWMP_PlayStateChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent) Handles PreviewWMP.PlayStateChange
-        'PreMH.
-        ' MovieHandler.PlaystateChangeNew(sender, e)
-    End Sub
 End Class

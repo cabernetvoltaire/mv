@@ -15,7 +15,7 @@ Public Module General
     End Enum
     Public VIDEOEXTENSIONS = ".divx.vob.webm.avi.flv.mov.m4p.mpeg.f4v.mpg.m4a.m4v.mkv.mp4.rm.ram.wmv.wav.mp3.3gp .lnk"
     Public PICEXTENSIONS = "arw.jpeg.png.jpg.bmp.gif.lnk"
-    Public separate As Boolean = False
+    Public separate As Boolean = True
     Public Enum CtrlFocus As Byte
         Tree = 0
         Files = 1

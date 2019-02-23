@@ -9,8 +9,6 @@ Imports MasaSam.Forms.Controls
 
 Public Class MainForm
 
-    Public Shared ReadOnly Property MyPictures As String
-    ' Public CurrentWMP As New AxWindowsMediaPlayer
 
     Public Initialising As Boolean = True
     Public defaultcolour As Color = Color.Aqua
@@ -30,7 +28,6 @@ Public Class MainForm
     Public DraggedFolder As String
     Public CurrentFileList As New List(Of String)
     Public T As Thread
-    '    Public WithEvents Media As New MediaHandler
 
 
 
@@ -56,9 +53,6 @@ Public Class MainForm
 
         Next
         If lbx1.Items.Count <> 0 Then lbx1.SetSelected(Math.Max(Math.Min(ind, lbx1.Items.Count - 1), 0), True)
-
-
-
     End Sub
 
     'Shared Function Main(ByVal cmdArgs() As String) As Integer
@@ -278,7 +272,7 @@ Public Class MainForm
 
             If .ShowDialog() = System.Windows.Forms.DialogResult.OK Then
                 path = .FileName
-                strButtonfile = path
+                ButtonFilePath = path
             End If
         End With
         Return path
@@ -623,12 +617,10 @@ Public Class MainForm
 
     End Sub
 
-    Public Sub CollapseShowlist(blnCollapse As Boolean)
-        MasterContainer.Panel2Collapsed = blnCollapse
-        'Random.OnDirChange = False
+    Public Sub CollapseShowlist(Collapse As Boolean)
+        MasterContainer.Panel2Collapsed = Collapse
         lbxFiles.SelectionMode = SelectionMode.One
         MasterContainer.SplitterDistance = MasterContainer.Height / 3
-        '        ctrTreeandFiles.Panel1Collapsed = Not ctrTreeandFiles.Panel1Collapsed
     End Sub
 
     Public Sub MediaSmallJump(e As KeyEventArgs)
@@ -1074,36 +1066,23 @@ Public Class MainForm
         Dim d As New System.IO.DirectoryInfo(Media.MediaDirectory)
         FindAllFilesBelow(d, list, extensions, True, "", True, False)
     End Sub
-
-    Private Sub GlobalInitialise()
-        '  InitialiseColours()
-        CollapseShowlist(True)
+    Private Sub PopulateLists()
+        Dim m As New StartPointHandler
         cbxFilter.Items.Clear()
         cbxOrder.Items.Clear()
-
         For Each s In CurrentFilterState.Descriptions
             cbxFilter.Items.Add(s)
         Next
         For Each s In PlayOrder.Descriptions
             cbxOrder.Items.Add(s)
         Next
-        Dim m As New StartPointHandler
         For Each s In m.Descriptions
             cbxStartPoint.Items.Add(s)
         Next
-        PositionUpdater.Enabled = False
-        tmrPicLoad.Interval = lngInterval * 15
-        ' AssignExtensionFilters()
+    End Sub
 
-
-        Randomize()
-        '  tmrLoadLastFolder.Enabled = True
-
-
-        Media.Player = MainWMP4
-        'alternateWMP = MainWMP2
+    Sub SetupPlayers()
         MainWMP4.stretchToFit = True
-        '        Media.Player.stretchToFit = True
         MainWMP2.stretchToFit = True
         MainWMP3.stretchToFit = True
         Media.Player.uiMode = "FULL"
@@ -1111,18 +1090,24 @@ Public Class MainForm
             MainWMP4.Dock = DockStyle.Fill 'Swapper
             MainWMP2.Dock = DockStyle.Fill
             MainWMP3.Dock = DockStyle.Fill
-
         End If
-
-        'alternateWMP.Dock = DockStyle.Fill 'Swapper
         MainWMP4.settings.volume = 100
         MainWMP2.settings.volume = 100
         MainWMP3.settings.volume = 100
 
+
+
+    End Sub
+    Private Sub GlobalInitialise()
+        Randomize()
+        PopulateLists()
+        CollapseShowlist(True)
+        Media.Player = MainWMP4
+        SetupPlayers()
+        PositionUpdater.Enabled = False
+        tmrPicLoad.Interval = lngInterval * 15
         currentPicBox = PictureBox1
         Media.Picture = currentPicBox
-        'Media.Player = Media.Player
-        tbPercentage.Enabled = True
 
         PreferencesGet()
 
@@ -1131,7 +1116,7 @@ Public Class MainForm
         AddHandler FileHandling.FileMoved, AddressOf OnFileMoved
         'Exit Sub
         Try
-            KeyAssignmentsRestore(strButtonfile)
+            KeyAssignmentsRestore(ButtonFilePath)
             If Not blnButtonsLoaded Then
                 ToggleButtons()
             End If
@@ -1144,18 +1129,11 @@ Public Class MainForm
 
             Exit Try
         End Try
-        If Media.MediaDirectory <> "" Then
-            '   WatchStart(Media.MediaDirectory)
-            '  ChangeFolder(Media.MediaDirectory)
-        End If
         NavigateMoveState.State = StateHandler.StateOptions.Navigate
         OnRandomChanged()
-        PlayOrder.State = SortHandler.Order.DateTime
+        '        PlayOrder.State = SortHandler.Order.DateTime
         Initialising = False
-        '    HighlightCurrent(Media.MediaPath)
-
         tmrPicLoad.Enabled = True
-        ReportAction("Startpoint state=" & Media.StartPoint.State)
 
     End Sub
     Public Sub WatchStart(path As String)
@@ -1229,18 +1207,18 @@ Public Class MainForm
         '  If True Then
 
         With sender
-                Dim lbx As ListBox = CType(sender, ListBox)
-                If lbx.SelectionMode = SelectionMode.One Then
-                    Dim i As Long = .SelectedIndex
-                    If i = -1 Then
-                    Else
-                        Debug.Print(vbCrLf & vbCrLf & "NEXT SELECTION ---------------------------------------")
-                        MSFiles.Listbox = sender
+            Dim lbx As ListBox = CType(sender, ListBox)
+            If lbx.SelectionMode = SelectionMode.One Then
+                Dim i As Long = .SelectedIndex
+                If i = -1 Then
+                Else
+                    Debug.Print(vbCrLf & vbCrLf & "NEXT SELECTION ---------------------------------------")
+                    MSFiles.Listbox = sender
                     MSFiles.ListIndex = i
                     If sender.Equals(lbxShowList) Then HighlightCurrent(lbxFiles.SelectedItem)
                 End If
-                End If
-            End With
+            End If
+        End With
         'Else
         'With sender
         '    Dim i As Long = .SelectedIndex
@@ -1349,10 +1327,6 @@ Public Class MainForm
 
 
 
-    Private Sub ToolStripButton4_Click_1(sender As Object, e As EventArgs)
-        'Toggle collapse
-        CollapseShowlist(Not MasterContainer.Panel2Collapsed)
-    End Sub
 
     Public Sub SetMotion(KeyCode As Integer)
 
@@ -1545,7 +1519,7 @@ Public Class MainForm
         tbRandom.Text = "ORDER:" & UCase(PlayOrder.Description)
         tbShowfile.Text = "SHOWFILE: " & LastShowList
         '   tbSpeed.Text = tbSpeed.Text = "SPEED (" & PlaybackSpeed & "fps)"
-        tbButton.Text = "BUTTONFILE: " & strButtonfile
+        tbButton.Text = "BUTTONFILE: " & ButtonFilePath
         tbZoom.Text = iZoomFactor
         If Random.StartPointFlag Then
             tbStartpoint.Text = "START:RANDOM"
@@ -1664,8 +1638,8 @@ Public Class MainForm
 
     Private Sub loadbuttonfiletoolstripmenuitem_Click(sender As Object, e As EventArgs) Handles LoadButtonFileToolStripMenuItem.Click
 
-        strButtonfile = LoadButtonList()
-        KeyAssignmentsRestore(strButtonfile)
+        ButtonFilePath = LoadButtonList()
+        KeyAssignmentsRestore(ButtonFilePath)
     End Sub
 
     Private Sub SaveListasToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SaveListToolStripMenuItem.Click
@@ -2073,8 +2047,8 @@ Public Class MainForm
             'Assign button
             AssignButton(i, iCurrentAlpha, 1, Media.MediaDirectory, True) 'Just assign in all modes when all three control buttons held
             'Always update the button file. 
-            If My.Computer.FileSystem.FileExists(strButtonfile) Then
-                KeyAssignmentsStore(strButtonfile)
+            If My.Computer.FileSystem.FileExists(ButtonFilePath) Then
+                KeyAssignmentsStore(ButtonFilePath)
             Else
                 SaveButtonlist()
             End If
@@ -2508,11 +2482,15 @@ Public Class MainForm
     End Sub
 
     Private Sub FavouritesFolderToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles FavouritesFolderToolStripMenuItem.Click
-        If MsgBox("Make current folder the new Favourites folder?", MsgBoxStyle.OkCancel, "Assign Favourites folder") = MsgBoxResult.Ok Then
-            FavesFolderPath = Media.MediaDirectory
-            PreferencesSave()
-        End If
+        Try
+            If MsgBox("Make " & Media.MediaDirectory & " the new Favourites folder?", MsgBoxStyle.OkCancel, "Assign Favourites folder") = MsgBoxResult.Ok Then
+                FavesFolderPath = Media.MediaDirectory
+                PreferencesSave()
+            End If
 
+        Catch ex As Exception
+
+        End Try
     End Sub
 
     Private Sub tmrMovieSlideShow_Tick(sender As Object, e As EventArgs) Handles tmrMovieSlideShow.Tick
