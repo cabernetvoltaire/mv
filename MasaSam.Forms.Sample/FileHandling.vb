@@ -25,26 +25,20 @@ Module FileHandling
 
     End Sub
 
-    Public Sub OnMediaShown(ByRef M As MediaHandler) Handles MSFiles.MediaShown
-
-        'Debug.Print("MediaShown" & M.Player.Name)
+    Public Sub OnMediaShown(M As MediaHandler) Handles MSFiles.MediaShown
         Media = M
         MSFiles.SetStartStates(Media.StartPoint)
         '  Media.MediaJumpToMarker()
-        'Debug.Print("Playing....:")
-        DebugStartpoint(M)
-        LabelStartPoint(M)
+        Debug.Print("On Media Shown")
+        DebugStartpoint(Media)
+        'LabelStartPoint(Media)
         MainForm.UpdateFileInfo()
     End Sub
-    Public Sub OnMediaLoaded(ByRef M As MediaHandler) Handles MSFiles.LoadedMedia
-        '  M.StartPoint.State = Media.StartPoint.State
-        M.Pause(True)
-        DebugStartpoint(M)
-        'M.MediaJumpToMarker()
-        '  MainForm.OnStartChanged(M.StartPoint, New EventArgs)
+    Public Sub OnMediaLoaded(M As MediaHandler) Handles MSFiles.LoadedMedia
+        'M.Pause(True)
     End Sub
 
-    Private Sub DebugStartpoint(ByRef M As MediaHandler)
+    Private Sub DebugStartpoint(M As MediaHandler)
         Debug.Print(M.MediaPath & " loaded into " & M.Player.Name)
         Debug.Print(M.StartPoint.StartPoint & " startpoint")
         Debug.Print(M.StartPoint.State & " State")
@@ -76,7 +70,7 @@ Module FileHandling
             Case FilterHandler.FilterState.All
             Case FilterHandler.FilterState.NoPicVid
                 For Each f In e.EnumerateFiles
-                    If InStr(PICEXTENSIONS & VIDEOEXTENSIONS, f.Extension) = 0 And Len(f.Extension) <> 0 Then
+                    If InStr(PICEXTENSIONS & VIDEOEXTENSIONS, LCase(f.Extension)) = 0 And Len(f.Extension) <> 0 Then
                     Else
                         lst.Remove(f.FullName)
                     End If
@@ -84,7 +78,7 @@ Module FileHandling
             Case FilterHandler.FilterState.LinkOnly
 
                 For Each f In e.EnumerateFiles
-                    If f.Extension = ".lnk" Then
+                    If LCase(f.Extension) = ".lnk" Then
                     Else
                         lst.Remove(f.FullName)
                     End If
@@ -92,7 +86,7 @@ Module FileHandling
             Case FilterHandler.FilterState.Piconly
 
                 For Each f In e.EnumerateFiles
-                    If InStr(PICEXTENSIONS, f.Extension) = 0 And Len(f.Extension) <> 0 Then
+                    If InStr(PICEXTENSIONS, LCase(f.Extension)) = 0 And Len(f.Extension) <> 0 Then
                         lst.Remove(f.FullName)
                     Else
                     End If
@@ -100,7 +94,7 @@ Module FileHandling
             Case FilterHandler.FilterState.PicVid
 
                 For Each f In e.EnumerateFiles
-                    If InStr(PICEXTENSIONS & VIDEOEXTENSIONS, f.Extension) = 0 And Len(f.Extension) <> 0 Then
+                    If InStr(PICEXTENSIONS & VIDEOEXTENSIONS, LCase(f.Extension)) = 0 And Len(f.Extension) <> 0 Then
                         lst.Remove(f.FullName)
                     Else
                     End If
@@ -108,7 +102,7 @@ Module FileHandling
             Case FilterHandler.FilterState.Vidonly
 
                 For Each f In e.EnumerateFiles
-                    If InStr(VIDEOEXTENSIONS, f.Extension) = 0 And Len(f.Extension) <> 0 Then
+                    If InStr(VIDEOEXTENSIONS, LCase(f.Extension)) = 0 And Len(f.Extension) <> 0 Then
                         lst.Remove(f.FullName)
                     Else
                     End If

@@ -9,9 +9,9 @@ Public Class MediaSwapper
     Private mListIndex As Integer
     Private mListbox As New ListBox
     Private mListcount As Integer
-    Public Event LoadedMedia(ByRef MH As MediaHandler)
+    Public Event LoadedMedia(MH As MediaHandler)
 
-    Public Event MediaShown(ByRef MH As MediaHandler)
+    Public Event MediaShown(MH As MediaHandler)
 
     Public Property Listbox() As ListBox
         Get
@@ -84,16 +84,11 @@ Public Class MediaSwapper
         Prev = NextF.PreviousItem
 
         Select Case Current
-            Case mMedia1.MediaPath
-                RotateMedia(mMedia1, mMedia2, mMedia3)
             Case mMedia2.MediaPath
                 RotateMedia(mMedia2, mMedia3, mMedia1)
             Case mMedia3.MediaPath
                 RotateMedia(mMedia3, mMedia1, mMedia2)
             Case Else
-                'mMedia1.MediaPath = Current
-                'mMedia2.MediaPath = Nxt
-                'mMedia3.MediaPath = Prev
                 RotateMedia(mMedia1, mMedia2, mMedia3)
         End Select
         oldindex = index
@@ -103,6 +98,9 @@ Public Class MediaSwapper
         Debug.Print("PREPARE: " & MH.Player.Name)
         MH.MediaPath = path
         MH.Player.Visible = True
+        RaiseEvent LoadedMedia(MH)
+
+        'NB Duration is not loaded by this point. 
         '        MH.StartPoint.State = Media.StartPoint.State
         '  MH.Pause(True)
     End Sub
@@ -128,6 +126,7 @@ Public Class MediaSwapper
 
     End Sub
     Public Sub SetStartpoints(ByRef SH As StartPointHandler)
+        SetStartStates(SH)
         '  Dim dur As Long
 
         'dur = mMedia1.StartPoint.Duration

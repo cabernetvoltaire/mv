@@ -422,7 +422,7 @@ Public Class MediaHandler
                     MainForm.AdvanceFile(True, False)
                 Else
                     MediaJumpToMarker()
-                    mPlayer.Ctlcontrols.play()
+                    ' mPlayer.Ctlcontrols.play()
 
                 End If
             Case WMPLib.WMPPlayState.wmppsPlaying
@@ -430,6 +430,7 @@ Public Class MediaHandler
                 MainForm.SwitchSound(False)
                 PositionUpdater.Enabled = True
                 Duration = mPlayer.currentMedia.duration
+                StartPoint.Duration = mPlayer.currentMedia.duration
                 MediaJumpToMarker()
                 Debug.Print(mPlayer.URL & " unpaused by playstatehandler")
                 If mPaused Then

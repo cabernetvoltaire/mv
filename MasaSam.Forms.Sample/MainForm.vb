@@ -157,6 +157,7 @@ Public Class MainForm
         End Select
         ' MSFiles.ListIndex = lbxFiles.SelectedIndex
         MSFiles.SetStartpoints(Media.StartPoint)
+
         FullScreen.Changing = False
         cbxStartPoint.SelectedIndex = Media.StartPoint.State
         tbStartpoint.Text = "START:" & Media.StartPoint.Description
@@ -1085,7 +1086,7 @@ Public Class MainForm
         MainWMP4.stretchToFit = True
         MainWMP2.stretchToFit = True
         MainWMP3.stretchToFit = True
-        Media.Player.uiMode = "FULL"
+        'Media.Player.uiMode = "FULL"
         If Not separate Then
             MainWMP4.Dock = DockStyle.Fill 'Swapper
             MainWMP2.Dock = DockStyle.Fill
@@ -1102,7 +1103,7 @@ Public Class MainForm
         Randomize()
         PopulateLists()
         CollapseShowlist(True)
-        Media.Player = MainWMP4
+        'Media.Player = MainWMP2
         SetupPlayers()
         PositionUpdater.Enabled = False
         tmrPicLoad.Interval = lngInterval * 15
@@ -1179,7 +1180,9 @@ Public Class MainForm
         ShiftDown = e.Shift
         CtrlDown = e.Control
         AltDown = e.Alt
-        UpdateButtonAppearance()
+        If e.KeyData <> (Keys.F4 Or e.Alt) Then
+            UpdateButtonAppearance()
+        End If
     End Sub
     Private Sub frmMain_Closing(sender As Object, e As CancelEventArgs) Handles MyBase.Closing
 
