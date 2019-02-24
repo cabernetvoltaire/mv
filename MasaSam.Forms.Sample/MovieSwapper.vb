@@ -98,6 +98,7 @@ Public Class MediaSwapper
         Debug.Print("PREPARE: " & MH.Player.Name)
         MH.MediaPath = path
         MH.Player.Visible = True
+        MH.PlaceResetter(True)
         RaiseEvent LoadedMedia(MH)
 
         'NB Duration is not loaded by this point. 
@@ -154,10 +155,10 @@ Public Class MediaSwapper
     End Sub
     Private Sub ShowPlayer(ByRef MHX As MediaHandler)
         '  MHX.MediaJumpToMarker()
-
         Debug.Print("SHOWPLAYER" & MHX.Player.Name)
         MuteAll()
         'MHX.Pause(False)
+        MHX.PlaceResetter(False)
         Debug.Print(MHX.Player.URL & " unpaused")
         With MHX.Player
 

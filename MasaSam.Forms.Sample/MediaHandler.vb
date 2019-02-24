@@ -6,7 +6,7 @@ Public Class MediaHandler
     Public Event StartChanged(ByVal sender As Object, ByVal e As EventArgs)
     Public Event MediaChanged(ByVal sender As Object, ByVal e As EventArgs)
     Public Event SpeedChanged(ByVal sender As Object, ByVal e As EventArgs)
-
+    Private WithEvents ResetPosition As New Timer
     Public WithEvents PositionUpdater As New Timer
     Private DefaultFile As String = "C:\exiftools.exe"
     Public WithEvents StartPoint As New StartPointHandler
@@ -156,6 +156,7 @@ Public Class MediaHandler
         Name = value
         PositionUpdater.Interval = 500
         PositionUpdater.Enabled = False
+        ResetPosition.Interval = 500
         '     StartPoint = Media.StartPoint
     End Sub
     Private mMediaDirectory As String
@@ -183,6 +184,7 @@ Public Class MediaHandler
             If mIsLink Then
                 GetBookmark()
             Else
+                mBookmark = -1
                 mLinkPath = ""
             End If
         End Set
@@ -354,6 +356,9 @@ Public Class MediaHandler
                 mPlayer.URL = URL
                 LastURL = URL
             End If
+        Else
+            GetBookmark()
+            MediaJumpToMarker()
         End If
 
     End Sub
@@ -474,7 +479,17 @@ Public Class MediaHandler
         End Try
 
     End Sub
+    Private Sub ResetPos() Handles ResetPosition.Tick
+        Try
+            MediaJumpToMarker()
+        Catch ex As Exception
 
+        End Try
+
+    End Sub
+    Public Sub PlaceResetter(ResetOn As Boolean)
+        ResetPosition.Enabled = ResetOn
+    End Sub
 
 
 
