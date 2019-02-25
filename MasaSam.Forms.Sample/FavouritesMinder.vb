@@ -53,20 +53,22 @@
 
             m = FavesList.Find(Function(x) x.Contains(f.Name))
             If m Is Nothing Then Exit While
+            'Debug.Print(m)
             Dim minfo As New IO.FileInfo(m)
-
+            'Get the bookmark
             If InStr(m, "%") <> 0 Then
-
                 Dim s As String()
                 s = m.Split("%")
                 bk = Val(s(1))
             Else
                 bk = 0
             End If
+            'Create a new shortcut where the old one was.
             Dim sch As New ShortcutHandler(destinationpath, minfo.Directory.FullName, f.Name)
             sch.MarkOffset = 0
             Dim fn As String = sch.Create_ShortCut(bk)
-            FavesList.Remove(fn)
+            'Remove the old shortcut
+            FavesList.Remove(m)
         End While
     End Sub
 End Class

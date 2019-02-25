@@ -71,6 +71,7 @@ Partial Class MainForm
         Me.lbxShowList = New System.Windows.Forms.ListBox()
         Me.pbxBlanker = New System.Windows.Forms.PictureBox()
         Me.ctrPicAndButtons = New System.Windows.Forms.SplitContainer()
+        Me.MainWMP4 = New AxWMPLib.AxWindowsMediaPlayer()
         Me.MainWMP3 = New AxWMPLib.AxWindowsMediaPlayer()
         Me.MainWMP2 = New AxWMPLib.AxWindowsMediaPlayer()
         Me.SoundWMP = New AxWMPLib.AxWindowsMediaPlayer()
@@ -219,7 +220,7 @@ Partial Class MainForm
         Me.PositionUpdater = New System.Windows.Forms.Timer(Me.components)
         Me.tmrMovieSlideShow = New System.Windows.Forms.Timer(Me.components)
         Me.BackgroundWorker1 = New System.ComponentModel.BackgroundWorker()
-        Me.MainWMP4 = New AxWMPLib.AxWindowsMediaPlayer()
+        Me.CreateListFromLinksToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.StatusStrip1.SuspendLayout()
         Me.TableLayoutPanel2.SuspendLayout()
         CType(Me.ctrMainFrame, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -239,6 +240,7 @@ Partial Class MainForm
         Me.ctrPicAndButtons.Panel1.SuspendLayout()
         Me.ctrPicAndButtons.Panel2.SuspendLayout()
         Me.ctrPicAndButtons.SuspendLayout()
+        CType(Me.MainWMP4, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.MainWMP3, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.MainWMP2, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.SoundWMP, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -260,7 +262,6 @@ Partial Class MainForm
         Me.GroupBox1.SuspendLayout()
         CType(Me.FileSystemWatcher1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.MenuStrip2.SuspendLayout()
-        CType(Me.MainWMP4, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'FileToolStripMenuItem
@@ -660,6 +661,17 @@ Partial Class MainForm
         Me.ctrPicAndButtons.SplitterWidth = 7
         Me.ctrPicAndButtons.TabIndex = 6
         Me.ctrPicAndButtons.TabStop = False
+        '
+        'MainWMP4
+        '
+        Me.MainWMP4.Enabled = True
+        Me.MainWMP4.Location = New System.Drawing.Point(0, 1)
+        Me.MainWMP4.Margin = New System.Windows.Forms.Padding(4)
+        Me.MainWMP4.Name = "MainWMP4"
+        Me.MainWMP4.OcxState = CType(resources.GetObject("MainWMP4.OcxState"), System.Windows.Forms.AxHost.State)
+        Me.MainWMP4.Size = New System.Drawing.Size(959, 491)
+        Me.MainWMP4.TabIndex = 6
+        Me.MainWMP4.TabStop = False
         '
         'MainWMP3
         '
@@ -1376,7 +1388,7 @@ Partial Class MainForm
         '
         'ToolStripMenuItem14
         '
-        Me.ToolStripMenuItem14.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SaveListToolStripMenuItem, Me.LoadListToolStripMenuItem, Me.ToolStripSeparator7, Me.AddCurrentFileListToolStripMenuItem, Me.AddCurrentAndSubfoldersToolStripMenuItem, Me.ClearCurrentListToolStripMenuItem, Me.SingleFilePerFolderToolStripMenuItem, Me.AddCurrentToShowlistToolStripMenuItem})
+        Me.ToolStripMenuItem14.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SaveListToolStripMenuItem, Me.LoadListToolStripMenuItem, Me.ToolStripSeparator7, Me.AddCurrentFileListToolStripMenuItem, Me.AddCurrentAndSubfoldersToolStripMenuItem, Me.ClearCurrentListToolStripMenuItem, Me.SingleFilePerFolderToolStripMenuItem, Me.AddCurrentToShowlistToolStripMenuItem, Me.CreateListFromLinksToolStripMenuItem})
         Me.ToolStripMenuItem14.Name = "ToolStripMenuItem14"
         Me.ToolStripMenuItem14.Size = New System.Drawing.Size(295, 34)
         Me.ToolStripMenuItem14.Text = "&Lists"
@@ -1875,16 +1887,11 @@ Partial Class MainForm
         '
         Me.tmrMovieSlideShow.Interval = 2000
         '
-        'MainWMP4
+        'CreateListFromLinksToolStripMenuItem
         '
-        Me.MainWMP4.Enabled = True
-        Me.MainWMP4.Location = New System.Drawing.Point(0, 1)
-        Me.MainWMP4.Margin = New System.Windows.Forms.Padding(4)
-        Me.MainWMP4.Name = "MainWMP4"
-        Me.MainWMP4.OcxState = CType(resources.GetObject("MainWMP4.OcxState"), System.Windows.Forms.AxHost.State)
-        Me.MainWMP4.Size = New System.Drawing.Size(959, 491)
-        Me.MainWMP4.TabIndex = 6
-        Me.MainWMP4.TabStop = False
+        Me.CreateListFromLinksToolStripMenuItem.Name = "CreateListFromLinksToolStripMenuItem"
+        Me.CreateListFromLinksToolStripMenuItem.Size = New System.Drawing.Size(486, 34)
+        Me.CreateListFromLinksToolStripMenuItem.Text = "Create list from links"
         '
         'MainForm
         '
@@ -1922,6 +1929,7 @@ Partial Class MainForm
         Me.ctrPicAndButtons.Panel2.ResumeLayout(False)
         CType(Me.ctrPicAndButtons, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ctrPicAndButtons.ResumeLayout(False)
+        CType(Me.MainWMP4, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.MainWMP3, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.MainWMP2, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.SoundWMP, System.ComponentModel.ISupportInitialize).EndInit()
@@ -1955,7 +1963,6 @@ Partial Class MainForm
         CType(Me.FileSystemWatcher1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.MenuStrip2.ResumeLayout(False)
         Me.MenuStrip2.PerformLayout()
-        CType(Me.MainWMP4, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -2161,4 +2168,5 @@ Partial Class MainForm
     Friend WithEvents MainWMP3 As AxWMPLib.AxWindowsMediaPlayer
     Friend WithEvents ByLinkFolderToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents MainWMP4 As AxWMPLib.AxWindowsMediaPlayer
+    Friend WithEvents CreateListFromLinksToolStripMenuItem As ToolStripMenuItem
 End Class

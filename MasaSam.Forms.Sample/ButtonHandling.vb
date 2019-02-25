@@ -409,17 +409,23 @@ Module ButtonHandling
         End If
 
         Dim fs As New StreamWriter(New FileStream(path, FileMode.OpenOrCreate, FileAccess.Write))
-        For iLetter = 0 To iAlphaCount - 1
-            For intLoop = 0 To 7
+        Try
 
-                If strButtonFilePath(intLoop, iLetter, 1) <> "" Then
-                    strEncrypted = intLoop & "|" & iLetter & "|" & strButtonFilePath(intLoop, iLetter, 1) & "|" & strButtonCaptions(intLoop, iLetter, 1)
-                    fs.WriteLine(strEncrypted)
-                End If
+            For iLetter = 0 To iAlphaCount - 1
+                For intLoop = 0 To 7
+
+                    If strButtonFilePath(intLoop, iLetter, 1) <> "" Then
+                        strEncrypted = intLoop & "|" & iLetter & "|" & strButtonFilePath(intLoop, iLetter, 1) & "|" & strButtonCaptions(intLoop, iLetter, 1)
+                        fs.WriteLine(strEncrypted)
+                    End If
+                Next
             Next
-        Next
-        ButtonFilePath = path
+        Catch ex As Exception
+            fs.Close()
+
+        End Try
         fs.Close()
+        ButtonFilePath = path
 
 
         PreferencesSave()

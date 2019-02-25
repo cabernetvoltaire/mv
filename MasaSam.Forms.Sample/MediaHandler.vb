@@ -156,7 +156,7 @@ Public Class MediaHandler
         Name = value
         PositionUpdater.Interval = 500
         PositionUpdater.Enabled = False
-        ResetPosition.Interval = 500
+        ResetPosition.Interval = 1000
         '     StartPoint = Media.StartPoint
     End Sub
     Private mMediaDirectory As String

@@ -37,7 +37,6 @@ Public Class MainForm
         'Dir.Delete()
     End Sub
     Public Sub OnFileMoved(files As List(Of String), lbx1 As ListBox)
-
         lbx1.SelectionMode = SelectionMode.One
         Dim ind As Long = lbx1.SelectedIndex
         For Each f In files
@@ -1103,13 +1102,13 @@ Public Class MainForm
         Randomize()
         PopulateLists()
         CollapseShowlist(True)
-        'Media.Player = MainWMP2
+        Media.Player = MainWMP2
         SetupPlayers()
         PositionUpdater.Enabled = False
         tmrPicLoad.Interval = lngInterval * 15
         currentPicBox = PictureBox1
         Media.Picture = currentPicBox
-
+        tbPercentage.Enabled = True
         PreferencesGet()
 
 
@@ -2594,5 +2593,9 @@ Public Class MainForm
 
     Private Sub ByLinkFolderToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ByLinkFolderToolStripMenuItem.Click
         DM.FilterByLinkFolder(Media.MediaDirectory)
+    End Sub
+
+    Private Sub CreateListFromLinksToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CreateListFromLinksToolStripMenuItem.Click
+        ListFromLinks(ListfromListbox(lbxFiles))
     End Sub
 End Class

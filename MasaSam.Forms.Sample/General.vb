@@ -15,7 +15,7 @@ Public Module General
     End Enum
     Public VIDEOEXTENSIONS = ".divx.vob.webm.avi.flv.mov.m4p.mpeg.f4v.mpg.m4a.m4v.mkv.mp4.rm.ram.wmv.wav.mp3.3gp .lnk"
     Public PICEXTENSIONS = "arw.jpeg.png.jpg.bmp.gif.lnk"
-    Public separate As Boolean = True
+    Public separate As Boolean = False
     Public Enum CtrlFocus As Byte
         Tree = 0
         Files = 1
@@ -262,6 +262,19 @@ Public Module General
         For Each l In lbx.SelectedItems
             s.Add(l)
         Next
+        Return s
+    End Function
+    Public Function ListFromLinks(list As List(Of String)) As List(Of String)
+        Dim s As New List(Of String)
+        For Each l In list
+            Dim tgt As String = LinkTarget(l)
+            If s.Contains(tgt) Then
+            Else
+                s.Add(LinkTarget(tgt))
+            End If
+
+        Next
+        FillShowbox(MainForm.lbxShowList, 0, s)
         Return s
     End Function
     ''' <summary>
