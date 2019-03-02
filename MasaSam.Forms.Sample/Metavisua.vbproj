@@ -360,6 +360,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\Key_empty_Small.png" />
+    <Content Include="Resources\MVSplash.PNG" />
     <None Include="Resources\Key_empty_Small1.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />

@@ -303,7 +303,7 @@ Public Class FileSystemTree
             End If
             Expand(d.FullName)
             HighlightSelectedNodes()
-            ' RaiseEvent DirectorySelected(Me, New DirectoryInfoEventArgs(d))
+            RaiseEvent DirectorySelected(Me, New DirectoryInfoEventArgs(d))
         End Set
     End Property
 
@@ -398,7 +398,7 @@ Public Class FileSystemTree
                     Dim k As New TreeNode
                     k = CType(d, TreeNode)
                     tvFiles.SelectedNode = k
-                    '  OnDirectorySelected(New DirectoryInfo(d.FullName))
+                    OnDirectorySelected(New DirectoryInfo(d.FullName))
                     '                    k.BackColor = SystemColors.HighlightText
                     Exit Sub
                 End If
@@ -907,9 +907,9 @@ Public Class FileSystemTree
     ''' <summary>
     ''' Raises DirectorySelected event.
     ''' </summary>
-    'Private Sub OnDirectorySelected(ByVal directory As DirectoryInfo)
-    '    RaiseEvent DirectorySelected(Me, New DirectoryInfoEventArgs(directory))
-    'End Sub
+    Private Sub OnDirectorySelected(ByVal directory As DirectoryInfo)
+        RaiseEvent DirectorySelected(Me, New DirectoryInfoEventArgs(directory))
+    End Sub
 
     ''' <summary>
     ''' Raises FileSelected event.

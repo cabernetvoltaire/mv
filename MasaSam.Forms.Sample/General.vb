@@ -1,6 +1,7 @@
 ﻿Option Explicit On
 Imports System.IO
 Imports System.Drawing.Imaging
+Imports System.Media
 Public Module General
     Public Enum ExifOrientations As Byte
         Unknown = 0
@@ -23,7 +24,7 @@ Public Module General
     End Enum
 
     Public lngShowlistLines As Long = 0
-
+    Public ReadOnly Property Asterisk As SystemSound
     Public Orientation() As String = {"Unknown", "TopLeft", "TopRight", "BottomRight", "BottomLeft", "LeftTop", "RightTop", "RightBottom", "LeftBottom"}
     Public Enum Filetype As Byte
         Pic
@@ -84,15 +85,15 @@ Public Module General
         Return deadlinks
     End Function
     Public Sub CreateFavourite(Filepath As String)
-        CreateLink(Filepath, FavesFolderPath, "")
+        CreateLink(Filepath, FavesFolderPath, "", Bookmark:=Media.Position)
         Exit Sub
 
 
     End Sub
-    Public Sub CreateLink(Filepath As String, DestinationDirectory As String, Name As String)
+    Public Sub CreateLink(Filepath As String, DestinationDirectory As String, Name As String, Optional Update As Boolean = True, Optional Bookmark As Long = -1)
         Dim sh As New ShortcutHandler
         Dim f As New FileInfo(Filepath)
-        sh.Bookmark = Media.Position
+        'sh.Bookmark = Media.Position
 
         sh.TargetPath = Filepath
         sh.ShortcutPath = DestinationDirectory
@@ -101,8 +102,8 @@ Public Module General
         Else
             sh.ShortcutName = Name
         End If
-        sh.Create_ShortCut(sh.Bookmark)
-        If DestinationDirectory = Media.MediaDirectory Then MainForm.UpdatePlayOrder(False)
+        sh.Create_ShortCut(Bookmark)
+        If DestinationDirectory = Media.MediaDirectory And Update Then MainForm.UpdatePlayOrder(False)
     End Sub
 
     Public Function GetAllFilesBelow(DirectoryPath As String, ByVal FileList As List(Of String))
@@ -132,6 +133,8 @@ Public Module General
     ''' <param name="str"></param>
     ''' <returns></returns>
     Public Function LinkTarget(str As String) As String
+        'Dim f As IO.File(str)
+
         Try
             str = CreateObject("WScript.Shell").CreateShortcut(str).TargetPath
             Return str
@@ -327,7 +330,18 @@ Public Module General
 
         End If
     End Sub
+    Public Sub Report(str As String, gaps As Integer, Optional Sound As Boolean = False)
+        If Sound Then SystemSounds.Asterisk.Play()
 
+        For i = 0 To gaps
+            Console.WriteLine()
+        Next
+        Console.WriteLine(str)
+        For i = 0 To gaps
+            Console.WriteLine()
+        Next
+
+    End Sub
     Public Sub ReportTime(str As String)
         Debug.Print(Int(Now().Second) & "." & Int(Now().Millisecond) & " " & str)
     End Sub

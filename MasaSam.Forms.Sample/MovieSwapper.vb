@@ -10,6 +10,7 @@ Public Class MediaSwapper
     Private mListbox As New ListBox
     Private mListcount As Integer
     Public Event LoadedMedia(MH As MediaHandler)
+    Public Event MediaNotFound(MH As MediaHandler)
 
     Public Event MediaShown(MH As MediaHandler)
 
@@ -38,8 +39,14 @@ Public Class MediaSwapper
             SetIndex(value)
         End Set
     End Property
-    Public Sub New(ByRef MP1 As AxWindowsMediaPlayer, ByRef MP2 As AxWindowsMediaPlayer, ByRef MP3 As AxWindowsMediaPlayer)
+    Public Sub New(ByRef MP1 As AxWindowsMediaPlayer, ByRef MP2 As AxWindowsMediaPlayer, ByRef MP3 As AxWindowsMediaPlayer, ByRef PB1 As PictureBox, ByRef PB2 As PictureBox, ByRef PB3 As PictureBox)
         AssignPlayers(MP1, MP2, MP3)
+        AssignPictures(PB1, PB2, PB3)
+    End Sub
+    Public Sub AssignPictures(ByRef PB1 As PictureBox, ByRef PB2 As PictureBox, ByRef PB3 As PictureBox)
+        mMedia1.Picture = PB1
+        mMedia2.Picture = PB2
+        mMedia3.Picture = PB3
 
     End Sub
     Public Sub AssignPlayers(ByRef MP1 As AxWindowsMediaPlayer, ByRef MP2 As AxWindowsMediaPlayer, ByRef MP3 As AxWindowsMediaPlayer)
@@ -98,12 +105,13 @@ Public Class MediaSwapper
         Debug.Print("PREPARE: " & MH.Player.Name)
         MH.MediaPath = path
         MH.Player.Visible = True
-        MH.PlaceResetter(True)
-        RaiseEvent LoadedMedia(MH)
+        If MH.MediaType = Filetype.Movie Then
+            MH.PlaceResetter(True)
+        End If
+        RaiseEvent LoadedMedia(MH) 'Currently does nothing.
 
         'NB Duration is not loaded by this point. 
-        '        MH.StartPoint.State = Media.StartPoint.State
-        '  MH.Pause(True)
+
     End Sub
     Private Sub RotateMedia(ByRef ThisMH As MediaHandler, ByRef NextMH As MediaHandler, ByRef PrevMH As MediaHandler)
 
@@ -144,8 +152,17 @@ Public Class MediaSwapper
         'mMedia3.StartPoint.Duration = dur
 
     End Sub
+    Public Sub URLSZero()
+        mMedia1.Player.URL = ""
+        mMedia2.Player.URL = ""
+        mMedia3.Player.URL = ""
 
-
+    End Sub
+    Public Sub ResettersOff()
+        mMedia1.PlaceResetter(False)
+        mMedia2.PlaceResetter(False)
+        mMedia3.PlaceResetter(False)
+    End Sub
 
     Private Sub MuteAll()
         mMedia1.Player.settings.mute = True
@@ -154,12 +171,8 @@ Public Class MediaSwapper
 
     End Sub
     Private Sub ShowPlayer(ByRef MHX As MediaHandler)
-        '  MHX.MediaJumpToMarker()
-        Debug.Print("SHOWPLAYER" & MHX.Player.Name)
         MuteAll()
-        'MHX.Pause(False)
         MHX.PlaceResetter(False)
-        Debug.Print(MHX.Player.URL & " unpaused")
         With MHX.Player
 
             '.Visible = True

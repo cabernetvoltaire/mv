@@ -49,6 +49,8 @@ Module Shortcuts
                 Return sShortcutName
             End Get
             Set(ByVal value As String)
+                Dim m() As String = value.Split("%")
+                mBookmark = m(1)
                 sShortcutName = value
             End Set
         End Property
@@ -111,16 +113,19 @@ Module Shortcuts
         End Function
 
 
+
+
+
+
+        Public Sub ReAssign_ShortCutPath(ByVal sTargetPath As String, sShortCutPath As String)
+            Dim d As New FileInfo(sShortCutPath)
+
+            CreateLink(sTargetPath, d.Directory.FullName, d.Name, False, Bookmark)
+
+        End Sub
+
+
     End Class
-
-
-
-
-    Public Sub ReAssign_ShortCutPath(ByVal sTargetPath As String, sShortCutPath As String)
-        Dim d As New FileInfo(sShortCutPath)
-
-        CreateLink(sTargetPath, d.Directory.FullName, d.Name)
-    End Sub
     Public Function LinkTargetExists(Linkfile As String) As Boolean
         Dim f As String
         f = LinkTarget(Linkfile)
@@ -136,6 +141,4 @@ Module Shortcuts
         End If
 
     End Function
-
-
 End Module

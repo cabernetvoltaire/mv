@@ -37,7 +37,7 @@
         If InStr(strPath, ".gif") = 0 Then
             Return LoadImage(strPath)
 
-            Exit Function 'This Causes problems if extension is .gif
+            ' Exit Function 'This Causes problems if extension is .gif
         Else
             Try
                 Dim img As Image = Image.FromFile(strPath)

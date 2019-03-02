@@ -55,7 +55,9 @@
 
                 Dim f As New IO.FileInfo(s)
 
-                Dim StartDest = New IO.DirectoryInfo(f.Directory.FullName)
+                '                Dim StartDest = New IO.DirectoryInfo(f.Directory.FullName)
+                Dim StartDest = New IO.DirectoryInfo(buttons.CurrentRow.Row(0).Path)
+
                 While Not StartDest.Exists
                     StartDest = StartDest.Parent
                 End While
@@ -65,10 +67,7 @@
                         Dim Names As New Dictionary(Of String, String)
                         Dim FilesToCheck As IO.FileInfo() = StartDest.GetFiles("*", IO.SearchOption.AllDirectories)
                         For Each xx In FilesToCheck
-                            If Names.ContainsKey(xx.Name) Then
-                            Else
-                                Names.Add(xx.Name, xx.FullName)
-                            End If
+                            If Not Names.ContainsKey(xx.Name) Then Names.Add(xx.Name, xx.FullName)
                         Next
                         'add names to foundparents
                         If Names.ContainsKey(f.Name) Then
@@ -110,13 +109,14 @@
 
     Public Sub Reunite()
         For Each m In mFoundParents
+            mSHandler.ShortcutName = m.Value
             Dim s As String = Right(m.Key, 7)
             Dim mn As String = m.Key
             If s(0) = "#" Then
                 mn = Replace(m.Key, s, "")
             End If
             Dim f As New IO.FileInfo(mn)
-            If f.Exists = True Then ReAssign_ShortCutPath(mn, m.Value)
+            If f.Exists = True Then mSHandler.ReAssign_ShortCutPath(mn, m.Value)
         Next
     End Sub
 End Class

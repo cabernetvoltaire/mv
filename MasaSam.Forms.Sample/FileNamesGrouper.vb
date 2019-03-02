@@ -73,11 +73,7 @@
         mGroupNames.Clear()
         mGroups.Clear()
     End Sub
-    ''' <summary>
-    ''' Takes a string, and uses a regular expression to strip out all the words. 
-    ''' Adds those words to a sorted list maintaining a count of the global frequency 
-    ''' </summary>
-    ''' <param name="str"></param>
+
     Private Sub OutputList(s As String, x As Object)
         Exit Sub
         Debug.Print(" ")

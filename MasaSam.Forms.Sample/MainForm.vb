@@ -25,6 +25,8 @@ Public Class MainForm
     Private WithEvents Op As New OrphanFinder
     Public WithEvents SP As New SpeedHandler
     Public WithEvents AT As New AutoTrailer
+
+
     Public DraggedFolder As String
     Public CurrentFileList As New List(Of String)
     Public T As Thread
@@ -36,23 +38,7 @@ Public Class MainForm
         'Dim dir As New IO.DirectoryInfo(path)
         'Dir.Delete()
     End Sub
-    Public Sub OnFileMoved(files As List(Of String), lbx1 As ListBox)
-        lbx1.SelectionMode = SelectionMode.One
-        Dim ind As Long = lbx1.SelectedIndex
-        For Each f In files
-            Select Case NavigateMoveState.State
-                Case StateHandler.StateOptions.Copy, StateHandler.StateOptions.CopyLink
-                    'lbx1.SelectedIndex = (lbx1.SelectedIndex + 1) Mod (lbx1.Items.Count - 1) 'Signal action completed by advancing
-                Case StateHandler.StateOptions.MoveLeavingLink
-                    UpdatePlayOrder(False)
-                    lbx1.SelectedItem = lbx1.Items(ind)
-                Case Else
-                    lbx1.Items.Remove(f)
-            End Select
 
-        Next
-        If lbx1.Items.Count <> 0 Then lbx1.SetSelected(Math.Max(Math.Min(ind, lbx1.Items.Count - 1), 0), True)
-    End Sub
 
     'Shared Function Main(ByVal cmdArgs() As String) As Integer
     '    MsgBox("The Main procedure is starting the application.")
@@ -155,7 +141,7 @@ Public Class MainForm
                 tbxPercentage.Enabled = False
         End Select
         ' MSFiles.ListIndex = lbxFiles.SelectedIndex
-        MSFiles.SetStartpoints(Media.StartPoint)
+        MSFiles.SetStartStates(Media.StartPoint)
 
         FullScreen.Changing = False
         cbxStartPoint.SelectedIndex = Media.StartPoint.State
@@ -201,19 +187,19 @@ Public Class MainForm
     ''' <param name="img"></param>
     Public Sub MovietoPic(img As Image)
         PreparePic(currentPicBox, pbxBlanker, img)
-        currentPicBox.Visible = True
-        currentPicBox.BringToFront()
+        'currentPicBox.Visible = True
+        'currentPicBox.BringToFront()
 
         SwitchSound(False)
         tbState.Text = ""
-        tmrJumpVideo.Enabled = False
+        'tmrJumpVideo.Enabled = False
     End Sub
     Private Sub PicToMovie()
         'PreparePic(currentPicBox, pbxBlanker, img)
         currentPicBox.Visible = False
         currentPicBox.SendToBack()
         'Media.Player.Visible = True
-        'SwitchSound(True)
+        SwitchSound(True)
         tbState.Text = ""
         'tmrJumpVideo.Enabled = False
     End Sub
@@ -310,14 +296,15 @@ Public Class MainForm
     End Sub
 
     Public Sub CancelDisplay()
+        MSFiles.URLSZero()
+        MSFiles.ResettersOff()
+
         If Media.Player.Visible Then
-            'Media.Player.Ctlcontrols.pause()
             Media.Player.URL = ""
         End If
         If currentPicBox.Visible Then
             currentPicBox.Image = Nothing
             GC.Collect()
-
         End If
         tmrMovieSlideShow.Enabled = False
         tmrSlideShow.Enabled = False
@@ -714,13 +701,21 @@ Public Class MainForm
 
             Case KeyDelete
                 'Use Movefiles with current selected list, and option to delete. 
+                Dim lbx As ListBox
                 CancelDisplay()
                 If e.Shift Then
 
                     DeleteFolder(tvMain2, NavigateMoveState.State = StateHandler.StateOptions.Navigate)
                 Else
-                    Dim m As List(Of String) = ListfromListbox(lbxFiles)
-                    MoveFiles(m, "", lbxFiles)
+                    If PFocus = CtrlFocus.ShowList Then
+                        lbx = lbxShowList
+                    Else
+                        lbx = lbxFiles
+
+
+                    End If
+                    Dim m As List(Of String) = ListfromListbox(lbx)
+                    MoveFiles(m, "", lbx)
                 End If
 #End Region
 
@@ -824,7 +819,7 @@ Public Class MainForm
 
             Case KeyJumpToPoint
 
-                Media.MediaJumpToMarker()
+                Media.MediaJumpToMarker(True)
                 e.SuppressKeyPress = True
             Case KeyMarkPoint, LKeyMarkPoint
                 'Addmarker(Media.MediaPath)
@@ -1094,7 +1089,16 @@ Public Class MainForm
         MainWMP4.settings.volume = 100
         MainWMP2.settings.volume = 100
         MainWMP3.settings.volume = 100
+        If Not separate Then
+            PictureBox1.Dock = DockStyle.Fill
+            PictureBox2.Dock = DockStyle.Fill
+            PictureBox3.Dock = DockStyle.Fill
+        Else
+            PictureBox1.Dock = DockStyle.None
+            PictureBox2.Dock = DockStyle.None
+            PictureBox3.Dock = DockStyle.None
 
+        End If
 
 
     End Sub
@@ -1201,13 +1205,14 @@ Public Class MainForm
 
     End Sub
 
-    Private Sub Listbox_SelectedIndexChanged(sender As Object, e As EventArgs) 'Handles lbxShowList.SelectedIndexChanged, lbxFiles.SelectedIndexChanged 'TODO Swapper
+    Private Sub Listbox_SelectedIndexChanged(sender As Object, e As EventArgs) Handles lbxShowList.SelectedIndexChanged, lbxFiles.SelectedIndexChanged 'TODO Swapper
+        NewIndex.Enabled = False
+
+        NewIndex.Interval = 10
+        NewIndex.Enabled = True
 
     End Sub
-    Private Sub IndexHandler(sender As Object, e As EventArgs) Handles lbxShowList.SelectedIndexChanged, lbxFiles.SelectedIndexChanged 'TODO Swapper
-        '   PositionUpdater.Enabled = True
-        '  If True Then
-
+    Private Sub IndexHandler(sender As Object, e As EventArgs) 'Handles lbxShowList.SelectedIndexChanged, lbxFiles.SelectedIndexChanged 'TODO Swapper
         With sender
             Dim lbx As ListBox = CType(sender, ListBox)
             If lbx.SelectionMode = SelectionMode.One Then
@@ -1364,6 +1369,7 @@ Public Class MainForm
     Public Sub LoadMedia(sender As Object, e As EventArgs) Handles tmrPicLoad.Tick
         '  If T.IsAlive Then Exit Sub
         Debug.Print("")
+
         ReportTime("PicLoadTick")
         HighlightCurrent(Media.MediaPath) 'Swapper
         fType = Media.MediaType
@@ -1433,18 +1439,18 @@ Public Class MainForm
     ''' <param name="e"></param>
 
     Private Sub tmrJumpVideo_Tick(sender As Object, e As EventArgs) Handles tmrJumpVideo.Tick
-        ReportTime("JumpVideoTick")
-        tmrJumpVideo.Enabled = False
+        'ReportTime("JumpVideoTick")
+        'tmrJumpVideo.Enabled = False
 
 
-        Media.Player.Ctlcontrols.currentPosition = Media.Position
-        'alternateWMP.Ctlcontrols.currentPosition = Media.Position
-        SoundWMP.Ctlcontrols.currentPosition = Media.Position
-        ReportTime("New position given:" & Media.Position)
+        'Media.Player.Ctlcontrols.currentPosition = Media.Position
+        ''alternateWMP.Ctlcontrols.currentPosition = Media.Position
+        'SoundWMP.Ctlcontrols.currentPosition = Media.Position
+        'ReportTime("New position given:" & Media.Position)
 
-        ' Media.Player.Visible = True
-        ReportTime("Made visible")
-        'Media.Player.BringToFront()
+        '' Media.Player.Visible = True
+        'ReportTime("Made visible")
+        ''Media.Player.BringToFront()
 
     End Sub
 
@@ -1535,7 +1541,7 @@ Public Class MainForm
             Text = "Metavisua - " & Media.MediaPath
 
         End If
-
+        Text = Text & " - " & Media.DisplayerName 'TODO remove displayer name for release. 
     End Sub
 
 
@@ -2267,6 +2273,7 @@ Public Class MainForm
         Dim x As New OrphanFinder
         x.OrphanList = s
         x.FindOrphans()
+        UpdatePlayOrder(False)
     End Sub
     Public Sub ReportAction(Msg As String)
         Console.WriteLine(Msg)
@@ -2597,5 +2604,11 @@ Public Class MainForm
 
     Private Sub CreateListFromLinksToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CreateListFromLinksToolStripMenuItem.Click
         ListFromLinks(ListfromListbox(lbxFiles))
+    End Sub
+
+    Private Sub NewIndex_Tick(sender As Object, e As EventArgs) Handles NewIndex.Tick
+
+        IndexHandler(lbxFiles, e)
+        NewIndex.Enabled = False
     End Sub
 End Class

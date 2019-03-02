@@ -1,24 +1,31 @@
 ﻿Public Class StartPointHandler
     Public Enum StartTypes As Byte
-        Beginning
         NearBeginning
-        NearEnd
-        Random
-        ParticularPercentage
         ParticularAbsolute
+        ParticularPercentage
+        Random
+        NearEnd
+        Beginning
     End Enum
 
     Public Event StateChanged(sender As Object, e As EventArgs)
     Public Event StartPointChanged(sender As Object, e As EventArgs)
     Public Event JumpKey()
-    Private mOrder = {"Beginning", "Near Beginning", "Near End", "Random", "Particular(%)", "Particular(s)"}
+    Private mOrder = {
+        "Near Beginning",
+        "Particular(s)",
+        "Particular(%)",
+        "Random",
+        "Near End",
+        "Beginning"
+    }
     Private mDescList As New List(Of String)
     Public Sub New(Optional ByVal StartPercentage As Byte = 50, Optional ByVal StartAbsolute As Byte = 65)
         mState = StartTypes.Beginning
-        mPercentage = 25
+        mPercentage = 40
         mDuration = 100
-        mAbsolute = 65
-        mDistance = 40
+        mAbsolute = 120
+        mDistance = 65
     End Sub
     Public ReadOnly Property Descriptions As List(Of String)
         Get
@@ -67,7 +74,7 @@
                 If value <= Duration Then
                     mAbsolute = value
                     mPercentage = mAbsolute / mDuration * 100
-                    RaiseEvent StartPointChanged(Me, Nothing)
+                    ' RaiseEvent StartPointChanged(Me, Nothing)
                 End If
             End If
         End Set
@@ -81,7 +88,7 @@
             Dim b As Byte = mPercentage
             mPercentage = value
             mAbsolute = mPercentage / 100 * mDuration
-            If b <> mPercentage Then RaiseEvent StartPointChanged(Me, Nothing)
+            'If b <> mPercentage Then RaiseEvent StartPointChanged(Me, Nothing)
         End Set
     End Property
     Private mStartPoint As Long
@@ -90,10 +97,7 @@
             GetStartPoint()
             Return mStartPoint
         End Get
-        '        Set(ByVal value As Long)
-        '  GetStartPoint()
-        '           mStartPoint = value
-        '  End Set
+
     End Property
     Private mState As Byte
     Public Property State() As Byte

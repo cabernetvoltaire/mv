@@ -6,12 +6,14 @@ Public Class MediaHandler
     Public Event StartChanged(ByVal sender As Object, ByVal e As EventArgs)
     Public Event MediaChanged(ByVal sender As Object, ByVal e As EventArgs)
     Public Event SpeedChanged(ByVal sender As Object, ByVal e As EventArgs)
+    Public Event MediaNotFound(ByVal sender As Object, ByVal e As EventArgs)
+
     Private WithEvents ResetPosition As New Timer
     Public WithEvents PositionUpdater As New Timer
     Private DefaultFile As String = "C:\exiftools.exe"
     Public WithEvents StartPoint As New StartPointHandler
     Public WithEvents Speed As New SpeedHandler
-
+    Public DisplayerName As String
     Private mPaused As Boolean
     Private mLoop As Boolean = True
     Private mType As Filetype
@@ -162,16 +164,8 @@ Public Class MediaHandler
     Private mMediaDirectory As String
     Public ReadOnly Property MediaDirectory() As String
         Get
-            'Dim f As New IO.FileInfo(mMediaPath)
-            ' mMediaDirectory = f.Directory.FullName
             Return mMediaDirectory
         End Get
-        'Set(ByVal value As String)
-        '    If value <> mMediaDirectory Then
-        '        mMediaDirectory = value
-        '        RaiseEvent MediaChanged(Me, New EventArgs)
-        '    End If
-        'End Set
     End Property
 
     Private mIsLink As Boolean = False
@@ -282,7 +276,7 @@ Public Class MediaHandler
         End Try
 
     End Function
-    Public Sub MediaJumpToMarker()
+    Public Sub MediaJumpToMarker(Optional ToEnd As Boolean = False)
         If mBookmark > -1 Then
             ' If False Then
             If StartPoint.State = StartPointHandler.StartTypes.ParticularAbsolute Then
@@ -291,15 +285,24 @@ Public Class MediaHandler
                 mPlayPosition = StartPoint.StartPoint
             End If
         Else
-            mPlayPosition = StartPoint.StartPoint
-            'Dim m As New StartPointHandler With {
-            '            .Duration = mDuration,
-            '            .State = StartPointHandler.StartTypes.NearEnd
-            '                        }
-            'mPlayPosition = m.StartPoint
+            If ToEnd Then
+                Dim m As New StartPointHandler With {
+                        .Duration = mDuration,
+                        .State = StartPointHandler.StartTypes.NearEnd
+                                    }
+                mPlayPosition = m.StartPoint
+            Else
+                mPlayPosition = StartPoint.StartPoint
+
+            End If
         End If
-        mPlayer.Ctlcontrols.currentPosition = mPlayPosition
-        Debug.Print("MediaJumpMarker set position to " & mPlayPosition)
+        If mPlayPosition > mDuration Then
+            Report(mPlayPosition & "Over-reach" & mDuration, 2, False)
+        Else
+
+            mPlayer.Ctlcontrols.currentPosition = mPlayPosition
+        End If
+        Debug.Print("MediaJumpMarker set" & mMediaPath & " position to " & mPlayPosition)
     End Sub
     Private Sub LoadMedia()
 
@@ -345,10 +348,13 @@ Public Class MediaHandler
         '    tmrSlideShow.Enabled = True
         '    blnRestartSlideShowFlag = False
         'End If
+        currentPicBox = mPicBox
         MainForm.MovietoPic(img)
+        DisplayerName = mPicBox.Name
     End Sub
 
     Private Sub HandleMovie(URL As String)
+
         Static LastURL As String
         If URL <> LastURL Then
             If mPlayer Is Nothing Then
@@ -360,59 +366,60 @@ Public Class MediaHandler
             GetBookmark()
             MediaJumpToMarker()
         End If
-
+        DisplayerName = mPlayer.Name
     End Sub
 #End Region
 
 #Region "Event Handlers"
     Private Sub PlaystateChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent) Handles mPlayer.PlayStateChange
-        Dim lbl As New Label
-        lbl = MainForm.lblNavigateState
-        Select Case e.newState
+        'Dim lbl As New Label
+        'lbl = MainForm.lblNavigateState
+        'Select Case e.newState
 
-            Case 0 ' Undefined
-                lbl.Text = lbl.Text & vbCrLf & "Undefined"
+        '    Case 0 ' Undefined
+        '        lbl.Text = lbl.Text & vbCrLf & "Undefined"
 
-            Case 1 ' Stopped
-                lbl.Text = lbl.Text & vbCrLf & "Stopped"
+        '    Case 1 ' Stopped
+        '        lbl.Text = lbl.Text & vbCrLf & "Stopped"
 
-            Case 2 ' Paused
-                lbl.Text = lbl.Text & vbCrLf & "Paused"
+        '    Case 2 ' Paused
+        '        lbl.Text = lbl.Text & vbCrLf & "Paused"
 
-            Case 3 ' Playing
-                lbl.Text = lbl.Text & vbCrLf & "Playing"
+        '    Case 3 ' Playing
+        '        lbl.Text = lbl.Text & vbCrLf & "Playing"
 
-            Case 4 ' ScanForward
-                lbl.Text = lbl.Text & vbCrLf & "ScanForward"
+        '    Case 4 ' ScanForward
+        '        lbl.Text = lbl.Text & vbCrLf & "ScanForward"
 
-            Case 5 ' ScanReverse
-                lbl.Text = lbl.Text & vbCrLf & "ScanReverse"
+        '    Case 5 ' ScanReverse
+        '        lbl.Text = lbl.Text & vbCrLf & "ScanReverse"
 
-            Case 6 ' Buffering
-                lbl.Text = lbl.Text & vbCrLf & "Buffering"
+        '    Case 6 ' Buffering
+        '        lbl.Text = lbl.Text & vbCrLf & "Buffering"
 
-            Case 7 ' Waiting
-                lbl.Text = lbl.Text & vbCrLf & "Waiting"
+        '    Case 7 ' Waiting
+        '        lbl.Text = lbl.Text & vbCrLf & "Waiting"
 
-            Case 8 ' MediaEnded
-                lbl.Text = lbl.Text & vbCrLf & "MediaEnded"
+        '    Case 8 ' MediaEnded
+        '        lbl.Text = lbl.Text & vbCrLf & "MediaEnded"
 
-            Case 9 ' Transitioning
-                lbl.Text = lbl.Text & vbCrLf & "Transitioning"
+        '    Case 9 ' Transitioning
+        '        lbl.Text = lbl.Text & vbCrLf & "Transitioning"
 
-            Case 10 ' Ready
-                lbl.Text = lbl.Text & vbCrLf & "Ready"
+        '    Case 10 ' Ready
+        '        lbl.Text = lbl.Text & vbCrLf & "Ready"
 
-            Case 11 ' Reconnecting
-                lbl.Text = lbl.Text & vbCrLf & "Reconnecting"
+        '    Case 11 ' Reconnecting
+        '        lbl.Text = lbl.Text & vbCrLf & "Reconnecting"
 
-            Case 12 ' Last
-                lbl.Text = lbl.Text & vbCrLf & "Last"
+        '    Case 12 ' Last
+        '        lbl.Text = lbl.Text & vbCrLf & "Last"
 
-            Case Else
-                lbl.Text = lbl.Text & vbCrLf & ("Unknown State: " + e.newState.ToString())
+        '    Case Else
+        '        lbl.Text = lbl.Text & vbCrLf & ("Unknown State: " + e.newState.ToString())
 
-        End Select
+        'End Select
+        Debug.Print(e.newState.ToString())
         Select Case e.newState
 
             Case WMPLib.WMPPlayState.wmppsStopped
@@ -423,6 +430,7 @@ Public Class MediaHandler
                 '  If mLoop Then
                 ' mPlayer.Ctlcontrols.play()
                 'End If
+                Debug.Print(mPlayer.URL & ", duration " & mDuration & ", playposition" & mPlayPosition & " STOPPED")
                 If MainForm.tmrAutoTrail.Enabled = False And mPlayer.Equals(Media.Player) Then
                     MainForm.AdvanceFile(True, False)
                 Else
@@ -436,8 +444,9 @@ Public Class MediaHandler
                 PositionUpdater.Enabled = True
                 Duration = mPlayer.currentMedia.duration
                 StartPoint.Duration = mPlayer.currentMedia.duration
+                Report("Duration:" & mDuration & vbCrLf & "Startpoint:" & StartPoint.StartPoint, 2)
                 MediaJumpToMarker()
-                Debug.Print(mPlayer.URL & " unpaused by playstatehandler")
+                Debug.Print(mPlayer.URL & " ` playstatehandler")
                 If mPaused Then
                     mPaused = False
                     Exit Sub

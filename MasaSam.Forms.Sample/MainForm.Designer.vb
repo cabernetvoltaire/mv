@@ -71,6 +71,8 @@ Partial Class MainForm
         Me.lbxShowList = New System.Windows.Forms.ListBox()
         Me.pbxBlanker = New System.Windows.Forms.PictureBox()
         Me.ctrPicAndButtons = New System.Windows.Forms.SplitContainer()
+        Me.PictureBox2 = New System.Windows.Forms.PictureBox()
+        Me.PictureBox3 = New System.Windows.Forms.PictureBox()
         Me.MainWMP4 = New AxWMPLib.AxWindowsMediaPlayer()
         Me.MainWMP3 = New AxWMPLib.AxWindowsMediaPlayer()
         Me.MainWMP2 = New AxWMPLib.AxWindowsMediaPlayer()
@@ -102,7 +104,7 @@ Partial Class MainForm
         Me.lbl1 = New System.Windows.Forms.Label()
         Me.btn1 = New System.Windows.Forms.Button()
         Me.lblAlpha = New System.Windows.Forms.Label()
-        Me.PictureBox2 = New System.Windows.Forms.PictureBox()
+        Me.emblem = New System.Windows.Forms.PictureBox()
         Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
         Me.Label3 = New System.Windows.Forms.Label()
         Me.cbxFilter = New System.Windows.Forms.ComboBox()
@@ -156,6 +158,7 @@ Partial Class MainForm
         Me.ClearCurrentListToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SingleFilePerFolderToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.AddCurrentToShowlistToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.CreateListFromLinksToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SearchFunctionsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SearchToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.RegexSearchToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -220,7 +223,7 @@ Partial Class MainForm
         Me.PositionUpdater = New System.Windows.Forms.Timer(Me.components)
         Me.tmrMovieSlideShow = New System.Windows.Forms.Timer(Me.components)
         Me.BackgroundWorker1 = New System.ComponentModel.BackgroundWorker()
-        Me.CreateListFromLinksToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.NewIndex = New System.Windows.Forms.Timer(Me.components)
         Me.StatusStrip1.SuspendLayout()
         Me.TableLayoutPanel2.SuspendLayout()
         CType(Me.ctrMainFrame, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -240,6 +243,8 @@ Partial Class MainForm
         Me.ctrPicAndButtons.Panel1.SuspendLayout()
         Me.ctrPicAndButtons.Panel2.SuspendLayout()
         Me.ctrPicAndButtons.SuspendLayout()
+        CType(Me.PictureBox2, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.PictureBox3, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.MainWMP4, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.MainWMP3, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.MainWMP2, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -254,7 +259,7 @@ Partial Class MainForm
         Me.Panel3.SuspendLayout()
         Me.Panel2.SuspendLayout()
         Me.Panel1.SuspendLayout()
-        CType(Me.PictureBox2, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.emblem, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.FlowLayoutPanel1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         CType(Me.tbAbsolute, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -645,6 +650,8 @@ Partial Class MainForm
         'ctrPicAndButtons.Panel1
         '
         Me.ctrPicAndButtons.Panel1.BackColor = System.Drawing.Color.Black
+        Me.ctrPicAndButtons.Panel1.Controls.Add(Me.PictureBox2)
+        Me.ctrPicAndButtons.Panel1.Controls.Add(Me.PictureBox3)
         Me.ctrPicAndButtons.Panel1.Controls.Add(Me.MainWMP4)
         Me.ctrPicAndButtons.Panel1.Controls.Add(Me.MainWMP3)
         Me.ctrPicAndButtons.Panel1.Controls.Add(Me.MainWMP2)
@@ -662,6 +669,28 @@ Partial Class MainForm
         Me.ctrPicAndButtons.TabIndex = 6
         Me.ctrPicAndButtons.TabStop = False
         '
+        'PictureBox2
+        '
+        Me.PictureBox2.BackColor = System.Drawing.Color.Black
+        Me.PictureBox2.Location = New System.Drawing.Point(1511, 140)
+        Me.PictureBox2.Margin = New System.Windows.Forms.Padding(4)
+        Me.PictureBox2.Name = "PictureBox2"
+        Me.PictureBox2.Size = New System.Drawing.Size(400, 400)
+        Me.PictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
+        Me.PictureBox2.TabIndex = 8
+        Me.PictureBox2.TabStop = False
+        '
+        'PictureBox3
+        '
+        Me.PictureBox3.BackColor = System.Drawing.Color.Black
+        Me.PictureBox3.Location = New System.Drawing.Point(8, 8)
+        Me.PictureBox3.Margin = New System.Windows.Forms.Padding(4)
+        Me.PictureBox3.Name = "PictureBox3"
+        Me.PictureBox3.Size = New System.Drawing.Size(400, 400)
+        Me.PictureBox3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
+        Me.PictureBox3.TabIndex = 7
+        Me.PictureBox3.TabStop = False
+        '
         'MainWMP4
         '
         Me.MainWMP4.Enabled = True
@@ -676,7 +705,7 @@ Partial Class MainForm
         'MainWMP3
         '
         Me.MainWMP3.Enabled = True
-        Me.MainWMP3.Location = New System.Drawing.Point(609, 150)
+        Me.MainWMP3.Location = New System.Drawing.Point(409, 430)
         Me.MainWMP3.Margin = New System.Windows.Forms.Padding(4)
         Me.MainWMP3.Name = "MainWMP3"
         Me.MainWMP3.OcxState = CType(resources.GetObject("MainWMP3.OcxState"), System.Windows.Forms.AxHost.State)
@@ -742,7 +771,7 @@ Partial Class MainForm
         Me.btnRow.Controls.Add(Me.Panel2, 2, 0)
         Me.btnRow.Controls.Add(Me.Panel1, 1, 0)
         Me.btnRow.Controls.Add(Me.lblAlpha, 5, 0)
-        Me.btnRow.Controls.Add(Me.PictureBox2, 0, 0)
+        Me.btnRow.Controls.Add(Me.emblem, 0, 0)
         Me.btnRow.Dock = System.Windows.Forms.DockStyle.Fill
         Me.btnRow.Location = New System.Drawing.Point(0, 0)
         Me.btnRow.Margin = New System.Windows.Forms.Padding(4)
@@ -1031,17 +1060,16 @@ Partial Class MainForm
         Me.lblAlpha.Text = "A"
         Me.lblAlpha.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         '
-        'PictureBox2
+        'emblem
         '
-        Me.PictureBox2.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.PictureBox2.Image = Global.MasaSam.Forms.Sample.My.Resources.Resources.Untitled_1_copy1
-        Me.PictureBox2.Location = New System.Drawing.Point(4, 4)
-        Me.PictureBox2.Margin = New System.Windows.Forms.Padding(4)
-        Me.PictureBox2.Name = "PictureBox2"
-        Me.PictureBox2.Size = New System.Drawing.Size(275, 145)
-        Me.PictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
-        Me.PictureBox2.TabIndex = 12
-        Me.PictureBox2.TabStop = False
+        Me.emblem.Image = Global.MasaSam.Forms.Sample.My.Resources.Resources.Untitled_1_copy1
+        Me.emblem.Location = New System.Drawing.Point(4, 4)
+        Me.emblem.Margin = New System.Windows.Forms.Padding(4)
+        Me.emblem.Name = "emblem"
+        Me.emblem.Size = New System.Drawing.Size(275, 145)
+        Me.emblem.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
+        Me.emblem.TabIndex = 12
+        Me.emblem.TabStop = False
         '
         'FlowLayoutPanel1
         '
@@ -1455,6 +1483,12 @@ Partial Class MainForm
         Me.AddCurrentToShowlistToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.F), System.Windows.Forms.Keys)
         Me.AddCurrentToShowlistToolStripMenuItem.Size = New System.Drawing.Size(486, 34)
         Me.AddCurrentToShowlistToolStripMenuItem.Text = "Add current file to showlist"
+        '
+        'CreateListFromLinksToolStripMenuItem
+        '
+        Me.CreateListFromLinksToolStripMenuItem.Name = "CreateListFromLinksToolStripMenuItem"
+        Me.CreateListFromLinksToolStripMenuItem.Size = New System.Drawing.Size(486, 34)
+        Me.CreateListFromLinksToolStripMenuItem.Text = "Create list from links"
         '
         'SearchFunctionsToolStripMenuItem
         '
@@ -1887,12 +1921,6 @@ Partial Class MainForm
         '
         Me.tmrMovieSlideShow.Interval = 2000
         '
-        'CreateListFromLinksToolStripMenuItem
-        '
-        Me.CreateListFromLinksToolStripMenuItem.Name = "CreateListFromLinksToolStripMenuItem"
-        Me.CreateListFromLinksToolStripMenuItem.Size = New System.Drawing.Size(486, 34)
-        Me.CreateListFromLinksToolStripMenuItem.Text = "Create list from links"
-        '
         'MainForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(11.0!, 24.0!)
@@ -1929,6 +1957,8 @@ Partial Class MainForm
         Me.ctrPicAndButtons.Panel2.ResumeLayout(False)
         CType(Me.ctrPicAndButtons, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ctrPicAndButtons.ResumeLayout(False)
+        CType(Me.PictureBox2, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.PictureBox3, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.MainWMP4, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.MainWMP3, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.MainWMP2, System.ComponentModel.ISupportInitialize).EndInit()
@@ -1951,7 +1981,7 @@ Partial Class MainForm
         Me.Panel2.PerformLayout()
         Me.Panel1.ResumeLayout(False)
         Me.Panel1.PerformLayout()
-        CType(Me.PictureBox2, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.emblem, System.ComponentModel.ISupportInitialize).EndInit()
         Me.FlowLayoutPanel1.ResumeLayout(False)
         Me.FlowLayoutPanel1.PerformLayout()
         Me.GroupBox2.ResumeLayout(False)
@@ -2063,7 +2093,7 @@ Partial Class MainForm
     Friend WithEvents tmrPumpFiles As Timer
     Friend WithEvents tmrAutoTrail As Timer
     Friend WithEvents ColorDialog1 As ColorDialog
-    Friend WithEvents PictureBox2 As PictureBox
+    Friend WithEvents emblem As PictureBox
     Friend WithEvents tsslPicState As ToolStripStatusLabel
     Friend WithEvents tbState As ToolStripStatusLabel
     Friend WithEvents SoundWMP As AxWMPLib.AxWindowsMediaPlayer
@@ -2169,4 +2199,7 @@ Partial Class MainForm
     Friend WithEvents ByLinkFolderToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents MainWMP4 As AxWMPLib.AxWindowsMediaPlayer
     Friend WithEvents CreateListFromLinksToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents PictureBox3 As PictureBox
+    Friend WithEvents PictureBox2 As PictureBox
+    Friend WithEvents NewIndex As Timer
 End Class

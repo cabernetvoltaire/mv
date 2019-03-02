@@ -14,7 +14,7 @@ Module FileHandling
     Public Event FolderMoved(Path As String)
     Public Event FileMoved(Files As List(Of String), lbx As ListBox)
     Public t As Thread
-    Public WithEvents MSFiles As New MediaSwapper(MainForm.MainWMP4, MainForm.MainWMP2, MainForm.MainWMP3)
+    Public WithEvents MSFiles As New MediaSwapper(MainForm.MainWMP4, MainForm.MainWMP2, MainForm.MainWMP3, MainForm.PictureBox1, MainForm.PictureBox2, MainForm.PictureBox3)
     '   Public WithEvents MSShow As New MovieSwapper(MainForm.MainWMP, MainForm.MainWMP2)
 
     Public WithEvents Media As New MediaHandler("Media")
@@ -45,9 +45,28 @@ Module FileHandling
         Debug.Print(M.StartPoint.Duration & " Duration")
         Debug.Print("")
     End Sub
-    Public Sub OnfileMoved(f As List(Of String), lbx As ListBox)
-        MainForm.OnFileMoved(f, lbx)
+    Public Sub OnFileMoved(files As List(Of String), lbx1 As ListBox)
+        '   Exit Sub
+        lbx1.SelectionMode = SelectionMode.One
+        Dim ind As Long = lbx1.SelectedIndex
+        For Each f In files
+            Select Case NavigateMoveState.State
+                Case StateHandler.StateOptions.Copy, StateHandler.StateOptions.CopyLink
+                    'lbx1.SelectedIndex = (lbx1.SelectedIndex + 1) Mod (lbx1.Items.Count - 1) 'Signal action completed by advancing
+                Case StateHandler.StateOptions.MoveLeavingLink
+                    MainForm.UpdatePlayOrder(False)
+                    lbx1.SelectedItem = lbx1.Items(ind)
+                Case Else
+                    lbx1.Items.Remove(f)
+            End Select
+            MSFiles.ResettersOff()
+            MSFiles.ListIndex = lbx1.SelectedIndex
+        Next
+        If lbx1.Items.Count <> 0 Then lbx1.SetSelected(Math.Max(Math.Min(ind, lbx1.Items.Count - 1), 0), True)
     End Sub
+    'Public Sub OnfileMoved(f As List(Of String), lbx As ListBox)
+    '    MainForm.OnFileMoved(f, lbx)
+    'End Sub
 
     Dim strFilterExtensions(6) As String
     Public Sub AssignExtensionFilters()
@@ -112,11 +131,11 @@ Module FileHandling
         Return lst
     End Function
 
-    Public Function FilterListBoxList(e As DirectoryInfo, ByVal lst As List(Of String))
-        lst = FilterLBList(e, lst)
-        Exit Function
+    'Public Function FilterListBoxList(e As DirectoryInfo, ByVal lst As List(Of String))
+    '    lst = FilterLBList(e, lst)
+    '    '    Exit Function
 
-    End Function
+    'End Function
 
 
 
@@ -204,7 +223,7 @@ Module FileHandling
             flist.Add(f.FullName)
         Next
         blnSuppressCreate = True
-        MoveFiles(flist, TargetDir.FullName & "\" & SourceDir.Name, Listbox)
+        MoveFiles(flist, TargetDir.FullName & "\" & SourceDir.Name, Listbox, True)
 
     End Sub
 
@@ -267,7 +286,7 @@ Module FileHandling
     ''' <param name="files"></param>
     ''' <param name="strDest"></param>
     ''' <param name="lbx1"></param>
-    Public Sub MoveFiles(files As List(Of String), strDest As String, lbx1 As ListBox)
+    Public Sub MoveFiles(files As List(Of String), strDest As String, lbx1 As ListBox, Optional Folder As Boolean = False)
 
 
         Dim s As String = strDest 'if strDest is empty then delete
@@ -287,8 +306,12 @@ Module FileHandling
         t.SetApartmentState(ApartmentState.STA)
         t.Start()
 
+        If Folder Then
+        Else
+            RaiseEvent FileMoved(files, lbx1)
+        End If
+
         'Deal with the list box
-        RaiseEvent FileMoved(files, lbx1)
 
 
     End Sub
@@ -337,9 +360,12 @@ Module FileHandling
                             Dim f As New IO.FileInfo(m.FullName)
                             fm.DestinationPath = spath
                             fm.CheckFile(f)
-                            m.MoveTo(spath)
-                            '    Movelink(f, spath)
+                            Try
+                                m.MoveTo(spath)
 
+                            Catch ex As Exception
+                                MsgBox(ex.Message)
+                            End Try
                         End If
                     Case StateHandler.StateOptions.MoveLeavingLink
                         'Move, and place link here
