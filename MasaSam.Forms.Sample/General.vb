@@ -93,6 +93,8 @@ Public Module General
     Public Sub CreateLink(Filepath As String, DestinationDirectory As String, Name As String, Optional Update As Boolean = True, Optional Bookmark As Long = -1)
         Dim sh As New ShortcutHandler
         Dim f As New FileInfo(Filepath)
+        Dim dt As Date = f.CreationTime
+
         'sh.Bookmark = Media.Position
 
         sh.TargetPath = Filepath
@@ -103,6 +105,7 @@ Public Module General
             sh.ShortcutName = Name
         End If
         sh.Create_ShortCut(Bookmark)
+
         If DestinationDirectory = Media.MediaDirectory And Update Then MainForm.UpdatePlayOrder(False)
     End Sub
 

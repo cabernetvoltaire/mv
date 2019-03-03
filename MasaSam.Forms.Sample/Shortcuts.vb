@@ -9,6 +9,7 @@ Module Shortcuts
             Dim ShortCutName As String = ""
 
         End Sub
+        Public ShortcutDate As Date
         Public PlaybackOffset As Long = 0
         Public MarkOffset As Long = 1
         Public Sub New(TargetPath, ShortCutPath, shortCutName)
@@ -50,7 +51,10 @@ Module Shortcuts
             End Get
             Set(ByVal value As String)
                 Dim m() As String = value.Split("%")
-                mBookmark = m(1)
+                If m.Length > 1 Then
+                    mBookmark = m(1)
+
+                End If
                 sShortcutName = value
             End Set
         End Property

@@ -37,7 +37,7 @@ Public Class FolderSelect
     End Property
     Public Property Button As Button
     Private Sub PlayMedia(value As String)
-        Exit Sub
+        ''  Exit Sub
         Dim x As New IO.DirectoryInfo(value)
         Dim count As Integer = x.GetFiles.Count
         If count = 0 Then
@@ -51,16 +51,28 @@ Public Class FolderSelect
             f = x.GetFiles.ToArray(i)
             ' med.Bookmark = med.Duration * Rnd()
             PreMH.Player = PreviewWMP
+            PreMH.Picture = PictureBox1
+            PreMH.StartPoint.State = StartPointHandler.StartTypes.ParticularPercentage
             PreMH.MediaPath = f.FullName
             If PreMH.MediaType = Filetype.Movie Or PreMH.MediaType = Filetype.Pic Then
 
                 If f.Exists Then
-                    PreviewWMP.URL = f.FullName
-                    PreviewWMP.settings.mute = True
-                    PreviewWMP.uiMode = "none"
-                    PreviewWMP.stretchToFit = True
-                    'PreviewWMP.Visible = True
-                    PreviewWMP.Ctlcontrols.play()
+                    '                    PreMH.MediaPath
+                    Select Case PreMH.MediaType
+                        Case Filetype.Movie
+                            SplitContainer1.Panel2Collapsed = True
+                            SplitContainer1.Panel1Collapsed = False
+                            'PreviewWMP.URL = f.FullName
+                            'PreviewWMP.settings.mute = True
+                            'PreviewWMP.uiMode = "none"
+                            'PreviewWMP.stretchToFit = True
+                            ''PreviewWMP.Visible = True
+                            'PreviewWMP.Ctlcontrols.play()
+                        Case Filetype.Pic
+                            SplitContainer1.Panel1Collapsed = True
+                            SplitContainer1.Panel2Collapsed = False
+
+                    End Select
                 End If
             End If
 
@@ -104,7 +116,7 @@ Public Class FolderSelect
     End Sub
 
     Private Sub FolderSelect_MouseLeave(sender As Object, e As EventArgs) Handles Me.MouseLeave
-        'Me.Close()
+        Me.Close()
     End Sub
 
     Private Sub fst1_DirectorySelected(sender As Object, e As DirectoryInfoEventArgs) Handles fst1.DirectorySelected

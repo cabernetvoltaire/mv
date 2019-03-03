@@ -60,7 +60,10 @@ Module FileHandling
                     lbx1.Items.Remove(f)
             End Select
             MSFiles.ResettersOff()
-            MSFiles.ListIndex = lbx1.SelectedIndex
+            If lbx1.Items.Count > 0 Then
+                MSFiles.ListIndex = lbx1.SelectedIndex
+            End If
+
         Next
         If lbx1.Items.Count <> 0 Then lbx1.SetSelected(Math.Max(Math.Min(ind, lbx1.Items.Count - 1), 0), True)
     End Sub

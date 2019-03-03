@@ -47,19 +47,21 @@ Module ButtonHandling
 
 
         Dim index As Byte = Val(sender.Name.ToString(3))
+        FolderSelect.ButtonNumber = index
+        FolderSelect.Alpha = iCurrentAlpha
         FolderSelect.Show()
         Dim s As String = buttons.CurrentRow.Row(index - 1).Path
         If s = "" Then s = Media.MediaDirectory
         FolderSelect.Folder = s
         '        x.Show()
-        'Dim control As Control = CType(sender, Control)
+        Dim control As Control = CType(sender, Control)
 
-        'Dim startpoint As Point
-        'startpoint.X = control.Left
-        'startpoint.Y = control.Top
-        'startpoint = control.PointToScreen(startpoint)
-        'FolderSelect.Left = startpoint.X - FolderSelect.Width / 2
-        'FolderSelect.Top = startpoint.Y - FolderSelect.Height
+        Dim startpoint As Point
+        startpoint.X = control.Left
+        startpoint.Y = control.Top
+        startpoint = control.PointToScreen(startpoint)
+        FolderSelect.Left = startpoint.X - FolderSelect.Width / 2
+        FolderSelect.Top = startpoint.Y - FolderSelect.Height
 
     End Sub
 

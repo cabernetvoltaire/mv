@@ -1366,7 +1366,7 @@ Public Class MainForm
         ' ToolStripButton3_Click(Me, e)
         tmrInitialise.Enabled = False
     End Sub
-    Public Sub LoadMedia(sender As Object, e As EventArgs) Handles tmrPicLoad.Tick
+    Public Sub LoadMedia(sender As Object, e As EventArgs) Handles tmrPicLoad.Tick 'TODO Only used for first loads. 
         '  If T.IsAlive Then Exit Sub
         Debug.Print("")
 
@@ -1395,7 +1395,6 @@ Public Class MainForm
                 If Media.IsLink Then
                     HandlePic(Media.LinkPath)
                 Else
-
                     HandlePic(Media.MediaPath)
                 End If
 
@@ -1438,33 +1437,10 @@ Public Class MainForm
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
 
-    Private Sub tmrJumpVideo_Tick(sender As Object, e As EventArgs) Handles tmrJumpVideo.Tick
-        'ReportTime("JumpVideoTick")
-        'tmrJumpVideo.Enabled = False
-
-
-        'Media.Player.Ctlcontrols.currentPosition = Media.Position
-        ''alternateWMP.Ctlcontrols.currentPosition = Media.Position
-        'SoundWMP.Ctlcontrols.currentPosition = Media.Position
-        'ReportTime("New position given:" & Media.Position)
-
-        '' Media.Player.Visible = True
-        'ReportTime("Made visible")
-        ''Media.Player.BringToFront()
-
-    End Sub
-
-    'Public Sub JumpVideo(wmp As AxWindowsMediaPlayer, swmp As AxWindowsMediaPlayer)
-    '    tmrJumpVideo.Enabled = True
-    '    Exit Sub
-    '    wmp.Ctlcontrols.currentPosition = Media.Startpoint.StartPoint
-    '    swmp.Ctlcontrols.currentPosition = Media.Startpoint.StartPoint
-
-    'End Sub
 
 
     Private Sub btn1_MouseDown(sender As Object, e As MouseEventArgs) Handles btn8.MouseDown, btn7.MouseDown, btn6.MouseDown, btn5.MouseDown, btn4.MouseDown, btn3.MouseDown, btn2.MouseDown, btn1.MouseDown
-        Exit Sub
+        ' Exit Sub
         Dim button As Button = sender
         Dim i As Integer = Val(button.Name(3)) - 1
 
@@ -2272,7 +2248,11 @@ Public Class MainForm
         s = DeadLinksSelect()
         Dim x As New OrphanFinder
         x.OrphanList = s
-        x.FindOrphans()
+        Dim d As New IO.DirectoryInfo("Q:\Watch")
+        For Each di In d.EnumerateDirectories("*")
+            x.FindOrphans(di.FullName)
+
+        Next
         UpdatePlayOrder(False)
     End Sub
     Public Sub ReportAction(Msg As String)
@@ -2610,5 +2590,13 @@ Public Class MainForm
 
         IndexHandler(lbxFiles, e)
         NewIndex.Enabled = False
+    End Sub
+
+    Private Sub btn1_MouseEnter(sender As Object, e As EventArgs) Handles btn1.MouseEnter
+
+    End Sub
+
+    Private Sub MainForm_MouseHover(sender As Object, e As EventArgs) Handles Me.MouseHover
+        FolderSelect.Hide()
     End Sub
 End Class

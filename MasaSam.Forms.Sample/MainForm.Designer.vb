@@ -1921,6 +1921,9 @@ Partial Class MainForm
         '
         Me.tmrMovieSlideShow.Interval = 2000
         '
+        'NewIndex
+        '
+        '
         'MainForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(11.0!, 24.0!)
