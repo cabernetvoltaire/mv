@@ -34,6 +34,7 @@ Public Class MainForm
 
 
     Public Sub OnFolderMoved(ByVal path As String)
+        '  tvMain2.RefreshTree(tvMain2.SelectedFolder)
         tvMain2.RemoveNode(path)
         'Dim dir As New IO.DirectoryInfo(path)
         'Dir.Delete()
@@ -296,7 +297,7 @@ Public Class MainForm
     End Sub
 
     Public Sub CancelDisplay()
-        MSFiles.URLSZero()
+        'MSFiles.URLSZero()
         MSFiles.ResettersOff()
 
         If Media.Player.Visible Then
@@ -714,8 +715,15 @@ Public Class MainForm
 
 
                     End If
+
                     Dim m As List(Of String) = ListfromListbox(lbx)
-                    MoveFiles(m, "", lbx)
+                    If NavigateMoveState.State = StateHandler.StateOptions.Move Then
+                        MoveFiles(m, "", lbx)
+                    Else
+                        For Each k In m
+                            lbx.Items.Remove(k)
+                        Next
+                    End If
                 End If
 #End Region
 
@@ -1027,7 +1035,7 @@ Public Class MainForm
         If Not MasterContainer.Panel2Collapsed Then 'Showlist is visible
             'Select in the showlist unless CTRL held
             If PFocus = CtrlFocus.ShowList AndAlso Not CtrlDown Then
-                '    If lbxShowList.FindString(strPath) <> -1 Then lbxShowList.SelectedIndex = lbxShowList.FindString(strPath)
+                If lbxShowList.FindString(strPath) <> -1 Then lbxShowList.SelectedIndex = lbxShowList.FindString(strPath)
             End If
         End If
 
@@ -1205,14 +1213,14 @@ Public Class MainForm
 
     End Sub
 
-    Private Sub Listbox_SelectedIndexChanged(sender As Object, e As EventArgs) Handles lbxShowList.SelectedIndexChanged, lbxFiles.SelectedIndexChanged 'TODO Swapper
+    Private Sub Listbox_SelectedIndexChanged(sender As Object, e As EventArgs) 'Handles lbxShowList.SelectedIndexChanged, lbxFiles.SelectedIndexChanged 'TODO Swapper
         NewIndex.Enabled = False
 
         NewIndex.Interval = 10
         NewIndex.Enabled = True
 
     End Sub
-    Private Sub IndexHandler(sender As Object, e As EventArgs) 'Handles lbxShowList.SelectedIndexChanged, lbxFiles.SelectedIndexChanged 'TODO Swapper
+    Private Sub IndexHandler(sender As Object, e As EventArgs) Handles lbxShowList.SelectedIndexChanged, lbxFiles.SelectedIndexChanged 'TODO Swapper
         With sender
             Dim lbx As ListBox = CType(sender, ListBox)
             If lbx.SelectionMode = SelectionMode.One Then
@@ -1222,7 +1230,7 @@ Public Class MainForm
                     Debug.Print(vbCrLf & vbCrLf & "NEXT SELECTION ---------------------------------------")
                     MSFiles.Listbox = sender
                     MSFiles.ListIndex = i
-                    If sender.Equals(lbxShowList) Then HighlightCurrent(lbxFiles.SelectedItem)
+                    'If sender.Equals(lbxShowList) Then HighlightCurrent(lbxFiles.SelectedItem)
                 End If
             End If
         End With
@@ -2026,7 +2034,7 @@ Public Class MainForm
     Public Sub HandleFunctionKeyDown(sender As Object, e As KeyEventArgs)
         Dim i As Byte = e.KeyCode - Keys.F5
         Dim s As StateHandler.StateOptions = NavigateMoveState.State
-        CancelDisplay() 'Need to cancel display to prevent 'already in use' problems when moving files or deleting them. 
+        '  CancelDisplay() 'Need to cancel display to prevent 'already in use' problems when moving files or deleting them. 
         If (e.Shift And e.Control And e.Alt) Or strVisibleButtons(i) = "" Then
             'Assign button
             AssignButton(i, iCurrentAlpha, 1, Media.MediaDirectory, True) 'Just assign in all modes when all three control buttons held
@@ -2054,7 +2062,7 @@ Public Class MainForm
 
                 End If
             ElseIf e.Shift Then
-                MovingFolder(strVisibleButtons(i))
+                MovingFolder(tvMain2.SelectedFolder, strVisibleButtons(i))
             Else
 
                 If lbxShowList.Visible Then
@@ -2066,7 +2074,7 @@ Public Class MainForm
         Else
             'Navigate behaviour
             If e.Shift And e.Control And strVisibleButtons(i) <> "" Then
-                MovingFolder(strVisibleButtons(i))
+                MovingFolder(tvMain2.SelectedFolder, strVisibleButtons(i))
 
             ElseIf e.Shift Then
                 MoveFiles(ListfromListbox(lbxFiles), strVisibleButtons(i), lbxFiles)
@@ -2088,15 +2096,15 @@ Public Class MainForm
 
     End Sub
 
-    Private Sub MovingFolder(strdest As String)
+    Private Sub MovingFolder(Source As String, Dest As String)
 
-        T = New Thread(New ThreadStart(Sub() MoveFolder(Media.MediaDirectory, strdest)))
+        T = New Thread(New ThreadStart(Sub() MoveFolder(Source, Dest)))
         T.IsBackground = True
         T.SetApartmentState(ApartmentState.STA)
 
         T.Start()
 
-        OnFolderMoved(Media.MediaDirectory)
+        OnFolderMoved(Source)
 
     End Sub
 
@@ -2371,7 +2379,9 @@ Public Class MainForm
         'FillListbox(lbxFiles, New DirectoryInfo(Media.MediaDirectory), Random.OnDirChange)
         tmrUpdateFileList.Enabled = False
     End Sub
-
+    Private Sub ChangedTree() Handles tvMain2.DirectorySelected
+        ChangeFolder(tvMain2.SelectedFolder)
+    End Sub
     Private Sub lbxFiles_MouseDown(sender As Object, e As MouseEventArgs) Handles lbxFiles.MouseDown
 
     End Sub

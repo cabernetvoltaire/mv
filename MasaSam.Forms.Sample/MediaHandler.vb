@@ -423,7 +423,7 @@ Public Class MediaHandler
         Select Case e.newState
 
             Case WMPLib.WMPPlayState.wmppsStopped
-                'reportStartpoint(Me)
+                mPlayer.Ctlcontrols.play()
 
             Case WMPLib.WMPPlayState.wmppsMediaEnded
                 'Debug.Print("Ended:" & StartPoint.StartPoint & " " & StartPoint.Duration)
@@ -498,6 +498,16 @@ Public Class MediaHandler
     End Sub
     Public Sub PlaceResetter(ResetOn As Boolean)
         ResetPosition.Enabled = ResetOn
+        Exit Sub
+        If ResetOn Then
+            MediaJumpToMarker()
+            mPlayer.Ctlcontrols.pause()
+        Else
+            mPlayer.Ctlcontrols.play()
+
+
+        End If
+
     End Sub
 
 

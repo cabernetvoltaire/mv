@@ -17,6 +17,7 @@ Public Module General
     Public VIDEOEXTENSIONS = ".divx.vob.webm.avi.flv.mov.m4p.mpeg.f4v.mpg.m4a.m4v.mkv.mp4.rm.ram.wmv.wav.mp3.3gp .lnk"
     Public PICEXTENSIONS = "arw.jpeg.png.jpg.bmp.gif.lnk"
     Public separate As Boolean = False
+    Public CurrentFolder As String
     Public Enum CtrlFocus As Byte
         Tree = 0
         Files = 1
@@ -360,16 +361,16 @@ Public Module General
         MainForm.lblNavigateState.Text = s
     End Sub
     Public Sub ChangeFolder(strPath As String)
-        If strPath = Media.MediaDirectory Then
+        If strPath = CurrentFolder Then
         Else
-            If Not LastFolder.Contains(Media.MediaDirectory) Then
-                LastFolder.Push(Media.MediaDirectory)
+            If Not LastFolder.Contains(CurrentFolder) Then
+                LastFolder.Push(CurrentFolder)
 
             End If
             MainForm.FNG.Clear()
-            MainForm.tvMain2.SelectedFolder = strPath
+            ' MainForm.tvMain2.SelectedFolder = strPath
             ChangeWatcherPath(strPath)
-
+            CurrentFolder = strPath
             ReDim FBCShown(0)
             NofShown = 0
             '   My.Computer.Registry.CurrentUser.SetValue("File", Media.MediaPath)

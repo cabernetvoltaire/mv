@@ -58,14 +58,16 @@ Module FileHandling
                     lbx1.SelectedItem = lbx1.Items(ind)
                 Case Else
                     lbx1.Items.Remove(f)
+                    'MSFiles.Listbox=lbx1
             End Select
             MSFiles.ResettersOff()
             If lbx1.Items.Count > 0 Then
-                MSFiles.ListIndex = lbx1.SelectedIndex
+
             End If
 
         Next
         If lbx1.Items.Count <> 0 Then lbx1.SetSelected(Math.Max(Math.Min(ind, lbx1.Items.Count - 1), 0), True)
+        MSFiles.ListIndex = lbx1.SelectedIndex
     End Sub
     'Public Sub OnfileMoved(f As List(Of String), lbx As ListBox)
     '    MainForm.OnFileMoved(f, lbx)
@@ -219,14 +221,33 @@ Module FileHandling
     Public Sub MoveFolderNew(Dir As String, Dest As String)
         Dim TargetDir As New DirectoryInfo(Dest)
         Dim SourceDir As New DirectoryInfo(Dir)
+        'Make target subdirectories.
+        MoveDirectoryContents(TargetDir, SourceDir, SourceDir, True)
+        For Each d In SourceDir.EnumerateDirectories("*", SearchOption.AllDirectories)
+            MoveDirectoryContents(TargetDir, SourceDir, d, True)
+        Next
+        '        My.Computer.FileSystem.CreateDirectory(TargetDir.FullName & "\" & SourceDir.Name)
 
-        My.Computer.FileSystem.CreateDirectory(TargetDir.FullName & "\" & SourceDir.Name)
+    End Sub
+
+    Private Sub MoveDirectoryContents(TargetDir As DirectoryInfo, SourceDir As DirectoryInfo, d As DirectoryInfo, Optional Parent As Boolean = False)
         Dim flist As New List(Of String)
-        For Each f In SourceDir.GetFiles
+        Dim newpath As String = d.FullName
+        If Parent Then
+            newpath = newpath.Replace(SourceDir.Parent.FullName, TargetDir.FullName)
+        Else
+            newpath = newpath.Replace(SourceDir.FullName, TargetDir.FullName)
+
+        End If
+        Dim NewDir As New DirectoryInfo(newpath)
+        If NewDir.Exists = False Then
+            NewDir.Create()
+        End If
+        For Each f In d.EnumerateFiles("*", SearchOption.TopDirectoryOnly)
             flist.Add(f.FullName)
         Next
         blnSuppressCreate = True
-        MoveFiles(flist, TargetDir.FullName & "\" & SourceDir.Name, Listbox, True)
+        MoveFiles(flist, newpath, Listbox, True)
 
     End Sub
 
@@ -310,6 +331,7 @@ Module FileHandling
         t.Start()
 
         If Folder Then
+
         Else
             RaiseEvent FileMoved(files, lbx1)
         End If
@@ -359,6 +381,7 @@ Module FileHandling
                         If Not currentPicBox.Image Is Nothing Then DisposePic(currentPicBox)
                         If strDest = "" Then
                             Deletefile(m.FullName)
+                            fm.DeleteFavourite(m.FullName)
                         Else
                             Dim f As New IO.FileInfo(m.FullName)
                             fm.DestinationPath = spath
@@ -376,12 +399,12 @@ Module FileHandling
                         fm.DestinationPath = spath
                         fm.CheckFile(f)
                         m.MoveTo(spath)
-                        CreateLink(m.FullName, Media.MediaDirectory, f.Name)
+                        CreateLink(m.FullName, Media.MediaDirectory, f.Name, Bookmark:=Media.Position)
 
                     Case StateHandler.StateOptions.CopyLink
                         'Paste a link in destination
                         Dim fpath As New FileInfo(spath)
-                        CreateLink(m.FullName, fpath.Directory.FullName, m.Name)
+                        CreateLink(m.FullName, fpath.Directory.FullName, m.Name, Bookmark:=Media.Position)
                     Case StateHandler.StateOptions.ExchangeLink
                         'Only works on links
                         Dim sh As New ShortcutHandler
@@ -390,12 +413,25 @@ Module FileHandling
                             Dim f As New IO.FileInfo(LinkTarget(m.FullName))
                             spath = f.FullName
                             f.MoveTo(Media.MediaDirectory & "\" & f.Name)
-                            CreateLink(f.FullName, New FileInfo(spath).Directory.FullName, m.Name)
+                            CreateLink(f.FullName, New FileInfo(spath).Directory.FullName, m.Name, Media.Bookmark)
                             m.Delete()
                         End If
-                        'Move link target here. 
-                        'Create link to this file in link target directory
-                        'Delite this link
+                    Case StateHandler.StateOptions.MoveOriginal
+                        'Only works on links
+                        Dim sh As New ShortcutHandler
+
+                        If m.Extension = ".lnk" Then
+                            Dim f As New IO.FileInfo(LinkTarget(m.FullName))
+                            ' spath = f.FullName
+                            strDest = strDest & "\" & f.Name
+                            Try
+                                f.MoveTo(strDest)
+
+                            Catch ex As IO.IOException
+                                MsgBox("File already exists in destination")
+                            End Try
+                        End If
+
 
 
                 End Select

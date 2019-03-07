@@ -51,6 +51,7 @@ Public Class FolderSelect
             f = x.GetFiles.ToArray(i)
             ' med.Bookmark = med.Duration * Rnd()
             PreMH.Player = PreviewWMP
+            PreMH.Player.settings.mute = True
             PreMH.Picture = PictureBox1
             PreMH.StartPoint.State = StartPointHandler.StartTypes.ParticularPercentage
             PreMH.MediaPath = f.FullName
@@ -110,6 +111,10 @@ Public Class FolderSelect
         If Not My.Computer.FileSystem.DirectoryExists(Folder) Then
             CreateNewDirectory(fst1, Folder, False)
         End If
+        PreMH.Player.URL = ""
+        PreMH.Player.Dispose()
+        PreMH.Picture.Dispose()
+        GC.Collect()
     End Sub
     Private Sub fst1_Paint(sender As Object, e As PaintEventArgs) Handles fst1.Paint
         fst1.SelectedFolder = newFolder

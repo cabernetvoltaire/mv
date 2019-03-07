@@ -6,18 +6,20 @@
         Copy
         CopyLink
         ExchangeLink
+        MoveOriginal
 
     End Enum
     Public Event StateChanged(sender As Object, e As EventArgs)
-    Public mColour() As Color = ({Color.Aqua, Color.Orange, Color.LightPink, Color.LightGreen, Color.Tomato, Color.BurlyWood})
+    Public mColour() As Color = ({Color.Aqua, Color.Orange, Color.LightPink, Color.LightGreen, Color.Tomato, Color.BurlyWood, Color.BlueViolet})
 
-    Private mDescription = {"Navigate Mode", "Move Mode", "Move (Leave link)", "Copy", "Copy Link", "Exchange Link"}
+    Private mDescription = {"Navigate Mode", "Move Mode", "Move (Leave link)", "Copy", "Copy Link", "Exchange Link", "Move original"}
     Private mInstructions = {"Function keys navigate to folder." & vbCrLf & "[SHIFT] + Fn moves file. " & vbCrLf & "[CTRL] + [SHIFT] +Fn moves folder" & vbCrLf & "[ALT]+[CTRL]+[SHIFT] + Fn redefines key",
         "Function keys move file to folder." & vbCrLf & "[SHIFT] + Fn moves current folder to folder. " & vbCrLf & "[CTRL] + [SHIFT] +Fn navigates to folder" & vbCrLf & "[ALT]+[CTRL]+[SHIFT] + Fn redefines key",
         "Function keys moves file, leaving link." & vbCrLf & "[SHIFT] + Fn does same for folder. " & vbCrLf & "[CTRL] + [SHIFT] +Fn navigates to folder" & vbCrLf & "[ALT]+[CTRL]+[SHIFT] + Fn redefines key",
         "Function keys copies file." & vbCrLf & "[SHIFT] + Fn does same for folder" & vbCrLf & "[CTRL] + [SHIFT] +Fn navigates to folder" & vbCrLf & "[ALT]+[CTRL]+[SHIFT] + Fn redefines key",
         "Function keys creates a link in the destination." & vbCrLf & "[SHIFT] + Fn does same for folder" & vbCrLf & "[CTRL] + [SHIFT] +Fn navigates to folder" & vbCrLf & "[ALT]+[CTRL]+[SHIFT] + Fn redefines key",
-        "Function keys exchanges link with file." & vbCrLf & "[SHIFT] + Fn does same for folder" & vbCrLf & "[CTRL] + [SHIFT] +Fn navigates to folder" & vbCrLf & "[ALT]+[CTRL]+[SHIFT] + Fn redefines key"
+        "Function keys exchanges link with file." & vbCrLf & "[SHIFT] + Fn does same for folder" & vbCrLf & "[CTRL] + [SHIFT] +Fn navigates to folder" & vbCrLf & "[ALT]+[CTRL]+[SHIFT] + Fn redefines key",
+        "Function keys moves original file of a link." & vbCrLf & "[SHIFT] + Fn does nothing" & vbCrLf & "[CTRL] + [SHIFT] +Fn navigates to folder" & vbCrLf & "[ALT]+[CTRL]+[SHIFT] + Fn redefines key"
     }
     Public ReadOnly Property Colour() As Color
         Get
@@ -78,7 +80,7 @@
 
     End Sub
     Public Sub IncrementState()
-        Me.State = (Me.State + 1) Mod (StateOptions.ExchangeLink + 1)
+        Me.State = (Me.State + 1) Mod (StateOptions.MoveOriginal + 1)
     End Sub
 End Class
 
