@@ -86,7 +86,7 @@ Partial Class FileSystemTree
     End Sub
 
     Private Sub tvFiles_MouseDown(sender As Object, e As MouseEventArgs) Handles tvFiles.MouseDown
-        tvFiles.DoDragDrop(tvFiles.SelectedNode.FullPath, DragDropEffects.Copy)
+        'tvFiles.DoDragDrop(tvFiles.SelectedNode.FullPath, DragDropEffects.Copy)
 
     End Sub
 

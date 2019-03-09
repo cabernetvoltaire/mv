@@ -45,9 +45,9 @@ Public Class FileSystemTree
     <Category("Behavior")>
     Public Event DirectorySelected As EventHandler(Of DirectoryInfoEventArgs)
 
-    <Description("Notifies when file is selected either by clicking or expanding.")>
-    <Category("Behavior")>
-    Public Event FileSelected As EventHandler(Of FileInfoEventArgs)
+    '<Description("Notifies when file is selected either by clicking or expanding.")>
+    '<Category("Behavior")>
+    'Public Event FileSelected As EventHandler(Of FileInfoEventArgs)
     Public Event LabelEditBegun As EventHandler(Of String)
     Public Event TreeBuilt(Sender As Object, e As EventArgs)
 #End Region
@@ -304,7 +304,7 @@ Public Class FileSystemTree
             End If
             Expand(d.FullName)
             HighlightSelectedNodes()
-            RaiseEvent DirectorySelected(Me, New DirectoryInfoEventArgs(d))
+            '  RaiseEvent DirectorySelected(Me, New DirectoryInfoEventArgs(d))
         End Set
     End Property
 
@@ -819,12 +819,12 @@ Public Class FileSystemTree
                 OnDriveSelected(drive)
             Case FileSystemNodeType.Directory
                 Dim directory As DirectoryInfo = CType(node, DirectoryNode).Directory
-               ' RaiseEvent DirectorySelected(Me, New DirectoryInfoEventArgs(directory))
+                RaiseEvent DirectorySelected(Me, New DirectoryInfoEventArgs(directory))
                 'SelectedFolder = directory.FullName
                 'OnDirectorySelected(directory)
-            Case FileSystemNodeType.File
-                Dim file As FileInfo = CType(node, FileNode).File
-                OnFileSelected(file)
+                'Case FileSystemNodeType.File
+                '    Dim file As FileInfo = CType(node, FileNode).File
+                '    OnFileSelected(file)
         End Select
 
     End Sub
@@ -916,9 +916,10 @@ Public Class FileSystemTree
     ''' <summary>
     ''' Raises FileSelected event.
     ''' </summary>
-    Private Sub OnFileSelected(ByVal file As FileInfo)
-        RaiseEvent FileSelected(Me, New FileInfoEventArgs(file))
-    End Sub
+    'Private Sub OnFileSelected(ByVal file As FileInfo)
+    '    RaiseEvent FileSelected(Me, New FileInfoEventArgs(file))
+    'End Sub
+
 
     ''' <summary>
     ''' Clears the selected nodes collection.
@@ -1076,9 +1077,11 @@ Public Class FileSystemTree
 
     End Sub
     Private Function NodePath(e) As String
+
         Dim s As String
         Dim myc As String = "My Computer\"
         s = e.node.FullPath
+        's.Replace(myc, "")
         If InStr(s, myc) <> 0 Then s = s.Remove(0, Len(myc))
         Return s
     End Function

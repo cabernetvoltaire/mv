@@ -211,10 +211,10 @@ Module FileHandling
         End If
     End Sub
     Public Sub LevelAllFolders()
-        Dim x As New DirectoryInfo(Media.MediaDirectory)
+        Dim x As New DirectoryInfo(CurrentFolder)
         For Each m In x.EnumerateDirectories("*", SearchOption.AllDirectories)
-            If m.Parent.FullName <> Media.MediaDirectory Then
-                MoveFolder(m.FullName, Media.MediaDirectory)
+            If m.Parent.FullName <> CurrentFolder Then
+                MoveFolder(m.FullName, CurrentFolder)
             End If
         Next
     End Sub
@@ -228,6 +228,7 @@ Module FileHandling
         For Each d In SourceDir.EnumerateDirectories("*", SearchOption.AllDirectories)
             MoveDirectoryContents(TargetDir, SourceDir, d, True)
         Next
+        'SourceDir.Delete()
         '        My.Computer.FileSystem.CreateDirectory(TargetDir.FullName & "\" & SourceDir.Name)
 
     End Sub
