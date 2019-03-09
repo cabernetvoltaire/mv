@@ -24,6 +24,7 @@ Public Class FileSystemTree
     Private m_currentNode As FileSystemNode 'pac
 
 
+
 #End Region
 
 #Region "Events"
@@ -48,7 +49,7 @@ Public Class FileSystemTree
     <Category("Behavior")>
     Public Event FileSelected As EventHandler(Of FileInfoEventArgs)
     Public Event LabelEditBegun As EventHandler(Of String)
-
+    Public Event TreeBuilt(Sender As Object, e As EventArgs)
 #End Region
 
 #Region "Properties"
@@ -647,6 +648,7 @@ Public Class FileSystemTree
 
             CreateInitialDriveTree(drvNode)
         End If
+        RaiseEvent TreeBuilt(Me, Nothing)
 
 
         Me.tvFiles.Nodes.Add(compNode)

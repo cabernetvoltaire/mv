@@ -27,14 +27,15 @@ Public Class FolderSelect
 
 
             newFolder = value
-            '  fst1.SelectedFolder = newFolder
             Label1.Text = value
             If value <> "" Then
 
                 PlayMedia(value)
+                '    fst1_Paint(Me, Nothing)
             End If
         End Set
     End Property
+    Public Property IsLoaded As Boolean = False
     Public Property Button As Button
     Private Sub PlayMedia(value As String)
         ''  Exit Sub
@@ -98,30 +99,35 @@ Public Class FolderSelect
     Public Sub ChangeMedia()
         PlayMedia(newFolder)
     End Sub
+    Public Sub UpdateFolder()
+        fst1.SelectedFolder = newFolder
+        '    fst1_Paint(Me, Nothing)
+    End Sub
 
     Private Sub btnAssign_Click(sender As Object, e As EventArgs) Handles btnAssign.Click
         AssignButton(ButtonNumber, Alpha, 1, Folder, True)
-        Me.Close()
+        'Me.Close()
     End Sub
     Private Sub Label1_DoubleClick(sender As Object, e As EventArgs) Handles Label1.DoubleClick
         fst1.SelectedFolder = newFolder
     End Sub
 
-    Private Sub FolderSelect_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
+    Private Sub FolderSelect_Closing(sender As Object, e As CancelEventArgs) Handles Me.Deactivate
         If Not My.Computer.FileSystem.DirectoryExists(Folder) Then
             CreateNewDirectory(fst1, Folder, False)
         End If
-        PreMH.Player.URL = ""
-        PreMH.Player.Dispose()
-        PreMH.Picture.Dispose()
-        GC.Collect()
+        'PreMH.Player.URL = ""
+        'PreMH.Player.Dispose()
+        'PreMH.Picture.Dispose()
+        'GC.Collect()
+        IsLoaded = False
     End Sub
     Private Sub fst1_Paint(sender As Object, e As PaintEventArgs) Handles fst1.Paint
         fst1.SelectedFolder = newFolder
     End Sub
 
     Private Sub FolderSelect_MouseLeave(sender As Object, e As EventArgs) Handles Me.MouseLeave
-        Me.Close()
+        'Me.Close()
     End Sub
 
     Private Sub fst1_DirectorySelected(sender As Object, e As DirectoryInfoEventArgs) Handles fst1.DirectorySelected
@@ -129,4 +135,24 @@ Public Class FolderSelect
     End Sub
 
 
+    Private Sub fst1_TreeBuilt(Sender As Object, e As EventArgs) Handles fst1.TreeBuilt
+        ' fst1.SelectedFolder = Folder
+    End Sub
+
+    Private Sub FolderSelect_Shown(sender As Object, e As EventArgs) Handles Me.Shown
+        IsLoaded = True
+    End Sub
+    Private WithEvents changepic As New Timer With {
+        .Interval = 1500,
+        .Enabled = True
+    }
+
+    Private Sub UpdatePic() Handles changepic.Tick
+        ChangeMedia()
+        '        changepic.Enabled = False
+    End Sub
+    Private Sub fst1_MouseMove(sender As Object, e As MouseEventArgs) Handles Me.MouseMove
+        '       changepic.Enabled = True
+
+    End Sub
 End Class

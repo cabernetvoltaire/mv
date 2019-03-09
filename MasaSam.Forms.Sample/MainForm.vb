@@ -1191,7 +1191,7 @@ Public Class MainForm
         ShiftDown = e.Shift
         CtrlDown = e.Control
         AltDown = e.Alt
-        If e.KeyData <> (Keys.F4 Or e.Alt) Then
+        If e.KeyData <> (Keys.F4 Or AltDown) Then
             UpdateButtonAppearance()
         End If
     End Sub
@@ -1448,7 +1448,7 @@ Public Class MainForm
 
 
     Private Sub btn1_MouseDown(sender As Object, e As MouseEventArgs) Handles btn8.MouseDown, btn7.MouseDown, btn6.MouseDown, btn5.MouseDown, btn4.MouseDown, btn3.MouseDown, btn2.MouseDown, btn1.MouseDown
-        ' Exit Sub
+        Exit Sub
         Dim button As Button = sender
         Dim i As Integer = Val(button.Name(3)) - 1
 
@@ -2608,5 +2608,9 @@ Public Class MainForm
 
     Private Sub MainForm_MouseHover(sender As Object, e As EventArgs) Handles Me.MouseHover
         FolderSelect.Hide()
+    End Sub
+
+    Private Sub ctrPicAndButtons_MouseHover(sender As Object, e As EventArgs) Handles ctrPicAndButtons.MouseHover
+        FolderSelect.Close()
     End Sub
 End Class

@@ -330,7 +330,6 @@ Public Class MediaHandler
 
                 Exit Sub
         End Select
-        If mMediaPath <> "" Then My.Computer.Registry.CurrentUser.SetValue("File", mMediaPath)
     End Sub
     Public Sub HandlePic(path As String)
 

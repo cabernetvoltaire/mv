@@ -33,6 +33,8 @@ Module FileHandling
         DebugStartpoint(Media)
         'LabelStartPoint(Media)
         MainForm.UpdateFileInfo()
+        If M.MediaPath <> "" Then My.Computer.Registry.CurrentUser.SetValue("File", M.MediaPath)
+
     End Sub
     Public Sub OnMediaLoaded(M As MediaHandler) Handles MSFiles.LoadedMedia
         'M.Pause(True)
